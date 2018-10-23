@@ -1,0 +1,125 @@
+name:                alpha
+version:             0.0.1
+github:              "0xCM/alpha"
+license:             MIT
+author:              "Chris Moore"
+maintainer:          "0xCM00@gmail.com"
+copyright:           "2018 Chris Moore"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+description: Please see the README on GitHub at <https://github.com/githubuser/alpha#readme>
+
+default-extensions:
+  AllowAmbiguousTypes  
+  DeriveDataTypeable
+  DeriveFoldable
+  DeriveGeneric
+  DeriveTraversable
+  FunctionalDependencies
+  FlexibleInstances
+  FlexibleContexts
+  GADTs
+  GeneralizedNewtypeDeriving
+  KindSignatures
+  MultiParamTypeClasses
+  NoImplicitPrelude
+  OverloadedStrings
+  PatternSynonyms
+  RankNTypes
+  ScopedTypeVariables
+  StandaloneDeriving
+  TypeSynonymInstances
+  TypeFamilies
+  TypeApplications
+  TypeOperators
+  OverloadedLists
+
+dependencies:
+- array
+- base
+- binary
+- bytestring
+- containers
+- deepseq
+- directory
+- filepath
+- ghc
+- ghc-prim
+- ghc-paths
+- mtl
+- parallel
+- parsec
+- process
+- stm
+- text
+- template-haskell
+- transformers
+- time
+
+- aeson
+- aeson-pretty
+- ansi-terminal
+- algebra
+- bifunctors
+- data-default
+- distributive
+- either
+- entropy
+- hashable
+- network
+- primitive
+- range
+- semigroupoids
+- semigroups
+- tagged
+- unordered-containers
+- vector
+
+# - adjunctions
+# - async
+# - attoparsec
+# - base-orphans
+# - bytestring-builder
+# - cmdargs
+# - comonad
+# - contravariant
+# - dlist
+# - fail
+# - generic-deriving
+# - haskell-src-exts
+# - integer-gmp
+# - integer-logarithms
+# - mwc-random
+# - nats
+# - typed-process
+# - pipes
+# - prettyclass
+# - profunctors
+# - scientific
+# - statistics
+
+# - th-abstraction
+# - time-locale-compat
+# - uuid-types
+# - void
+
+
+library:
+  source-dirs: src
+
+executables:
+  alpha-test:
+    main: Main.hs
+    source-dirs:         
+      - test
+    dependencies:
+      - alpha
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -fno-warn-missing-pattern-synonym-signatures
+
