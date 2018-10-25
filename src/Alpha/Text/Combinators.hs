@@ -20,9 +20,9 @@ import Numeric(showIntAtBase)
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Text.Text
-import Alpha.Data.Concatenable
 import Alpha.Text.Format
 import Alpha.Text.Symbols
+import Alpha.Data.Maybe
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool

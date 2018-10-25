@@ -1,4 +1,4 @@
-module Alpha.Math.Arithmetic
+module Alpha.Numerics.Arithmetic
 (
     divides,
     modpart,

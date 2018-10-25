@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.1
+version:             0.0.3
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -14,6 +14,7 @@ description: Please see the README on GitHub at <https://github.com/githubuser/a
 
 default-extensions:
   AllowAmbiguousTypes  
+  ConstraintKinds
   DeriveDataTypeable
   DeriveFoldable
   DeriveGeneric
@@ -59,21 +60,25 @@ dependencies:
 - transformers
 - time
 
+- adjunctions
 - aeson
 - aeson-pretty
 - ansi-terminal
 - algebra
 - bifunctors
+- comonad
 - data-default
 - distributive
 - either
 - entropy
 - hashable
+- keys
 - network
 - primitive
 - range
 - semigroupoids
 - semigroups
+- streams
 - tagged
 - unordered-containers
 - vector
@@ -84,7 +89,6 @@ dependencies:
 # - base-orphans
 # - bytestring-builder
 # - cmdargs
-# - comonad
 # - contravariant
 # - dlist
 # - fail

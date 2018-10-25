@@ -11,9 +11,6 @@ module Alpha.Data.Numbers
     -- *GHC.Float
     Double , Double#, Float, Float#,
     
-    -- *GHC.Natural
-    Natural, natural,
- 
     -- *GHC.Num
     Num(abs, signum),
     Integer,
@@ -62,9 +59,6 @@ int n = convert n
 word :: (Integral n) => n -> Word
 word n = convert n
 
--- | Canonical 'Natural' constructor
-natural::(Integral n) => n -> Natural
-natural n = fromIntegral n
 
 -- | Canonical 'Integer' constructor
 integer::(Integral n) => n -> Integer

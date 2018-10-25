@@ -29,10 +29,17 @@ import Data.Eq(Eq(..))
 import Data.Bits ((.&.))
 import Data.Int
 import GHC.Num
+import qualified GHC.Natural as TN
+import qualified GHC.TypeLits as TL
+import Prelude
+
 import Alpha.TypeLevel.Some
 import Alpha.TypeLevel.Common
-import qualified GHC.Natural as TN
-import Prelude
+import Alpha.TypeLevel.Proxy
+import Alpha.Canonical(Reifiable(..))
+
+instance (KnownNat n) => Reifiable (n::Nat) Integer where
+    reify = TL.natVal (proxy @n)
 
 newtype NatRepr (n::Nat) = NatRepr {
    natValue :: Integer
@@ -193,21 +200,6 @@ plusMinusCancel _ _ = unsafeCoerce (Refl :: m :~: m)
 minusPlusCancel :: forall f m g n . (n <= m) => f m -> g n -> (m - n) + n :~: m
 minusPlusCancel _ _ = unsafeCoerce (Refl :: m :~: m)
 
--- addMulDistribRight :: forall n m p f g h. f n -> g m -> h p
---                     -> ((n * p) + (m * p)) :~: ((n + m) * p)
--- addMulDistribRight _n _m _p = unsafeCoerce Refl
-
--- withAddMulDistribRight :: forall n m p f g h a. f n -> g m -> h p
---                     -> ( (((n * p) + (m * p)) ~ ((n + m) * p)) => a) -> a
--- withAddMulDistribRight n m p f =
---   case addMulDistribRight n m p of
---     Refl -> f
-
--- withSubMulDistribRight :: forall n m p f g h a. (m <= n) => f n -> g m -> h p
---                     -> ( (((n * p) - (m * p)) ~ ((n - m) * p)) => a) -> a
--- withSubMulDistribRight _n _m _p f =
---   case unsafeCoerce (Refl :: 0 :~: 0) of
---     (Refl :: (((n * p) - (m * p)) :~: ((n - m) * p)) ) -> f
 
 ------------------------------------------------------------------------
 -- LeqProof
@@ -364,29 +356,9 @@ instance TestEquality NatRepr where
         | m == n = Just (unsafeCoerce Refl)
         | otherwise = Nothing
 
-word8Val :: forall (n::Nat). Witness n => Word8
-word8Val = fromIntegral (value @_ @n)
 
-word16Val :: forall (n::Nat). Witness n => Word16
-word16Val = fromIntegral (value @_ @n)
-    
-word32Val :: forall (n::Nat). Witness n => Word32
-word32Val = fromIntegral (value @_ @n)
-
-word64Val :: forall (n::Nat). Witness n => Word64
-word64Val = fromIntegral (value @_ @n)
-
-wordVal :: forall (n::Nat). Witness n => Word
-wordVal = fromIntegral (value @_ @n)
-
-intVal :: forall (n::Nat). Witness n => Int
-intVal = fromIntegral (value @_ @n)
-
-integerVal :: forall (n::Nat). Witness n => Integer
-integerVal = fromIntegral (value @_ @n)
-
-nat :: forall n. KnownNat n => TN.Natural
-nat = TN.naturalFromInteger(natVal @n Proxy)
+-- nat :: forall n. Witness n => TN.Natural
+-- nat = TN.naturalFromInteger(natVal @n Proxy)
 
 -- | Ordering over two distinct types with a proof they are equal.
 data Ordering' x y where

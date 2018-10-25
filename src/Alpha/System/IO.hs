@@ -12,7 +12,8 @@ module Alpha.System.IO
     readBytes,
     isFile,files,
     isFolder,folders,dir,
-    print, out, out'
+    print, out, out',
+    shredIO,IO
 )
 where
 
@@ -35,6 +36,10 @@ import Alpha.System.Files
 import Alpha.Data.AppMessage
 import Alpha.Text as Text
 
+-- | Just say "no" to the monolithic imprisonment of IO
+shredIO :: IO a -> a
+shredIO = unsafeDupablePerformIO 
+
 -- | Renders a line of text to standard out 
 out :: Show s => s -> IO()
 out s = print s
@@ -42,7 +47,6 @@ out s = print s
 -- | Renders text to standard out
 out' :: Show s => s -> IO()
 out' s = putStr (show s)
-
     
 -- | Reads the lines of text from a file
 readLines::FilePath -> [Text]
@@ -84,9 +88,6 @@ instance Jailbreak IO a where
 instance (PrimBase m) => Jailbreak m a where
     escape x = x |> unsafeInlinePrim
 
---data Emitter = forall a.Emitter(AppMessage a -> IO())
-
-
 log::AppMessage a -> IO()
 log (AppMessage severity text _) = do
     setSGR [SetColor Foreground intensity color]
@@ -97,5 +98,4 @@ log (AppMessage severity text _) = do
                     Info  -> (Vivid, Green)
                     Warn -> (Vivid, Yellow)
                     Error -> (Vivid, Red)
-                    Fatal -> (Vivid, Red)
-            
+                    Fatal -> (Vivid, Red)        

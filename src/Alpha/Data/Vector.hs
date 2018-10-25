@@ -3,9 +3,12 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Alpha.Data.Vector where
+module Alpha.Data.Vector
+(
+    Vector, unsized, Vectored(..)
+)
+where
 import qualified Data.Vector as V
-import Data.Function
 import Alpha.Base
 import Alpha.Data.Tuple
 import Alpha.Canonical
@@ -13,19 +16,16 @@ import Alpha.Data.Numbers
 import qualified Data.List as List
 
 newtype Vector (n::Nat) a = Vector (V.Vector a)
-    deriving (Show)
+    deriving (Show,Generic,Data,Typeable)
 
-v2::T2 e -> Vector 2 e
-v2 (x1, x2) = Vector  (V.fromList [x1, x2])    
-    
-v3::T3 e -> Vector 3 e
-v3 (x1, x2, x3) = Vector  (V.fromList [x1, x2, x3])    
+class Vectored (n::Nat) a b where    
+    vector::a -> Vector n b
 
-v4::T4 e -> Vector 4 e
-v4 (x1, x2, x3, x4) = Vector  (V.fromList [x1, x2, x3, x4])
+unsized::Vector n a -> V.Vector a
+unsized = coerce
 
-v5::T5 e -> Vector 5 e
-v5 (x1, x2, x3, x4, x5) = Vector  (V.fromList [x1, x2, x3, x4, x5])
+instance Wrapped (Vector n a) (V.Vector a) where
+    unwrap = coerce
 
 instance Length (V.Vector a) where
     length = convert . V.length
@@ -33,25 +33,31 @@ instance Length (V.Vector a) where
 instance Indexed (Vector n a) a where
     item (Vector a) i = a V.! i
 
-instance Tupled (Vector 2 e) where    
-    type Tuple' (Vector 2 e) = T2 e
+instance Tupled 2 (Vector 2 e) where    
+    type Tuple' (Vector 2 e) = Tuple (e, e)
     tuple  x = ( x ! 0, x ! 1) 
 
-instance Tupled (Vector 3 e) where    
-    type Tuple' (Vector 3 e) = T3 e
+instance Vectored 2 (a,a) a where
+    vector (x1, x2) = Vector( V.fromList [x1, x2])
+    
+instance Tupled 3 (Vector 3 e) where    
+    type Tuple' (Vector 3 e) = Tuple (e, e, e)
     tuple  x = ( x ! 0, x ! 1, x ! 2) 
-            
-instance Tupled (Vector 4 e) where    
-    type Tuple' (Vector 4 e) = T4 e
+
+instance Vectored 3 (a, a, a) a where
+    vector (x1, x2, x3) = Vector( V.fromList [x1, x2, x3])
+        
+instance Tupled 4 (Vector 4 e) where    
+    type Tuple' (Vector 4 e) = Tuple (e, e, e, e)
     tuple  x = ( x ! 0, x ! 1, x ! 2, x ! 3) 
 
-instance Tupled (Vector 5 e) where    
-    type Tuple' (Vector 5 e) = T5 e
-    tuple  x = ( x ! 0, x ! 1, x ! 2, x ! 3, x ! 4) 
-            
+instance Vectored 4 (a, a, a, a) a where
+    vector (x1, x2, x3, x4) = Vector( V.fromList [x1, x2, x3, x4])
     
-vector::Tn e -> V.Vector e
-vector (T2 (x1,x2)) = V.fromList [x1 , x2]
-vector (T3 (x1,x2,x3)) = V.fromList [x1 , x2, x3]
-vector (T4 (x1,x2,x3,x4)) = V.fromList [x1 , x2, x3, x4]
-vector (T5 (x1,x2,x3,x4,x5)) = V.fromList [x1 , x2, x3, x4,x5]
+instance Tupled 5 (Vector 5 e) where    
+    type Tuple' (Vector 5 e) = Tuple (e, e, e, e, e)
+    tuple  x = ( x ! 0, x ! 1, x ! 2, x ! 3, x ! 4) 
+
+instance Vectored 4 (a, a, a, a, a) a where
+    vector (x1, x2, x3, x4, x5) = Vector( V.fromList [x1, x2, x3, x4, x5])
+    

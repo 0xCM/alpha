@@ -22,7 +22,7 @@ import Data.Hashable
 import Data.Ix
 import Data.Functor
 import Data.Foldable
-import Data.Function
+--import Data.Function
 import Data.Ord(compare)
 import Data.Kind(Type)
 import Data.Proxy as Proxy

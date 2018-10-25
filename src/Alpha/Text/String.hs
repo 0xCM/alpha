@@ -9,10 +9,7 @@ import Alpha.Canonical
 import Alpha.Data.Numbers
 
 
-instance Formattable String where
-    format = T.pack 
-
 instance Length String where
     length = convert . List.length
-    
+        
 

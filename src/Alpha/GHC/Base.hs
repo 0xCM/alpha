@@ -7,34 +7,35 @@
 -----------------------------------------------------------------------------
 module Alpha.GHC.Base
 (
-    module X,
+    Show(..),
     Generic(..),
     Generic1(..),    
+    Bounded(..),
+
     Enum(..),
-    Num, 
-    Integer,
-    Integral,
-    Symbol(..),
-    KnownSymbol(..),
-    SomeSymbol(..),
-    Nat,    
+    Num, Integer, Integral,
+    Symbol(..), KnownSymbol(..), SomeSymbol(..), 
+    KnownNat(..), SomeNat(..), Nat(..),
     mod,
     symbolVal,
-    Bounded(..),
     fromIntegral,
+    ($),(<=), (>=),
     
+
 )
 where
 
 
-import GHC.Show as X
+import GHC.Show(Show(..))
 import GHC.TypeLits
-import GHC.Real
+import GHC.Real((/), (^), (^^), (%), Real(..), Integral(..), RealFrac(..), Fractional(..), fromIntegral)
 import GHC.Num
 import GHC.Enum
 import GHC.Types
+import GHC.Base(($),(<=), (>=))
 import GHC.TypeNats(Mod)
 import GHC.Generics(Generic(..),Generic1(..))
+import GHC.TypeLits(KnownNat(..), SomeNat(..), Nat(..))
 
 
 

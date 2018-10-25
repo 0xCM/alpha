@@ -7,7 +7,6 @@
 
 module Alpha.TypeLevel.Common
 (
-    Witness(..),
     Value(..)
 
 )
@@ -29,24 +28,7 @@ import GHC.TypeLits
 import GHC.Num
 import GHC.Show
 import Prelude(undefined)
-
-type family Value k :: Type    
-
-class Witness (w :: k) where
-    value :: Value k
-
-type instance Value Bool = Bool
-type instance Value Symbol = String
-type instance Value Nat = Integer
-    
-instance KnownSymbol s => Witness (s :: Symbol) where
-    value = symbolVal @s undefined
-    
-instance KnownNat n => Witness (n :: Nat) where
-    value = natVal @n undefined    
-
--- type a :*: b = (a, b)
--- data a :|: b = OrL a | OrR b
+import Alpha.TypeLevel.Proxy
     
 ------------------------------------------------------------------------
 -- CoercibleF
@@ -78,19 +60,6 @@ class EqF (f :: k -> *) where
 instance Eq a => EqF (Const a) where
     eqF (Const x) (Const y) = x == y
   
-------------------------------------------------------------------------
--- PolyEq
-
--- | A polymorphic equality operator that generalizes 'TestEquality'.
-class PolyEq u v where
-    polyEqF :: u -> v -> Maybe (u :~: v)
-  
-    polyEq :: u -> v -> Bool
-    polyEq x y = isJust (polyEqF x y)
-  
-------------------------------------------------------------------------
--- HashableF
-
 -- | A default salt used in the implementation of 'hash'.
 defaultSalt :: Int
 #if WORD_SIZE_IN_BITS == 64
@@ -110,5 +79,3 @@ class HashableF (f :: k -> *) where
 
 instance Hashable a => HashableF (Const a) where
   hashWithSaltF s (Const x) = hashWithSalt s x
-
-

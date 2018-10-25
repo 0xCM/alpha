@@ -13,4 +13,6 @@
 :set -XScopedTypeVariables
 :set -XFlexibleContexts
 :set -XGADTs
+:set -XDataKinds
+:set -XPolyKinds
 :load Alpha

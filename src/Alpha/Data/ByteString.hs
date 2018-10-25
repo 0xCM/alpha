@@ -14,43 +14,42 @@ module Alpha.Data.ByteString
     bytestring
 )
 where
-
-
-import qualified Data.ByteString as EG
-import qualified Data.ByteString.Lazy as LZ
-
-import Alpha.Canonical
+import System.IO.Unsafe
+import System.Entropy
 import Data.Word
 import Data.Int
 import Data.Functor
 import Data.Function
-import Data.List(takeWhile,iterate)
 import Data.Bool
-import System.Entropy
+import Data.Tuple
+import Data.Eq
+
+import Data.List(takeWhile,iterate)
 
 import qualified Data.Text as Text
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as LC8    
 import qualified Data.ByteString.Char8 as C8
+import qualified Data.ByteString as EG
+import qualified Data.ByteString.Lazy as LZ
 
+import Data.Ix(range)
 import GHC.Enum
 import GHC.Real
-import Data.Eq
-import Data.Ix(range)
 import GHC.Exts
 import qualified Data.Ix as Ix
 import qualified Data.List as L
+
 import Alpha.Canonical
 import Alpha.Data.Numbers
 import Alpha.Text.Combinators
-import Alpha.Math.Arithmetic
-import Data.Tuple
+import Alpha.Numerics.Arithmetic
+import Alpha.Canonical
+import Alpha.Data.Maybe
 
 type instance Eager EG.ByteString = EG.ByteString
 
 type instance Lazy EG.ByteString = LZ.ByteString
-
-
 
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
@@ -64,12 +63,11 @@ segment (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
 bytestring::[Word8] -> EG.ByteString
 bytestring = EG.pack
 
--- Partitions a bytestring into segments of a specified length
-chunk :: Int -> EG.ByteString -> [EG.ByteString]
-chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)
-
+instance Chunkable EG.ByteString where
+    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)
+    
 entropy::Int -> EG.ByteString
-entropy n = (getHardwareEntropy n |> shredIO ) |> fromJust 
+entropy n = (getHardwareEntropy n |> unsafeDupablePerformIO ) |> fromJust
 
 segments::Int->Int->[(Int,Int)]
 segments width total = intervals    
@@ -127,4 +125,3 @@ instance Indexed LZ.ByteString Word8 where
 
 instance Convertible EG.ByteString [Word8] where
     convert source = source |> bytes 0 (length source - 1) 
-

@@ -15,7 +15,7 @@ import Alpha.TypeLevel as A
 import Alpha.Canonical as A
 import Alpha.Data as A
 import Alpha.System as A
-import Alpha.Math as A
+import Alpha.Numerics as A
 
 
 

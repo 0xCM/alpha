@@ -45,8 +45,8 @@ traverseSome :: Functor m
                 -> m (Some g)
 traverseSome f (Some x) = Some `fmap` f x
 
-{-# INLINE traverseSome_ #-}
+
 -- | Modify the inner value.
 traverseSome_ :: Functor m => (forall tp . f tp -> m ()) -> Some f -> m ()
 traverseSome_ f (Some x) = (\_ -> ()) `fmap` f x
-    
+{-# INLINE traverseSome_ #-}    

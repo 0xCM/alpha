@@ -1,6 +1,5 @@
 module Alpha.Algebra
 (
-    Natural,
     NonEmpty,
     Additive, (+),
     Multiplicative, (*),
@@ -27,7 +26,6 @@ module Alpha.Algebra
     Semigroupoid(..), compose, 
     Groupoid(..), 
     Group, (-), negate, subtract, times,    
-    Rig,rig,
     
     LeftModule, (.*),
     RightModule,  (*.),
@@ -87,9 +85,6 @@ compose = o
 data Isomorphism k a b where
     Embedding:: k a b -> Isomorphism k a b
     Projection:: k a b -> Isomorphism k a b
-
-rig::(Rig r) => Natural -> r
-rig = fromNatural    
 
 
 --`factor f c` returns a non-empty list containing `f a b` for all `a, b` such that `a * b = c`.

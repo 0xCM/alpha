@@ -48,6 +48,7 @@ import Alpha.Text
 import Alpha.Canonical
 import Alpha.Base
 import Alpha.Text.Char
+import Alpha.Data.Maybe
 
 class PathComponent a where
     path::a -> Text

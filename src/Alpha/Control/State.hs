@@ -5,7 +5,6 @@ import Control.Monad(forever, (>>=))
 import Control.Monad.ST
 import Control.Concurrent(forkFinally)
 import System.IO
-import Alpha.Operators
 
 import Network.Socket
 
