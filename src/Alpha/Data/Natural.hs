@@ -19,7 +19,6 @@ newtype Natural k = Natural N.Natural
     
 instance Show (Natural k) where
     show (Natural i) = show i 
-
     
 -- | Defines a net
 nat::forall m (n::Nat). (Integral m) =>  m -> Natural n

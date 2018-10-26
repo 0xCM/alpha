@@ -8,24 +8,20 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
-module Alpha.Classes 
+module Alpha.Canonical.Classes 
 (
     Concatenable(..),
     Decomposable(..),
     ToString(..),
     Formattable(..),
     FromText(..),
-    Chain(..),
     Counted(..),
     Jailbreak(..),
     Producer(..),
     Convertible(..),
-    Infimum(..),
-    Supremum(..),
     Indexed(..),
     Packable(..),
     Length(..),
-    Collapsable(..),
     Proxy(..),
     ToLines(..),
     ToBool(..),
@@ -35,24 +31,26 @@ module Alpha.Classes
     Structured(..),
     Enumerable(..),
     Singletary(..),
-    Existential(..)
-
+    Existential(..),
+    Faceted(..),
+    Flow(..), Coflow(..),
+    Reducible(..),
+    Reversible(..)
 )
 where
-
-import Data.Text(Text)
-import Data.String(String)
-import Data.Int(Int)
+import qualified Data.Text as T
 import GHC.TypeLits(KnownNat,Nat(..))
-import Data.Proxy
---import Data.Kind(Type)
 import Data.Vector(Vector)
-import GHC.Num(Num)
-import GHC.Real(Integral)
 import Alpha.Base
-import Alpha.Algebra
-import Alpha.Functors
+import Alpha.Canonical.Algebra
+import Alpha.Canonical.Functors
+import Alpha.Canonical.Operators
 
+class Sized (n::Nat) c e | e -> c where    
+
+type Router a b = a -> b 
+
+    
 -- | Characterizes a type parameterized by some type 'a'  that is decomposable into a sequence a-values
 class Decomposable a b where
     decompose::a -> [b]
@@ -72,16 +70,17 @@ class Formattable a where
 
 -- | Characterizes measurable things, in the spirit, but not formally, of Lebesque
 class Measurable (n::Nat) a where
-    measure::forall b. (Integral b) => a -> b
+    measure::forall b. (Num b) => a -> b
 
 class Length a where    
-    length::forall b. (Integral b) => a -> b
+    length::forall b. (Num b) => a -> b
     
 instance Length a => Measurable 1 a where
     measure = length
        
-class Collapsable a where
-    collapse::[a] -> a
+class Reversible a where
+    reverse::a -> a
+
 
 -- / Applicable when values can be joined via a binary function that need not be structure-preserving
 class (Measurable n a) => Mixable n a where
@@ -115,16 +114,14 @@ class ToBool a where
 class FromText a where
     -- | Materializes an 'a'-value from text
     fromText::Text -> a
-
-class Chain a b where
-    lchain::a->b
-    rchain::b->a
     
 -- | Defines membership predicated on the ability to be counted by an existential machine
 class Counted a where
     -- | Counts the number of items within the purview of the subject
-    count::a -> Int
-    
+    count::(Integral n) => a -> n
+
+-- | Characterizes a finite container or other type that contains elements
+-- that can be partitioned     
 class Chunkable a where
     chunk::Int -> a -> [a]
     
@@ -132,16 +129,10 @@ class Chunkable a where
 class Jailbreak m a where
     escape::m a -> a
 
-instance Jailbreak Maybe a where
-    escape x = fromJust x
-
-class (Ord a) => Infimum a where
-    -- / The greatest lower bound
-    infimum::a    
-    
-class (Ord a) => Supremum a where
-    -- / The least upper bound
-    supremum::a
+-- Removes a layer of enumerable structure    
+-- In the case of a monoid, 'reduce' reduces to 'fold', pun intended
+class Reducible a where
+    reduce::[a] -> a
     
 -- | Codifies a production relationship between an input value of type 'a' and 
 -- an output value of type 'b'
@@ -164,33 +155,25 @@ class Indexed c e where
     (!)::c -> Int -> e
     (!) = item
     
-class Paired a b where
-    type Pair a b
-    type Pair a b = (a, b)
-
-    pair::a -> b -> Pair a b
         
 class Wrapped a b where
     unwrap::a -> b
 
--- Characterizes a key-value store
-class Store k v where
-    put::k -> v -> ()
-    get::k -> v    
-    del::k -> ()
+-- A flow from a --> b
+class Flow a b where
+    flow::a -> Router a b -> b
+    flow = (|>)
 
-type Router a b = a -> b    
-
-class Target a b where
-    push::a -> Router a b -> b
-    push = (|>)
+-- A covariant from a --> b
+class Coflow a b where
+    coflow::(a -> b) -> a -> b
+    coflow = (<|)
 
 class Enumerable c e | e -> c where 
     -- A source of type 'c' producing elements of type 'e'
     type Source c e
     
     items::Source c e -> [e]
-
 
 class (Enumerable c e) =>  Singletary c e  where
     singleton::e -> Source c e
@@ -200,15 +183,16 @@ class (Eq e, Enumerable c e) => Existential c e  where
 
     absent::e -> Source c e -> Bool
     absent item src = not (exists item src)
-    
 
+    
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
 class Reifiable (a::k) r where
     reify::r 
-
-
-class Sized (n::Nat) c e | e -> c where    
-    
-     
-    
+        
+class (KnownSymbol f) => Faceted f v where
+    facetName::Text
+    facetName =  symstr @f |> T.pack
+            
+instance Jailbreak Maybe a where
+    escape x = fromJust x

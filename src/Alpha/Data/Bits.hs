@@ -11,7 +11,8 @@
 module Alpha.Data.Bits 
 (
     toggled, bitcount, bitsplat,
-    (.^.), (.~.), (.<<.), (.>>.), (.?.)
+    (.^.), (.~.), (.<<.), (.>>.), (.?.),
+    lobyte,hibyte
 )
 where
 import qualified Data.Text as Text
@@ -55,20 +56,14 @@ infixl 8 .>>.
 (.?.) :: Bits a => a -> Int -> Bool
 (.?.) = testBit
 infixl 5 .?.
-            
--- | The number of bits in a signed integral type
-type family SBitCount a :: Nat where
-    SBitCount Int8  = 8
-    SBitCount Int16 = 16
-    SBitCount Int32 = 32
-    SBitCount Int64 = 64
 
--- | The number of bits in an unsigned integral type
-type family UBitCount a :: Nat where
-    UBitCount Word8  = 8
-    UBitCount Word16 = 16
-    UBitCount Word32 = 32
-    UBitCount Word64 = 64
+lobyte :: Word16 -> Word8
+lobyte x = x .&. 0xFF |> fromIntegral
+
+-- | Extracts the high-order byte 
+hibyte :: Word16 -> Word8
+hibyte x  = (x .>>.8) .&. 0xFF |> fromIntegral
+
 
 instance Concatenable Word8 Word8 where
     type Concatenated Word8 Word8 = Word16    

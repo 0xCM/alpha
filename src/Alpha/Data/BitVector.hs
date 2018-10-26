@@ -284,10 +284,9 @@ bvExtractWithRepr repr pos bv = BV repr (truncBits width xShf)
   where (BV _ xShf) = bvShift bv (- pos)
         width = natValue repr
 
-
 -- | Zero-extend a vector to one of greater length. If given an input of greater
 -- length than the output type, this performs a truncation.
-bvZext :: NatPair w1 w2 => BitVector w1 -> BitVector w2
+bvZext :: (KnownNat w1, KnownNat w2) => BitVector w1 -> BitVector w2
 bvZext (BV _ x) = bitvector x
 
 -- | Unconstrained variant of 'bvZext' with an explicit 'NatRepr' argument.
@@ -297,7 +296,7 @@ bvZextWithRepr repr (BV _ x) = BV repr (truncBits width x)
 
 -- | Sign-extend a vector to one of greater length. If given an input of greater
 -- length than the output type, this performs a truncation.
-bvSext :: NatPair w1 w2 => BitVector w1 -> BitVector w2
+bvSext :: (KnownNat w1, KnownNat w2) => BitVector w1 -> BitVector w2
 bvSext bv = bitvector (bvIntegerS bv)
 
 -- | Unconstrained variant of 'bvSext' with an explicit 'NatRepr' argument.

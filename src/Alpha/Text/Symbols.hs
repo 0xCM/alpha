@@ -8,6 +8,8 @@
 module Alpha.Text.Symbols where
 
 import Data.Text
+import Alpha.Base
+import Alpha.Canonical
 
 -- | Produces "."
 dot::Text
@@ -60,6 +62,14 @@ lbrace = "{"
 -- | Produces "}"
 rbrace::Text
 rbrace = "}"
+
+-- | Produces "{"
+lparen::Text
+lparen = "("
+
+-- | Produces "}"
+rparen::Text
+rparen = ")"
 
 -- | Produces "/"
 fslash::Text

@@ -1,10 +1,16 @@
+-----------------------------------------------------------------------------
+-- | Defines the Data segment API surface
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Data
 (
     module X
 )
 where
 
-import Alpha.Data.AppMessage as X
+import Alpha.Data.Message as X
 import Alpha.Data.Asci as X
 import Alpha.Data.Bits as X
 import Alpha.Data.BitVector as X
@@ -20,3 +26,4 @@ import Alpha.Data.Semigroup as X
 import Alpha.Data.Stream as X
 import Alpha.Data.Tuple as X
 import Alpha.Data.Vector as X
+import Alpha.Data.Symbols as X

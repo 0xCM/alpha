@@ -64,7 +64,6 @@ dependencies:
 - aeson
 - aeson-pretty
 - ansi-terminal
-- algebra
 - bifunctors
 - comonad
 - data-default

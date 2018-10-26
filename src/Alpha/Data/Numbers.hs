@@ -23,7 +23,9 @@ module Alpha.Data.Numbers
     word8, word16, word32, word64,
 
     SizedInt(..), SizedWord(..),
-    int', word'
+    int', word',
+    zed, sub',
+    divides, modpart
 )
 where
 
@@ -32,14 +34,18 @@ import Data.Int
 import Data.Bits 
 import Data.Kind(Type)
 import qualified Data.Text as Text
-import GHC.Num
+import GHC.Num 
 import GHC.Float
 import GHC.Natural
 import GHC.Real
+import qualified GHC.Num as N
+import qualified Data.List as L
+
 import Numeric
 import Alpha.Base
 import Alpha.Text.Format
-import Alpha.Canonical
+import Alpha.Canonical hiding((+),(*),(-))
+
 
 -- | An integer of arbitrary size
 type BigInt = Integer
@@ -123,7 +129,6 @@ type family SizedWord (n::Nat) where
     SizedWord 32 = Word32
     SizedWord 64 = Word64    
         
-
 unsigned :: (Integral i, Num (Unsigned i)) => i -> Unsigned i
 unsigned = convert    
 
@@ -133,5 +138,101 @@ word' = convert
 int' :: (Num (SizedInt n), Integral i) => i -> SizedInt n
 int' = convert
 
-test::SizedInt 32
-test  = int' @32 51
+zed::(Num a) => a
+zed = 0
+
+sub'::(Num a) => a -> a -> a
+sub' x y = x - y
+
+-- Determines whether m is evenly divisible by n
+divides::(Integral a) => a -> a -> Bool
+divides m n = (m `mod` n) == 0
+
+-- Calculates the points within the interval that are
+-- divisible by n
+modpart::(Integral a, Ix a) => (a, a) -> a -> [a]
+modpart (min,max) n 
+    = range (min, max) 
+      |> fmap (\j -> case divides j n of True -> j; _ -> 0)
+      |> L.filter (\j -> j /= 0)
+
+
+instance Semigroup Int where (<>) = (+)
+instance Monoid Int where mempty = 0    
+instance Invertible Int Int where invert x = 0 - x
+instance Additive Int where add = (+)
+instance Multiplicative Int where mul = (*)
+instance Subtractive Int where sub = (-)
+
+instance Semigroup Integer where (<>) = (+)
+instance Monoid Integer where mempty = 0    
+instance Invertible Integer Integer where invert x = 0 - x
+instance Additive Integer where add = (+)
+instance Multiplicative Integer where mul = (*)
+instance Subtractive Integer where sub = (-)
+
+instance Semigroup Int8 where (<>) = (+)
+instance Monoid Int8 where mempty = 0    
+instance Invertible Int8 Int8 where invert x = 0 - x
+instance Additive Int8 where add = (+)
+instance Multiplicative Int8 where mul = (*)
+instance Subtractive Int8 where sub = (-)
+
+instance Semigroup Int16 where (<>) = (+)
+instance Monoid Int16 where mempty = 0    
+instance Invertible Int16 Int16 where invert x = 0 - x
+instance Additive Int16 where add = (+)
+instance Multiplicative Int16 where mul = (*)
+instance Subtractive Int16 where sub = (-)
+
+instance Semigroup Int32 where (<>) = (+)
+instance Monoid Int32 where mempty = 0           
+instance Invertible Int32 Int32 where invert x = 0 - x    
+instance Additive Int32 where add = (+)
+instance Multiplicative Int32 where mul = (*)
+instance Subtractive Int32 where sub = (-)
+
+instance Semigroup Int64 where (<>) = (+)
+instance Monoid Int64 where mempty = 0           
+instance Invertible Int64 Int64  where invert x = 0 - x
+instance Additive Int64 where add = (+)
+instance Multiplicative Int64 where mul = (*)
+instance Subtractive Int64 where sub = (-)
+
+instance Invertible Word Int where invert x = 0 - (fromIntegral x)
+instance Additive Word where add = (+)
+instance Multiplicative Word where mul = (*)
+instance Subtractive Word where sub = (-)
+
+instance Invertible Word8 Int8 where invert x = 0 - (fromIntegral x)
+instance Additive Word8 where add = (+)
+instance Multiplicative Word8 where mul = (*)
+instance Subtractive Word8 where sub = (-)
+
+instance Invertible Word16 Int16 where invert x = 0 - (fromIntegral x)
+instance Additive Word16 where add = (+)
+instance Multiplicative Word16 where mul = (*)
+instance Subtractive Word16 where sub = (-)
+
+instance Invertible Word32 Int32 where invert x = 0 - (fromIntegral x)
+instance Additive Word32 where add = (+)
+instance Multiplicative Word32 where mul = (*)
+instance Subtractive Word32 where sub = (-)
+
+instance Invertible Word64 Int64 where invert x = 0 - (fromIntegral x)
+instance Additive Word64 where add = (+)
+instance Multiplicative Word64 where mul = (*)
+instance Subtractive Word64 where sub = (-)
+
+instance Invertible Double Double where invert x = 0 - x
+instance Additive Double where add = (+)
+instance Multiplicative Double where mul = (*)
+instance Subtractive Double where sub = (-)
+
+
+instance Group Int
+instance Group Integer
+instance Group Int8
+instance Group Int16
+instance Group Int32
+instance Group Int64

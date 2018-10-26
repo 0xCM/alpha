@@ -15,7 +15,6 @@ module Alpha.Data.Base
     Monoid(..),
     String,
     Text,
-    Set,
     HashSet,
     HashMap,
     Either(..),
@@ -34,13 +33,13 @@ import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Bits as X
 import Data.Char as X
 import Data.Data as X
-import Data.Set(Set)
 import Data.Default as X
 import Data.Coerce
 import Data.Kind as X
 import Data.Either.Combinators as X
 import Data.Either(Either(..))
 import Data.Eq as X
+import Data.Functor as X
 import Data.Int as X
 import Data.Ix as X
 import Data.Maybe as X

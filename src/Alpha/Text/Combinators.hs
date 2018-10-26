@@ -8,7 +8,8 @@ module Alpha.Text.Combinators
     leftOfFirst, rightOfLast,ltrim,embrace,
     prefixIfMissing, suffixIfMissing, zpadL, padL, toText,
     hexstring,showBasedInt,bitstring,bitstringN,
-    Text.append, textlen, Text.intersperse, Text.reverse 
+    tupelize,
+    Text.append, textlen, Text.intersperse
     
 )
  where
@@ -23,6 +24,7 @@ import Alpha.Text.Text
 import Alpha.Text.Format
 import Alpha.Text.Symbols
 import Alpha.Data.Maybe
+import Alpha.Data.Numbers 
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -46,7 +48,8 @@ padL n c s
     | textlen s < n  = [padding, s] |> Text.concat
     | otherwise     = s
     where 
-        padding = replicate (n - textlen s) c    
+        padding = replicate len c    
+        len = sub n (textlen s)
         
 -- | Creates a left-zero-padded string    
 zpadL :: (Integral n) => n -> Text -> Text
@@ -131,4 +134,9 @@ bitstring n = showBasedInt 2 n |> zpadL width
 -- | Encodes an integral value as a base-2 Text
 bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitstringN w n = showBasedInt 2 n |> zpadL w
-    
+
+-- Formats a list of formattable items as a tuple
+tupelize::(Formattable a) => [a] -> Text
+tupelize src =  Text.concat [lparen, content, rparen]
+    where content = Text.concat (fmap format (List.intersperse comma flist))
+          flist = fmap format src

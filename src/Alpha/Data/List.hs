@@ -10,7 +10,6 @@ module Alpha.Data.List
 (    
     exclude,
     split,
-    collapse,
     exists,
     absent,
     replicate,
@@ -26,7 +25,6 @@ module Alpha.Data.List
     partition,
     any,
     all,
-    reverse,
     (List.++)
 ) where
 import qualified Data.List as List
@@ -34,8 +32,9 @@ import Data.Functor
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Data.Numbers
-
 import Data.List(filter,intersperse,last,head,takeWhile,cycle,partition,any,all,reverse)
+import GHC.Real
+import Prelude((-))
 
 
 -- | Determines whether a distinguished element is absent from a list
@@ -72,10 +71,12 @@ splitAt = List.genericSplitAt
 replicate::(Integral i) => i -> a -> [a]
 replicate = List.genericReplicate
 
+
 -- | Applies an indexed function to a list
-mapi::((Int, a)->b) -> [a] -> [b]
+mapi::(Integral i) => ((i, a)->b) -> [a] -> [b]
 mapi f l = fmap f z where 
-        idx = [0..(length l) - 1 ]
+        idx = [zed..upper]
+        upper  = sub' (length l) 1
         z = List.zip idx l
 
 instance Concatenable [a] [a] where
@@ -89,11 +90,14 @@ instance Enumerable [a] a where
 instance Length [a] where
     length x = List.length x |> convert
 
-instance Collapsable [[a]] where
-    collapse = List.concat    
+instance Reducible [[a]] where
+    reduce = List.concat    
 
 instance (Eq a) => Existential [a] a where
     exists x l = List.notElem x l |> not
         
 instance Singletary [a] a where
     singleton x = [x]
+
+instance Reversible [a] where
+    reverse = List.reverse

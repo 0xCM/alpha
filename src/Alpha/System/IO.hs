@@ -33,7 +33,7 @@ import Alpha.Text.Combinators
 import Alpha.Data.Numbers
 import Alpha.Canonical
 import Alpha.System.Files
-import Alpha.Data.AppMessage
+import Alpha.Data.Message
 import Alpha.Text as Text
 
 -- | Just say "no" to the monolithic imprisonment of IO
@@ -88,8 +88,8 @@ instance Jailbreak IO a where
 instance (PrimBase m) => Jailbreak m a where
     escape x = x |> unsafeInlinePrim
 
-log::AppMessage a -> IO()
-log (AppMessage severity text _) = do
+log::Message a -> IO()
+log (Message severity text _) = do
     setSGR [SetColor Foreground intensity color]
     text |> out
     setSGR [Reset]

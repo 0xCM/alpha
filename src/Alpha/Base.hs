@@ -9,7 +9,6 @@ module Alpha.Base
     Double, Double#,
     ByteString.ByteString,    
     IO,
-    undefined,
     div,
     flip,
     (++)

@@ -19,7 +19,9 @@ module Alpha.GHC.Base
     mod,
     symbolVal,
     fromIntegral,
+    undefined,
     ($),(<=), (>=),
+    id
     
 
 )
@@ -32,7 +34,7 @@ import GHC.Real((/), (^), (^^), (%), Real(..), Integral(..), RealFrac(..), Fract
 import GHC.Num
 import GHC.Enum
 import GHC.Types
-import GHC.Base(($),(<=), (>=))
+import GHC.Base(($),(<=), (>=),undefined, id)
 import GHC.TypeNats(Mod)
 import GHC.Generics(Generic(..),Generic1(..))
 import GHC.TypeLits(KnownNat(..), SomeNat(..), Nat(..))

@@ -43,9 +43,9 @@ import qualified Data.List as L
 import Alpha.Canonical
 import Alpha.Data.Numbers
 import Alpha.Text.Combinators
-import Alpha.Numerics.Arithmetic
 import Alpha.Canonical
 import Alpha.Data.Maybe
+--import Prelude((-),(+))
 
 type instance Eager EG.ByteString = EG.ByteString
 
@@ -54,7 +54,7 @@ type instance Lazy EG.ByteString = LZ.ByteString
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
 bytes::(Indexed a Word8) => Int -> Int -> a -> [Word8]
-bytes i width src = fmap (\k -> src ! k) [i..(i+width)]
+bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
 
 segment::(Int,Int) -> EG.ByteString -> EG.ByteString
 segment (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
@@ -74,7 +74,7 @@ segments width total = intervals
     where 
         source = entropy total
         len = length source
-        cutpoints = range(1, len-1)
+        cutpoints = range(1, len - 1)
                   |>fmap (\i ->  case divides i width of
                                     True -> i
                                     False -> 0)

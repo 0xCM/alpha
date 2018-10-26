@@ -12,6 +12,7 @@
 :set -XPatternSynonyms
 :set -XScopedTypeVariables
 :set -XFlexibleContexts
+:set -XAllowAmbiguousTypes
 :set -XGADTs
 :set -XDataKinds
 :set -XPolyKinds

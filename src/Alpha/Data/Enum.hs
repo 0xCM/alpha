@@ -12,13 +12,14 @@ module Alpha.Data.Enum
     -- Bitwise operators
     firstValue, 
     lastValue,
-    values
+    enumValues
         
 )
 where
 import GHC.Enum
-import Data.List(reverse, head, length, zip)
+import Data.List(head, length, zip)
 import Alpha.Canonical
+import Alpha.Data.List
 
 -- | Retrieves the first value of an enum
 firstValue::(Enum e) => e
@@ -26,9 +27,9 @@ firstValue = toEnum 0
 
 -- | Retrieves the last value of a bounded enum
 lastValue::(Bounded e, Enum e) => e
-lastValue = head (reverse values) 
+lastValue = head (reverse enumValues) 
 
 -- | Retrieves all values of a bounded enum
-values::(Bounded e, Enum e) => [e]
-values = enumFrom firstValue
+enumValues::(Bounded e, Enum e) => [e]
+enumValues = enumFrom firstValue
 

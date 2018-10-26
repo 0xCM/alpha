@@ -85,7 +85,7 @@ instance Show Flag where
     show On = "1"
     show Off = "0"
 
-instance Invertible Bit where
+instance Invertible Bit Bit where
     invert (Bit On) = off
     invert (Bit Off) = on
 
