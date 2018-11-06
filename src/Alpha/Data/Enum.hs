@@ -27,7 +27,7 @@ firstValue = toEnum 0
 
 -- | Retrieves the last value of a bounded enum
 lastValue::(Bounded e, Enum e) => e
-lastValue = head (reverse enumValues) 
+lastValue = head (reverse enumValues) where
 
 -- | Retrieves all values of a bounded enum
 enumValues::(Bounded e, Enum e) => [e]

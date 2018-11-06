@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.3
+version:             0.0.6
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -24,6 +24,7 @@ default-extensions:
   FlexibleContexts
   GADTs
   GeneralizedNewtypeDeriving
+  InstanceSigs
   KindSignatures
   MultiParamTypeClasses
   NoImplicitPrelude
@@ -32,10 +33,11 @@ default-extensions:
   RankNTypes
   ScopedTypeVariables
   StandaloneDeriving
-  TypeSynonymInstances
-  TypeFamilies
   TypeApplications
+  TypeFamilies
+  TypeFamilyDependencies
   TypeOperators
+  TypeSynonymInstances
   OverloadedLists
 
 dependencies:
@@ -66,11 +68,13 @@ dependencies:
 - ansi-terminal
 - bifunctors
 - comonad
+- contravariant
 - data-default
 - distributive
 - either
 - entropy
 - hashable
+- intervals
 - keys
 - network
 - primitive

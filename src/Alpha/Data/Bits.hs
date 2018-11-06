@@ -22,6 +22,7 @@ import Alpha.Canonical
 import Alpha.Text.Combinators
 import Alpha.Data.Numbers
 import Alpha.Data.Bit
+import GHC.TypeLits
 
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> fromBool
@@ -30,12 +31,14 @@ toggled n i = testBit n i |> fromBool
 bitcount :: (FiniteBits a) => a -> Int
 bitcount a = finiteBitSize a
 
-bitsplat::(Integral a, Bits a, Integral b, Bits b) => Int -> a -> a -> b
+bitsplat::(Integral a, Bits a, Integral b, Bits b, Integral c) => c -> a -> a -> b
 bitsplat n x y = left .|. right
         where 
-            left = (fromIntegral x) .<<. n
+            left = (fromIntegral x) .<<. (fromIntegral n)
             right = fromIntegral y 
 
+            
+            
 (.^.) :: Bits a => a -> a -> a
 (.^.) m n = xor m n
 infixl 6 .^.

@@ -16,12 +16,14 @@ module Alpha.GHC.Base
     Num, Integer, Integral,
     Symbol(..), KnownSymbol(..), SomeSymbol(..), 
     KnownNat(..), SomeNat(..), Nat(..),
+    IsList(..),
     mod,
     symbolVal,
     fromIntegral,
     undefined,
     ($),(<=), (>=),
-    id
+    id,
+    natVal, natVal'
     
 
 )
@@ -38,6 +40,7 @@ import GHC.Base(($),(<=), (>=),undefined, id)
 import GHC.TypeNats(Mod)
 import GHC.Generics(Generic(..),Generic1(..))
 import GHC.TypeLits(KnownNat(..), SomeNat(..), Nat(..))
+import GHC.Exts(IsList(..))
 
 
 

@@ -8,16 +8,27 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Range 
 (
-    Range,
-    span
+    R.Range
 )
 where
-import Data.Range.Range
+import qualified Data.Range.Range as R
 import Data.Ord
+import Alpha.Base
+import Alpha.Canonical
 
--- | Creates an inclusively-bound range
-span::(Ord a) => a  -> a -> Range a
-span min max = SpanRange min max
+instance (Ord a) => Spanned (R.Range a) a where
+    span min max = R.SpanRange min max    
 
 
+instance OrderedEnum a => Unionizable [R.Range a] where
+    union = R.union
 
+instance OrderedEnum a => Intersectable [R.Range a] where
+    intersect = R.intersection
+    
+instance OrderedEnum a => Diffable [R.Range a] where
+    delta = R.difference
+    
+instance Ord a => Container (R.Range a) a where
+    contains c e = R.inRange e c
+    singleton = R.SingletonRange

@@ -20,6 +20,3 @@ instance Wrapped (Endo a) (a->a) where
 instance Wrapped (Sum a) a where
     unwrap = getSum
     
-instance Wrapped (Product a) a where
-    unwrap = getProduct
-        

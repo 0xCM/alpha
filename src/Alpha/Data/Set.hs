@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Set
 (
-    Set
+    Set, set, Hashable(..)
 )
 where
 import Alpha.Base
@@ -22,17 +22,17 @@ import Alpha.Canonical
 
 type Set a = HashSet a
 
-instance Enumerable (Set a) a where
-    type Source (Set a) a = Set a
-    items = Set.toList
-
 instance (Show a) => Formattable (Set a) where
     format x =  wrap (T.pack (show x))
         where wrap y = T.append Ascii.LBrace (T.append y Ascii.RBrace)
-    
-instance (Hashable a) => Singletary (Set a) a where
+
+instance Enumerable (Set a) a where
+    type Source (Set a) a = Set a
+    items = Set.toList
+            
+instance (Eq a, Hashable a) => Container (Set a) a where
+    contains = Set.member
     singleton = Set.singleton
     
-instance (Eq a, Hashable a) => Existential (Set a) a where
-    exists = Set.member
-    
+set::(Hashable a, Eq a) => [a] -> Set a
+set = Set.fromList

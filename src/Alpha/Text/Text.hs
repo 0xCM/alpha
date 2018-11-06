@@ -12,9 +12,6 @@ import qualified Data.List as List
 instance Length T.Text where
     length t =   convert (T.length t)
     
-instance Nullary T.Text where
-    zero = ""
-
 instance Packable S.String T.Text where
     pack = T.pack
     unpack = T.unpack
@@ -25,7 +22,7 @@ instance ToString T.Text where
 instance ToLines T.Text where    
     lines = T.lines
 
-instance Reversible T.Text where    
+instance Reversible T.Text T.Text where    
     reverse = T.reverse
     
 instance Formattable T.Text where

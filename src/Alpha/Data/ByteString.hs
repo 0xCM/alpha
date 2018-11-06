@@ -24,7 +24,7 @@ import Data.Bool
 import Data.Tuple
 import Data.Eq
 
-import Data.List(takeWhile,iterate)
+import Data.List(takeWhile,iterate,head)
 
 import qualified Data.Text as Text
 import qualified Data.ByteString.Lazy as LBS
@@ -37,17 +37,17 @@ import Data.Ix(range)
 import GHC.Enum
 import GHC.Real
 import GHC.Exts
+import GHC.TypeLits(natVal, KnownNat)
 import qualified Data.Ix as Ix
 import qualified Data.List as L
 
-import Alpha.Canonical
 import Alpha.Data.Numbers
 import Alpha.Text.Combinators
-import Alpha.Canonical
+import Alpha.Canonical hiding(range)
 import Alpha.Data.Maybe
---import Prelude((-),(+))
+import Alpha.Data.Bits
 
-type instance Eager EG.ByteString = EG.ByteString
+type instance Strict EG.ByteString = EG.ByteString
 
 type instance Lazy EG.ByteString = LZ.ByteString
 
@@ -64,7 +64,7 @@ bytestring::[Word8] -> EG.ByteString
 bytestring = EG.pack
 
 instance Chunkable EG.ByteString where
-    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)
+    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
     
 entropy::Int -> EG.ByteString
 entropy n = (getHardwareEntropy n |> unsafeDupablePerformIO ) |> fromJust

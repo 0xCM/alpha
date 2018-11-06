@@ -4,7 +4,7 @@ module Alpha.Text.Combinators
 (    
     dot, dots, space, colon, semi, comma, 
     fslash, bslash, larrow, rarrow,
-    enclose, splat, isPrefix, isSuffix, contains,    
+    enclose, splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,embrace,
     prefixIfMissing, suffixIfMissing, zpadL, padL, toText,
     hexstring,showBasedInt,bitstring,bitstringN,
@@ -48,7 +48,7 @@ padL n c s
     | textlen s < n  = [padding, s] |> Text.concat
     | otherwise     = s
     where 
-        padding = replicate len c    
+        padding = Text.replicate len c    
         len = sub n (textlen s)
         
 -- | Creates a left-zero-padded string    
@@ -91,9 +91,10 @@ enclose left content right = splat [format left, format content, format right]
 embrace::(Formattable a) => a -> Text
 embrace content = enclose lbrace content rbrace
 
+instance Container Text Text where
 -- | Determines whether text contains a specified substring
-contains::Text -> Text -> Bool
-contains match subject = Text.isInfixOf match subject
+    contains match subject = Text.isInfixOf match subject
+    singleton x = x
 
 -- | Conditionally prepends the subject with a prefix
 prefixIfMissing::Text -> Text -> Text

@@ -29,9 +29,9 @@ import Data.Void
 import Data.Ord
 import qualified Data.List as List
 import GHC.Show
-import Alpha.Canonical hiding ((-),Order,Nat,reverse)
 import GHC.Exts (Constraint)
 import Alpha.TypeLevel.Proxy
+import Alpha.Canonical hiding ((-),Order,Nat,reverse,replicate)
 
 
 

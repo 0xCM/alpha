@@ -82,11 +82,6 @@ folders x = x |> dir
               |> fmap folder
               |> List.filter isFolder
                                         
-instance Jailbreak IO a where
-    escape = shredIO
-
-instance (PrimBase m) => Jailbreak m a where
-    escape x = x |> unsafeInlinePrim
 
 log::Message a -> IO()
 log (Message severity text _) = do
@@ -99,3 +94,11 @@ log (Message severity text _) = do
                     Warn -> (Vivid, Yellow)
                     Error -> (Vivid, Red)
                     Fatal -> (Vivid, Red)        
+
+
+instance Jailbreak IO a where
+    escape = shredIO
+
+instance (PrimBase m) => Jailbreak m a where
+    escape x = x |> unsafeInlinePrim
+                    

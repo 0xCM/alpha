@@ -1,3 +1,10 @@
+-----------------------------------------------------------------------------
+-- | Representation of a logic gate
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -8,12 +15,10 @@ import Data.Kind(Type)
 import GHC.TypeLits
 import Data.Bool
 
-
-
 import Alpha.Canonical
 import Alpha.Data.Bit
 import Alpha.Data.Bits
-import Alpha.Data.Tuple
+import Alpha.Data.Product
 import Alpha.Data.BitVector
 
 -- A model of a logic gate

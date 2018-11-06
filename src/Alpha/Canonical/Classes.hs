@@ -8,6 +8,8 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE ConstraintKinds #-}
+
 module Alpha.Canonical.Classes 
 (
     Concatenable(..),
@@ -29,13 +31,20 @@ module Alpha.Canonical.Classes
     Reifiable(..),
     Chunkable(..),
     Structured(..),
-    Enumerable(..),
-    Singletary(..),
-    Existential(..),
     Faceted(..),
     Flow(..), Coflow(..),
-    Reducible(..),
-    Reversible(..)
+    Collappsible(..),
+    Reversible(..),
+    Replicator(..),
+    Intersectable(..),
+    Unionizable(..),
+    Diffable(..),
+    Enumerable(..),
+    Container(..),
+    SetOperable(..),
+    OrderedEnum(..),
+    Assembly(..)
+
 )
 where
 import qualified Data.Text as T
@@ -45,18 +54,18 @@ import Alpha.Base
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Functors
 import Alpha.Canonical.Operators
+import qualified Data.List as L
 
 class Sized (n::Nat) c e | e -> c where    
 
 type Router a b = a -> b 
 
-    
+-- Synonym for combined Ord and Enum constraints
+type OrderedEnum a = (Enum a, Ord a)    
+
 -- | Characterizes a type parameterized by some type 'a'  that is decomposable into a sequence a-values
 class Decomposable a b where
     decompose::a -> [b]
-
-class Infinite a where
-    next::a -> a
 
 class Structured a b where
     type Construction a b
@@ -77,11 +86,35 @@ class Length a where
     
 instance Length a => Measurable 1 a where
     measure = length
-       
-class Reversible a where
-    reverse::a -> a
+
+-- | Characterizes a type that manifests the concept
+-- of an invertible reversion    
+class Reversible a b | a -> b, b -> a  where
+    reverse::a -> b
 
 
+class Enumerable c e | e -> c where 
+    -- A source of type 'c' producing elements of type 'e'
+    type Source c e
+    
+    items::Source c e -> [e]
+
+-- | Characterizes a structure that supports invertible construction/destruction operations
+class Assembly a b | a->b, b -> a where
+    disassemble::a -> [b]
+    assemble::[b] -> a
+    
+-- / Characterizes the concept of a container    
+class Container c e | c -> e where
+    contains::e -> c  -> Bool
+
+    -- | Constructs a container with exactly one element
+    singleton::e -> c
+
+    absent::e -> c -> Bool
+    absent item src = not (contains item src)
+
+                
 -- / Applicable when values can be joined via a binary function that need not be structure-preserving
 class (Measurable n a) => Mixable n a where
     type Mixed n a 
@@ -131,8 +164,8 @@ class Jailbreak m a where
 
 -- Removes a layer of enumerable structure    
 -- In the case of a monoid, 'reduce' reduces to 'fold', pun intended
-class Reducible a where
-    reduce::[a] -> a
+class Collappsible a where
+    collapse::[a] -> a
     
 -- | Codifies a production relationship between an input value of type 'a' and 
 -- an output value of type 'b'
@@ -154,9 +187,8 @@ class Indexed c e where
 
     (!)::c -> Int -> e
     (!) = item
-    
-        
-class Wrapped a b where
+            
+class Wrapped a b | a -> b where
     unwrap::a -> b
 
 -- A flow from a --> b
@@ -169,22 +201,21 @@ class Coflow a b where
     coflow::(a -> b) -> a -> b
     coflow = (<|)
 
-class Enumerable c e | e -> c where 
-    -- A source of type 'c' producing elements of type 'e'
-    type Source c e
     
-    items::Source c e -> [e]
+-- Characterizes types for which a meaningful union operation can be specified    
+class Unionizable a where
+    union::a -> a -> a
 
-class (Enumerable c e) =>  Singletary c e  where
-    singleton::e -> Source c e
+-- Characterizes types for which a meaningful intersection operation can be specified        
+class Intersectable a where
+    intersect::a -> a -> a
+
+-- Characterizes types for which a meaningful delta operation can be specified        
+class Diffable a where
+    delta::a -> a -> a
     
-class (Eq e, Enumerable c e) => Existential c e  where
-    exists::e -> Source c e -> Bool
+type SetOperable a = (Unionizable a, Intersectable a, Diffable a)    
 
-    absent::e -> Source c e -> Bool
-    absent item src = not (exists item src)
-
-    
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
 class Reifiable (a::k) r where
@@ -193,6 +224,26 @@ class Reifiable (a::k) r where
 class (KnownSymbol f) => Faceted f v where
     facetName::Text
     facetName =  symstr @f |> T.pack
-            
+          
+-- Captures the assertion that values of a type a can be partitioned by
+-- values of an enumerable type c
+class (Enum c) => Classifiable a c where
+    classify::(a -> c) -> [a] -> [(c,a)]
+
+class Queryable a where
+    take::(Integral i) => i -> [a] -> [a]
+    filter::(a -> Bool) -> [a] -> [a]
+    
+class Replicator a where
+    replicate::Int -> a -> [a]
+    replicate = L.replicate
+    
 instance Jailbreak Maybe a where
     escape x = fromJust x
+
+instance (Eq a) => Unionizable [a] where
+    union = L.union
+    
+instance (Eq a) => Intersectable [a] where
+    intersect = L.intersect
+    

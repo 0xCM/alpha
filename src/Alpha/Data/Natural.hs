@@ -16,11 +16,19 @@ import Alpha.Canonical(Formattable(..), (<>))
 -- Unifies type and value-level naturals
 newtype Natural k = Natural N.Natural
     deriving (Num)
-    
-instance Show (Natural k) where
-    show (Natural i) = show i 
-    
--- | Defines a net
+
+type Zero = Natural 0
+type One =  Natural 1
+type Next n = Natural (n + 1)
+type Add m n = Natural (m + n)
+type Sub m n  = Natural (m - n)
+type Mul m n = Natural (m * n)
+
+-- Extracts the value encoded at the type-level
+natval::forall n i. (KnownNat n, Integral i) => i
+natval = fromInteger( natVal (Proxy @n) )
+        
+-- | Defines a nat
 nat::forall m (n::Nat). (Integral m) =>  m -> Natural n
 nat = Natural . fromIntegral 
 
@@ -47,3 +55,6 @@ mul (Natural i) (Natural j) = Natural (i * j)
 -- | Nat mod
 mod::forall (m::Nat) (n::Nat). Natural m -> Natural n -> Natural (Mod m n)
 mod (Natural i) (Natural j) = Natural (i `R.mod` j)
+
+instance Show (Natural k) where
+    show (Natural i) = show i 

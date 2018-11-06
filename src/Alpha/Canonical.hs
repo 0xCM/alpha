@@ -14,11 +14,8 @@
 
 module Alpha.Canonical 
 (
-    module Alpha.Canonical.Algebra,
-    module Alpha.Canonical.Functors,
-    module Alpha.Canonical.Classes,
-    module Alpha.Canonical.Operators,
-    Lazy(..), Eager(..), Boxed(..), Raw(..)
+    module X
+
 
 )
 where
@@ -38,16 +35,11 @@ import Data.Kind(Type)
 import Data.Vector(Vector)
 import GHC.Num(Num)
 import GHC.Real(Integral)
-import Alpha.Canonical.Algebra
-import Alpha.Canonical.Functors
-import Alpha.Canonical.Classes
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Algebra as X
+import Alpha.Canonical.Functors as X
+import Alpha.Canonical.Classes as X
+import Alpha.Canonical.Operators as X
+import Alpha.Canonical.Disjoint as X
+import Alpha.Canonical.Families as X
 
 
-type family Lazy a 
-
-type family Eager a
-
-type family Boxed a
-
-type family Raw a

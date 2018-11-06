@@ -10,7 +10,7 @@ module Alpha.Data.Base
 (
     module X,
     Category, (.),
-    Foldable, foldby, fold, foldr, foldr', foldl, foldl', null,
+    Foldable, foldby, fold, foldr, foldr', foldl, foldl',
     Bool(..),(&&), (||), not, otherwise,
     Monoid(..),
     String,
@@ -19,16 +19,16 @@ module Alpha.Data.Base
     HashMap,
     Either(..),
     IsString,
-    Ord,
+    Ord, Ordering,
     const,
     Coercible, coerce,
-    Semigroup, (<>)
+    Semigroup, (<>), sconcat
     
 
 )
 where
-import Control.Category (Category, (.))
-import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl', null)
+import Control.Category (Category, (.), id)
+import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl')
 import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Bits as X
 import Data.Char as X
@@ -43,7 +43,7 @@ import Data.Functor as X
 import Data.Int as X
 import Data.Ix as X
 import Data.Maybe as X
-import Data.Ord(Ord)
+import Data.Ord(Ord, Ordering)
 import Data.String(String,IsString)
 import Data.Semigroup
 import Data.Text(Text)

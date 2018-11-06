@@ -20,28 +20,12 @@ where
     
 import Foreign.Storable (Storable, poke, peek, sizeOf, alignment)
 import Foreign.Ptr (Ptr, castPtr)
---import Data.Word
 import Data.Bool hiding(bool)
---import Data.Eq
---import Data.Ord
---import Data.Functor
---import Data.Maybe
---import Data.Function hiding(on)
 import Alpha.GHC.Base
 import Alpha.Canonical
 import Data.Bits(Bits(..))
 import Prelude(undefined)
 import Alpha.Base
-
--- class (Generic a, Data a, Eq a, Typeable a) => GD a where
-
--- class (Generic a, Ord a, Data a, Eq a, Typeable a) => GORD a where
-
--- newtype GData a = GData a
---      deriving (Eq, Generic, Data, Typeable, GD)
-
--- newtype GORData a = GORData a
---     deriving (Eq, Ord, Generic, Data, Typeable, GORD)
 
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable)

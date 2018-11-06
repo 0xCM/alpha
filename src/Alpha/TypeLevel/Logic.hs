@@ -25,6 +25,7 @@ import Data.Type.Equality hiding (type (==), apply)
 type True = 'True
 type False = 'False
 
+
 type family Equal a b :: Bool where
     Equal a a = True
     Equal a b = False    
@@ -39,7 +40,8 @@ type a :||: b = Or a b
 
 or'::Proxy a -> Proxy b -> Proxy (a :||: b)
 or' Proxy Proxy = Proxy
-    
+  
+
 
 type family And (a::Bool) (b::Bool) :: Bool where
     And True True = True
@@ -105,3 +107,4 @@ type family (:=>) a b where
     (:=>) F T = T
     (:=>) T F = F
     (:=>) T T = T    
+
