@@ -1,10 +1,8 @@
 -----------------------------------------------------------------------------
--- | Bit-level tyeps and operations
+-- | Bit-level types and operations
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 
@@ -36,9 +34,7 @@ bitsplat n x y = left .|. right
         where 
             left = (fromIntegral x) .<<. (fromIntegral n)
             right = fromIntegral y 
-
-            
-            
+                    
 (.^.) :: Bits a => a -> a -> a
 (.^.) m n = xor m n
 infixl 6 .^.
@@ -91,4 +87,3 @@ instance Concatenable Int16 Int16 where
 instance Concatenable Int32 Int32 where
     type Concatenated Int32 Int32 = Int64    
     concat x y = bitsplat 32 x y
-    

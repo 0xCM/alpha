@@ -3,7 +3,8 @@
 
 module Alpha.Base
 (
-    module X,
+    module DB,
+    module GB,
     module Text.Show,
     Float, Float#, 
     Double, Double#,
@@ -16,13 +17,13 @@ module Alpha.Base
     
 ) where
 
-import System.IO
+import System.IO(IO)
 import Prelude(map, length, zip, undefined, flip, fromIntegral,div)
 import qualified Data.Text as Text
 import qualified Data.ByteString as ByteString
-import GHC.Float
+import GHC.Float(Float, Float#, Double, Double#)
 import Text.Show
 import Data.List as List
-import Alpha.Data.Base as X
-import Alpha.GHC.Base as X
+import Alpha.Data.Base as DB
+import Alpha.GHC.Base as GB
 

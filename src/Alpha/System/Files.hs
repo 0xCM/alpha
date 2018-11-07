@@ -1,10 +1,8 @@
 -----------------------------------------------------------------------------
--- | Model of the file system
+-- | Defines file system model
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 {-# OPTIONS_GHC -fobject-code #-}

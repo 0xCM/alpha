@@ -2,38 +2,33 @@
 
 module Alpha.Canonical.Algebra
 (
+    module X,
     NonEmpty,
     Additive(..),
     Subtractive(..),
     Multiplicative(..),
-    --Divisible(..),
-    
     Invertible(..),    
     Semigroup, (<>), First(..), Last(..), Min(..), Max(..),
     Monoid, mempty, mappend, mconcat, Dual(..), Endo(..), All(..), Any(..), Sum(..), 
     Semigroupoid(..), compose, 
     Groupoid(..),
     Group(..),
-
-    Ord(..),
+    Ord,
     Setoid(..),
     Infimum(..),
     Supremum(..),
     Relation(..),
     Preorder(..),
+    PartialOrder(..), Poset(..),
+    TotalOrder(..), Chain(..),
     Equivalence(..),
     Nullary(..), null,
     Spanned(..),
     Degenerate(..),
-
     Vector(..), 
     Vectored(..), Covectored(..),
-    dual,
-    minimal,
-    maximal,
-    endo,
-    endoply,
-    cartesian
+    dual, minimal, maximal, endo, endoply, cartesian, associator
+
 
 )
 
@@ -55,58 +50,56 @@ import Data.Semigroupoid
 import Data.Groupoid(Groupoid(..))
 import Data.Semigroup(Semigroup(..), Min(..), Max(..), First(..), Last(..))
 import Data.Monoid(Dual(..), Endo(..), All(..), Any(..),  Monoid(..), Sum(..),Alt(..))
-import Data.Ord
+import qualified Prelude as P
+import Data.Ord(Ord)
 import Data.List.NonEmpty hiding(span)
 import qualified Data.Vector as V
 
-type family Operator a  where
-    Operator (a,a) = a -> a
-    Operator (a,a,a) = (a,a) -> a
+import Alpha.Canonical.Functions as X
 
--- Characterizes a binary operator    
-class BinaryOperator a where
-    operate::(a,a)-> a
-
-    associator::(a, a, a) -> (a,a)
-    associator (x,y,z) =  (left,right) where
-        left = operate(operate (x,y), z)
-        right = operate(x, operate (y, z))
-
--- Characterizes a relation on a set s    
-class Relation s where
-    type Related s
-    type Related s = (s,s)
-
-    -- Relation adjudicator
-    (~~) ::s -> s -> Bool
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
-    sub::a -> a -> a
+    -- | Subracts the second value from the first
+    sub::BinaryOperator a
 
-    (-)::a -> a -> a
+    -- | Infix synonym for 'sub'    
+    (-)::BinaryOperator a
     (-) = sub
+
+infixl 6 -    
 
 -- / Characterizes a type that supports a notion of addition      
 class Additive a where
-    add::a -> a -> a
+    add::BinaryOperator a
     
-    (+)::a -> a -> a
+    -- | Infix synonym for 'add'    
+    (+)::BinaryOperator a
     (+) = add
+
+infixl 6 +
 
 -- / Characterizes a type that supports a notion of division
 class Divisible a where
-    div::a -> a -> a
+    -- | Divides the first value by the second
+    div::BinaryOperator a
 
-    (/)::a -> a -> a
+    -- | Infix synonym for 'div'
+    (/)::BinaryOperator a
     (/) = div
+
+infixl 7 /
 
 -- / Characterizes a type that supports a notion of multiplication    
 class Multiplicative a where
-    mul::a -> a -> a
-    
-    (*)::a -> a -> a
+    -- | Multiplies the first value by the second
+    mul::BinaryOperator a
+
+    -- | Infix synonym for 'mul'
+    (*)::BinaryOperator a
     (*) = mul
+
+infixl 7 *
 
 -- Characterizes types that are inhabited by 'degenerate' values
 -- Examples include empty lists, mathematical intervals 
@@ -128,8 +121,20 @@ class Nullary a where
 -- interpreteted as equality
 -- See https://en.wikipedia.org/wiki/Setoid
 class (Eq a) => Setoid a where
-    equals::a -> a -> Bool
+    equals::BinaryPredicate a
     equals x y = x == y
+
+-- Characterizes a relation on a set s    
+class Relation a where
+
+    -- Relation adjudicator
+    related::BinaryPredicate a
+
+    -- Infix synonym for 'related'
+    (~~)::BinaryPredicate a
+    (~~) = related
+
+infixl 6 ~~
 
 -- Characterizes relations that are reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Preorder
@@ -137,19 +142,46 @@ class Relation s => Preorder s where
 
 -- Characterizes preorders that are antisymmetric: a ~~ b and b ~~ a => a = b
 -- See https://en.wikipedia.org/wiki/Preorder
-class Preorder s => PartialOrder s where
+class Preorder a => PartialOrder a where
+    (~<)::BinaryPredicate a
+    (~<) = (~~)
+
+-- Characterizes a total order relation
+-- https://en.wikipedia.org/wiki/Total_order    
+class Ord a => TotalOrder a where
+    (<=)::a -> a -> Bool
+    (<=) a b= a P.<= b
+
+    (<)::a -> a -> Bool
+    (<) a b = a P.< b
+
+    (>)::a -> a -> Bool
+    (>) a b = a P.> b
+
+    (>=)::a -> a -> Bool
+    (>=) a b = a P.>= b
+
+infix 4 <=
+infix 4 <    
+infix 4 >
+infix 4 >=    
+    
 
 -- Characterizes a partially ordered set
 -- See https://en.wikipedia.org/wiki/Partially_ordered_set   
-class (Setoid s, PartialOrder s) => Poset s where
-    meets::s -> s -> s -> Bool
-    joins::s -> s -> s -> Bool
+class (Setoid a, PartialOrder a) => Poset a where
+    meets::TernaryPredicate a
+    joins::TernaryPredicate a
+
+-- Characterizes a totally ordered set, otherwise known as a chain
+-- See https://en.wikipedia.org/wiki/Total_order  
+class (Setoid a, TotalOrder a) => Chain a where
 
 -- Characterizes preorders that are symmetric, and hence 
 -- define equivalence relations: a ~= b => b ~= a
-class Preorder s => Equivalence r s where
+class Preorder a => Equivalence a where
     -- Equivalence relation adjudicator
-    (~=) :: s -> s -> Bool
+    (~=)::BinaryPredicate a
     (~=) = (~~)
     
 -- / Characterizes types for which a greatest lower bound can
@@ -169,31 +201,42 @@ class Supremum a b where
     supremum::a -> b
     
 -- | Characterizes types whose values can be inverted
+-- Note that the operation is not necessarily closed over its
+-- domain, but is however total
 class Invertible a b where
     invert::a -> b
 
+-- | Characterizes a type that contains a relatively contiguous
+-- set of values bound by least and greatest values
 class (Ord b) => Spanned a b where
+    
+    -- | Creates a b-value bound by a min and max value
     span::b -> b -> a
     
+    -- | The span operator, an infix synonym for 'span'
     (...)::b -> b -> a
     (...) = span
 
+infixl 5 ...
 
 -- | A group is a monoid together with an inversion operator (-)
 -- such that for every element g there exists a unique elment -g where g + (-g) = 0
 class (Monoid a, Subtractive a, Invertible a a) => Group a where    
 
+-- | Represents a sized vector
 data Vector (n::Nat) a 
     = Col (V.Vector a)
     | Row (V.Vector a)
         deriving (Show,Generic,Data,Typeable)    
 
+-- | Characterizes types that can be expressed as a sized vector        
 class Vectored (n::Nat) a b where        
-    -- Creates a column vector from coordinate tuples
+    -- Creates a column vector from an a-value
     col::a -> Vector n b
 
+-- | Characterizes types that can be expressed as a sized covector        
 class Covectored (n::Nat) a b where
-    -- Creates a row vector from coordinate tuples
+    -- Creates a row vector from an a-value
     row::a -> Vector n b
     
 -- Alias for semigroupoid composition operator
@@ -230,4 +273,13 @@ null a = a == zero
 
 alt::Monoid a => f a -> Alt f a
 alt = Alt
+
+-- Computes both left and right-associative applications
+-- If an operator is associtive, these values will coincide
+associator::BinaryOperator a -> (a, a, a) -> (a,a)
+associator op (x,y,z) =  (left,right) where
+    xy = op x y 
+    yz = op y z
+    left =  op xy z
+    right = op x yz
 

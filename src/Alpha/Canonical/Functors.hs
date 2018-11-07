@@ -1,12 +1,12 @@
 module Alpha.Canonical.Functors
 (
     Functor, fmap,(<$>), (<$), ($>),
-    Apply, apply, (<.>), (.>), (<.),
+    Apply, fapply, (<.>), (.>), (<.),
     Alt, (<!>),
     Bind, join, (>>-),(-<<), (-<-), (->-), 
     Plus, fzero,
     Foldable, foldr, fold,
-    Traversable, traverse, evaluate,
+    Traversable, traverse, feval,
     Bifoldable, bifoldl, bifoldr, bifold, bisum,
     Bitraversable, bitraverse,
     Bifunctor, bimap,
@@ -53,9 +53,9 @@ import Data.Int
 fzero::Plus f  => f a
 fzero = Plus.zero
 
-apply::(Apply f) => (a->b->c) -> f a -> f b -> f c
-apply = liftF2
-infixl 4 `apply` 
+fapply::(Apply f) => (a->b->c) -> f a -> f b -> f c
+fapply = liftF2
+infixl 4 `fapply` 
 
-evaluate::(Traversable t, Applicative f) => t (f a) -> f (t a)
-evaluate = sequenceA
+feval::(Traversable t, Applicative f) => t (f a) -> f (t a)
+feval = sequenceA

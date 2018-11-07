@@ -1,10 +1,8 @@
 -----------------------------------------------------------------------------
--- | Consolidates text-related operations and types
+-- | Defines the Text segment API surface
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# LANGUAGE NoImplicitPrelude #-}
 

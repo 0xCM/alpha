@@ -5,17 +5,22 @@ module Alpha
 ( 
     module X,
     module A,
+    module D,
+    module TL,
+    module S,
+    module IO,
+    module Text,
     Coercible(..), Coercion(..)
   
 ) where
     
-import Alpha.Base as X
+import Alpha.Base as X hiding((<=),(>=),(<),(>))
 import Alpha.Canonical as A
-import Alpha.Text as A
-import Alpha.IO as A
-import Alpha.TypeLevel as A
-import Alpha.Data as A
-import Alpha.System as A
+import Alpha.Text as Text
+import Alpha.IO as IO
+import Alpha.TypeLevel as TL
+import Alpha.Data as D
+import Alpha.System as S
 import Data.Coerce(Coercible(..))
 import Data.Type.Coercion
 

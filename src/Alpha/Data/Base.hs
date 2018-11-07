@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Base
 (
-    module X,
+    FiniteBits(..),
     Category, (.),
     Foldable, foldby, fold, foldr, foldr', foldl, foldl',
     Bool(..),(&&), (||), not, otherwise,
@@ -22,7 +22,19 @@ module Alpha.Data.Base
     Ord, Ordering,
     const,
     Coercible, coerce,
-    Semigroup, (<>), sconcat
+    Semigroup, (<>), sconcat,
+    Data(..),
+    Type,
+    Int,Int8,Int16,Int32,Int64,
+    Word,Word8,Word16,Word32,Word64,
+    Char,chr,intToDigit,
+    Functor(..),
+    Default, def,
+    Eq(..),
+    Traversable(..),
+    Typeable(..), Proxy(..),
+    Maybe(..), isNothing, fromJust,
+    Ix(..)
     
 
 )
@@ -30,27 +42,26 @@ where
 import Control.Category (Category, (.), id)
 import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl')
 import Data.Bool(Bool(..), (&&), (||), not, otherwise)
-import Data.Bits as X
-import Data.Char as X
-import Data.Data as X
-import Data.Default as X
-import Data.Coerce
-import Data.Kind as X
-import Data.Either.Combinators as X
+import Data.Bits(FiniteBits(..))
+import Data.Char(Char,chr,intToDigit)
+import Data.Data(Data(..))
+import Data.Default(Default,def)
+import Data.Coerce(Coercible,coerce)
+import Data.Kind(Type)
 import Data.Either(Either(..))
-import Data.Eq as X
-import Data.Functor as X
-import Data.Int as X
-import Data.Ix as X
-import Data.Maybe as X
+import Data.Eq(Eq(..),(==),(/=))
+import Data.Functor(Functor(..))
+import Data.Int(Int,Int8,Int16,Int32,Int64)
+import Data.Ix(Ix(..))
+import Data.Maybe(Maybe(..),isNothing,fromJust)
 import Data.Ord(Ord, Ordering)
 import Data.String(String,IsString)
-import Data.Semigroup
+import Data.Semigroup(Semigroup, (<>), sconcat)
 import Data.Text(Text)
-import Data.Traversable as X
-import Data.Typeable as X
-import Data.Word as X
-import Data.Monoid
+import Data.Traversable(Traversable(..))
+import Data.Typeable(Typeable(..),Proxy(..))
+import Data.Word(Word,Word8,Word16,Word32,Word64)
+import Data.Monoid(Monoid(..))
 import Data.HashSet(HashSet)
 import Data.HashMap.Strict(HashMap)
 import Data.Function(const)

@@ -8,6 +8,7 @@ module Alpha.Data.Coproduct
 )
 where
 import Alpha.Base
+import Alpha.Data.Product
 
 type family Coproduct a | a -> a
 
@@ -56,6 +57,10 @@ data Sum3 a1 a2 a3
     | Sum33 {-# UNPACK #-} !a3
     deriving (Eq, Ord, Data, Generic, Typeable, Show)
 
+map3::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3)) => Product3 f1 f2 f3 -> (Sum3 a1 a2 a3) -> (Sum3 b1 b2 b3)
+map3 (Product3 f1 _ _) (Sum31 a1) = Sum31 (f1 a1)
+map3 (Product3 _ f2 _) (Sum32 a2) = Sum32 (f2 a2)  
+map3 (Product3 _ _ f3) (Sum33 a3) = Sum33 (f3 a3)
 
 type instance Coproduct (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
 
@@ -237,3 +242,13 @@ instance Coproductive 7 7 a7 (Sum7 a1 a2 a3 a4 a5 a6 a7)  where
     cofactor (Sum77 a) = Just a
     cofactor _         = Nothing
     
+data DisjointUnion a1 a2 a3 a4 a5 a6 a7 a8 a9
+    = DU1 {-# Unpack #-} !a1
+    | DU2 {-# Unpack #-} !a2
+    | DU3 {-# Unpack #-} !a3
+    | DU4 {-# Unpack #-} !a4
+    | DU5 {-# Unpack #-} !a5
+    | DU6 {-# Unpack #-} !a6
+    | DU7 {-# Unpack #-} !a7
+    | DU8 {-# Unpack #-} !a8
+    | DU9 {-# Unpack #-} !a9

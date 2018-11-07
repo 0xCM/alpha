@@ -1,18 +1,16 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 -----------------------------------------------------------------------------
 -- | Defines and re-exports common operators and combinators
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 module Alpha.Data.Enum
 (    
-    -- Bitwise operators
+    
     firstValue, 
     lastValue,
-    enumValues
+    enumValues,
+    Enum
         
 )
 where

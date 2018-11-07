@@ -36,14 +36,14 @@ module Alpha.Canonical.Classes
     Collappsible(..),
     Reversible(..),
     Replicator(..),
-    Intersectable(..),
-    Unionizable(..),
-    Diffable(..),
     Enumerable(..),
     Container(..),
-    SetOperable(..),
     OrderedEnum(..),
-    Assembly(..)
+    Assembly(..),
+    Unionizable(..),
+    Intersectable(..),
+    Diffable(..)
+
 
 )
 where
@@ -53,7 +53,7 @@ import Data.Vector(Vector)
 import Alpha.Base
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Functors
-import Alpha.Canonical.Operators
+
 import qualified Data.List as L
 
 class Sized (n::Nat) c e | e -> c where    
@@ -193,28 +193,13 @@ class Wrapped a b | a -> b where
 
 -- A flow from a --> b
 class Flow a b where
-    flow::a -> Router a b -> b
+    flow::a -> (a -> b) -> b
     flow = (|>)
 
--- A covariant from a --> b
+-- A covariant from b --> a
 class Coflow a b where
-    coflow::(a -> b) -> a -> b
+    coflow::(b -> a) -> b -> a
     coflow = (<|)
-
-    
--- Characterizes types for which a meaningful union operation can be specified    
-class Unionizable a where
-    union::a -> a -> a
-
--- Characterizes types for which a meaningful intersection operation can be specified        
-class Intersectable a where
-    intersect::a -> a -> a
-
--- Characterizes types for which a meaningful delta operation can be specified        
-class Diffable a where
-    delta::a -> a -> a
-    
-type SetOperable a = (Unionizable a, Intersectable a, Diffable a)    
 
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
@@ -241,9 +226,53 @@ class Replicator a where
 instance Jailbreak Maybe a where
     escape x = fromJust x
 
+-- Characterizes types for which a meaningful union operation can be specified    
+class Unionizable a where
+    union::a -> a -> a
+
+-- Characterizes types for which a meaningful intersection operation can be specified        
+class Intersectable a where
+    intersect::a -> a -> a
+
+-- Characterizes types for which a meaningful delta operation can be specified        
+class Diffable a where
+    delta::a -> a -> a
+    
+
 instance (Eq a) => Unionizable [a] where
     union = L.union
     
 instance (Eq a) => Intersectable [a] where
     intersect = L.intersect
     
+-- Follows the ideas as presented in Wadler's Propositions as Types
+
+--Disjunction A ∨ B corresponds to a disjoint sum A + B, that
+--is, a variant with two alternatives. A proof of the proposition
+--A ∨ B consists of either a proof of A or a proof of B, including
+--an indication of which of the two has been proved. Similarly, a
+--value of type A + B consists of either a value of type A or a
+--value of type B, including an indication of whether this is a left
+--or right summand.
+data Disjunct a b = Disjunct (Either a b)
+
+type a :||: b = Disjunct a b
+
+
+-- Conjunction A & B corresponds to Cartesian product A × B,
+-- that is, a record with two fields, also known as a pair. A proof
+-- of the proposition A&B consists of a proof of A and a proof of
+-- B. Similarly, a value of type A × B consists of a value of type
+-- A and a value of type B
+data Conjunct a b = Conjunct (a,b)
+
+type a :&: b = Conjunct a b
+
+--Implication A => B corresponds to function space A -> B. A
+--proof of the proposition A => B consists of a procedure that
+--given a proof of A yields a proof of B. Similarly, a value of
+--type A -> B consists of a function that when applied to a value
+--of type A returns a value of type B.
+data Implies a b = Implies (a->b)
+
+type a :-> b = Implies a b        

@@ -4,8 +4,6 @@
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
@@ -22,7 +20,6 @@ import Data.Hashable
 import Data.Ix
 import Data.Functor
 import Data.Foldable
---import Data.Function
 import Data.Ord(compare)
 import Data.Kind(Type)
 import Data.Proxy as Proxy

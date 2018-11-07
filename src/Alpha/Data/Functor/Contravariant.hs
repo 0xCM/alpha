@@ -12,6 +12,7 @@ module Alpha.Data.Functor.Contravariant
 where
 import Alpha.Base
 
+
 import Data.Functor.Contravariant
 
 type OpMap = Op

@@ -189,6 +189,7 @@ instance Additive Int where add = (+)
 instance Multiplicative Int where mul = (*)
 instance Subtractive Int where sub = (-)
 instance Group Int
+instance TotalOrder Int
 
 instance Nullary Integer where zero = 0
 instance Semigroup Integer where (<>) = (+)
@@ -198,6 +199,7 @@ instance Additive Integer where add = (+)
 instance Multiplicative Integer where mul = (*)
 instance Subtractive Integer where sub = (-)
 instance Group Integer
+instance TotalOrder Integer
 
 instance Nullary Int8 where zero = 0
 instance Semigroup Int8 where (<>) = (+)
@@ -207,6 +209,7 @@ instance Additive Int8 where add = (+)
 instance Multiplicative Int8 where mul = (*)
 instance Subtractive Int8 where sub = (-)
 instance Group Int8
+instance TotalOrder Int8
 
 instance Nullary Int16 where zero = 0
 instance Semigroup Int16 where (<>) = (+)
@@ -216,6 +219,7 @@ instance Additive Int16 where add = (+)
 instance Multiplicative Int16 where mul = (*)
 instance Subtractive Int16 where sub = (-)
 instance Group Int16
+instance TotalOrder Int16
 
 instance Nullary Int32 where zero = 0
 instance Semigroup Int32 where (<>) = (+)
@@ -225,6 +229,7 @@ instance Additive Int32 where add = (+)
 instance Multiplicative Int32 where mul = (*)
 instance Subtractive Int32 where sub = (-)
 instance Group Int32
+instance TotalOrder Int32
 
 instance Nullary Int64 where zero = 0
 instance Semigroup Int64 where (<>) = (+)
@@ -234,36 +239,42 @@ instance Additive Int64 where add = (+)
 instance Multiplicative Int64 where mul = (*)
 instance Subtractive Int64 where sub = (-)
 instance Group Int64
+instance TotalOrder Int64
 
 instance Nullary Word where zero = 0
 instance Invertible Word Int where invert x = zero - (fromIntegral x)
 instance Additive Word where add = (+)
 instance Multiplicative Word where mul = (*)
 instance Subtractive Word where sub = (-)
+instance TotalOrder Word
 
 instance Nullary Word8 where zero = 0
 instance Invertible Word8 Int8 where invert x = zero - (fromIntegral x)
 instance Additive Word8 where add = (+)
 instance Multiplicative Word8 where mul = (*)
 instance Subtractive Word8 where sub = (-)
+instance TotalOrder Word8
 
 instance Nullary Word16 where zero = 0
 instance Invertible Word16 Int16 where invert x = zero - (fromIntegral x)
 instance Additive Word16 where add = (+)
 instance Multiplicative Word16 where mul = (*)
 instance Subtractive Word16 where sub = (-)
+instance TotalOrder Word16
 
 instance Nullary Word32 where zero = 0
 instance Invertible Word32 Int32 where invert x = zero - (fromIntegral x)
 instance Additive Word32 where add = (+)
 instance Multiplicative Word32 where mul = (*)
 instance Subtractive Word32 where sub = (-)
+instance TotalOrder Word32
 
 instance Nullary Word64 where zero = 0
 instance Invertible Word64 Int64 where invert x = zero - (fromIntegral x)
 instance Additive Word64 where add = (+)
 instance Multiplicative Word64 where mul = (*)
 instance Subtractive Word64 where sub = (-)
+instance TotalOrder Word64
 
 instance Nullary Double where zero = 0
 instance Invertible Double Double where invert x = zero - x

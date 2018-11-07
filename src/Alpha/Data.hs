@@ -31,5 +31,5 @@ import Alpha.Data.Product as X
 import Alpha.Data.Coproduct as X
 import Alpha.Data.Vector as X
 import Alpha.Data.Symbols as X
-import Alpha.Data.Functor.Contravariant as X
+
 

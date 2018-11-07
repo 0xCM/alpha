@@ -8,20 +8,23 @@
 module Alpha.GHC.Base
 (
     Show(..),
-    Generic(..),
-    Generic1(..),    
-    Bounded(..),
-
-    Enum(..),
-    Num, Integer, Integral,
-    Symbol(..), KnownSymbol(..), SomeSymbol(..), 
-    KnownNat(..), SomeNat(..), Nat(..),
+    Generic,
+    Generic1,    
+    Bounded,minBound,maxBound,
+    Enum,fromEnum,toEnum,
+    Num, Integer, Integral, mod,
+    Symbol, 
+    KnownSymbol, 
+    SomeSymbol, 
+    KnownNat, 
+    SomeNat, 
+    Nat,
     IsList(..),
-    mod,
+    
     symbolVal,
     fromIntegral,
     undefined,
-    ($),(<=), (>=),
+    ($),
     id,
     natVal, natVal'
     
@@ -31,15 +34,14 @@ where
 
 
 import GHC.Show(Show(..))
-import GHC.TypeLits
-import GHC.Real((/), (^), (^^), (%), Real(..), Integral(..), RealFrac(..), Fractional(..), fromIntegral)
-import GHC.Num
-import GHC.Enum
-import GHC.Types
-import GHC.Base(($),(<=), (>=),undefined, id)
+import GHC.Real((/), (^), (^^), (%), Integral, mod, RealFrac, Fractional, fromIntegral)
+import GHC.Num(Num,Integer)
+import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
+import GHC.Types(Symbol)
+import GHC.Base(($),undefined, id)
 import GHC.TypeNats(Mod)
-import GHC.Generics(Generic(..),Generic1(..))
-import GHC.TypeLits(KnownNat(..), SomeNat(..), Nat(..))
+import GHC.Generics(Generic,Generic1)
+import GHC.TypeLits(KnownNat, SomeNat, Nat,natVal, natVal', symbolVal, symbolVal',SomeSymbol,KnownSymbol)
 import GHC.Exts(IsList(..))
 
 

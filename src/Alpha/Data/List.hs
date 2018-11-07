@@ -95,7 +95,6 @@ scan op x = fmap (reduce op) (inits x)
 (\\) = scan
 infixl 6 \\
 
-
 instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]
     concat x y = x List.++ y

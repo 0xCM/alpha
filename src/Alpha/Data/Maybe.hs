@@ -1,6 +1,6 @@
 module Alpha.Data.Maybe
 (
-    some, isSome, none, isNone, fromJust
+    Maybe, some, isSome, none, isNone, fromJust
 )
 where
 

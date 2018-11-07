@@ -1,9 +1,8 @@
 -----------------------------------------------------------------------------
--- | Consolidate file-related operations and types
+-- | Defines the IO segment API surface
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  not yet
 -----------------------------------------------------------------------------
 module Alpha.IO
 (
