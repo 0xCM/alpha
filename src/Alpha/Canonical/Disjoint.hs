@@ -4,9 +4,6 @@ module Alpha.Canonical.Disjoint where
 
 import Alpha.Base
 
-
-
-
 -- Defines an indexed family of disjoint unions
 type family Disjoint (n::Nat) a where
     Disjoint 1 a = [a]

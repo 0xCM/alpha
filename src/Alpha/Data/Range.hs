@@ -19,7 +19,6 @@ import Alpha.Canonical
 instance (Ord a) => Spanned (R.Range a) a where
     span min max = R.SpanRange min max    
 
-
 instance OrderedEnum a => Unionizable [R.Range a] where
     union = R.union
 

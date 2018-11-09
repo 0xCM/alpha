@@ -13,10 +13,10 @@
 module Alpha.Canonical(module X) where
 
 import Alpha.Canonical.Algebra as X
-import Alpha.Canonical.Functors as X
 import Alpha.Canonical.Classes as X
 import Alpha.Canonical.Disjoint as X
-import Alpha.Canonical.Families as X
+import Alpha.Canonical.Modality as X
+import Alpha.Canonical.Operators as X
 
 
 

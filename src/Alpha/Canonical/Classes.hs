@@ -42,9 +42,8 @@ module Alpha.Canonical.Classes
     Assembly(..),
     Unionizable(..),
     Intersectable(..),
-    Diffable(..)
-
-
+    Diffable(..),
+    FiniteMembership(..)
 )
 where
 import qualified Data.Text as T
@@ -52,13 +51,10 @@ import GHC.TypeLits(KnownNat,Nat(..))
 import Data.Vector(Vector)
 import Alpha.Base
 import Alpha.Canonical.Algebra
-import Alpha.Canonical.Functors
+import Alpha.Canonical.Operators
+import GHC.TypeLits
 
 import qualified Data.List as L
-
-class Sized (n::Nat) c e | e -> c where    
-
-type Router a b = a -> b 
 
 -- Synonym for combined Ord and Enum constraints
 type OrderedEnum a = (Enum a, Ord a)    
@@ -92,7 +88,6 @@ instance Length a => Measurable 1 a where
 class Reversible a b | a -> b, b -> a  where
     reverse::a -> b
 
-
 class Enumerable c e | e -> c where 
     -- A source of type 'c' producing elements of type 'e'
     type Source c e
@@ -113,7 +108,6 @@ class Container c e | c -> e where
 
     absent::e -> c -> Bool
     absent item src = not (contains item src)
-
                 
 -- / Applicable when values can be joined via a binary function that need not be structure-preserving
 class (Measurable n a) => Mixable n a where
@@ -153,6 +147,11 @@ class Counted a where
     -- | Counts the number of items within the purview of the subject
     count::(Integral n) => a -> n
 
+-- | Characterizes finitely-presented types, i.e. types for which there are fintely many inhabitants    
+class FiniteMembership a b where
+    -- Retrieves the members of 'a'
+    members::a -> [b]    
+
 -- | Characterizes a finite container or other type that contains elements
 -- that can be partitioned     
 class Chunkable a where
@@ -177,9 +176,13 @@ class Producer a b where
 class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
     convert::a -> b    
-        
+
+-- Characterizes a pair of types for which transformations are defined 
+-- for respectively "packing"  and "unpacking" type values
 class Packable a b where
+    -- Encodes an a-value to a b-value
     pack::a -> b
+    -- Restores an a-value from a b-value
     unpack::b -> a    
     
 class Indexed c e where
@@ -223,30 +226,19 @@ class Replicator a where
     replicate::Int -> a -> [a]
     replicate = L.replicate
     
-instance Jailbreak Maybe a where
-    escape x = fromJust x
-
--- Characterizes types for which a meaningful union operation can be specified    
+-- /Characterizes types for which a meaningful union operation can be specified    
 class Unionizable a where
     union::a -> a -> a
 
--- Characterizes types for which a meaningful intersection operation can be specified        
+-- /Characterizes types for which a meaningful intersection operation can be specified        
 class Intersectable a where
     intersect::a -> a -> a
 
--- Characterizes types for which a meaningful delta operation can be specified        
+-- |Characterizes types for which a meaningful delta operation can be specified        
 class Diffable a where
     delta::a -> a -> a
-    
-
-instance (Eq a) => Unionizable [a] where
-    union = L.union
-    
-instance (Eq a) => Intersectable [a] where
-    intersect = L.intersect
-    
--- Follows the ideas as presented in Wadler's Propositions as Types
-
+        
+--From Wadler's Propositions as Types:
 --Disjunction A ∨ B corresponds to a disjoint sum A + B, that
 --is, a variant with two alternatives. A proof of the proposition
 --A ∨ B consists of either a proof of A or a proof of B, including
@@ -258,7 +250,7 @@ data Disjunct a b = Disjunct (Either a b)
 
 type a :||: b = Disjunct a b
 
-
+-- From Wadler's Propositions as Types:
 -- Conjunction A & B corresponds to Cartesian product A × B,
 -- that is, a record with two fields, also known as a pair. A proof
 -- of the proposition A&B consists of a proof of A and a proof of
@@ -268,6 +260,7 @@ data Conjunct a b = Conjunct (a,b)
 
 type a :&: b = Conjunct a b
 
+-- From Wadler's Propositions as Types:
 --Implication A => B corresponds to function space A -> B. A
 --proof of the proposition A => B consists of a procedure that
 --given a proof of A yields a proof of B. Similarly, a value of
@@ -276,3 +269,19 @@ type a :&: b = Conjunct a b
 data Implies a b = Implies (a->b)
 
 type a :-> b = Implies a b        
+
+class SmallSet a where
+    member::a -> Bool
+    member _ = True
+
+instance SmallSet a
+    
+instance (Eq a) => Unionizable [a] where
+    union = L.union
+    
+instance (Eq a) => Intersectable [a] where
+    intersect = L.intersect
+
+instance Jailbreak Maybe a where
+    escape x = fromJust x
+    

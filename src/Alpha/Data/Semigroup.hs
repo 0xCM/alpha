@@ -10,6 +10,7 @@
 module Alpha.Data.Semigroup where
 
 import Alpha.Canonical
+import Alpha.Base
 
 instance Wrapped (Dual a) a where
     unwrap = getDual

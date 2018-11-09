@@ -3,8 +3,6 @@
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 module Alpha.Data.Stream
 (
@@ -34,12 +32,9 @@ class (Enumerable (Stream e) e) => Streaming e where
     intersperse :: e -> Stream e -> Stream e    
     iterate :: (e -> e) -> e -> Stream e
     cycle::[e] -> Stream e
-    
-    
-    
+            
 instance Streaming (Stream s)  where
     tail = S.tail
     intersperse = S.intersperse
     iterate = S.iterate
     cycle (x:xs) = S.cycle(x :| xs)
-    

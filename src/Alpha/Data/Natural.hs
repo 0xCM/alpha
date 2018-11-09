@@ -11,7 +11,7 @@ import GHC.TypeLits(natVal)
 import GHC.Num hiding(Natural)
 import Alpha.Base
 import Alpha.TypeLevel.Proxy
-import Alpha.Canonical(Formattable(..), (<>))
+import Alpha.Canonical(Formattable(..))
 
 -- Unifies type and value-level naturals
 newtype Natural k = Natural N.Natural
@@ -23,6 +23,10 @@ type Next n = Natural (n + 1)
 type Add m n = Natural (m + n)
 type Sub m n  = Natural (m - n)
 type Mul m n = Natural (m * n)
+
+class (KnownNat n) => Sized n where
+    size::Int
+    size = natval @n
 
 -- Extracts the value encoded at the type-level
 natval::forall n i. (KnownNat n, Integral i) => i

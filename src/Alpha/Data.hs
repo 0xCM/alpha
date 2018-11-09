@@ -10,26 +10,28 @@ module Alpha.Data
 )
 where
 
-import Alpha.Data.Message as X
 import Alpha.Data.Asci as X
 import Alpha.Data.Bits as X
+import Alpha.Data.Coproduct as X
 import Alpha.Data.BitVector as X
 import Alpha.Data.ByteString as X
 import Alpha.Data.Enum as X
+import Alpha.Data.Func as X
 import Alpha.Data.Gate as X
 import Alpha.Data.Maybe as X
+import Alpha.Data.Message as X
 import Alpha.Data.MTuple as X
-import Alpha.Data.Product as X
+import Alpha.Data.NFunc as X
 import Alpha.Data.Numbers as X
+import Alpha.Data.Product as X
 import Alpha.Data.Records as X
 import Alpha.Data.Reflection as X
 import Alpha.Data.Range as X
 import Alpha.Data.Semigroup as X
 import Alpha.Data.Set as X
 import Alpha.Data.Stream as X
-import Alpha.Data.Product as X
-import Alpha.Data.Coproduct as X
-import Alpha.Data.Vector as X
+import Alpha.Data.Sum as X
 import Alpha.Data.Symbols as X
+import Alpha.Data.Vector as X
 
 

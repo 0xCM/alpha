@@ -3,8 +3,6 @@
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 module Alpha.Data.List
 (    
@@ -73,10 +71,9 @@ tails  = (filter (\x -> length x /= 0 )) . List.tails
 inits::[a] -> [[a]]
 inits = (filter (\x -> length x /= 0 )) . List.inits
 
--- The reduce and scan operators are based on the definitions supplied by [Y1987TWOX]
-
 -- The reduction operator // takes a binary operator ⊕ on its left and a vector
 -- x of values on its right. The meaning of ⊕//x for x = [a,b,...z] is the value a⊕b⊕...⊕z
+-- See [Y1987TWOX]
 reduce::(Nullary a) => (a -> a -> a) -> [a] -> a
 reduce op (a:b:tail) =  op (op a b)  (reduce op tail)
 reduce op (a:[]) = a
@@ -88,6 +85,7 @@ infixl 5 //
 
 -- The scan operator \\ takes a binary operator ⊕ on its left and a vector
 -- x ov values on the right and is defined by ⊕\\x for x = [a,b,...z] is the value [a,a⊕b,...,a⊕b..⊕z]
+-- See [Y1987TWOX]
 scan::(Nullary a) => (a -> a -> a) -> [a] -> [a]
 scan op x = fmap (reduce op) (inits x)
 

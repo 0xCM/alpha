@@ -1,8 +1,14 @@
-module Alpha.Canonical.Functors
+-----------------------------------------------------------------------------
+-- | Defines the functorial API surface provided by external libraries
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+module Alpha.Functor.Base
 (
     Functor, fmap,(<$>), (<$), ($>),
     Apply, fapply, (<.>), (.>), (<.),
-    Alt, (<!>),
+    AltF, (<!>),
     Bind, join, (>>-),(-<<), (-<-), (->-), 
     Plus, fzero,
     Foldable, foldr, fold,
@@ -19,7 +25,8 @@ module Alpha.Canonical.Functors
     Monad,
     Applicative, pure, (<*>), (<**>), liftA2, (<*), (*>),
     Alternative, empty, (<|>), optional,
-    Comonad, extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>)
+    Comonad, extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>),
+    map
 )
 where
 import Data.Functor.Bind(Bind(..),Apply(..), (<.>), (-<<), (-<-), (->-),join)
@@ -48,6 +55,7 @@ import qualified Data.Functor.Plus as Plus
 
 import Data.Int
 
+type AltF = Alt
 
 -- | Alias for Plus.zero as 'zero' is alreadly taken by 'Monoidal'
 fzero::Plus f  => f a
@@ -59,3 +67,6 @@ infixl 4 `fapply`
 
 feval::(Traversable t, Applicative f) => t (f a) -> f (t a)
 feval = sequenceA
+
+map::(Functor f) => (a -> b) -> f a -> f b
+map = fmap

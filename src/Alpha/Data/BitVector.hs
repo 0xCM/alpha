@@ -62,7 +62,11 @@ bitvector :: KnownNat w => Integer -> BitVector w
 bitvector x = BV wRepr (truncBits width (fromIntegral x))
   where wRepr = knownNat
         width = natValue wRepr
-    
+
+-- The zero bitvector
+bv0 :: BitVector 0
+bv0 = bitvector 0
+        
 -- | Mask for a specified number of lower bits.
 lowMask :: (Integral a, Bits b) => a -> b
 lowMask numBits = complement (complement zeroBits `shiftL` fromIntegral numBits)
@@ -381,9 +385,3 @@ instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2
 
 instance KnownNat w => Length (BitVector w) where
   length  = convert . finiteBitSize  
-
--- The zero bitvector
-bv0 :: BitVector 0
-bv0 = bitvector 0
-
-

@@ -19,8 +19,10 @@ import qualified Data.Text as T
 import qualified Alpha.Data.Asci as Ascii
 import Alpha.Canonical
 
-
 type Set a = HashSet a
+
+set::(Hashable a, Eq a) => [a] -> Set a
+set = Set.fromList
 
 instance (Show a) => Formattable (Set a) where
     format x =  wrap (T.pack (show x))
@@ -34,5 +36,3 @@ instance (Eq a, Hashable a) => Container (Set a) a where
     contains = Set.member
     singleton = Set.singleton
     
-set::(Hashable a, Eq a) => [a] -> Set a
-set = Set.fromList

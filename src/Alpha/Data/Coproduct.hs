@@ -1,16 +1,31 @@
+-----------------------------------------------------------------------------
+-- | Defines coproduct machinery
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
 
 module Alpha.Data.Coproduct
 (
-    Coproduct, Coproductive(..)
+    Coproduct(..), Coproductive(..)
     
 )
 where
 import Alpha.Base
 import Alpha.Data.Product
+import Alpha.Data.Sum
 
-type family Coproduct a | a -> a
+type family Coproduct a | a -> a where
+    Coproduct (Sum1 a1) = Sum1 a1
+    Coproduct (Sum2 a1 a2) = Sum2 a1 a2     
+    Coproduct (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
+    Coproduct (Sum4 a1 a2 a3 a4) = Sum4 a1 a2 a3 a4
+    Coproduct (Sum5 a1 a2 a3 a4 a5) = Sum5 a1 a2 a3 a4 a5
+    Coproduct (Sum6 a1 a2 a3 a4 a5 a6) = Sum6 a1 a2 a3 a4 a5 a6
+    Coproduct (Sum7 a1 a2 a3 a4 a5 a6 a7) = Sum7 a1 a2 a3 a4 a5 a6 a7
+    Coproduct (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) = Sum8 a1 a2 a3 a4 a5 a6 a7 a8
 
 class Coproductive (m::Nat) (n::Nat) a b where
     -- | Injects an a-value into a b-valued coproduct
@@ -20,23 +35,12 @@ class Coproductive (m::Nat) (n::Nat) a b where
     cofactor::Coproduct b -> Maybe a
 
 -- Coproduct 1         
-data Sum1 a1 
-    = Sum11 {-# UNPACK #-} !a1
-    deriving (Eq, Ord, Data, Generic, Typeable, Show)
-type instance Coproduct (Sum1 a1) = Sum1 a1
-
 instance Coproductive 1 1 a1 (Sum1 a1 )  where 
     coproduct  = Sum11    
     cofactor (Sum11 a) = Just a
 
 -- Coproduct 2     
 -------------------------------------------------------------------------------
-data Sum2 a1 a2 
-     = Sum21 {-# UNPACK #-} !a1
-     | Sum22 {-# UNPACK #-} !a2
-     deriving (Eq, Ord, Data, Generic, Typeable, Show)
-
-type instance Coproduct (Sum2 a1 a2) = Sum2 a1 a2     
 
 instance Coproductive 2 1 a1 (Sum2 a1 a2)  where 
     coproduct  = Sum21    
@@ -48,27 +52,17 @@ instance Coproductive 2 2 a2 (Sum2 a1 a2)  where
     cofactor (Sum22 a) = Just a
     cofactor _         = Nothing
 
-
+comap2::(f1 ~ (a1->b1), f2 ~ (a2 -> b2)) => Product2 f1 f2 -> (Sum2 a1 a2) -> (Sum2 b1 b2)
+comap2 (Product2 f1 _ ) (Sum21 a1) = Sum21 (f1 a1)
+comap2 (Product2 _ f2 ) (Sum22 a2) = Sum22 (f2 a2)  
+    
 -- Coproduct 3
 -------------------------------------------------------------------------------
-data Sum3 a1 a2 a3 
-    = Sum31 {-# UNPACK #-} !a1
-    | Sum32 {-# UNPACK #-} !a2
-    | Sum33 {-# UNPACK #-} !a3
-    deriving (Eq, Ord, Data, Generic, Typeable, Show)
-
-map3::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3)) => Product3 f1 f2 f3 -> (Sum3 a1 a2 a3) -> (Sum3 b1 b2 b3)
-map3 (Product3 f1 _ _) (Sum31 a1) = Sum31 (f1 a1)
-map3 (Product3 _ f2 _) (Sum32 a2) = Sum32 (f2 a2)  
-map3 (Product3 _ _ f3) (Sum33 a3) = Sum33 (f3 a3)
-
-type instance Coproduct (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
 
 instance Coproductive 3 1 a1 (Sum3 a1 a2 a3)  where 
     coproduct  = Sum31
     cofactor (Sum31 a) = Just a
     cofactor _         = Nothing
-
 
 instance Coproductive 3 2 a2 (Sum3 a1 a2 a3)  where 
     coproduct  = Sum32
@@ -81,16 +75,13 @@ instance Coproductive 3 3 a3 (Sum3 a1 a2 a3)  where
     cofactor (Sum33 a) = Just a
     cofactor _         = Nothing
 
+comap3::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3)) => Product3 f1 f2 f3 -> (Sum3 a1 a2 a3) -> (Sum3 b1 b2 b3)
+comap3 (Product3 f1 _ _) (Sum31 a1) = Sum31 (f1 a1)
+comap3 (Product3 _ f2 _) (Sum32 a2) = Sum32 (f2 a2)  
+comap3 (Product3 _ _ f3) (Sum33 a3) = Sum33 (f3 a3)
+    
 -- Coproduct 4
 -------------------------------------------------------------------------------
-data Sum4 a1 a2 a3 a4
-    = Sum41 {-# UNPACK #-} !a1
-    | Sum42 {-# UNPACK #-} !a2
-    | Sum43 {-# UNPACK #-} !a3
-    | Sum44 {-# UNPACK #-} !a4
-    deriving (Eq, Ord, Data, Generic, Typeable, Show)
-
-type instance Coproduct (Sum4 a1 a2 a3 a4) = Sum4 a1 a2 a3 a4
 
 instance Coproductive 4 1 a1 (Sum4 a1 a2 a3 a4)  where 
     coproduct  = Sum41
@@ -112,17 +103,13 @@ instance Coproductive 4 4 a4 (Sum4 a1 a2 a3 a4)  where
     cofactor (Sum44 a) = Just a
     cofactor _         = Nothing
 
+comap4::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3), f4 ~ (a4 -> b4)) => Product4 f1 f2 f3 f4 -> (Sum4 a1 a2 a3 a4) -> (Sum4 b1 b2 b3 b4)
+comap4 (Product4 f1 _ _ _) (Sum41 a1) = Sum41 (f1 a1)
+comap4 (Product4 _ f2 _ _) (Sum42 a2) = Sum42 (f2 a2)  
+comap4 (Product4 _ _ f3 _) (Sum43 a3) = Sum43 (f3 a3)
+comap4 (Product4 _ _ _ f4) (Sum44 a4) = Sum44 (f4 a4)    
 -- Coproduct 5
 -------------------------------------------------------------------------------
-data Sum5 a1 a2 a3 a4 a5
-    = Sum51 {-# UNPACK #-} !a1
-    | Sum52 {-# UNPACK #-} !a2
-    | Sum53 {-# UNPACK #-} !a3
-    | Sum54 {-# UNPACK #-} !a4
-    | Sum55 {-# UNPACK #-} !a5
-    deriving (Eq, Ord, Data, Generic, Typeable, Show)
-
-type instance Coproduct (Sum5 a1 a2 a3 a4 a5) = Sum5 a1 a2 a3 a4 a5
 
 instance Coproductive 5 1 a1 (Sum5 a1 a2 a3 a4 a5)  where 
     coproduct  = Sum51
@@ -151,16 +138,6 @@ instance Coproductive 5 5 a5 (Sum5 a1 a2 a3 a4 a5)  where
 
 -- Coproduct 6
 -------------------------------------------------------------------------------
-data Sum6 a1 a2 a3 a4 a5 a6
-    = Sum61 {-# UNPACK #-} !a1
-    | Sum62 {-# UNPACK #-} !a2
-    | Sum63 {-# UNPACK #-} !a3
-    | Sum64 {-# UNPACK #-} !a4
-    | Sum65 {-# UNPACK #-} !a5
-    | Sum66 {-# UNPACK #-} !a6
-    deriving (Eq, Ord, Data, Generic, Typeable, Show)
-
-type instance Coproduct (Sum6 a1 a2 a3 a4 a5 a6) = Sum6 a1 a2 a3 a4 a5 a6
 
 instance Coproductive 6 1 a1 (Sum6 a1 a2 a3 a4 a5 a6)  where 
     coproduct  = Sum61
@@ -194,18 +171,6 @@ instance Coproductive 6 6 a6 (Sum6 a1 a2 a3 a4 a5 a6)  where
 
 -- Coproduct 7
 -------------------------------------------------------------------------------
-data Sum7 a1 a2 a3 a4 a5 a6 a7
-    = Sum71 {-# UNPACK #-} !a1
-    | Sum72 {-# UNPACK #-} !a2
-    | Sum73 {-# UNPACK #-} !a3
-    | Sum74 {-# UNPACK #-} !a4
-    | Sum75 {-# UNPACK #-} !a5
-    | Sum76 {-# UNPACK #-} !a6
-    | Sum77 {-# UNPACK #-} !a7
-    deriving (Eq, Ord, Data, Generic, Typeable, Functor, Show)
-
-
-type instance Coproduct (Sum7 a1 a2 a3 a4 a5 a6 a7) = Sum7 a1 a2 a3 a4 a5 a6 a7
 
 instance Coproductive 7 1 a1 (Sum7 a1 a2 a3 a4 a5 a6 a7)  where 
     coproduct  = Sum71
@@ -241,14 +206,48 @@ instance Coproductive 7 7 a7 (Sum7 a1 a2 a3 a4 a5 a6 a7)  where
     coproduct  = Sum77
     cofactor (Sum77 a) = Just a
     cofactor _         = Nothing
+
+
+-- Coproduct 8
+-------------------------------------------------------------------------------
+
+instance Coproductive 8 1 a1 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum81
+    cofactor (Sum81 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 2 a2 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum82
+    cofactor (Sum82 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 3 a3 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum83
+    cofactor (Sum83 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 4 a4 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum84
+    cofactor (Sum84 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 5 a5 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum85
+    cofactor (Sum85 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 6 a6 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum86
+    cofactor (Sum86 a) = Just a
+    cofactor _         = Nothing
+
+instance Coproductive 8 7 a7 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    coproduct  = Sum87
+    cofactor (Sum87 a) = Just a
+    cofactor _         = Nothing
     
-data DisjointUnion a1 a2 a3 a4 a5 a6 a7 a8 a9
-    = DU1 {-# Unpack #-} !a1
-    | DU2 {-# Unpack #-} !a2
-    | DU3 {-# Unpack #-} !a3
-    | DU4 {-# Unpack #-} !a4
-    | DU5 {-# Unpack #-} !a5
-    | DU6 {-# Unpack #-} !a6
-    | DU7 {-# Unpack #-} !a7
-    | DU8 {-# Unpack #-} !a8
-    | DU9 {-# Unpack #-} !a9
+instance Coproductive 8 8 a8 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8)  where 
+    coproduct  = Sum88
+    cofactor (Sum88 a) = Just a
+    cofactor _         = Nothing
+        

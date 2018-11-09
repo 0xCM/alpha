@@ -1,4 +1,4 @@
-module Alpha.Data.Functor.Contravariant 
+module Alpha.Functor.Contravariant 
 (
     Contravariant,
     contramap, (>$<), (>$$<),

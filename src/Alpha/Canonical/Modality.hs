@@ -1,4 +1,4 @@
-module Alpha.Canonical.Families 
+module Alpha.Canonical.Modality
 (
     Lazy(..), Strict(..), Boxed(..), Unboxed(..)
 )

@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Numeric.Interval 
+module Alpha.Numerics.Interval 
 (
     Interval, (+/-),interval,width
 )

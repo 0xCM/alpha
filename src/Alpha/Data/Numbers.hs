@@ -1,10 +1,9 @@
 -----------------------------------------------------------------------------
--- | Defines the integer-related API surface
+-- | Defines the elementary number-related API surface
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-
 {-# LANGUAGE MagicHash #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
@@ -13,8 +12,6 @@
 module Alpha.Data.Numbers
 (    
     BigInt,
-    Base, 
-    BasedInt,
     SizedInt(..), 
     SizedWord(..),
     Integer,
@@ -23,7 +20,6 @@ module Alpha.Data.Numbers
     Num(abs, signum),
 
     intn, wordn,
-    based, base2, base10, base16,
     int, bigint, 
     int8, int16, int32, int64,
     word8, word16, word32, word64,
@@ -49,7 +45,22 @@ import Numeric
 import Alpha.Base
 import Alpha.Text.Format
 import Alpha.Canonical hiding((+),(*),(-),range)
-    
+
+
+instance SignedIntegral Integer
+instance SignedIntegral Int
+instance SignedIntegral Int8
+instance SignedIntegral Int16
+instance SignedIntegral Int32
+instance SignedIntegral Int64
+
+instance UnsignedIntegral Word
+instance UnsignedIntegral Word8
+instance UnsignedIntegral Word16
+instance UnsignedIntegral Word32
+instance UnsignedIntegral Word64
+
+
 type family Unsigned i :: * where
     Unsigned Int8 = Word8
     Unsigned Int16 = Word16
@@ -72,24 +83,8 @@ type family SizedWord (n::Nat) | n -> n where
     SizedWord 32 = Word32
     SizedWord 64 = Word64    
         
--- expandWord::SizedWord n -> SizedWord (n + n)
--- expandWord  = coerce 
-
 -- | An integer of arbitrary size
 type BigInt = Integer
-
-data Base (n::Nat) = Base
-
-data BasedInt (n::Nat) i = BasedInt !i
-
-based::forall (n::Nat) i. (Integral i) => i -> BasedInt n i
-based i = BasedInt i
-
-base2 = based @2
-
-base10 = based @10
-
-base16 = based @16
 
 -- | Canonical 'Int' constructor for machine-sized integers
 int::(Integral n) => n -> Int
@@ -175,115 +170,162 @@ modpart (min,max) n
 zed::(Num a) => a
 zed = 0
 
+unity::(Num a) => a
+unity = 1
+
 sub'::(Num a) => a -> a -> a
 sub' x y = x - y
       
 instance (Integral a, Num b) => Convertible a b where
     convert = fromIntegral
 
-instance Nullary Int where zero = 0    
-instance Semigroup Int where (<>) = (+)
-instance Monoid Int where mempty = zero
-instance Invertible Int Int where invert x = zero - x
-instance Additive Int where add = (+)
-instance Multiplicative Int where mul = (*)
-instance Subtractive Int where sub = (-)
-instance Group Int
-instance TotalOrder Int
+instance (SignedIntegral a) => Invertible a a where invert x = zed - x
 
-instance Nullary Integer where zero = 0
-instance Semigroup Integer where (<>) = (+)
-instance Monoid Integer where mempty = zero   
-instance Invertible Integer Integer where invert x = zero - x
-instance Additive Integer where add = (+)
-instance Multiplicative Integer where mul = (*)
-instance Subtractive Integer where sub = (-)
-instance Group Integer
+instance TotalOrder Natural
 instance TotalOrder Integer
-
-instance Nullary Int8 where zero = 0
-instance Semigroup Int8 where (<>) = (+)
-instance Monoid Int8 where mempty = zero
-instance Invertible Int8 Int8 where invert x = zero - x
-instance Additive Int8 where add = (+)
-instance Multiplicative Int8 where mul = (*)
-instance Subtractive Int8 where sub = (-)
-instance Group Int8
+instance TotalOrder Int
 instance TotalOrder Int8
-
-instance Nullary Int16 where zero = 0
-instance Semigroup Int16 where (<>) = (+)
-instance Monoid Int16 where mempty = zero
-instance Invertible Int16 Int16 where invert x = zero - x
-instance Additive Int16 where add = (+)
-instance Multiplicative Int16 where mul = (*)
-instance Subtractive Int16 where sub = (-)
-instance Group Int16
 instance TotalOrder Int16
-
-instance Nullary Int32 where zero = 0
-instance Semigroup Int32 where (<>) = (+)
-instance Monoid Int32 where mempty = zero
-instance Invertible Int32 Int32 where invert x = zero - x    
-instance Additive Int32 where add = (+)
-instance Multiplicative Int32 where mul = (*)
-instance Subtractive Int32 where sub = (-)
-instance Group Int32
 instance TotalOrder Int32
-
-instance Nullary Int64 where zero = 0
-instance Semigroup Int64 where (<>) = (+)
-instance Monoid Int64 where mempty = zero
-instance Invertible Int64 Int64  where invert x = zero - x
-instance Additive Int64 where add = (+)
-instance Multiplicative Int64 where mul = (*)
-instance Subtractive Int64 where sub = (-)
-instance Group Int64
 instance TotalOrder Int64
-
-instance Nullary Word where zero = 0
-instance Invertible Word Int where invert x = zero - (fromIntegral x)
-instance Additive Word where add = (+)
-instance Multiplicative Word where mul = (*)
-instance Subtractive Word where sub = (-)
 instance TotalOrder Word
-
-instance Nullary Word8 where zero = 0
-instance Invertible Word8 Int8 where invert x = zero - (fromIntegral x)
-instance Additive Word8 where add = (+)
-instance Multiplicative Word8 where mul = (*)
-instance Subtractive Word8 where sub = (-)
 instance TotalOrder Word8
-
-instance Nullary Word16 where zero = 0
-instance Invertible Word16 Int16 where invert x = zero - (fromIntegral x)
-instance Additive Word16 where add = (+)
-instance Multiplicative Word16 where mul = (*)
-instance Subtractive Word16 where sub = (-)
 instance TotalOrder Word16
-
-instance Nullary Word32 where zero = 0
-instance Invertible Word32 Int32 where invert x = zero - (fromIntegral x)
-instance Additive Word32 where add = (+)
-instance Multiplicative Word32 where mul = (*)
-instance Subtractive Word32 where sub = (-)
 instance TotalOrder Word32
-
-instance Nullary Word64 where zero = 0
-instance Invertible Word64 Int64 where invert x = zero - (fromIntegral x)
-instance Additive Word64 where add = (+)
-instance Multiplicative Word64 where mul = (*)
-instance Subtractive Word64 where sub = (-)
 instance TotalOrder Word64
+instance TotalOrder Float
+instance TotalOrder Double
 
-instance Nullary Double where zero = 0
-instance Invertible Double Double where invert x = zero - x
-instance Additive Double where add = (+)
-instance Multiplicative Double where mul = (*)
+instance Subtractive Natural where sub = (-)
+instance Subtractive Integer where sub = (-)
+instance Subtractive Int where sub = (-)
+instance Subtractive Int8 where sub = (-)
+instance Subtractive Int16 where sub = (-)
+instance Subtractive Int32 where sub = (-)
+instance Subtractive Int64 where sub = (-)
+instance Subtractive Word where sub = (-)
+instance Subtractive Word8 where sub = (-)
+instance Subtractive Word16 where sub = (-)
+instance Subtractive Word32 where sub = (-)
+instance Subtractive Word64 where sub = (-)
+instance Subtractive Float where sub = (-)
 instance Subtractive Double where sub = (-)
 
-instance Nullary Float where zero = 0
-instance Invertible Float Float where invert x = zero - x
+instance Additive Natural where add = (+)
+instance Additive Integer where add = (+)
+instance Additive Int where add = (+)
+instance Additive Int8 where add = (+)
+instance Additive Int16 where add = (+)
+instance Additive Int32 where add = (+)
+instance Additive Int64 where add = (+)
+instance Additive Word where add = (+)
+instance Additive Word8 where add = (+)
+instance Additive Word16 where add = (+)
+instance Additive Word32 where add = (+)
+instance Additive Word64 where add = (+)
 instance Additive Float where add = (+)
+instance Additive Double where add = (+)
+
+instance Semigroup Natural where (<>) = (+)
+instance Semigroup Integer where (<>) = (+)
+instance Semigroup Int where (<>) = (+)
+instance Semigroup Int8 where (<>) = (+)
+instance Semigroup Int16 where (<>) = (+)
+instance Semigroup Int32 where (<>) = (+)
+instance Semigroup Int64 where (<>) = (+)
+instance Semigroup Word where (<>) = (+)
+instance Semigroup Word8 where (<>) = (+)
+instance Semigroup Word16 where (<>) = (+)
+instance Semigroup Word32 where (<>) = (+)
+instance Semigroup Word64 where (<>) = (+)
+instance Semigroup Float where (<>) = (+)
+instance Semigroup Double where (<>) = (+)
+
+instance Multiplicative Natural where mul = (*)
+instance Multiplicative Integer where mul = (*)
+instance Multiplicative Int where mul = (*)
+instance Multiplicative Int8 where mul = (*)
+instance Multiplicative Int16 where mul = (*)
+instance Multiplicative Int32 where mul = (*)
+instance Multiplicative Int64 where mul = (*)
+instance Multiplicative Word where mul = (*)
+instance Multiplicative Word8 where mul = (*)
+instance Multiplicative Word16 where mul = (*)
+instance Multiplicative Word32 where mul = (*)
+instance Multiplicative Word64 where mul = (*)
 instance Multiplicative Float where mul = (*)
-instance Subtractive Float where sub = (-)
+instance Multiplicative Double where mul = (*)
+
+instance Nullary Natural where zero = zed
+instance Nullary Integer where zero = zed
+instance Nullary Int where zero = zed
+instance Nullary Int8 where zero = zed
+instance Nullary Int16 where zero = zed
+instance Nullary Int32 where zero = zed
+instance Nullary Int64 where zero = zed
+instance Nullary Word where zero = zed
+instance Nullary Word8 where zero = zed
+instance Nullary Word16 where zero = zed
+instance Nullary Word32 where zero = zed
+instance Nullary Word64 where zero = zed
+instance Nullary Float where zero = zed
+instance Nullary Double where zero = zed
+
+instance Monoid Natural where mempty = zero
+instance Monoid Integer where mempty = zero
+instance Monoid Int where mempty = zero
+instance Monoid Int8 where mempty = zero
+instance Monoid Int16 where mempty = zero
+instance Monoid Int32 where mempty = zero
+instance Monoid Int64 where mempty = zero
+instance Monoid Word where mempty = zero
+instance Monoid Word8 where mempty = zero
+instance Monoid Word16 where mempty = zero
+instance Monoid Word32 where mempty = zero
+instance Monoid Word64 where mempty = zero
+instance Monoid Float where mempty = zero
+instance Monoid Double where mempty = zero
+
+instance Unital Natural where one = unity
+instance Unital Integer where one = unity
+instance Unital Int where one = unity
+instance Unital Int8 where one = unity
+instance Unital Int16 where one = unity
+instance Unital Int32 where one = unity
+instance Unital Int64 where one = unity
+instance Unital Word where one = unity
+instance Unital Word8 where one = unity
+instance Unital Word16 where one = unity
+instance Unital Word32 where one = unity
+instance Unital Word64 where one = unity
+instance Unital Float where one = unity
+instance Unital Double where one = unity
+
+instance Group Integer
+instance Group Int
+instance Group Int8
+instance Group Int16
+instance Group Int32
+instance Group Int64
+
+instance Abelian Integer
+instance Abelian Int
+instance Abelian Int8
+instance Abelian Int16
+instance Abelian Int32
+instance Abelian Int64
+
+instance Ring Integer
+instance Ring Int
+instance Ring Int8
+instance Ring Int16
+instance Ring Int32
+instance Ring Int64
+
+instance Invertible Word Int where invert x = zero - (fromIntegral x)
+instance Invertible Word8 Int8 where invert x = zero - (fromIntegral x)
+instance Invertible Word16 Int16 where invert x = zero - (fromIntegral x)
+instance Invertible Word32 Int32 where invert x = zero - (fromIntegral x)
+instance Invertible Word64 Int64 where invert x = zero - (fromIntegral x)
+instance Invertible Float Float where invert x = zed - x
+instance Invertible Double Double where invert x = zed - x

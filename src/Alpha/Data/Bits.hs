@@ -8,9 +8,11 @@
 
 module Alpha.Data.Bits 
 (
+    SizedBits(..),
     toggled, bitcount, bitsplat,
     (.^.), (.~.), (.<<.), (.>>.), (.?.),
     lobyte,hibyte
+    
 )
 where
 import qualified Data.Text as Text
@@ -20,11 +22,14 @@ import Alpha.Canonical
 import Alpha.Text.Combinators
 import Alpha.Data.Numbers
 import Alpha.Data.Bit
+import Alpha.Data.Natural
 import GHC.TypeLits
+
+class (Sized n, FiniteBits a) => SizedBits n a where
 
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> fromBool
-    
+
 -- | Delegates to the finiteBitSize function
 bitcount :: (FiniteBits a) => a -> Int
 bitcount a = finiteBitSize a

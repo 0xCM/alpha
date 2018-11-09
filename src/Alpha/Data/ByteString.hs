@@ -46,7 +46,6 @@ import Alpha.Data.Maybe
 import Alpha.Data.Bits
 
 type instance Strict EG.ByteString = EG.ByteString
-
 type instance Lazy EG.ByteString = LZ.ByteString
 
 -- Extracts a contiguous sequence of bytes from the source
@@ -60,9 +59,6 @@ segment (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
 -- Constructs a bytestring from a list of words
 bytestring::[Word8] -> EG.ByteString
 bytestring = EG.pack
-
-instance Chunkable EG.ByteString where
-    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
     
 entropy::Int -> EG.ByteString
 entropy n = (getHardwareEntropy n |> unsafeDupablePerformIO ) |> fromJust
@@ -80,13 +76,9 @@ segments width total = intervals
         intervals = cutpoints |> fmap (\c -> (c - width, c - 1))
         segs = intervals |> fmap (\x -> segment x source)
 
-
--- 'ByteString' -> 'Text'
 instance Formattable EG.ByteString where
-    --format x = C8.unpack x |> Text.pack 
     format x = (bytes 0 (EG.length x) x) |> format
 
--- 'LBS.ByteString' -> 'Text'    
 instance Formattable LZ.ByteString where
     format  = Text.pack . LC8.unpack 
 
@@ -123,3 +115,7 @@ instance Indexed LZ.ByteString Word8 where
 
 instance Convertible EG.ByteString [Word8] where
     convert source = source |> bytes 0 (length source - 1) 
+
+instance Chunkable EG.ByteString where
+    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
+        

@@ -44,3 +44,4 @@ instance Concatenable Char Char where
     type Concatenated Char Char = Text
     concat c1 c2  = T.pack ([c1] List.++ [c2])
     
+    

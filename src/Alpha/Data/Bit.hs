@@ -3,8 +3,6 @@
 -- Copyright   :  (c) 0xCM, 2018 + Contributors per license
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingVia #-}
