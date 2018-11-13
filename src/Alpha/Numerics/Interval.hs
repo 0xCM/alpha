@@ -16,7 +16,7 @@ import Alpha.Base
 import Alpha.Canonical hiding( (...))
 
 instance (Ord a) => Container (Interval a) a where
-    contains = I.member
+    type Source (Interval a) a = Interval a
     singleton = I.singleton
 
 instance (Eq a) => Nullary (Interval a) where

@@ -5,6 +5,7 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Alpha.Data.Sum
 (
@@ -17,6 +18,7 @@ module Alpha.Data.Sum
 where
 
 import Alpha.Base
+import Alpha.Canonical
 
 -- A single-case sum
 data Sum1 a1 
@@ -89,6 +91,28 @@ type a !+! b = Sum2 a b
 (+!) = Sum22
 
 
+instance IndexedChoice (Sum2 a1 a2) where
+    choiceix (Sum21 _) = 1
+    choiceix (Sum22 _) = 2
+    
+instance IndexedChoice (Sum3 a1 a2 a3) where
+    choiceix (Sum31 _) = 1
+    choiceix (Sum32 _) = 2
+    choiceix (Sum33 _) = 3
+
+instance IndexedChoice (Sum4 a1 a2 a3 a4) where
+    choiceix (Sum41 _) = 1
+    choiceix (Sum42 _) = 2
+    choiceix (Sum43 _) = 3
+    choiceix (Sum44 _) = 4
+
+instance IndexedChoice (Sum5 a1 a2 a3 a4 a5) where
+    choiceix (Sum51 _) = 1
+    choiceix (Sum52 _) = 2
+    choiceix (Sum53 _) = 3
+    choiceix (Sum54 _) = 4
+    choiceix (Sum55 _) = 5
+
 -- A disjoint sum of arity n    
 type family NSum (n::Nat) a | n -> a where
     NSum 1 (Sum1 a1) = Sum1 a1
@@ -101,14 +125,76 @@ type family NSum (n::Nat) a | n -> a where
     NSum 8 (Sum8 a1 a2 a3 a4 a5 a6 a7 a8) = Sum8 a1 a2 a3 a4 a5 a6 a7 a8
     NSum 9 (Sum9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = Sum9 a1 a2 a3 a4 a5 a6 a7 a8 a9
 
-data DisjointUnion a1 a2 a3 a4 a5 a6 a7 a8 a9
-    = DU1 !a1
-    | DU2 !a2
-    | DU3 !a3
-    | DU4 !a4
-    | DU5 !a5
-    | DU6 !a6
-    | DU7 !a7
-    | DU8 !a8
-    | DU9 !a9
-    deriving (Show)
+instance  Semigroup (Sum2 a1 a2) where
+    Sum21 _ <> a2 = a2
+    a1      <> _ = a1
+
+instance Functor (Sum2 a1) where
+    fmap _ (Sum21 a1) = Sum21 a1
+    fmap f (Sum22 a2) = Sum22 (f a2)
+
+-- instance Alt (Sum2 a1) where
+--     f <!> (Sum21 a1) = f <$> a1
+--     f <!> (Sum22 a2) = f <$> a2
+    
+instance Applicative (Sum2 a1) where
+    pure            = Sum22
+    Sum21 a1 <*> _  = Sum21 a1
+    Sum22 f  <*> a2 = fmap f a2
+
+instance Foldable (Sum2 a1) where
+    foldMap _ (Sum21 _) = mempty
+    foldMap f (Sum22 y) = f y
+
+    foldr _ z (Sum21 _) = z
+    foldr f z (Sum22 y) = f y z
+
+instance Traversable (Sum2 a1) where
+    traverse _ (Sum21 a1) = pure (Sum21 a1)
+    traverse f (Sum22 a2) = Sum22 <$> f a2
+
+instance Monad (Sum2 a1) where
+    Sum21 a1 >>= _ = Sum21 a1
+    Sum22 a2 >>= k = k a2
+        
+instance Apply (Sum2 a1) where
+    Sum21 a1  <.> _         = Sum21 a1
+    Sum22 _   <.> Sum21 a1  = Sum21 a1
+    Sum22 f   <.> Sum22 a2  = Sum22 (f a2)
+    
+    Sum21 a1  <.  _       = Sum21 a1
+    Sum22 _   <. Sum21 a1 = Sum21 a1
+    Sum22 a1  <. Sum22 _  = Sum22 a1
+    
+    Sum21 a1   .> _       = Sum21 a1
+    Sum22 _  .> Sum21 a1  = Sum21 a1
+    Sum22 _  .> Sum22 a2  = Sum22 a2
+      
+
+-- instance Alt (Sum3 a1 a2) where
+--     f <!> (Sum31 a1) = Sum31 (f a1)
+--     f <!> (Sum32 a2) = Sum32 (f a2)    
+--     f <!> (Sum33 a3) = Sum32 (f a3)        
+
+instance Functor (Sum3 a1 a2) where
+    fmap _ (Sum31 a1) = Sum31 a1
+    fmap _ (Sum32 a2) = Sum32 a2
+    fmap f (Sum33 a3) = Sum33 (f a3)
+
+instance Functor (Sum4 a1 a2 a3) where
+    fmap _ (Sum41 a1) = Sum41 a1
+    fmap _ (Sum42 a2) = Sum42 a2
+    fmap _ (Sum43 a3) = Sum43 a3
+    fmap f (Sum44 a4) = Sum44 (f a4)
+
+instance Bifunctor Sum2 where
+    bimap f1 _ (Sum21 a1) = Sum21 (f1 a1)
+    bimap _ f2 (Sum22 a2) = Sum22 (f2 a2)
+
+instance Bifoldable Sum2 where
+    bifoldMap f1 _ (Sum21 a1) = f1 a1
+    bifoldMap _ f2 (Sum22 a2) = f2 a2
+      
+instance Bitraversable Sum2 where
+    bitraverse f1 _ (Sum21 a1) = Sum21 <$> f1 a1
+    bitraverse _ f2 (Sum22 a2) = Sum22 <$> f2 a2    

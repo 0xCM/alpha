@@ -6,35 +6,55 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Stream
 (
-    Stream
+    Stream, Streamer
 )
-
 where
 
 import qualified Data.Stream.Infinite as IS
 import qualified Data.Stream.Infinite as S
+import Data.Stream.Infinite
+import Data.List.NonEmpty( NonEmpty((:|)) )
+
 import Alpha.Canonical
-import Alpha.Data.Base
-import Data.List.NonEmpty
-
-type Stream = S.Stream
-
-instance Enumerable (Stream e) e where
-    type Source (Stream e) e = Stream e
-
-    items s = S.takeWhile (\_ -> True) s
+import Alpha.Base
+import Alpha.Data.Numbers
+import Alpha.Data.Seq
 
 
-class (Enumerable (Stream e) e) => Streaming e where    
-    -- Skips the leading element and returns the remainder
-    tail::Stream e -> Stream e
-    -- Constructs a new stream by interspersing a specific element with an existin stream
-    intersperse :: e -> Stream e -> Stream e    
-    iterate :: (e -> e) -> e -> Stream e
-    cycle::[e] -> Stream e
-            
-instance Streaming (Stream s)  where
+type SeqStream e = Sequential (Stream e) e
+
+class SeqStream a => Streamer a where    
+
+    -- Constructs a new stream by interspersing a specific element with an existing stream
+    intersperse::a -> Stream a -> Stream a    
+    
+    -- Constructs a stream by successive function applications
+    -- to an initial value, i.e. ...f (f (a))
+    iterate::(a -> a) -> a -> Stream a
+    
+    -- Constructs a sream that emits the elements
+    -- of a list, cyling over said elements indefinitely
+    -- if the list is finite
+    cycle::[a] -> Stream a
+
+    -- Constructs a stream via opaque function calls
+    blackbox::(() -> a) -> Stream a
+
+instance Sequential (Stream e) e where    
+    listed s = S.takeWhile (\_ -> True) s
+    take i s = fromList $ S.take (int i) s
+    split = S.partition
+    while pred src = undefined
     tail = S.tail
+    filter = S.filter
+    skip n s = S.drop (fromIntegral n) s
+
+instance Container (Stream e) e where
+    type Source (Stream e) e = Stream e
+    singleton x = S.cycle [x]
+
+instance Streamer (Stream s)  where
     intersperse = S.intersperse
     iterate = S.iterate
     cycle (x:xs) = S.cycle(x :| xs)
+    blackbox f = S.iterate (\_ -> f ()) (f())        

@@ -8,7 +8,7 @@ module Alpha.Canonical.Algebra
     Multiplicative(..),
     Unital(..),
     Invertible(..),    
-    Semigroupoid(..), compose, 
+    Semigroupoid(..),
     Groupoid(..),
     Group(..), Abelian(..),
     Ring(..),
@@ -16,17 +16,13 @@ module Alpha.Canonical.Algebra
     Setoid(..),
     Infimum(..),
     Supremum(..),
-    Relation(..),
-    Preorder(..),
-    PartialOrder(..), Poset(..),
-    TotalOrder(..), Chain(..),
-    Equivalence(..),
     Nullary(..), null,
     Spanned(..),
     Degenerate(..),
     Vector(..), 
     Vectored(..), Covectored(..),
     SignedIntegral(..),UnsignedIntegral(..),
+    Monoidal(..),
     dual, minimal, maximal, endo, endoply, cartesian
 )
 where
@@ -47,6 +43,7 @@ import qualified Data.Vector as V
 
 import Alpha.Data.Base
 import Alpha.Canonical.Operators
+import qualified Data.Monoid as Monoid
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -56,6 +53,7 @@ class Subtractive a where
     -- | Infix synonym for 'sub'    
     (-)::BinaryOperator a
     (-) = sub
+    
 
 infixl 6 -    
 
@@ -117,65 +115,6 @@ class Unital a where
 class (Eq a) => Setoid a where
     equals::BinaryPredicate a
     equals x y = x == y
-
--- Characterizes a relation on a set s    
-class Relation a where
-
-    -- Relation adjudicator
-    related::BinaryPredicate a
-
-    -- Infix synonym for 'related'
-    (~~)::BinaryPredicate a
-    (~~) = related
-
-infixl 6 ~~
-
--- Characterizes relations that are reflexive and transitive
--- See https://en.wikipedia.org/wiki/Preorder
-class Relation s => Preorder s where
-
--- Characterizes preorders that are antisymmetric: a ~~ b and b ~~ a => a = b
--- See https://en.wikipedia.org/wiki/Preorder
-class Preorder a => PartialOrder a where
-    (~<)::BinaryPredicate a
-    (~<) = (~~)
-
--- Characterizes a total order relation
--- https://en.wikipedia.org/wiki/Total_order    
-class Ord a => TotalOrder a where
-    (<=)::a -> a -> Bool
-    (<=) a b= a P.<= b
-
-    (<)::a -> a -> Bool
-    (<) a b = a P.< b
-
-    (>)::a -> a -> Bool
-    (>) a b = a P.> b
-
-    (>=)::a -> a -> Bool
-    (>=) a b = a P.>= b
-
-infix 4 <=
-infix 4 <    
-infix 4 >
-infix 4 >=    
-    
--- Characterizes a partially ordered set
--- See https://en.wikipedia.org/wiki/Partially_ordered_set   
-class (Setoid a, PartialOrder a) => Poset a where
-    meets::TernaryPredicate a
-    joins::TernaryPredicate a
-
--- Characterizes a totally ordered set, otherwise known as a chain
--- See https://en.wikipedia.org/wiki/Total_order  
-class (Setoid a, TotalOrder a) => Chain a where
-
--- Characterizes preorders that are symmetric, and hence 
--- define equivalence relations: a ~= b => b ~= a
-class Preorder a => Equivalence a where
-    -- Equivalence relation adjudicator
-    (~=)::BinaryPredicate a
-    (~=) = (~~)
     
 -- / Characterizes types for which a greatest lower bound can
 -- be identified, with bounded intervals being the canonical
@@ -212,6 +151,11 @@ class (Ord b) => Spanned a b where
 
 infixl 5 ...
 
+-- A finitely presented permutation: A bijection from [1..n] 
+data Permutation a = Permutation (Map Natural a) (Map a Natural)
+
+class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a
+
 -- | A group is a monoid together with an inversion operator (-)
 -- such that for every element g there exists a unique elment -g where g + (-g) = 0
 class (Monoid a, Subtractive a, Invertible a a) => Group a where    
@@ -236,11 +180,17 @@ class Covectored (n::Nat) a b where
     -- Creates a row vector from an a-value
     row::a -> Vector n b
     
+data Polarity = Polarity{signed::Bool}    
+
+
 -- Identifies signed integral types
 class (Integral i) => SignedIntegral i where
 
+
     -- Identifies usigned integral types    
 class (Integral i) => UnsignedIntegral i where
+
+    
 
 -- Alias for semigroupoid composition operator
 compose::(Semigroupoid c) => c j k -> c i j -> c i k
@@ -274,8 +224,5 @@ cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
 null::(Eq a, Nullary a) => a -> Bool
 null a = a == zero
 
-alt::Monoid a => f a -> Alt f a
-alt = Alt
-
--- A finitely presented permutation: A bijection from [1..n] 
-data Permutation a = Permutation (Map Natural a) (Map a Natural)
+alt::Monoid a => f a -> Monoid.Alt f a
+alt = Monoid.Alt

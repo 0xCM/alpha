@@ -14,13 +14,15 @@ module Alpha
   
 ) where
     
-import Alpha.Base as X hiding((<=),(>=),(<),(>))
+import Alpha.Base as X hiding((<=),(>=),(<),(>),zero)
+
 import Alpha.Canonical as A
 import Alpha.Text as Text
 import Alpha.IO as IO
 import Alpha.TypeLevel as TL
 import Alpha.Data as D
 import Alpha.System as S
+
 import Data.Coerce(Coercible(..))
 import Data.Type.Coercion
 

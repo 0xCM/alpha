@@ -74,14 +74,14 @@ rightOfLast::Text -> Text -> Maybe Text
 rightOfLast match subject 
     = case (Text.splitOn match subject) of
         [] -> none
-        segments -> segments |> List.last |> some
+        segments -> segments |> List.last |> just
 
 -- | Returns the text that precedes the first occurrence of a specified pattern, if any
 leftOfFirst::Text -> Text -> Maybe Text
 leftOfFirst match subject 
     = case (Text.splitOn match subject) of
         [] -> none
-        segments -> segments |> List.head |> some
+        segments -> segments |> List.head |> just
 
 -- | Fences content between a left and right bondary
 enclose::(Formattable l, Formattable c, Formattable r) => l -> c -> r -> Text
@@ -92,9 +92,12 @@ embrace::(Formattable a) => a -> Text
 embrace content = enclose lbrace content rbrace
 
 instance Container Text Text where
--- | Determines whether text contains a specified substring
-    contains match subject = Text.isInfixOf match subject
+    type Source Text Text = Text
     singleton x = x
+
+-- Determines whether a block of text contains a specified substring
+textContains::Text -> Text -> Bool
+textContains match subject = Text.isInfixOf match subject    
 
 -- | Conditionally prepends the subject with a prefix
 prefixIfMissing::Text -> Text -> Text

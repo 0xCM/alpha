@@ -6,60 +6,105 @@
 -----------------------------------------------------------------------------
 module Alpha.Functor.Base
 (
-    Functor, fmap,(<$>), (<$), ($>),
-    Apply, fapply, (<.>), (.>), (<.),
-    AltF, (<!>),
+    Arrow(..), (^>>), (<<^), (>>^), (^<<), (>>>), (<<<),
+    ArrowLoop(..),
+    ArrowPlus, ArrowChoice, ArrowZero(..),
+    Applicative(..), 
+    (<**>), 
+    Alternative, 
+    Apply(..), fapply, 
+    Alt(..), optional,
     Bind, join, (>>-),(-<<), (-<-), (->-), 
-    Plus, fzero,
-    Foldable, foldr, fold,
-    Traversable, traverse, feval,
-    Bifoldable, bifoldl, bifoldr, bifold, bisum,
-    Bitraversable, bitraverse,
-    Bifunctor, bimap,
+
+    Bifoldable(..), bisum,    
+    Biapplicative(..), biliftA3,traverseBia, sequenceBia, traverseBiaWith,         
+    Bitraversable(..),
+    Bifunctor(..), 
     Biapply(..),(<<$>>),(<<..>>),
-    Extend, duplicated, extended,
-    Const,
-    Arrow, arr, 
-    (***), (&&&), (^>>), (<<^), (>>^), (^<<), (>>>), (<<<),
-    ArrowLoop, loop,
-    Monad,
-    Applicative, pure, (<*>), (<**>), liftA2, (<*), (*>),
-    Alternative, empty, (<|>), optional,
-    Comonad, extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>),
-    map
+    
+    Category(..),
+    Comonad(..), (=>=), (=<=),(<<=), (=>>),
+    Const(..),
+    Contravariant(..), phantom, ($<), (>$<),  (>$$<),
+    Opposite, opposite,
+
+    Distributive(..), cotraverse,
+    Extend(..),
+    Monad(..),
+    Functor(..), (<$>), ($>),
+    Foldable(..), 
+    Traversable(..), feval,
+
+    ProductF(..), pair,
+    SumF(..), lsum, rsum,
+    IdentityF(..), identity
+    
 )
 where
-import Data.Functor.Bind(Bind(..),Apply(..), (<.>), (-<<), (-<-), (->-),join)
-import Control.Category(Category, (.))
-import Control.Arrow(Arrow, arr, (***), (&&&), (^>>), (<<^), (>>^), (^<<), (>>>), (<<<))
-import Control.Arrow(ArrowLoop, loop)
-import Control.Monad(Monad)
-import Control.Applicative(Applicative, pure, (<*>), (<**>), liftA2, (<*), (*>))
-import Control.Applicative(Alternative, empty, (<|>), optional)
-import Control.Comonad(Comonad, extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>)  )    
-import Data.Traversable(Traversable, traverse, sequenceA)
-import Data.Distributive(distribute, collect, cotraverse)
-import Data.Foldable(Foldable,foldr, foldl, fold)
-import Data.Functor.Alt(Alt, (<!>))
-import Data.Functor.Plus(Plus)
-import Data.Functor(Functor, fmap, (<$), ($>), (<$>))
-import Data.Functor.Extend(Extend, duplicated, extended)
-import Data.Functor.Const(Const)
-import Data.Bifunctor.Sum(Sum(..))
-import Data.Bifunctor.Product(Product(..))
-import Data.Bifunctor(Bifunctor, bimap)
-import Data.Bifunctor.Apply(Biapply(..), (<<$>>),(<<..>>))
-import Data.Bifoldable
-import Data.Bitraversable
+import Control.Category(Category((.)))
+import Control.Arrow(Arrow(arr, (***), (&&&)))
+import Control.Arrow(ArrowLoop(loop))
+import Control.Arrow(ArrowPlus(..), ArrowChoice(..), ArrowZero(..))
+import Control.Arrow((^>>), (<<^), (>>^), (^<<), (>>>), (<<<))
+import Control.Monad(Monad(..))
+import Control.Applicative(Applicative(pure, (<*>)),  (<**>), liftA2, (<*), (*>))
+import Control.Applicative(Alternative(..), empty, (<|>))
+import Control.Comonad(Comonad(..), extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>))    
+import Data.Traversable(Traversable(..), traverse, sequenceA)
+import Data.Distributive(Distributive(distribute, collect), cotraverse)
+import Data.Foldable(Foldable(foldr, foldl, fold, foldMap))
+import Data.Functor.Bind(Bind(..),Apply((<.>), (<.), (.>),liftF2), (-<<), (-<-), (->-),join)
+import Data.Functor.Alt(Alt((<!>),some,many), optional)
+import Data.Functor(Functor(fmap,(<$)),(<$), ($>), (<$>))
+import Data.Functor.Extend(Extend(duplicated, extended))
+import Data.Functor.Const(Const(..))
+import Data.Functor.Identity
+import Data.Functor.Contravariant(Contravariant(..), Op(..), phantom, ($<), (>$<),  (>$$<))
+
+import qualified Data.Functor.Product as Product
 import qualified Data.Functor.Plus as Plus
+import qualified Data.Functor.Sum as Sum
 
-import Data.Int
+import qualified Data.Bifunctor.Product as Biproduct
+import qualified Data.Bifunctor.Sum as Bisum
+import Data.Bifunctor(Bifunctor(..), bimap)
+import Data.Bifunctor.Apply(Biapply(..), (<<$>>),(<<..>>))
+import Data.Bifoldable(Bifoldable(..),bisum)
+import Data.Bitraversable(Bitraversable(..))
+import Data.Biapplicative(Biapplicative((<<*>>), bipure, biliftA2, (*>>), (<<*)))
+import Data.Biapplicative(biliftA3,traverseBia, sequenceBia, traverseBiaWith)
 
+
+-- A synonym for the Alt functor
 type AltF = Alt
 
--- | Alias for Plus.zero as 'zero' is alreadly taken by 'Monoidal'
-fzero::Plus f  => f a
-fzero = Plus.zero
+-- A synonym for the Product functor
+type ProductF = Product.Product
+
+-- A synonym for the Sum functor
+type SumF = Sum.Sum
+
+-- A synonym for the Identity functor
+type IdentityF = Identity
+
+-- A synonym for the Opposite (contravariant) arrow/function
+type Opposite = Op
+
+-- Constructs a product functor
+pair::(Functor f, Functor g) => f a -> g a -> ProductF f g a
+pair = Product.Pair
+
+-- Constructs a left functorial sum
+lsum::(Functor f, Functor g) => f a -> SumF f g a
+lsum = Sum.InL
+
+-- Constructs the identity functor
+identity::(Functor f) => f a -> IdentityF (f a)
+identity = Identity
+
+-- Constructs a right functorial sum
+rsum::(Functor f, Functor g) => g a -> SumF f g a
+rsum = Sum.InR
 
 fapply::(Apply f) => (a->b->c) -> f a -> f b -> f c
 fapply = liftF2
@@ -68,5 +113,5 @@ infixl 4 `fapply`
 feval::(Traversable t, Applicative f) => t (f a) -> f (t a)
 feval = sequenceA
 
-map::(Functor f) => (a -> b) -> f a -> f b
-map = fmap
+opposite::(b -> a) -> Opposite a b
+opposite f = Op {getOp = f}

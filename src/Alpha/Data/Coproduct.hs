@@ -16,6 +16,7 @@ where
 import Alpha.Base
 import Alpha.Data.Product
 import Alpha.Data.Sum
+import Alpha.Data.Func
 
 type family Coproduct a | a -> a where
     Coproduct (Sum1 a1) = Sum1 a1
@@ -51,8 +52,8 @@ instance Coproductive 2 2 a2 (Sum2 a1 a2)  where
     coproduct  = Sum22
     cofactor (Sum22 a) = Just a
     cofactor _         = Nothing
-
-comap2::(f1 ~ (a1->b1), f2 ~ (a2 -> b2)) => Product2 f1 f2 -> (Sum2 a1 a2) -> (Sum2 b1 b2)
+    
+comap2::(f1 ~ Func1 a1 b1, f2 ~ Func1 a2 b2) => Product2 f1 f2 -> (Sum2 a1 a2) -> (Sum2 b1 b2)
 comap2 (Product2 f1 _ ) (Sum21 a1) = Sum21 (f1 a1)
 comap2 (Product2 _ f2 ) (Sum22 a2) = Sum22 (f2 a2)  
     

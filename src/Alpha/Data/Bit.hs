@@ -6,12 +6,12 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Alpha.Data.Bit 
 (
-    Bit,Toggle(..),
+    Bit,Toggle(..),ToBit(..),
     on, off,
-    toBool,
     fromBool
 )
 where
@@ -34,31 +34,27 @@ newtype Bit = Bit Flag
 class ToBit a where
     bit::a -> Bit    
     
-type family Toggle t where
+type family Toggle t | t -> t where
     Toggle 0 = 0
     Toggle 1 = 1    
         
-off:: Bit
+off::Bit
 off = Bit Off
 
-on:: Bit
+on::Bit
 on = Bit On
 
-bitref' :: Ptr Bit -> Ptr Word8
+bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr
-
-toBool :: Bit -> Bool
-toBool (Bit On) = True
-toBool (Bit Off) = False
 
 fromBool :: Bool -> Bit
 fromBool False = off
 fromBool True = on
 
-instance ToBool Bit where
+instance Boolean Bit where
     bool (Bit On) = True
     bool (Bit Off) = False
-
+    
 instance ToBit Bool where
     bit True = on
     bit False = off    

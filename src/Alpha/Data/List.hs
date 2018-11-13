@@ -7,17 +7,13 @@
 module Alpha.Data.List
 (    
     exclude,
-    split,
     splitAt,
-    take,
     mapi,
-    filter,    
     intersperse,
     last,
     head,
     takeWhile,
     cycle,
-    partition,
     any,
     all,
     tails,    
@@ -28,29 +24,18 @@ module Alpha.Data.List
 ) where
 import qualified Data.List as List
 import Data.Functor
-import Alpha.Base
-import Alpha.Canonical
-import Alpha.Data.Numbers
-import Data.List(filter,intersperse,last,head,takeWhile,cycle,partition,any,all)
+import Data.List(intersperse,last,head,takeWhile,cycle,partition,any,all)
 import GHC.Real hiding(reduce)
 import Prelude((-))
+import Alpha.Base hiding(zero)
+import Alpha.Canonical
+import Alpha.Data.Numbers
+import Alpha.Data.Seq
+
 
 -- | Excludes a specified subset of list elements from the result list
 exclude::(Eq a) => [a] -> [a] -> [a] 
-exclude exclusions source = source |>  List.filter ( `absent` exclusions) 
-
--- | Partitions the list according to the outcome of a preducate
--- By convention, the elements that did not satisfy the predicate are
--- collected in the first coordinate of a tuple and those that did
--- accumulate in the second
-split::(a ->Bool) -> [a] -> ([a],[a])
-split predicate input =  
-    (input |>List.filter predicate, input |> List.filter invert) 
-        where invert = (\x -> not (predicate x))  
-
--- | Makes the 'List.genericTake' function the 'default' take function
-take::(Integral i) => i -> [a] -> [a]
-take = List.genericTake
+exclude exclusions source = source |>  List.filter ( `List.notElem` exclusions) 
 
 -- | Makes the 'List.genericSplitAt' function the 'default' splitAt function
 splitAt::(Integral i) => i -> [a] -> ([a],[a])
@@ -65,11 +50,11 @@ mapi f l = fmap f z where
 
 -- | Identical to List.tails except that the empty list is excluded from the result        
 tails::[a] -> [[a]]
-tails  = (filter (\x -> length x /= 0 )) . List.tails
+tails  = (List.filter (\x -> length x /= 0 )) . List.tails
 
 -- | Identical to List.inits except that the empty list is excluded from the result
 inits::[a] -> [[a]]
-inits = (filter (\x -> length x /= 0 )) . List.inits
+inits = (List.filter (\x -> length x /= 0 )) . List.inits
 
 -- The reduction operator // takes a binary operator ⊕ on its left and a vector
 -- x of values on its right. The meaning of ⊕//x for x = [a,b,...z] is the value a⊕b⊕...⊕z
@@ -97,18 +82,23 @@ instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]
     concat x y = x List.++ y
         
-instance Enumerable [a] a where
-    type Source [a] a = [a]
-    items = id
+instance (Eq a) => Sequential [a] a where
+    listed = id
+    take i src = fromList $ List.take (fromIntegral i) src
+    split = List.partition
+    tail = List.tail
+    while = List.takeWhile
+    filter = List.filter
+    skip n s = List.drop (fromIntegral n) s
 
 instance Length [a] where
     length x = List.length x |> convert
 
-instance Collappsible [[a]] where
+instance Collapsible [[a]] [a] where
     collapse = List.concat    
 
 instance (Eq a) => Container [a] a where
-    contains x l = List.notElem x l |> not
+    type Source [a] a = [a]    
     singleton x = [x]    
 
 instance Reversible [a] [a] where

@@ -29,5 +29,5 @@ instance OrderedEnum a => Diffable [R.Range a] where
     delta = R.difference
     
 instance Ord a => Container (R.Range a) a where
-    contains c e = R.inRange e c
+    type Source (R.Range a) a = R.Range a
     singleton = R.SingletonRange

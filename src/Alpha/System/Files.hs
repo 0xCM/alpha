@@ -188,6 +188,6 @@ size (FilePath path) =
 
 getExtension':: Text -> Maybe FileExtension
 getExtension' x = case (x |> rightOfLast dot) of 
-        Just y -> extension y |> some
+        Just y -> extension y |> just
         _ -> none
 

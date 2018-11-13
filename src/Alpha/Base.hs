@@ -11,6 +11,7 @@ module Alpha.Base
     module DB,
     module GB,
     module FB,
+    module CB,
     module Text.Show,
     Float, Float#, 
     Double, Double#,
@@ -33,3 +34,4 @@ import Data.List as List
 import Alpha.Data.Base as DB
 import Alpha.GHC.Base as GB
 import Alpha.Functor.Base as FB
+import Alpha.Control.Base as CB

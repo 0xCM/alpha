@@ -1,29 +1,27 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE ViewPatterns #-}
 module Alpha.Data.Product
 (
-    Product,Productive(..),Factored(..),
+    Product, UniProduct, 
+    Productive(..),Factored(..),
+    
     Product1(..), Product2(..), Product3(..), Product4(..), Product5(..),
     Product6(..), Product7(..), Product8(..), Product9(..),
+
+    UniProduct1(..), UniProduct2(..), UniProduct3(..), UniProduct4(..), UniProduct5(..),
+    UniProduct6(..), UniProduct7(..), UniProduct8(..), UniProduct9(..),
+
+
     type (!*!), (!*!)
 ) where
-import Alpha.Base
+import Alpha.Base hiding(zero)
 import Alpha.Canonical
 import Alpha.Text.Combinators
 import qualified Control.Category as C
 import qualified Data.Vector as V
 
--- Defines a family of product types
-type family Product a | a -> a where        
-    Product (a1,a2) = Product2 a1 a2
-    Product (a1,a2,a3) = Product3 a1 a2 a3
-    Product (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
-    Product (a1,a2,a3,a4,a5)  = Product5 a1 a2 a3 a4 a5
-    Product (a1,a2,a3,a4,a5,a6)  = Product6 a1 a2 a3 a4 a5 a6 
-    Product (a1,a2,a3,a4,a5,a6,a7)  = Product7 a1 a2 a3 a4 a5 a6 a7
-    Product (a1,a2,a3,a4,a5,a6,a7,a8)  = Product8 a1 a2 a3 a4 a5 a6 a7 a8
-    Product (a1,a2,a3,a4,a5,a6,a7,a8,a9)  = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
 
 type family Factor (j::Nat) a where
     Factor 1 (Product2 a1 a2) = a1
@@ -78,6 +76,96 @@ type family Factor (j::Nat) a where
     Factor 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
     Factor 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9    
 
+
+-- Characterizes a componentized type a with n components indexed by j
+class Factored (j::Nat) a where    
+    -- | Extracts the j-th component from a
+    factor::a -> Factor j a
+
+-- Defines an arity-1 heterogenous product
+data Product1 a1 
+    = Product1 !a1
+        deriving (Eq, Ord, Data, Generic, Typeable, Show)
+
+-- Defines an arity-1 homogenous product
+type UniProduct1 a = Product1 a
+
+-- Defines an arity-2 heterogenous product
+data Product2 a1 a2 
+    = Product2 !a1 !a2
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-2 homogenous product        
+type UniProduct2 a = Product2 a a
+
+-- Defines an arity-3 heterogenous product
+data Product3 a1 a2 a3 
+    = Product3 !a1 !a2 !a3
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-3 homogenous product        
+type UniProduct3 a = Product3 a a a
+
+-- Defines an arity-4 heterogenous product
+data Product4 a1 a2 a3 a4 
+    = Product4 !a1 !a2 !a3 !a4
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-4 homogenous product        
+type UniProduct4 a = Product4 a a a a
+
+-- Defines an arity-5 heterogenous product        
+data Product5 a1 a2 a3 a4 a5 
+    = Product5 !a1 !a2 !a3 !a4 !a5
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-5 homogenous product        
+type UniProduct5 a = Product5 a a a a a
+
+-- Defines an arity-6 heterogenous product        
+data Product6 a1 a2 a3 a4 a5 a6 
+    = Product6 !a1 !a2 !a3 !a4 !a5 !a6
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-6 homogenous product        
+type UniProduct6 a = Product6 a a a a a a
+
+-- Defines an arity-7 heterogenous product
+data Product7 a1 a2 a3 a4 a5 a6 a7 
+    = Product7 !a1 !a2 !a3 !a4 !a5 !a6 !a7
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-7 homogenous product        
+type UniProduct7 a = Product7 a a a a a a a
+
+-- Defines an arity-8 heterogenous product        
+data Product8 a1 a2 a3 a4 a5 a6 a7 a8 
+    = Product8 !a1 !a2 !a3 !a4 !a5 !a6 !a7 !a8
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-8 homogenous product        
+type UniProduct8 a = Product8 a a a a a a a a
+
+-- Defines an arity-9 heterogenous product        
+data Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9 
+    = Product9 !a1 !a2 !a3 !a4 !a5 !a6 !a7 !a8 !a9
+        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+
+-- Defines an arity-9 homogenous product        
+type UniProduct9 a = Product9 a a a a a a a a a
+
+
+-- Unifies arity-specific product definitions
+type family Product (n::Nat) a = r | r -> n a where
+    Product 2 (a1,a2) = Product2 a1 a2
+    Product 3 (a1,a2,a3) = Product3 a1 a2 a3
+    Product 4 (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
+    Product 5 (a1,a2,a3,a4,a5)  = Product5 a1 a2 a3 a4 a5
+    Product 6 (a1,a2,a3,a4,a5,a6)  = Product6 a1 a2 a3 a4 a5 a6 
+    Product 7 (a1,a2,a3,a4,a5,a6,a7)  = Product7 a1 a2 a3 a4 a5 a6 a7
+    Product 8 (a1,a2,a3,a4,a5,a6,a7,a8)  = Product8 a1 a2 a3 a4 a5 a6 a7 a8
+    Product 9 (a1,a2,a3,a4,a5,a6,a7,a8,a9)  = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
+
 type a !*! b = Product2 a b
 
 -- Constructs a product
@@ -85,87 +173,71 @@ type a !*! b = Product2 a b
 (!*!) = Product2
 infixl 5 !*!
 
+type family a !~! b  where
+    (Product2 a1 a2) !~! (Product2 a3 a4) = Product4 a1 a2 a3 a4
+    (Product2 a1 a2) !~! (Product3 a3 a4 a5) = Product5 a1 a2 a3 a4 a5
+    (Product2 a1 a2) !~! (Product4 a3 a4 a5 a6) = Product6 a1 a2 a3 a4 a5 a6
+    (Product2 a1 a2) !~! (Product5 a3 a4 a5 a6 a7) = Product7 a1 a2 a3 a4 a5 a6 a7
+    (Product2 a1 a2) !~! (Product6 a3 a4 a5 a6 a7 a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8
+    (Product2 a1 a2) !~! (Product7 a3 a4 a5 a6 a7 a8 a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
+    (Product3 a1 a2 a3) !~! (Product2 a4 a5) = Product5 a1 a2 a3 a4 a5
+    (Product3 a1 a2 a3) !~! (Product3 a4 a5 a6) = Product6 a1 a2 a3 a4 a5 a6
+    (Product3 a1 a2 a3) !~! (Product4 a4 a5 a6 a7) = Product7 a1 a2 a3 a4 a5 a6 a7
+    (Product3 a1 a2 a3) !~! (Product5 a4 a5 a6 a7 a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8
+    (Product3 a1 a2 a3) !~! (Product6 a4 a5 a6 a7 a8 a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
+
+-- Defines a family of uniform products, i.e., products where factors are homogenous     
+type family UniProduct (n::Nat) a = r | r -> n a where
+    UniProduct 2 (a,a) = UniProduct2 a
+    UniProduct 3 (a,a,a) = UniProduct3 a
+    UniProduct 4 (a,a,a,a) = UniProduct4 a
+    UniProduct 5 (a,a,a,a,a)  = UniProduct5 a
+    UniProduct 6 (a,a,a,a,a,a)  = UniProduct6 a
+    UniProduct 7 (a,a,a,a,a,a,a)  = UniProduct7 a
+    UniProduct 8 (a,a,a,a,a,a,a,a)  = UniProduct8 a
+    UniProduct 9 (a,a,a,a,a,a,a,a,a)  = UniProduct9 a
+
+
 -- Characterizes types from which products can be constructed
-class Productive a where    
+class (KnownNat n) => Productive n a where    
     -- | Forms a product from a tuple
-    prod::a -> Product a
+    prod::a -> Product n a
 
-    -- | Forms a tuple from a product
-    tuple::Product a -> a
-
--- Characterizes a componentized type a with n components indexed by j
-class Factored (j::Nat) a where    
-    -- | Extracts the j-th component from a
-    factor::a -> Factor j a
     
-data Product1 a1 
-    = Product1 !a1
-        deriving (Eq, Ord, Data, Generic, Typeable, Functor, Show)
-
-data Product2 a1 a2 
-    = Product2 !a1 !a2
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product3 a1 a2 a3 
-    = Product3 !a1 !a2 !a3
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product4 a1 a2 a3 a4 
-    = Product4 !a1 !a2 !a3 !a4
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product5 a1 a2 a3 a4 a5 
-    = Product5 !a1 !a2 !a3 !a4 !a5
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product6 a1 a2 a3 a4 a5 a6 
-    = Product6 !a1 !a2 !a3 !a4 !a5 !a6
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product7 a1 a2 a3 a4 a5 a6 a7 
-    = Product7 !a1 !a2 !a3 !a4 !a5 !a6 !a7
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product8 a1 a2 a3 a4 a5 a6 a7 a8 
-    = Product8 !a1 !a2 !a3 !a4 !a5 !a6 !a7 !a8
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-
-data Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9 
-    = Product9 !a1 !a2 !a3 !a4 !a5 !a6 !a7 !a8 !a9
-        deriving (Eq, Ord, Data,Generic, Typeable, Functor, Show)
-    
-instance Productive (a1,a2) where
+instance Productive 2 (a1,a2) where
     prod (a1,a2) = Product2 a1 a2
-    tuple (Product2 a1 a2) = (a1,a2) 
-
-instance Productive (a1,a2,a3) where
-    prod (a1,a2,a3) = Product3 a1 a2 a3
-    tuple (Product3 a1 a2 a3) = (a1,a2,a3) 
-
-instance Productive (a1,a2,a3,a4)  where
-    prod (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
-    tuple (Product4 a1 a2 a3 a4) = (a1,a2,a3,a4) 
-
-instance Productive (a1,a2,a3,a4,a5) where
-    prod (a1,a2,a3,a4,a5) = Product5 a1 a2 a3 a4 a5
-    tuple (Product5 a1 a2 a3 a4 a5) = (a1,a2,a3,a4,a5)         
-
-instance Productive (a1,a2,a3,a4,a5,a6) where
-    prod (a1,a2,a3,a4,a5,a6) = Product6 a1 a2 a3 a4 a5 a6
-    tuple (Product6 a1 a2 a3 a4 a5 a6) = (a1,a2,a3,a4,a5,a6)         
-
-instance Productive (a1,a2,a3,a4,a5,a6,a7) where
-    prod (a1,a2,a3,a4,a5,a6,a7) = Product7 a1 a2 a3 a4 a5 a6 a7
-    tuple (Product7 a1 a2 a3 a4 a5 a6 a7) = (a1,a2,a3,a4,a5,a6,a7)
-
-instance Productive (a1,a2,a3,a4,a5,a6,a7,a8) where
-    prod (a1,a2,a3,a4,a5,a6,a7,a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8
-    tuple (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = (a1,a2,a3,a4,a5,a6,a7,a8)
-
-instance Productive (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
+instance Productive 3 (a1,a2,a3) where
+    prod (a1,a2,a3) = Product3 a1 a2 a3    
+instance Productive 4 (a1,a2,a3,a4)  where
+    prod (a1,a2,a3,a4) = Product4 a1 a2 a3 a4    
+instance Productive 5 (a1,a2,a3,a4,a5) where
+    prod (a1,a2,a3,a4,a5) = Product5 a1 a2 a3 a4 a5    
+instance Productive 6 (a1,a2,a3,a4,a5,a6) where
+    prod (a1,a2,a3,a4,a5,a6) = Product6 a1 a2 a3 a4 a5 a6    
+instance Productive 7 (a1,a2,a3,a4,a5,a6,a7) where
+    prod (a1,a2,a3,a4,a5,a6,a7) = Product7 a1 a2 a3 a4 a5 a6 a7    
+instance Productive 8 (a1,a2,a3,a4,a5,a6,a7,a8) where
+    prod (a1,a2,a3,a4,a5,a6,a7,a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8    
+instance Productive 9 (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
     prod (a1,a2,a3,a4,a5,a6,a7,a8,a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
-    tuple (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = (a1,a2,a3,a4,a5,a6,a7,a8,a9)
-        
+    
+instance Tupled 2 (Product2 a1 a2) (a1,a2) where
+    tuple (Product2 a1 a2) = (a1,a2)     
+instance Tupled 3 (Product3 a1 a2 a3) (a1,a2,a3) where
+    tuple (Product3 a1 a2 a3) = (a1,a2, a3) 
+instance Tupled 4 (Product4 a1 a2 a3 a4) (a1,a2,a3,a4) where
+    tuple (Product4 a1 a2 a3 a4) = (a1,a2,a3,a4) 
+instance Tupled 5 (Product5 a1 a2 a3 a4 a5) (a1,a2,a3,a4,a5) where
+    tuple (Product5 a1 a2 a3 a4 a5) = (a1,a2,a3,a4,a5)         
+instance Tupled 6 (Product6 a1 a2 a3 a4 a5 a6) (a1,a2,a3,a4,a5,a6) where
+    tuple (Product6 a1 a2 a3 a4 a5 a6) = (a1,a2,a3,a4,a5,a6)         
+instance Tupled 7 (Product7 a1 a2 a3 a4 a5 a6 a7) (a1,a2,a3,a4,a5,a6,a7) where
+    tuple (Product7 a1 a2 a3 a4 a5 a6 a7) = (a1,a2,a3,a4,a5,a6,a7)
+instance Tupled 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) (a1,a2,a3,a4,a5,a6,a7,a8) where
+    tuple (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = (a1,a2,a3,a4,a5,a6,a7,a8)
+instance Tupled 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
+    tuple (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = (a1,a2,a3,a4,a5,a6,a7,a8,a9)            
+
 instance Factored 1 (Product2 a1 a2) where 
     factor (Product2 x1 x2) = x1    
 instance Factored 2 (Product2 a1 a2) where 
@@ -262,14 +334,14 @@ instance Factored 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where
 instance Factored 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9
                 
-instance Counted (Product2 a1 a2) where count _  = 2
-instance Counted (Product3 a1 a2 a3) where count _  = 3
-instance Counted (Product4 a1 a2 a3 a4) where count _  = 4
-instance Counted (Product5 a1 a2 a3 a4 a5) where count _  = 5
-instance Counted (Product6 a1 a2 a3 a4 a5 a6) where count _  = 6
-instance Counted (Product7 a1 a2 a3 a4 a5 a6 a7) where count _  = 7
-instance Counted (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where count _  = 8
-instance Counted (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where count _  = 9    
+instance Arital 2 (Product2 a1 a2)
+instance Arital 3 (Product3 a1 a2 a3)
+instance Arital 4 (Product4 a1 a2 a3 a4)
+instance Arital 5 (Product5 a1 a2 a3 a4 a5)
+instance Arital 6 (Product6 a1 a2 a3 a4 a5 a6)
+instance Arital 7  (Product7 a1 a2 a3 a4 a5 a6 a7)
+instance Arital 8  (Product8 a1 a2 a3 a4 a5 a6 a7 a8)
+instance Arital 9  (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9)
     
 type Additive2 a1 a2 = (Additive a1, Additive a2)
 type Additive3 a1 a2 a3 = (Additive2 a1 a2, Additive a3)
@@ -460,7 +532,6 @@ instance Semigroup7 a1 a2 a3 a4 a5 a6 a7 => Semigroup (Product7 a1 a2 a3 a4 a5 a
 instance Semigroup8 a1 a2 a3 a4 a5 a6 a7 a8 => Semigroup (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where (<>) x y = x + y
 instance Semigroup9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Semigroup (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where (<>) x y = x + y
 
-type Monoidal a = (Monoid a, Nullary a, Additive a)
 type Monoid2 a1 a2 = (Monoid a1, Monoid a2, Nullary2 a1 a2, Additive2 a1 a2)
 type Monoid3 a1 a2 a3 = (Monoid2 a1 a2, Nullary a3, Monoid a3, Additive a3)
 type Monoid4 a1 a2 a3 a4 = (Monoid3 a1 a2 a3, Nullary a4, Monoid a4, Additive a4)
@@ -479,13 +550,60 @@ instance Monoid7 a1 a2 a3 a4 a5 a6 a7 => Monoid (Product7 a1 a2 a3 a4 a5 a6 a7) 
 instance Monoid8 a1 a2 a3 a4 a5 a6 a7 a8 => Monoid (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where mempty = zero
 instance Monoid9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Monoid (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where mempty = zero
 
-type Group2 a1 a2 = (Group a1, Group a2, Monoidal a1, Monoidal a2)
-type Group3 a1 a2 a3 = (Group2 a1 a2, Group a3, Monoidal a3)
-type Group4 a1 a2 a3 a4 = (Group3 a1 a2 a3, Group a4, Monoidal a4)
-type Group5 a1 a2 a3 a4 a5 = (Group4 a1 a2 a3 a4, Group a5, Monoidal a5)
-type Group6 a1 a2 a3 a4 a5 a6 = (Group5 a1 a2 a3 a4 a5, Group a6, Monoidal a6)
-type Group7 a1 a2 a3 a4 a5 a6 a7 = (Group6 a1 a2 a3 a4 a5 a6, Group a7, Monoidal a7)
-type Group8 a1 a2 a3 a4 a5 a6 a7 a8 = (Group7 a1 a2 a3 a4 a5 a6 a7, Group a8, Monoidal a8)
-type Group9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Group8 a1 a2 a3 a4 a5 a6 a7 a8, Group a9, Monoidal a9)
+instance Functor Product1 where
+    fmap f ~ (Product1 x) = Product1 (f x)
+instance Functor (Product2 a1) where
+    fmap f ~ (Product2 a1 x) = Product2 a1 (f x)
+instance Functor (Product3 a1 a2) where
+    fmap f ~ (Product3 a1 a2 x) = Product3 a1 a2 (f x)
+instance Functor (Product4 a1 a2 a3) where
+    fmap f ~ (Product4 a1 a2 a3 x) = Product4 a1 a2 a3 (f x)
+instance Functor (Product5 a1 a2 a3 a4) where
+    fmap f ~ (Product5 a1 a2 a3 a4 x) = Product5 a1 a2 a3 a4 (f x)
+instance Functor (Product6 a1 a2 a3 a4 a5) where
+    fmap f ~ (Product6 a1 a2 a3 a4 a5 x) = Product6 a1 a2 a3 a4 a5 (f x)
+instance Functor (Product7 a1 a2 a3 a4 a5 a6) where
+    fmap f ~ (Product7 a1 a2 a3 a4 a5 a6 x) = Product7 a1 a2 a3 a4 a5 a6 (f x)
+        
+instance Foldable (Product2 a) where
+    foldMap f (Product2 _ b) = f b
+    foldr f c (Product2 _ b) = f b c
     
---instance Group2 a1 a2 => Group (Product2 a1 a2)
+instance Traversable (Product2 a) where
+    traverse f (Product2 a b) = Product2 a <$> f b
+    
+    
+instance Bifunctor Product2 where
+    bimap f g ~ (Product2 a1 a2) = Product2 (f a1) (g a2)
+instance Bifunctor (Product3 a1) where
+    bimap f g ~ (Product3 a1 x y) = Product3 a1 (f x) (g y)
+instance Bifunctor (Product4 a1 a2) where
+    bimap f g ~ (Product4 a1 a2 x y) = Product4 a1 a2 (f x) (g y)
+instance Bifunctor (Product5 a1 a2 a3) where
+    bimap f g ~ (Product5 a1 a2 a3 x y) = Product5 a1 a2 a3 (f x) (g y)
+instance Bifunctor (Product6 a1 a2 a3 a4) where
+    bimap f g ~ (Product6 a1 a2 a3 a4 x y) = Product6 a1 a2 a3 a4 (f x) (g y)
+instance Bifunctor (Product7 a1 a2 a3 a4 a5) where
+    bimap f g ~ (Product7 a1 a2 a3 a4 a5 x y) = Product7 a1 a2 a3 a4 a5 (f x) (g y)
+            
+instance Biapply Product2 where
+    Product2 f g <<.>> Product2 a b = Product2 (f a) (g b)
+
+instance Biapplicative Product2 where
+    bipure = Product2        
+    Product2 f g <<*>> Product2 x y = Product2 (f x) (g y)    
+    biliftA2 f g (Product2 x y) (Product2 a b) = Product2 (f x a) (g y b)
+    
+instance Monoid a1 => Biapplicative (Product3 a1)  where
+    bipure = Product3 mempty
+    Product3 a1 f g <<*>> Product3 a1' x y = Product3 (mappend a1 a1') (f x) (g y)
+    
+instance Monoid2 a1 a2 => Biapplicative (Product4 a1 a2)  where
+    bipure a1 a2 = Product4 mempty mempty a1 a2
+    Product4 a1 a2 f g <<*>> Product4 a1' a2' x y = Product4 (mappend a1 a1') (mappend a2 a2') (f x) (g y)
+          
+instance Comonad (Product2 e) where
+    duplicate src = Product2 (factor @1 src) src
+    extract src = factor @2 src
+
+

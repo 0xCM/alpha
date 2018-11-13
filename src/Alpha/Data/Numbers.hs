@@ -42,7 +42,7 @@ import qualified GHC.Num as N
 import qualified Data.List as L
 
 import Numeric
-import Alpha.Base
+import Alpha.Base hiding(zero)
 import Alpha.Text.Format
 import Alpha.Canonical hiding((+),(*),(-),range)
 

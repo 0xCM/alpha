@@ -1,6 +1,6 @@
 module Alpha.Data.Maybe
 (
-    Maybe, some, isSome, none, isNone, fromJust
+    Maybe, just, isJust, none, isNone, fromJust
 )
 where
 
@@ -9,12 +9,8 @@ import Data.Maybe
 import GHC.Base(($))
 
 -- | Constructs a valued 'Maybe'
-some :: a -> Maybe a
-some x = Just x
-
--- | Determines whether the 'Maybe' is valued
-isSome :: Maybe a -> Bool
-isSome x =  not $ isNothing x  
+just :: a -> Maybe a
+just x = Just x
 
 -- | Constructs a non-valued 'Maybe'
 none :: Maybe a

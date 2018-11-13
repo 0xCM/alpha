@@ -16,7 +16,7 @@ module Alpha.Data.Bits
 )
 where
 import qualified Data.Text as Text
-import Data.Bits
+import Data.Bits hiding(bit)
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Text.Combinators
@@ -28,7 +28,7 @@ import GHC.TypeLits
 class (Sized n, FiniteBits a) => SizedBits n a where
 
 toggled :: Bits a => a -> Int -> Bit
-toggled n i = testBit n i |> fromBool
+toggled n i = testBit n i |> bit
 
 -- | Delegates to the finiteBitSize function
 bitcount :: (FiniteBits a) => a -> Int

@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.11
+version:             0.0.13
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -76,6 +76,8 @@ dependencies:
 - hashable
 - intervals
 - keys
+- lattices
+- multiset
 - network
 - primitive
 - range
