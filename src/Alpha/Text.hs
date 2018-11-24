@@ -8,27 +8,20 @@
 
 module Alpha.Text
 (   
-    module Alpha.Text.Text,
-    module Alpha.Text.Json,
-    module Alpha.Text.Format,
-    module Alpha.Text.Combinators,
-    module Alpha.Text.String,
-
-    module Text.Show,
-    T.Text
+    module Char,
+    module Combinators,
+    module Format,
+    module Json,
+    module String,
+    module Text
     
 ) where
-import Text.Show
-
-import qualified Data.Text as T
-import qualified Data.String as S
-
-import Alpha.Text.Json
-import Alpha.Text.Format
-import Alpha.Text.Combinators
-import Alpha.Text.String
-import Alpha.Text.Text
-import Alpha.Canonical
+import Alpha.Text.Char as Char
+import Alpha.Text.Combinators as Combinators
+import Alpha.Text.Format as Format
+import Alpha.Text.Json as Json
+import Alpha.Text.String as String
+import Alpha.Text.Text as Text
 
 
 

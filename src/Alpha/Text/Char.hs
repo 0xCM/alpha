@@ -10,6 +10,4 @@ instance ToString Char where
     string x = [x]
 
 instance Formattable Char where
-    format x = T.singleton x
-
-    
+    format x = T.singleton x    

@@ -17,6 +17,9 @@ module Alpha.Base
     Double, Double#,
     ByteString.ByteString,    
     IO,
+    Set,
+    Storable,
+    Coercible(..), Coercion(..),
     div,
     flip,
     (++)
@@ -35,3 +38,7 @@ import Alpha.Data.Base as DB
 import Alpha.GHC.Base as GB
 import Alpha.Functor.Base as FB
 import Alpha.Control.Base as CB
+import Data.Set(Set)
+import Foreign.Storable(Storable)
+import Data.Coerce(Coercible(..))
+import Data.Type.Coercion

@@ -2,17 +2,15 @@ module Alpha.Canonical.Relations
 (    
     Relation(..),
     TotalOrder(..), 
-    Equivalence(..)
-
+    Equivalence(..),
+    PartialOrd(..),
+    PartialOrder(..)
 ) where
-
+import Algebra.PartialOrd 
 import Alpha.Base
 import Alpha.Canonical.Operators
-import qualified Prelude as P
 
--- Encodes that values a and by are related via a relation r
-data Related r a b = Related r (a,b)
-    deriving (Show,Ord,Eq)
+import qualified Prelude as P
 
 -- Characterizes a relation on a set s    
 class Relation a where
@@ -32,6 +30,13 @@ class Relation a => Equivalence a where
     -- Equivalence relation adjudicator
     (~=)::BinaryPredicate a
     (~=) = (~~)
+
+class (PartialOrd a, Relation a) =>  PartialOrder a where
+
+    (~<=)::BinaryPredicate a
+    (~<=) = leq
+
+infix 4 ~<=
 
 -- Characterizes a total order relation
 -- https://en.wikipedia.org/wiki/Total_order    
@@ -55,7 +60,3 @@ infix 4 <=
 infix 4 <    
 infix 4 >
 infix 4 >=    
-
--- Defines a relation between a and b via r
-related::r -> (a,b) -> Related r a b
-related  = Related

@@ -1,27 +1,27 @@
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE ViewPatterns #-}
 module Alpha.Data.Product
 (
     Product, UniProduct, 
-    Productive(..),Factored(..),
+    Productive(..), Factored(..),
     
     Product1(..), Product2(..), Product3(..), Product4(..), Product5(..),
     Product6(..), Product7(..), Product8(..), Product9(..),
 
+    Pair,Triple,
+
     UniProduct1(..), UniProduct2(..), UniProduct3(..), UniProduct4(..), UniProduct5(..),
-    UniProduct6(..), UniProduct7(..), UniProduct8(..), UniProduct9(..),
+    UniProduct6(..), UniProduct7(..), UniProduct8(..), UniProduct9(..)
 
 
-    type (!*!), (!*!)
+    
 ) where
 import Alpha.Base hiding(zero)
 import Alpha.Canonical
 import Alpha.Text.Combinators
 import qualified Control.Category as C
 import qualified Data.Vector as V
-
 
 type family Factor (j::Nat) a where
     Factor 1 (Product2 a1 a2) = a1
@@ -76,16 +76,10 @@ type family Factor (j::Nat) a where
     Factor 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
     Factor 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9    
 
-
--- Characterizes a componentized type a with n components indexed by j
-class Factored (j::Nat) a where    
-    -- | Extracts the j-th component from a
-    factor::a -> Factor j a
-
 -- Defines an arity-1 heterogenous product
 data Product1 a1 
     = Product1 !a1
-        deriving (Eq, Ord, Data, Generic, Typeable, Show)
+        deriving (Eq, Ord, Data, Generic, Typeable, Show, Read)
 
 -- Defines an arity-1 homogenous product
 type UniProduct1 a = Product1 a
@@ -93,7 +87,10 @@ type UniProduct1 a = Product1 a
 -- Defines an arity-2 heterogenous product
 data Product2 a1 a2 
     = Product2 !a1 !a2
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
+
+-- | Synonym for a product of arity 2                
+type Pair a1 a2 = Product2 a1 a2        
 
 -- Defines an arity-2 homogenous product        
 type UniProduct2 a = Product2 a a
@@ -101,7 +98,10 @@ type UniProduct2 a = Product2 a a
 -- Defines an arity-3 heterogenous product
 data Product3 a1 a2 a3 
     = Product3 !a1 !a2 !a3
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
+
+-- | Synonym for a product of arity 3        
+type Triple a1 a2 a3 = Product3 a1 a2 a3
 
 -- Defines an arity-3 homogenous product        
 type UniProduct3 a = Product3 a a a
@@ -109,7 +109,7 @@ type UniProduct3 a = Product3 a a a
 -- Defines an arity-4 heterogenous product
 data Product4 a1 a2 a3 a4 
     = Product4 !a1 !a2 !a3 !a4
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
 
 -- Defines an arity-4 homogenous product        
 type UniProduct4 a = Product4 a a a a
@@ -117,7 +117,7 @@ type UniProduct4 a = Product4 a a a a
 -- Defines an arity-5 heterogenous product        
 data Product5 a1 a2 a3 a4 a5 
     = Product5 !a1 !a2 !a3 !a4 !a5
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
 
 -- Defines an arity-5 homogenous product        
 type UniProduct5 a = Product5 a a a a a
@@ -125,7 +125,7 @@ type UniProduct5 a = Product5 a a a a a
 -- Defines an arity-6 heterogenous product        
 data Product6 a1 a2 a3 a4 a5 a6 
     = Product6 !a1 !a2 !a3 !a4 !a5 !a6
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
 
 -- Defines an arity-6 homogenous product        
 type UniProduct6 a = Product6 a a a a a a
@@ -133,7 +133,7 @@ type UniProduct6 a = Product6 a a a a a a
 -- Defines an arity-7 heterogenous product
 data Product7 a1 a2 a3 a4 a5 a6 a7 
     = Product7 !a1 !a2 !a3 !a4 !a5 !a6 !a7
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
 
 -- Defines an arity-7 homogenous product        
 type UniProduct7 a = Product7 a a a a a a a
@@ -141,7 +141,7 @@ type UniProduct7 a = Product7 a a a a a a a
 -- Defines an arity-8 heterogenous product        
 data Product8 a1 a2 a3 a4 a5 a6 a7 a8 
     = Product8 !a1 !a2 !a3 !a4 !a5 !a6 !a7 !a8
-        deriving (Eq, Ord, Data,Generic, Typeable, Show)
+        deriving (Eq, Ord, Data,Generic, Typeable, Show, Read)
 
 -- Defines an arity-8 homogenous product        
 type UniProduct8 a = Product8 a a a a a a a a
@@ -154,17 +154,17 @@ data Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
 -- Defines an arity-9 homogenous product        
 type UniProduct9 a = Product9 a a a a a a a a a
 
-
+        
 -- Unifies arity-specific product definitions
-type family Product (n::Nat) a = r | r -> n a where
-    Product 2 (a1,a2) = Product2 a1 a2
-    Product 3 (a1,a2,a3) = Product3 a1 a2 a3
-    Product 4 (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
-    Product 5 (a1,a2,a3,a4,a5)  = Product5 a1 a2 a3 a4 a5
-    Product 6 (a1,a2,a3,a4,a5,a6)  = Product6 a1 a2 a3 a4 a5 a6 
-    Product 7 (a1,a2,a3,a4,a5,a6,a7)  = Product7 a1 a2 a3 a4 a5 a6 a7
-    Product 8 (a1,a2,a3,a4,a5,a6,a7,a8)  = Product8 a1 a2 a3 a4 a5 a6 a7 a8
-    Product 9 (a1,a2,a3,a4,a5,a6,a7,a8,a9)  = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
+type family Product a = r | r -> a where
+    Product (a1,a2) = Product2 a1 a2
+    Product (a1,a2,a3) = Product3 a1 a2 a3
+    Product (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
+    Product (a1,a2,a3,a4,a5)  = Product5 a1 a2 a3 a4 a5
+    Product (a1,a2,a3,a4,a5,a6)  = Product6 a1 a2 a3 a4 a5 a6 
+    Product (a1,a2,a3,a4,a5,a6,a7)  = Product7 a1 a2 a3 a4 a5 a6 a7
+    Product (a1,a2,a3,a4,a5,a6,a7,a8)  = Product8 a1 a2 a3 a4 a5 a6 a7 a8
+    Product (a1,a2,a3,a4,a5,a6,a7,a8,a9)  = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
 
 type a !*! b = Product2 a b
 
@@ -199,26 +199,26 @@ type family UniProduct (n::Nat) a = r | r -> n a where
 
 
 -- Characterizes types from which products can be constructed
-class (KnownNat n) => Productive n a where    
-    -- | Forms a product from a tuple
-    prod::a -> Product n a
+class  Productive a where    
+    -- | Forms a product from an input type
+    prod::a -> Product a
 
     
-instance Productive 2 (a1,a2) where
+instance Productive (a1,a2) where
     prod (a1,a2) = Product2 a1 a2
-instance Productive 3 (a1,a2,a3) where
+instance Productive (a1,a2,a3) where
     prod (a1,a2,a3) = Product3 a1 a2 a3    
-instance Productive 4 (a1,a2,a3,a4)  where
+instance Productive (a1,a2,a3,a4)  where
     prod (a1,a2,a3,a4) = Product4 a1 a2 a3 a4    
-instance Productive 5 (a1,a2,a3,a4,a5) where
+instance Productive (a1,a2,a3,a4,a5) where
     prod (a1,a2,a3,a4,a5) = Product5 a1 a2 a3 a4 a5    
-instance Productive 6 (a1,a2,a3,a4,a5,a6) where
+instance Productive (a1,a2,a3,a4,a5,a6) where
     prod (a1,a2,a3,a4,a5,a6) = Product6 a1 a2 a3 a4 a5 a6    
-instance Productive 7 (a1,a2,a3,a4,a5,a6,a7) where
+instance Productive (a1,a2,a3,a4,a5,a6,a7) where
     prod (a1,a2,a3,a4,a5,a6,a7) = Product7 a1 a2 a3 a4 a5 a6 a7    
-instance Productive 8 (a1,a2,a3,a4,a5,a6,a7,a8) where
+instance Productive (a1,a2,a3,a4,a5,a6,a7,a8) where
     prod (a1,a2,a3,a4,a5,a6,a7,a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8    
-instance Productive 9 (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
+instance Productive (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
     prod (a1,a2,a3,a4,a5,a6,a7,a8,a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
     
 instance Tupled 2 (Product2 a1 a2) (a1,a2) where
@@ -238,110 +238,115 @@ instance Tupled 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) (a1,a2,a3,a4,a5,a6,a7,a8) w
 instance Tupled 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
     tuple (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = (a1,a2,a3,a4,a5,a6,a7,a8,a9)            
 
+-- Characterizes a componentized type a with n components indexed by j
+class Factored (j::Nat) a where    
+    -- | Extracts the j-th component from a product
+    project::a -> Factor j a
+
 instance Factored 1 (Product2 a1 a2) where 
-    factor (Product2 x1 x2) = x1    
+    project (Product2 a1 a2) = a1    
 instance Factored 2 (Product2 a1 a2) where 
-    factor (Product2 x1 x2) = x2
+    project (Product2 a1 a2) = a2
     
 instance Factored 1 (Product3 a1 a2 a3) where 
-    factor (Product3 a1 a2 a3) = a1
+    project (Product3 a1 a2 a3) = a1
 instance Factored 2 (Product3 a1 a2 a3) where 
-    factor (Product3 a1 a2 a3) = a2
+    project (Product3 a1 a2 a3) = a2
 instance Factored 3 (Product3 a1 a2 a3) where 
-    factor (Product3 a1 a2 a3) = a3
+    project (Product3 a1 a2 a3) = a3
 
 instance Factored 1 (Product4 a1 a2 a3 a4) where 
-    factor (Product4 a1 a2 a3 a4) = a1
+    project (Product4 a1 a2 a3 a4) = a1
 instance Factored 2 (Product4 a1 a2 a3 a4) where 
-    factor (Product4 a1 a2 a3 a4) = a2
+    project (Product4 a1 a2 a3 a4) = a2
 instance Factored 3 (Product4 a1 a2 a3 a4) where 
-    factor (Product4 a1 a2 a3 a4) = a3    
+    project (Product4 a1 a2 a3 a4) = a3    
 instance Factored 4 (Product4 a1 a2 a3 a4) where 
-    factor (Product4 a1 a2 a3 a4) = a4
+    project (Product4 a1 a2 a3 a4) = a4
 
 instance Factored 1 (Product5 a1 a2 a3 a4 a5) where 
-    factor (Product5 a1 a2 a3 a4 a5) = a1
+    project (Product5 a1 a2 a3 a4 a5) = a1
 instance Factored 2 (Product5 a1 a2 a3 a4 a5) where 
-    factor (Product5 a1 a2 a3 a4 a5) = a2
+    project (Product5 a1 a2 a3 a4 a5) = a2
 instance Factored 3 (Product5 a1 a2 a3 a4 a5) where 
-    factor (Product5 a1 a2 a3 a4 a5) = a3    
+    project (Product5 a1 a2 a3 a4 a5) = a3    
 instance Factored 4 (Product5 a1 a2 a3 a4 a5) where 
-    factor (Product5 a1 a2 a3 a4 a5) = a4
+    project (Product5 a1 a2 a3 a4 a5) = a4
 instance Factored 5 (Product5 a1 a2 a3 a4 a5) where 
-    factor (Product5 a1 a2 a3 a4 a5) = a5
+    project (Product5 a1 a2 a3 a4 a5) = a5
 
 instance Factored 1 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a1
+    project (Product6 a1 a2 a3 a4 a5 a6) = a1
 instance Factored 2 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a2
+    project (Product6 a1 a2 a3 a4 a5 a6) = a2
 instance Factored 3 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a3    
+    project (Product6 a1 a2 a3 a4 a5 a6) = a3    
 instance Factored 4 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a4
+    project (Product6 a1 a2 a3 a4 a5 a6) = a4
 instance Factored 5 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a5
+    project (Product6 a1 a2 a3 a4 a5 a6) = a5
 instance Factored 6 (Product6 a1 a2 a3 a4 a5 a6) where 
-    factor (Product6 a1 a2 a3 a4 a5 a6) = a6
+    project (Product6 a1 a2 a3 a4 a5 a6) = a6
 
 instance Factored 1 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a1
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a1
 instance Factored 2 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a2
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a2
 instance Factored 3 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a3    
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a3    
 instance Factored 4 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a4
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a4
 instance Factored 5 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a5
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a5
 instance Factored 6 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a6
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a6
 instance Factored 7 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
-    factor (Product7 a1 a2 a3 a4 a5 a6 a7) = a7
+    project (Product7 a1 a2 a3 a4 a5 a6 a7) = a7
 
 instance Factored 1 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a1
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a1
 instance Factored 2 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a2
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a2
 instance Factored 3 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a3    
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a3    
 instance Factored 4 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a4
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a4
 instance Factored 5 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a5
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a5
 instance Factored 6 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a6
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a6
 instance Factored 7 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a7
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a7
 instance Factored 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
-    factor (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a8
+    project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a8
 
 instance Factored 1 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a1
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a1
 instance Factored 2 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a2
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a2
 instance Factored 3 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a3    
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a3    
 instance Factored 4 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a4
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a4
 instance Factored 5 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a5
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a5
 instance Factored 6 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a6
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a6
 instance Factored 7 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a7
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a7
 instance Factored 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
 instance Factored 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
-    factor (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9
+    project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9
                 
 instance Arital 2 (Product2 a1 a2)
 instance Arital 3 (Product3 a1 a2 a3)
 instance Arital 4 (Product4 a1 a2 a3 a4)
 instance Arital 5 (Product5 a1 a2 a3 a4 a5)
 instance Arital 6 (Product6 a1 a2 a3 a4 a5 a6)
-instance Arital 7  (Product7 a1 a2 a3 a4 a5 a6 a7)
-instance Arital 8  (Product8 a1 a2 a3 a4 a5 a6 a7 a8)
-instance Arital 9  (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9)
+instance Arital 7 (Product7 a1 a2 a3 a4 a5 a6 a7)
+instance Arital 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8)
+instance Arital 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9)
     
 type Additive2 a1 a2 = (Additive a1, Additive a2)
 type Additive3 a1 a2 a3 = (Additive2 a1 a2, Additive a3)
@@ -603,7 +608,7 @@ instance Monoid2 a1 a2 => Biapplicative (Product4 a1 a2)  where
     Product4 a1 a2 f g <<*>> Product4 a1' a2' x y = Product4 (mappend a1 a1') (mappend a2 a2') (f x) (g y)
           
 instance Comonad (Product2 e) where
-    duplicate src = Product2 (factor @1 src) src
-    extract src = factor @2 src
+    duplicate src = Product2 (project @1 src) src
+    extract src = project @2 src
 
 

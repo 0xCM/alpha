@@ -50,7 +50,7 @@ type instance Lazy EG.ByteString = LZ.ByteString
 
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
-bytes::(Indexed a Word8) => Int -> Int -> a -> [Word8]
+bytes::(Indexed a Int Word8) => Int -> Int -> a -> [Word8]
 bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
 
 segment::(Int,Int) -> EG.ByteString -> EG.ByteString
@@ -89,14 +89,14 @@ instance Packable [Word8] EG.ByteString where
     pack = EG.pack
     unpack = EG.unpack 
 
-instance Concatenable EG.ByteString EG.ByteString where
+instance Concatenable EG.ByteString EG.ByteString where    
     type Concatenated EG.ByteString EG.ByteString = EG.ByteString
     concat = EG.append
 
 instance Length EG.ByteString where
     length = convert . EG.length 
 
-instance Indexed EG.ByteString Word8 where    
+instance Indexed EG.ByteString Int Word8 where    
     item = EG.index
 
 instance Packable [Word8] LZ.ByteString where
@@ -110,7 +110,7 @@ instance Concatenable LZ.ByteString LZ.ByteString where
 instance Length LZ.ByteString where
     length = convert . LZ.length 
 
-instance Indexed LZ.ByteString Word8 where    
+instance Indexed LZ.ByteString Int Word8 where    
     item x n = LZ.index x (int64 n)
 
 instance Convertible EG.ByteString [Word8] where

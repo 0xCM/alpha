@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | Defines Maybe & Optional-related api surface
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Data.Maybe
 (
     Maybe, just, isJust, none, isNone, fromJust

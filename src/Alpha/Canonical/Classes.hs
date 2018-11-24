@@ -24,23 +24,22 @@ module Alpha.Canonical.Classes
     Proxy(..),
     ToLines(..),
     Boolean(..),
-    Wrapped(..),
     Reifiable(..),
     Chunkable(..),
     Faceted(..),
     Flow(..), Coflow(..),
     Collapsible(..),
     Reversible(..),
-    Container(..),
     OrderedEnum(..),
     Assembly(..),
-    Unionizable(..),
-    Intersectable(..),
-    Diffable(..),
+    Membership(..),
     FiniteMembership(..),
     Tupled(..),
-    IndexedChoice(..)
-
+    IndexedChoice(..),
+    Appendable(..),
+    Prependable(..),
+    FiniteIntegral,
+    Dimensional(..)
 )
 where
 import qualified Data.Text as T
@@ -50,8 +49,9 @@ import Alpha.Base
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Operators
 import GHC.TypeLits
-
 import qualified Data.List as L
+
+type FiniteIntegral n = (Integral n, FiniteBits n)
 
 -- Synonym for combined Ord and Enum constraints
 type OrderedEnum a = (Enum a, Ord a)    
@@ -86,19 +86,21 @@ class Assembly a b | a -> b, b -> a where
     disassemble::a -> [b]
     
     assemble::[b] -> a
+
+-- | Characterizes a pair whose terms can be related via an append operation
+class Appendable a b where
+    type Appended a b
+    append::a -> b -> Appended a b
+
+-- | Characterizes a pair whose terms can be related via an prepend operation    
+class Prependable a b where
+    type Prepended a b
+    prepend::a -> b -> Prepended a b
     
--- / Characterizes the concept of a container    
-class Container c e | c -> e where
-    -- | A source of type 'c' producing elements of type 'e'
-    type Source c e
-
-    -- | Constructs a container with exactly one element
-    singleton::e -> c
-
-                
--- / Applicable when values can be concatenated in a "structure-preserving" way
+-- / Characterizes a pair whose terms can be related via associative concat operations
 class Concatenable a b where
     type Concatenated a b
+
     concat :: a -> b -> Concatenated a b
 
     (+++) :: a -> b -> Concatenated a b
@@ -129,6 +131,10 @@ class Counted a where
     -- | Counts the number of items within the purview of the subject
     count::(Integral n) => a -> n
 
+-- | Characterizes types that present membersip in the form of a predicate    
+class Membership c e where
+    member::e -> c -> Bool
+
 -- | Characterizes finitely-presented types, i.e. types for which there are fintely many inhabitants    
 class FiniteMembership a b where
     -- Retrieves the members of 'a'
@@ -153,7 +159,7 @@ class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
     convert::a -> b    
 
--- Characterizes a pair of types for which transformations are defined 
+-- | Characterizes a pair of types for which transformations are defined 
 -- for respectively "packing"  and "unpacking" type values
 class Packable a b where
     -- Encodes an a-value to a b-value
@@ -161,15 +167,13 @@ class Packable a b where
     -- Restores an a-value from a b-value
     unpack::b -> a    
     
-class Indexed c e where
-    item::c -> Int -> e
+-- | Characterizes a container of type c holding elements of type e indexed by type i    
+class Indexed c i e where
+    item::c -> i -> e
 
-    (!)::c -> Int -> e
+    (!)::c -> i -> e
     (!) = item
             
-class Wrapped a b | a -> b where
-    unwrap::a -> b
-
 -- A flow from a --> b
 class Flow a b where
     flow::a -> (a -> b) -> b
@@ -193,22 +197,17 @@ class (KnownSymbol f) => Faceted f v where
 -- values of an enumerable type c
 class (Enum c) => Classifiable a c where
     classify::(a -> c) -> [a] -> [(c,a)]
-        
--- | Characterizes types for which a meaningful union operation can be specified    
-class Unionizable a where
-    union::a -> a -> a
-
--- | Characterizes types for which a meaningful intersection operation can be specified        
-class Intersectable a where
-    intersect::a -> a -> a
-
--- |Characterizes types for which a meaningful delta operation can be specified        
-class Diffable a where
-    delta::a -> a -> a
 
 -- Characterizes a type that represents a finite sequence of mutually disjoint choices
-class IndexedChoice a where
+class IndexedChoice a where    
     choiceix::a -> Int
+
+-- Characterizes a type for which a notion of dimensionality 
+-- can be defined, e.g., an array, matrix or more generally a tensor
+class Dimensional a where
+    type Dimension a
+    dimension::a -> Dimension a
+    
     
 --From Wadler's Propositions as Types:
 --Disjunction A ∨ B corresponds to a disjoint sum A + B, that
@@ -242,17 +241,12 @@ data Implies a b = Implies (a->b)
 
 type a :-> b = Implies a b        
 
-class SmallSet a where
-    member::a -> Bool
-    member _ = True
+-- class (Membership a) => SmallSet a where
+--     member::a -> Bool
+--     member _ = True
 
-instance SmallSet a
+-- instance SmallSet a
     
-instance (Eq a) => Unionizable [a] where
-    union = L.union
-    
-instance (Eq a) => Intersectable [a] where
-    intersect = L.intersect
 
 instance Jailbreak Maybe a where
     escape x = fromJust x

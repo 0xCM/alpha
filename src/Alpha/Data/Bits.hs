@@ -26,7 +26,7 @@ import Alpha.Data.Natural
 import GHC.TypeLits
 
 class (Sized n, FiniteBits a) => SizedBits n a where
-
+    
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> bit
 
@@ -70,25 +70,25 @@ hibyte x  = (x .>>.8) .&. 0xFF |> fromIntegral
 
 
 instance Concatenable Word8 Word8 where
-    type Concatenated Word8 Word8 = Word16    
+    type Concatenated Word8 Word8 = Word16
     concat x y = bitsplat 8 x y
             
 instance Concatenable Word16 Word16 where
-    type Concatenated Word16 Word16 = Word32    
+    type Concatenated Word16 Word16 = Word32
     concat x y = bitsplat 16 x y
 
 instance Concatenable Word32 Word32 where
-    type Concatenated Word32 Word32 = Word64    
+    type Concatenated Word32 Word32 = Word64
     concat x y = bitsplat 32 x y
 
 instance Concatenable Int8 Int8 where
-    type Concatenated Int8 Int8 = Int16    
+    type Concatenated Int8 Int8 = Int16
     concat x y = bitsplat 8 x y
             
 instance Concatenable Int16 Int16 where
-    type Concatenated Int16 Int16 = Int32    
+    type Concatenated Int16 Int16 = Int32
     concat x y = bitsplat 16 x y
 
 instance Concatenable Int32 Int32 where
-    type Concatenated Int32 Int32 = Int64    
+    type Concatenated Int32 Int32 = Int64
     concat x y = bitsplat 32 x y

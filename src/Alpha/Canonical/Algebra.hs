@@ -5,9 +5,9 @@ module Alpha.Canonical.Algebra
     NonEmpty,
     Additive(..),
     Subtractive(..),
+    Negatable(..),
     Multiplicative(..),
     Unital(..),
-    Invertible(..),    
     Semigroupoid(..),
     Groupoid(..),
     Group(..), Abelian(..),
@@ -19,31 +19,41 @@ module Alpha.Canonical.Algebra
     Nullary(..), null,
     Spanned(..),
     Degenerate(..),
-    Vector(..), 
-    Vectored(..), Covectored(..),
     SignedIntegral(..),UnsignedIntegral(..),
     Monoidal(..),
-    dual, minimal, maximal, endo, endoply, cartesian
+    JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
+    Sign(..), positive, negative, sign,
+    dual, minimal, maximal, endo, endoply, cartesian, alt
 )
 where
-import GHC.Base(NonEmpty)
+import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
+import Algebra.Lattice(Lattice(..))   
 import Data.Functor.Product
 import Data.Function
 import Data.Foldable hiding(null)
+import Data.Semigroupoid
+import Data.Ord(Ord)
+import Data.List.NonEmpty hiding(span)
+
+import GHC.Base(NonEmpty)
 import GHC.Show(Show)
 import GHC.TypeLits
 import GHC.Num(Num,Natural)
 import GHC.Real(Integral)
 import GHC.Generics
-import Data.Semigroupoid
+
 import qualified Prelude as P
-import Data.Ord(Ord)
-import Data.List.NonEmpty hiding(span)
 import qualified Data.Vector as V
 
 import Alpha.Data.Base
 import Alpha.Canonical.Operators
+import Alpha.Canonical.Relations
 import qualified Data.Monoid as Monoid
+
+-- / Characterizes types for which unary negation may be defined
+class Negatable a b where
+    -- | Negates the operand
+    negate::a -> b
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -132,12 +142,6 @@ class Supremum a b where
     -- / The least upper bound
     supremum::a -> b
     
--- | Characterizes types whose values can be inverted
--- Note that the operation is not necessarily closed over its
--- domain, but is however total
-class Invertible a b where
-    invert::a -> b
-
 -- | Characterizes a type that contains a relatively contiguous
 -- set of values bound by least and greatest values
 class (Ord b) => Spanned a b where
@@ -154,7 +158,7 @@ infixl 5 ...
 -- A finitely presented permutation: A bijection from [1..n] 
 data Permutation a = Permutation (Map Natural a) (Map a Natural)
 
-class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a
+class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a where
 
 -- | A group is a monoid together with an inversion operator (-)
 -- such that for every element g there exists a unique elment -g where g + (-g) = 0
@@ -164,33 +168,15 @@ class (Group a, Additive a) => Abelian a where
     
 class (Abelian a, Multiplicative a, Unital a) => Ring a where
     
--- | Represents a sized vector
-data Vector (n::Nat) a 
-    = Col (V.Vector a)
-    | Row (V.Vector a)
-        deriving (Show,Generic,Data,Typeable)    
-
--- | Characterizes types that can be expressed as a sized vector        
-class Vectored (n::Nat) a b where        
-    -- Creates a column vector from an a-value
-    col::a -> Vector n b
-
--- | Characterizes types that can be expressed as a sized covector        
-class Covectored (n::Nat) a b where
-    -- Creates a row vector from an a-value
-    row::a -> Vector n b
-    
-data Polarity = Polarity{signed::Bool}    
-
+data Sign = Positive | Negative
+    deriving (Show,Ord,Eq)
 
 -- Identifies signed integral types
 class (Integral i) => SignedIntegral i where
 
-
-    -- Identifies usigned integral types    
+-- Identifies usigned integral types    
 class (Integral i) => UnsignedIntegral i where
 
-    
 
 -- Alias for semigroupoid composition operator
 compose::(Semigroupoid c) => c j k -> c i j -> c i k
@@ -207,9 +193,9 @@ minimal (x:xs) = sconcat (fmap Min (x :| xs) )
 
 maximal::(Ord a, Semigroup a) => [a] -> Max a
 maximal (x:xs) = sconcat (fmap Max (x :| xs) ) 
-    
--- Constructs an endomorphism
-endo::(Monoid a) => (a -> a) -> Endo a
+
+-- Constructs a (claimed) endomorphism
+endo::(a -> a) -> Endo a
 endo f = Endo f    
 
 -- Applies an endomorphism
@@ -224,5 +210,21 @@ cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
 null::(Eq a, Nullary a) => a -> Bool
 null a = a == zero
 
+-- Lifts the input into the Alt monoid
+-- Example:
+-- alt Nothing  <> alt (Just 4) <> alt (Just 7)
+-- >> Alt {getAlt = Just 4}
 alt::Monoid a => f a -> Monoid.Alt f a
 alt = Monoid.Alt
+
+-- Produces a 'Sign' of positive polarity
+positive::Sign
+positive = Positive
+
+-- Produces a 'Sign' of negative polarity
+negative::Sign
+negative = Negative
+
+-- Computes the sign of a value
+sign::(TotalOrder a, Nullary a) => a -> Sign
+sign a = ifelse (a >= zero) positive negative

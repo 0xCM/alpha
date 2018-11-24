@@ -26,7 +26,7 @@ import qualified Data.List as List
 import Data.Functor
 import Data.List(intersperse,last,head,takeWhile,cycle,partition,any,all)
 import GHC.Real hiding(reduce)
-import Prelude((-))
+--import Prelude((-))
 import Alpha.Base hiding(zero)
 import Alpha.Canonical
 import Alpha.Data.Numbers
@@ -42,10 +42,10 @@ splitAt::(Integral i) => i -> [a] -> ([a],[a])
 splitAt = List.genericSplitAt
 
 -- | Applies an indexed function to a list
-mapi::(Integral i) => ((i, a)->b) -> [a] -> [b]
+mapi::(Integral i, Nullary i, Subtractive i) => ((i, a)->b) -> [a] -> [b]
 mapi f l = fmap f z where 
-        idx = [zed..upper]
-        upper  = sub' (length l) 1
+        idx = [zero..upper]
+        upper  = (length l) - 1
         z = List.zip idx l
 
 -- | Identical to List.tails except that the empty list is excluded from the result        
@@ -78,6 +78,14 @@ scan op x = fmap (reduce op) (inits x)
 (\\) = scan
 infixl 6 \\
 
+instance Appendable [a] [a]where
+    type Appended [a] [a] = [a]
+    append = (List.++)
+
+instance Prependable [a] [a] where
+    type Prepended [a] [a] = [a]
+    prepend x y = y List.++ x
+
 instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]
     concat x y = x List.++ y
@@ -87,9 +95,11 @@ instance (Eq a) => Sequential [a] a where
     take i src = fromList $ List.take (fromIntegral i) src
     split = List.partition
     tail = List.tail
-    while = List.takeWhile
-    filter = List.filter
+    while = List.takeWhile    
     skip n s = List.drop (fromIntegral n) s
+
+instance (Eq a) => Filterable [a] a where
+    filter = List.filter
 
 instance Length [a] where
     length x = List.length x |> convert
@@ -98,7 +108,6 @@ instance Collapsible [[a]] [a] where
     collapse = List.concat    
 
 instance (Eq a) => Container [a] a where
-    type Source [a] a = [a]    
     singleton x = [x]    
 
 instance Reversible [a] [a] where
@@ -113,3 +122,9 @@ instance Degenerate [a] where
 instance Assembly [a] a where
     assemble = id
     disassemble = id
+
+instance (Eq a) => Setwise [a] a where
+    union = List.union
+    intersect = List.intersect
+    delta =  List.union
+    

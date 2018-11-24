@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Alpha.Numerics.Modular
 (
-    Zn, zN, modulus, leastResidues,residue,
+    Zn, zN, modulus, residues,residue,
     based, base2, base10, base16,
 
     Base, BasedInt
@@ -42,10 +42,10 @@ residue m = Residue (zN) m
 
 -- See https://github.com/TikhonJelvis/modular-arithmetic/blob/master/src/Data/Modular.hs
 
--- | The canonical residues modulo n
+-- | The canonical least residues modulo n
 -- See https://en.wikipedia.org/wiki/Modular_arithmetic for terminology
-leastResidues::KnownNat n => Zn n -> [Integer]    
-leastResidues (Zn n) = [0..(n-1)] 
+residues::KnownNat n => Zn n -> [Integer]    
+residues (Zn n) = [0..(n-1)] 
 
 type ModN n m = (KnownNat n, Integral m, Additive m)
 
@@ -54,7 +54,7 @@ instance KnownNat n => Show (Zn n) where
         nn = show (natVal (Proxy @n))
 
 instance KnownNat n => FiniteMembership (Zn n) Integer where    
-    members = leastResidues
+    members = residues
 
 instance (Show m, ModN n m) => Show(Residue n m) where
     show (Residue zN m) = (show m) ++ " " ++ (show zN)

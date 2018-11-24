@@ -10,9 +10,10 @@ module Alpha.Canonical.Operators
     Operator(..), BinaryOperator, UnaryOperator, TernaryOperator,
     Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,    
     (<|),(|>), ifelse, left,right, symstr, associator,
-    BinaryFunc, UnaryFunc, TernaryFunc,
+    Function, BinaryFunc, UnaryFunc, TernaryFunc,
     type (~>), Hom, Dom, Cod,
-    Arital(..)
+    Arital(..),Compositional(..), Invertible(..), 
+    Inversion(..), inversion
     
 
 )
@@ -28,17 +29,29 @@ import GHC.TypeLits
 import Data.Function
 import Prelude(fromIntegral)
 
-type family (x ~> y)
-type instance (x ~> y) = x -> y
-type Hom x y = x ~> y
+-- A synonym for a unary function
+type Function a b = a -> b
+
+type family (a ~> b)
+type Hom a b = a ~> b
+
+type instance (a ~> b) = Function a b
 
 -- Represents a function domain
 type family Dom f :: Type where
-    Dom (x->y) = x
+    Dom (Function a b) = a
     
 -- Represents a function codomain
 type family Cod f :: Type where
-    Cod (x->y) = y
+    Cod (Function a b) = b
+
+type family Composition a c where
+    Composition (Function b c) (Function a b) = Function a c
+    
+-- Characterizes function composition
+class Compositional a b c where
+    compose::Hom b c -> Hom a b -> Hom a c
+    compose g f = g . f
 
 -- Characterizes type with which an arity is associated
 class KnownNat n => Arital n a where
@@ -81,10 +94,23 @@ type family Operator (n::Nat) a  where
     Operator 2 (a,a,a) =   BinaryOperator a
     Operator 3 (a,a,a,a) = TernaryOperator a
 
+-- | Characterizes types whose values can be inverted
+-- Note that the operation is not necessarily closed over its
+-- domain, but is however total
+class Invertible a b where
+    invert::a -> b
+    
 -- Specifies an arital operator
 class (KnownNat n, Arital n a) => Operative n a where
     operator::Operator n a
 
+-- Specifies an arital predicate 
+class (KnownNat n, Arital n a) => Predicative n a where
+    predicate::Predicate n a
+
+-- Captures a pair of functions (f,g) such that f . g = g . f = id
+newtype Inversion a b = Inversion (a -> b, b -> a)
+    
 instance Arital 1 (UnaryOperator a)    
 instance Arital 2 (BinaryOperator a)
 instance Arital 3 (TernaryOperator a)
@@ -95,15 +121,10 @@ type family Predicate (n::Nat)  a | a -> a where
     Predicate 2 (a,a,Bool) =   BinaryPredicate a
     Predicate 3 (a,a,a,Bool) = TernaryPredicate a
 
--- Specifies an arital predicate 
-class (KnownNat n, Arital n a) => Predicative n a where
-    predicate::Predicate n a
-
 instance Arital 1 (UnaryPredicate a)    
 instance Arital 2 (BinaryPredicate a)
 instance Arital 3 (TernaryPredicate a)
-    
-    
+        
 -- | If the first input value is true, returns the 2nd input value,
 -- otherwise, returns the third input value
 ifelse::Bool -> a -> a -> a
@@ -129,10 +150,11 @@ infixl 0 |>
 f <| x = f x
 infixr 0 <|
 
+-- | Produces a strong for a symbol
 symstr :: forall s. KnownSymbol s => String
 symstr = symbolVal @s Proxy
 
--- Computes both left and right-associative applications
+-- | Computes both left and right-associative applications
 -- If an operator is associtive, these values will coincide
 associator::BinaryOperator a -> (a, a, a) -> (a,a)
 associator op (x,y,z) =  (left,right) where
@@ -140,3 +162,10 @@ associator op (x,y,z) =  (left,right) where
     yz = op y z
     left =  op xy z
     right = op x yz
+
+-- | Produces an inversion from complementary inverses    
+inversion::(a -> b) -> (b -> a) -> Inversion a b
+inversion f g = Inversion(f,g)
+
+instance Invertible (Inversion a b) (Inversion b a) where
+    invert (Inversion (f, g)) = Inversion (g, f)

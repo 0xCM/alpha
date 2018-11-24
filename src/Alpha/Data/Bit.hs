@@ -37,7 +37,7 @@ class ToBit a where
 type family Toggle t | t -> t where
     Toggle 0 = 0
     Toggle 1 = 1    
-        
+            
 off::Bit
 off = Bit Off
 
@@ -119,3 +119,4 @@ instance Bits Bit where
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
   
+

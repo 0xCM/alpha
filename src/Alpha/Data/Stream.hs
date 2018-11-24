@@ -46,11 +46,9 @@ instance Sequential (Stream e) e where
     split = S.partition
     while pred src = undefined
     tail = S.tail
-    filter = S.filter
     skip n s = S.drop (fromIntegral n) s
 
 instance Container (Stream e) e where
-    type Source (Stream e) e = Stream e
     singleton x = S.cycle [x]
 
 instance Streamer (Stream s)  where
@@ -58,3 +56,7 @@ instance Streamer (Stream s)  where
     iterate = S.iterate
     cycle (x:xs) = S.cycle(x :| xs)
     blackbox f = S.iterate (\_ -> f ()) (f())        
+
+instance (Eq a) => Filterable (Stream a) a where
+    filter = S.filter
+    

@@ -12,7 +12,7 @@
 
 module Alpha.Data.BitVector
 (
-  BitVector(..),(<:>)
+  BitVector(..),(<:>),ToBitVector(..),bitvector
 )
 where
 import Data.Bits
@@ -229,7 +229,7 @@ bvLTU bv1 bv2 = bvIntegerU bv1 < bvIntegerU bv2
 --
 -- Note that the first argument gets placed in the higher-order bits. The above
 -- example should be illustrative enough.
-bvConcat :: BitVector v -> BitVector w -> BitVector (v+w)
+bvConcat :: BitVector v -> BitVector w -> BitVector (v + w)
 bvConcat (BV hiWRepr hi) (BV loWRepr lo) =
   BV (hiWRepr `addNat` loWRepr) ((hi `shiftL` loWidth) .|. lo)
   where loWidth = fromIntegral (natValue loWRepr)
@@ -379,7 +379,7 @@ instance ToBitVector Word32 32 where
 instance ToBitVector Word64 64 where
   bv x = bitvector (fromIntegral x)
 
-instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2) where
+instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2)  where
   type Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
   concat = bvConcat
 

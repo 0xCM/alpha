@@ -4,8 +4,6 @@
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  Per accompanying LICENSE file
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE DataKinds #-}

@@ -1,6 +1,13 @@
+-----------------------------------------------------------------------------
+-- | Defines api surface of control-level constructs upon which alpha depends
+-- Copyright   :  (c) 0xCM, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Control.Base
 (
     Monad(..),
+    NFData(..), force, ($!!), deepseq,
     
     Comonad(..)
     , liftW     -- :: Comonad w => (a -> b) -> w a -> w b
@@ -27,3 +34,4 @@ where
 
 import Control.Monad
 import Control.Comonad
+import Control.DeepSeq

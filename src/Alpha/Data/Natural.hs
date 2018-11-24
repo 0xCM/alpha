@@ -5,9 +5,9 @@
 module Alpha.Data.Natural
 (
     Sized(..),
-    Natural, NatRange, 
+    Natural, NatPair, 
     Zero, One, Next, Add, Sub,Mul,
-    natval, natrange, nat, natdec, natinc, natadd, natsub, natmul, natmod
+    natural, natpair, natdec, natinc, natadd, natsub, natmul, natmod
 )
 where
 
@@ -24,11 +24,18 @@ import Alpha.Canonical(Formattable(..))
 newtype Natural k = Natural N.Natural
     deriving (Num)
 
-class (KnownNat n) => Sized n where
+class KnownNat n => Sized n where
     size::Int
-    size = natval @n
+    size = s where
+        n = natural @n
+        s = integral n
+        integral::Natural k -> Int
+        integral (Natural x) = fromIntegral x
+        
 
-data NatRange (i::Nat) (j::Nat) = NatRange (Natural i, Natural j)    
+-- | Determines a pair of typed natural numbers    
+data NatPair (i::Nat) (j::Nat) 
+    = NatPair (Natural i) (Natural j)
 
 type Zero = Natural 0
 type One =  Natural 1
@@ -36,19 +43,14 @@ type Next n = Natural (n + 1)
 type Add m n = Natural (m + n)
 type Sub m n  = Natural (m - n)
 type Mul m n = Natural (m * n)
+    
+-- | Constructs a typed nat
+natural :: forall n. KnownNat n => Natural n
+natural = fromIntegral (natVal (proxy @n))
 
-natrange::forall (i::Nat) (j::Nat). (KnownNat i, KnownNat j) => NatRange i j
-natrange = NatRange (x, y) where 
-    x = fromIntegral(natVal (Proxy @i))
-    y = fromIntegral(natVal (Proxy @j))
-
--- Extracts the value encoded at the type-level
-natval::forall n i. (KnownNat n, Integral i) => i
-natval = fromInteger( natVal (Proxy @n) )
-        
--- | Defines a nat
-nat::forall m (n::Nat). (Integral m) =>  m -> Natural n
-nat = Natural . fromIntegral 
+-- | Constructs a typed nat pair
+natpair::forall r c. (KnownNat r, KnownNat c) => NatPair r c
+natpair = NatPair (natural @r) ( natural @c)
 
 -- | Decrements a nat
 natdec::forall (n::Nat). Natural(n+1) -> Natural n

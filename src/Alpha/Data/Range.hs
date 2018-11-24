@@ -18,16 +18,12 @@ import Alpha.Canonical
 
 instance (Ord a) => Spanned (R.Range a) a where
     span min max = R.SpanRange min max    
-
-instance OrderedEnum a => Unionizable [R.Range a] where
-    union = R.union
-
-instance OrderedEnum a => Intersectable [R.Range a] where
-    intersect = R.intersection
-    
-instance OrderedEnum a => Diffable [R.Range a] where
-    delta = R.difference
     
 instance Ord a => Container (R.Range a) a where
-    type Source (R.Range a) a = R.Range a
     singleton = R.SingletonRange
+
+-- instance (Ord a, Enum a) =>  Setwise [R.Range a] a where
+--     union = R.union
+--     intersect = R.intersection
+--     delta = R.difference
+    

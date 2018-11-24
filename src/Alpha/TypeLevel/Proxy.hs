@@ -23,7 +23,7 @@ type instance Value Symbol = String
 type instance Value Nat = Integer
     
 instance KnownSymbol s => Witness (s :: Symbol) where
-    value =  symbolVal (proxy @s) --undefined
+    value =  symbolVal (proxy @s)
     
 instance KnownNat n => Witness (n :: Nat) where
-    value = natVal (proxy @n) --undefined    
+    value = natVal (proxy @n)

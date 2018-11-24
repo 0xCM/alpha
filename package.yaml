@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.13
+version:             0.0.30
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -13,32 +13,54 @@ extra-source-files:
 description: Please see the README on GitHub at <https://github.com/githubuser/alpha#readme>
 
 default-extensions:
-  AllowAmbiguousTypes  
+  AllowAmbiguousTypes
+  BinaryLiterals
+  BlockArguments
   ConstraintKinds
+  DefaultSignatures
   DeriveDataTypeable
   DeriveFoldable
   DeriveGeneric
   DeriveTraversable
+  DuplicateRecordFields
   FunctionalDependencies
   FlexibleInstances
   FlexibleContexts
   GADTs
   GeneralizedNewtypeDeriving
+  HexFloatLiterals
+  ImplicitParams
   InstanceSigs
   KindSignatures
+  LambdaCase
+  LiberalTypeSynonyms
+  MonadComprehensions
   MultiParamTypeClasses
+  MultiWayIf
   NoImplicitPrelude
+  OverloadedLabels
+  OverloadedLists
   OverloadedStrings
+  ParallelListComp
   PatternSynonyms
+  PolyKinds
+  QuasiQuotes
   RankNTypes
+  RecursiveDo
+  RoleAnnotations
   ScopedTypeVariables
   StandaloneDeriving
+  TransformListComp
+  TupleSections
   TypeApplications
+  TypeInType
   TypeFamilies
   TypeFamilyDependencies
   TypeOperators
   TypeSynonymInstances
-  OverloadedLists
+  ViewPatterns
+  UnicodeSyntax
+  
 
 dependencies:
 - array
@@ -77,9 +99,11 @@ dependencies:
 - intervals
 - keys
 - lattices
+- matrix
 - multiset
 - network
 - primitive
+- profunctors
 - range
 - semigroupoids
 - semigroups

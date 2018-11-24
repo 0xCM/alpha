@@ -18,7 +18,7 @@ import Alpha.Data.Product
 import Alpha.Data.Sum
 import Alpha.Data.Func
 
-type family Coproduct a | a -> a where
+type family Coproduct a = r | r -> a where
     Coproduct (Sum1 a1) = Sum1 a1
     Coproduct (Sum2 a1 a2) = Sum2 a1 a2     
     Coproduct (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
@@ -52,8 +52,12 @@ instance Coproductive 2 2 a2 (Sum2 a1 a2)  where
     coproduct  = Sum22
     cofactor (Sum22 a) = Just a
     cofactor _         = Nothing
+
+type CoFunc2 f1 a1 b1 f2 a2 b2
+    = (f1 ~ Func1 a1 b1, f2 ~ Func1 a2 b2)
     
-comap2::(f1 ~ Func1 a1 b1, f2 ~ Func1 a2 b2) => Product2 f1 f2 -> (Sum2 a1 a2) -> (Sum2 b1 b2)
+comap2::CoFunc2 f1 a1 b1 f2 a2 b2 
+    => Product2 f1 f2 -> (Sum2 a1 a2) -> (Sum2 b1 b2)
 comap2 (Product2 f1 _ ) (Sum21 a1) = Sum21 (f1 a1)
 comap2 (Product2 _ f2 ) (Sum22 a2) = Sum22 (f2 a2)  
     
@@ -76,7 +80,11 @@ instance Coproductive 3 3 a3 (Sum3 a1 a2 a3)  where
     cofactor (Sum33 a) = Just a
     cofactor _         = Nothing
 
-comap3::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3)) => Product3 f1 f2 f3 -> (Sum3 a1 a2 a3) -> (Sum3 b1 b2 b3)
+type CoFunc3 f1 a1 b1 f2 a2 b2 f3 a3 b3
+    = (CoFunc2 f1 a1 b1 f2 a2 b2, f3 ~ Func1 a3 b3)
+
+comap3::CoFunc3 f1 a1 b1 f2 a2 b2 f3 a3 b3 
+    => Product3 f1 f2 f3 -> (Sum3 a1 a2 a3) -> (Sum3 b1 b2 b3)
 comap3 (Product3 f1 _ _) (Sum31 a1) = Sum31 (f1 a1)
 comap3 (Product3 _ f2 _) (Sum32 a2) = Sum32 (f2 a2)  
 comap3 (Product3 _ _ f3) (Sum33 a3) = Sum33 (f3 a3)
@@ -104,11 +112,16 @@ instance Coproductive 4 4 a4 (Sum4 a1 a2 a3 a4)  where
     cofactor (Sum44 a) = Just a
     cofactor _         = Nothing
 
-comap4::(f1 ~ (a1->b1), f2 ~ (a2 -> b2), f3 ~ (a3 -> b3), f4 ~ (a4 -> b4)) => Product4 f1 f2 f3 f4 -> (Sum4 a1 a2 a3 a4) -> (Sum4 b1 b2 b3 b4)
+type CoFunc4 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4  
+    = (CoFunc3 f1 a1 b1 f2 a2 b2 f3 a3 b3, f4 ~ Func1 a4 b4)
+
+comap4::(CoFunc4 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4) 
+    => Product4 f1 f2 f3 f4 -> (Sum4 a1 a2 a3 a4) -> (Sum4 b1 b2 b3 b4)
 comap4 (Product4 f1 _ _ _) (Sum41 a1) = Sum41 (f1 a1)
 comap4 (Product4 _ f2 _ _) (Sum42 a2) = Sum42 (f2 a2)  
 comap4 (Product4 _ _ f3 _) (Sum43 a3) = Sum43 (f3 a3)
 comap4 (Product4 _ _ _ f4) (Sum44 a4) = Sum44 (f4 a4)    
+
 -- Coproduct 5
 -------------------------------------------------------------------------------
 
@@ -136,6 +149,17 @@ instance Coproductive 5 5 a5 (Sum5 a1 a2 a3 a4 a5)  where
     coproduct  = Sum55
     cofactor (Sum55 a) = Just a
     cofactor _         = Nothing
+
+type CoFunc5 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4 f5 a5 b5 
+    = (CoFunc4 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4, f5 ~ Func1 a5 b5)
+
+comap5::CoFunc5 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4 f5 a5 b5 
+    => Product5 f1 f2 f3 f4 f5 -> (Sum5 a1 a2 a3 a4 a5) -> (Sum5 b1 b2 b3 b4 b5)
+comap5 (Product5 f1 _ _ _ _) (Sum51 a1) = Sum51 (f1 a1)
+comap5 (Product5 _ f2 _ _ _) (Sum52 a2) = Sum52 (f2 a2)  
+comap5 (Product5 _ _ f3 _ _) (Sum53 a3) = Sum53 (f3 a3)
+comap5 (Product5 _ _ _ f4 _) (Sum54 a4) = Sum54 (f4 a4)    
+comap5 (Product5 _ _ _ _ f5) (Sum55 a5) = Sum55 (f5 a5)    
 
 -- Coproduct 6
 -------------------------------------------------------------------------------
@@ -170,6 +194,17 @@ instance Coproductive 6 6 a6 (Sum6 a1 a2 a3 a4 a5 a6)  where
     cofactor (Sum66 a) = Just a
     cofactor _         = Nothing
 
+type CoFunc6 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4 f5 a5 b5 f6 a6 b6
+    = (CoFunc5 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4 f5 a5 b5, f6 ~ Func1 a6 b6)
+
+comap6::CoFunc6 f1 a1 b1 f2 a2 b2 f3 a3 b3 f4 a4 b4 f5 a5 b5 f6 a6 b6
+    => Product6 f1 f2 f3 f4 f5 f6 -> (Sum6 a1 a2 a3 a4 a5 a6) -> (Sum6 b1 b2 b3 b4 b5 b6)
+comap6 (Product6 f1 _ _ _ _ _) (Sum61 a1) = Sum61 (f1 a1)
+comap6 (Product6 _ f2 _ _ _ _) (Sum62 a2) = Sum62 (f2 a2)  
+comap6 (Product6 _ _ f3 _ _ _) (Sum63 a3) = Sum63 (f3 a3)
+comap6 (Product6 _ _ _ f4 _ _) (Sum64 a4) = Sum64 (f4 a4)    
+comap6 (Product6 _ _ _ _ f5 _) (Sum65 a5) = Sum65 (f5 a5)    
+comap6 (Product6 _ _ _ _ _ f6) (Sum66 a6) = Sum66 (f6 a6)    
 -- Coproduct 7
 -------------------------------------------------------------------------------
 

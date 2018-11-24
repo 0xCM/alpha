@@ -11,11 +11,14 @@ module Alpha.Data.Func
     Func0, Func1, Func2, Func3, Func4, Func5, Func6, Func7, Func8, Func9,
     CFunc1, CFunc2, CFunc3, CFunc4, CFunc5, CFunc6,
     SFunc1, SFunc2, SFunc3, SFunc4, SFunc5,
+
+    Curried, Uncurried, curry, uncurry,
     
     CFunc(..),
     SFunc(..),
-    Func(..), Functional(..),
+    Func(..), Functional,
     NFunc(..), NFx(..)
+
 )
 where
 
@@ -23,6 +26,22 @@ import Alpha.Base
 import Alpha.Canonical
 import Alpha.Data.Product
 import Alpha.Data.Sum
+import qualified Data.Tuple as Tuple
+
+
+instance Compositional (Product2 b c) (Product2 a b) (Product2 a c)        
+
+-- Synonym for an 'uncurried' function
+type Uncurried a b c = Function (a, b) c
+
+-- Synonym for an 'curried' function
+type Curried a b c =  a -> b -> c
+
+curry::Uncurried a b c -> Curried a b c
+curry = Tuple.curry
+
+uncurry::Curried a b c -> Uncurried a b c
+uncurry = Tuple.uncurry
 
 -- A synonym for a constant function
 type Func0 r  = r
@@ -160,12 +179,12 @@ type family SFunc a b where
 
 class Functional a r where    
 
-    type Function a r    
-    type Function a r = Func a r
+    type F a r    
+    type F a r = Func a r
     
-    eval::Function a r -> a -> r
+    eval::F a r -> a -> r
 
-    func::(f ~ Function a r) => f -> Function a r
+    func::(f ~ F a r) => f -> F a r
     func f = f    
     
 instance Functional (Product1 a1) r where

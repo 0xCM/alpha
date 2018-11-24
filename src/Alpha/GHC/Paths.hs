@@ -13,6 +13,7 @@ import Alpha.Text
 import Alpha.System.Files
 import Alpha.Canonical
 import qualified Data.Text as T
+import GHC.Show(Show)
 
 import qualified GHC.Paths as GP
 

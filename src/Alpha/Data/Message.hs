@@ -4,6 +4,8 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE DataKinds #-}
+
 module Alpha.Data.Message
 (
     Severity(..),
@@ -11,6 +13,8 @@ module Alpha.Data.Message
     babble, inform, warn, oops, doom
 ) where
 import Alpha.Base
+import Alpha.Canonical
+import Alpha.Data.Numbers
 
 
 -- Defines a severity classifier
@@ -31,6 +35,14 @@ instance Default Severity where
 data Message a = Message Severity Text (Maybe a)
     deriving(Eq,Show)
 
+severity::Word -> Severity
+severity val 
+    = if | val == 0 -> Trivia  
+         | val == 1 -> Info
+         | val == 2 -> Warn
+         | val == 3 -> Error
+         | val >= 5 -> Fatal
+      
 construct::Severity -> Text -> Maybe a -> Message a
 construct sev msg payload = Message sev msg payload
 

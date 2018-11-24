@@ -2,17 +2,15 @@
 -- | Common GHC.* imports
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
--- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
 -----------------------------------------------------------------------------
 module Alpha.GHC.Base
 (
-    Show(..),
+    Show(..), Read(..),
     Generic,
     Generic1,    
     Bounded,minBound,maxBound,
     Enum,fromEnum,toEnum,
-    Num, Integer, Integral, mod,
+    Num, Integer, Integral, Real, mod,
     Symbol, 
     KnownSymbol, 
     SomeSymbol, 
@@ -34,7 +32,8 @@ where
 
 
 import GHC.Show(Show(..))
-import GHC.Real((/), (^), (^^), (%), Integral, mod, RealFrac, Fractional, fromIntegral)
+import GHC.Read(Read(..))
+import GHC.Real((/), (^), (^^), (%), Real, Integral, mod, RealFrac, Fractional, fromIntegral)
 import GHC.Num(Num,Integer)
 import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
 import GHC.Types(Symbol)

@@ -11,22 +11,22 @@
 
 module Alpha.Data.Numbers
 (    
-    BigInt,
     SizedInt(..), 
     SizedWord(..),
     Integer,
     Integral(quot, rem, div, mod, quotRem, divMod),
     Double , Double#, Float, Float#,
     Num(abs, signum),
+    FromDouble(..), ToDouble(..),
 
-    intn, wordn,
-    int, bigint, 
-    int8, int16, int32, int64,
-    word8, word16, word32, word64,
+    --intn, wordn,    
+    int, int8, int16, int32, int64,
+    word, word8, word16, word32, word64,
     divides, modpart,
     fromIntegral,
     fromInteger,
-    zed, sub'
+    sub'
+
 )
 where
 import Data.Word 
@@ -38,6 +38,7 @@ import GHC.Num
 import GHC.Natural
 import GHC.Real
 import GHC.TypeLits
+import GHC.Float(double2Float,float2Double)
 import qualified GHC.Num as N
 import qualified Data.List as L
 
@@ -46,20 +47,14 @@ import Alpha.Base hiding(zero)
 import Alpha.Text.Format
 import Alpha.Canonical hiding((+),(*),(-),range)
 
+class FromDouble d where
+    -- / Converts a 'Double' value to a 'd' value
+    fromDouble::Double -> d
 
-instance SignedIntegral Integer
-instance SignedIntegral Int
-instance SignedIntegral Int8
-instance SignedIntegral Int16
-instance SignedIntegral Int32
-instance SignedIntegral Int64
-
-instance UnsignedIntegral Word
-instance UnsignedIntegral Word8
-instance UnsignedIntegral Word16
-instance UnsignedIntegral Word32
-instance UnsignedIntegral Word64
-
+class ToDouble d where
+    -- / Converts a 'd' value to a 'Double' value
+    toDouble::d -> Double
+    
 
 type family Unsigned i :: * where
     Unsigned Int8 = Word8
@@ -82,13 +77,13 @@ type family SizedWord (n::Nat) | n -> n where
     SizedWord 16 = Word16
     SizedWord 32 = Word32
     SizedWord 64 = Word64    
-        
--- | An integer of arbitrary size
-type BigInt = Integer
-
--- | Canonical 'Int' constructor for machine-sized integers
+        -- | Canonical 'Int' constructor for machine-sized integers
 int::(Integral n) => n -> Int
 int n = convert n
+
+-- | Canonical 'Integer' constructor for unbounded integers
+integer::(Integral n) => n -> Integer
+integer = fromIntegral
 
 -- | Constructs a list of Int values from a list of Integral values
 ints::(Integral n) => [n] -> [Int]
@@ -101,10 +96,6 @@ word n = convert n
 -- | Constructs a list of Word values from a list of Integral values
 words::(Integral n) => [n] -> [Word]
 words src = fmap word src
-
--- | Canonical 'Integer' constructor
-integer::(Integral n) => n -> Integer
-integer n = fromIntegral n
 
 -- | Constructs a list of Integer values from a list of Integral values
 integers::(Integral n) => [n] -> [Integer]
@@ -142,18 +133,17 @@ word32 n = convert n
 word64::(Integral n) => n -> Word64
 word64 n = convert n
 
--- | Constructs a 'BigInt' from an integral value
-bigint::(Integral n) => n -> BigInt
-bigint n = convert n
+-- | Constructs an 'Unsigned' value
+-- unsigned::(Integral i, Num (Unsigned i)) => i -> Unsigned i
+-- unsigned = convert    
 
-unsigned::(Integral i, Num (Unsigned i)) => i -> Unsigned i
-unsigned = convert    
+-- | Constructs a 'SizedWord' value
+-- wordn::(Integral i, Num (SizedWord n)) => i -> SizedWord n
+-- wordn = convert
 
-wordn::(Integral i, Num (SizedWord n)) => i -> SizedWord n
-wordn = convert
 
-intn::(Num (SizedInt n), Integral i) => i -> SizedInt n
-intn = convert
+-- intn::(Num (SizedInt n), Integral i) => i -> SizedInt n
+-- intn = convert
 
 -- Determines whether m is evenly divisible by n
 divides::(Integral a) => a -> a -> Bool
@@ -167,9 +157,11 @@ modpart (min,max) n
       |> fmap (\j -> case divides j n of True -> j; _ -> 0)
       |> L.filter (\j -> j /= 0)
 
+-- | Constructs a Num-typed 0 value      
 zed::(Num a) => a
 zed = 0
 
+-- | Constructs a Num-typed 1 value      
 unity::(Num a) => a
 unity = 1
 
@@ -179,7 +171,12 @@ sub' x y = x - y
 instance (Integral a, Num b) => Convertible a b where
     convert = fromIntegral
 
-instance (SignedIntegral a) => Invertible a a where invert x = zed - x
+
+-- instance Convertible Double Int where
+--     convert = round
+
+instance (SignedIntegral a) => Invertible a a where 
+    invert x = zed - x
 
 instance TotalOrder Natural
 instance TotalOrder Integer
@@ -322,10 +319,68 @@ instance Ring Int16
 instance Ring Int32
 instance Ring Int64
 
-instance Invertible Word Int where invert x = zero - (fromIntegral x)
-instance Invertible Word8 Int8 where invert x = zero - (fromIntegral x)
-instance Invertible Word16 Int16 where invert x = zero - (fromIntegral x)
-instance Invertible Word32 Int32 where invert x = zero - (fromIntegral x)
-instance Invertible Word64 Int64 where invert x = zero - (fromIntegral x)
-instance Invertible Float Float where invert x = zed - x
-instance Invertible Double Double where invert x = zed - x
+instance Invertible Word Int where invert x = zero - (int x)
+instance Invertible Word8 Int8 where invert x = zero - (int8 x)
+instance Invertible Word16 Int16 where invert x = zero - (int16 x)
+instance Invertible Word32 Int32 where invert x = zero - (int32 x)
+instance Invertible Word64 Int64 where invert x = zero - (int64 x)
+instance Invertible Float Float where invert x = zero - x
+instance Invertible Double Double where invert x = zero - x
+
+instance Negatable Natural Integer where negate x = zero - (integer x)
+instance Negatable Integer Integer where negate x = zero - x
+instance Negatable Int Int where negate x = zero - x
+instance Negatable Int8 Int8 where negate x = zero - x
+instance Negatable Int16 Int16 where negate x = zero - x
+instance Negatable Int32 Int32 where negate x = zero - x
+instance Negatable Int64 Int64 where negate x = zero - x
+instance Negatable Word Int where negate x = zero- (int x)
+instance Negatable Word8 Int8 where negate x = zero - (int8 x)
+instance Negatable Word16 Int16 where negate x = zero - (int16 x)
+instance Negatable Word32 Int32 where negate x = zero - (int32 x)
+instance Negatable Word64 Int64 where negate x = zero- (int64 x)
+instance Negatable Float Float where negate x = zero - x
+instance Negatable Double Double where negate x = zero - x
+
+instance SignedIntegral Integer
+instance SignedIntegral Int
+instance SignedIntegral Int8
+instance SignedIntegral Int16
+instance SignedIntegral Int32
+instance SignedIntegral Int64
+
+instance UnsignedIntegral Word
+instance UnsignedIntegral Word8
+instance UnsignedIntegral Word16
+instance UnsignedIntegral Word32
+instance UnsignedIntegral Word64
+
+instance FromDouble Natural where fromDouble = truncate
+instance FromDouble Integer where fromDouble = truncate
+instance FromDouble Int where fromDouble = truncate
+instance FromDouble Int8 where fromDouble = truncate
+instance FromDouble Int16 where fromDouble = truncate
+instance FromDouble Int32 where fromDouble = truncate
+instance FromDouble Int64 where fromDouble = truncate
+instance FromDouble Word where fromDouble = truncate
+instance FromDouble Word8 where fromDouble = truncate
+instance FromDouble Word16 where fromDouble = truncate
+instance FromDouble Word32 where fromDouble = truncate
+instance FromDouble Word64 where fromDouble = truncate
+instance FromDouble Float where fromDouble = double2Float
+instance FromDouble Double where fromDouble = id
+
+instance ToDouble Natural where toDouble = fromIntegral
+instance ToDouble Integer where toDouble = fromIntegral
+instance ToDouble Int where toDouble = fromIntegral
+instance ToDouble Int8 where toDouble = fromIntegral
+instance ToDouble Int16 where toDouble = fromIntegral
+instance ToDouble Int32 where toDouble = fromIntegral
+instance ToDouble Int64 where toDouble = fromIntegral
+instance ToDouble Word where toDouble = fromIntegral
+instance ToDouble Word8 where toDouble = fromIntegral
+instance ToDouble Word16 where toDouble = fromIntegral
+instance ToDouble Word32 where toDouble = fromIntegral
+instance ToDouble Word64 where toDouble = fromIntegral
+instance ToDouble Float where toDouble = float2Double
+instance ToDouble Double where toDouble = id

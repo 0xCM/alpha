@@ -20,15 +20,11 @@ countDistinct = MS.distinctSize
 instance Counted (Bag a) where
     count = fromIntegral . MS.size
 
-instance (Ord a) => Unionizable (Bag a) where
-    union = MS.union
-
-instance (Ord a) => Intersectable (Bag a) where
-    intersect = MS.intersection
-
-instance (Ord a) => Diffable (Bag a) where
-    delta = MS.difference
-
-instance (Ord a) => Container (Bag a) a where    
-    type Source (Bag a) a = Bag a
+instance (Ord a) => Container (Bag a) a where        
     singleton = MS.singleton
+
+instance (Ord a) => Setwise (Bag a) a where
+    intersect = MS.intersection
+    delta = MS.difference
+    union = MS.union
+    

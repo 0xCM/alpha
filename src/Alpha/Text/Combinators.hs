@@ -8,8 +8,8 @@ module Alpha.Text.Combinators
     leftOfFirst, rightOfLast,ltrim,embrace,
     prefixIfMissing, suffixIfMissing, zpadL, padL, toText,
     hexstring,showBasedInt,bitstring,bitstringN,
-    tupelize,
-    Text.append, textlen, Text.intersperse
+    tuplestring,
+    textlen, Text.intersperse
     
 )
  where
@@ -92,7 +92,6 @@ embrace::(Formattable a) => a -> Text
 embrace content = enclose lbrace content rbrace
 
 instance Container Text Text where
-    type Source Text Text = Text
     singleton x = x
 
 -- Determines whether a block of text contains a specified substring
@@ -122,7 +121,7 @@ ltrim match subject =
         _ -> subject
 
 -- | Encodes a finite integral value as a base-16 Text
-hexstring :: (Integral n, Show n, FiniteBits n) => n -> Text
+hexstring :: (Show n, FiniteIntegral n) => n -> Text
 hexstring n = showBasedInt 16 n |> zpadL width
     where width = 16 |> div (finiteBitSize n)
 
@@ -131,7 +130,7 @@ showBasedInt:: (Integral n, Show n) => n -> n -> Text
 showBasedInt b n = showIntAtBase b intToDigit n "" |> Text.pack
 
 -- | Encodes a finite integral value as a base-2 Text
-bitstring :: (Integral n, Show n, FiniteBits n) => n -> Text
+bitstring :: (Show n, FiniteIntegral n) => n -> Text
 bitstring n = showBasedInt 2 n |> zpadL width
     where width = finiteBitSize n
 
@@ -140,7 +139,7 @@ bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitstringN w n = showBasedInt 2 n |> zpadL w
 
 -- Formats a list of formattable items as a tuple
-tupelize::(Formattable a) => [a] -> Text
-tupelize src =  Text.concat [lparen, content, rparen]
+tuplestring::(Formattable a) => [a] -> Text
+tuplestring src =  Text.concat [lparen, content, rparen]
     where content = Text.concat (fmap format (List.intersperse comma flist))
           flist = fmap format src

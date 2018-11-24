@@ -6,8 +6,6 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Asci where
 
-import qualified Data.List as List
-
 pattern D0 = "0"
 pattern D1 = "1"
 pattern D2 = "2"
@@ -84,26 +82,40 @@ pattern AlZl <- [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il,
                 Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
                 Sl, Tl, ll, Vl, Wl, Xl, Yl, Zl]
 
-pattern STick = "`"
-pattern STild = "~"
-pattern SBang = "!"
-pattern SAt = "!"
-pattern SDol = "$"
-pattern SPct = "%"
-pattern SExp = "^"
-pattern SAmp = "&"
-pattern SAst = "*"
-pattern SMin = "-"
-pattern SPlus = "+"
-pattern SUnd = "_"
-pattern Eq = "="
+
 pattern LBrace = "{"
 pattern RBrace = "}"
+pattern Braces <- [LBrace, RBrace]
+
 pattern LBrack = "["
 pattern RBrack = "]"
+pattern Brackets <- [LBrack,RBrack]
+
+pattern FSlash = "/"
+pattern BSlash = "\\"
+pattern Slashes <- [FSlash,BSlash]
+
+pattern LParen = "("
+pattern RParen = ")"
+pattern Parens <- [LParen,RParen]
+
+pattern Tick = "`"
+pattern Tilde = "~"
+pattern Bang = "!"
+pattern At = "@"
+pattern Dollar = "$"
+pattern Pct = "%"
+pattern Caret = "^"
+pattern Amp = "&"
+pattern Ast = "*"
+pattern Dash = "-"
+pattern Plus = "+"
+pattern Und = "_"
+pattern Eq = "="
 pattern Dot = "."
 pattern Comma = ","
 pattern Semi = ";"
+pattern Colon = ":"
 
 
 

@@ -3,28 +3,29 @@
 
 module Alpha
 ( 
-    module X,
-    module A,
-    module D,
-    module TL,
-    module S,
+    module Base,
+    module Canonical,
+    module Claim,
+    module Data,
     module IO,
+    module Numeric,
+    module System,
     module Text,
-    Coercible(..), Coercion(..)
+    module Types
   
 ) where
     
-import Alpha.Base as X hiding((<=),(>=),(<),(>),zero)
+import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero)
 
-import Alpha.Canonical as A
+import Alpha.Canonical as Canonical
 import Alpha.Text as Text
 import Alpha.IO as IO
-import Alpha.TypeLevel as TL
-import Alpha.Data as D
-import Alpha.System as S
+import Alpha.Data as Data
+import Alpha.System as System
+import Alpha.Numeric as Numeric
+import Alpha.Claim as Claim
+import Alpha.Types as Types
 
-import Data.Coerce(Coercible(..))
-import Data.Type.Coercion
 
 
 
