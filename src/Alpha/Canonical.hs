@@ -18,6 +18,8 @@ import Alpha.Canonical.Modality as X
 import Alpha.Canonical.Operators as X
 import Alpha.Canonical.Relations as X
 import Alpha.Canonical.Containers as X
+import Alpha.Canonical.System as X
+import Alpha.Canonical.Numeric as X
 
 
 

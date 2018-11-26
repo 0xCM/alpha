@@ -7,10 +7,12 @@ module Alpha.Canonical.Algebra
     Subtractive(..),
     Negatable(..),
     Multiplicative(..),
+    Divisible(..),
     Unital(..),
     Semigroupoid(..),
     Groupoid(..),
-    Group(..), Abelian(..),
+    Group(..), 
+    AbelianGroup(..),
     Ring(..),
     Ord,
     Setoid(..),
@@ -19,7 +21,6 @@ module Alpha.Canonical.Algebra
     Nullary(..), null,
     Spanned(..),
     Degenerate(..),
-    SignedIntegral(..),UnsignedIntegral(..),
     Monoidal(..),
     JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
     Sign(..), positive, negative, sign,
@@ -77,17 +78,6 @@ class Additive a where
 
 infixl 6 +
 
--- / Characterizes a type that supports a notion of division
-class Divisible a where
-    -- | Divides the first value by the second
-    div::BinaryOperator a
-
-    -- | Infix synonym for 'div'
-    (/)::BinaryOperator a
-    (/) = div
-
-infixl 7 /
-
 -- / Characterizes a type that supports a notion of multiplication    
 class Multiplicative a where
     -- | Multiplies the first value by the second
@@ -99,6 +89,19 @@ class Multiplicative a where
 
 infixl 7 *
 
+    
+-- / Characterizes a type that supports a notion of division
+class Divisible a where
+    -- | Divides the first value by the second
+    div::BinaryOperator a
+
+    -- | Infix synonym for 'div'
+    (/)::BinaryOperator a
+    (/) = div
+
+infixl 7 /
+
+    
 -- Characterizes types that are inhabited by 'degenerate' values
 -- Examples include empty lists, mathematical intervals 
 -- that represent a single value, etc. What precicely constitutes a 
@@ -162,21 +165,14 @@ class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a where
 
 -- | A group is a monoid together with an inversion operator (-)
 -- such that for every element g there exists a unique elment -g where g + (-g) = 0
-class (Monoid a, Subtractive a, Invertible a a) => Group a where    
+class (Unital a, Nullary a, Semigroup a, Subtractive a, Invertible a a) => Group a where    
 
-class (Group a, Additive a) => Abelian a where
+class (Group a, Additive a) => AbelianGroup a where
     
-class (Abelian a, Multiplicative a, Unital a) => Ring a where
-    
+class (AbelianGroup a, Multiplicative a, Unital a) => Ring a where
+        
 data Sign = Positive | Negative
     deriving (Show,Ord,Eq)
-
--- Identifies signed integral types
-class (Integral i) => SignedIntegral i where
-
--- Identifies usigned integral types    
-class (Integral i) => UnsignedIntegral i where
-
 
 -- Alias for semigroupoid composition operator
 compose::(Semigroupoid c) => c j k -> c i j -> c i k

@@ -4,6 +4,8 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE MagicHash #-}
+
 module Alpha.Data.Base
 (
     Arg, ArgMin, ArgMax,
@@ -27,13 +29,19 @@ module Alpha.Data.Base
     Functor(..),
     Default(..),
     Eq(..),
+    Seq,
     Traversable(..),
     Typeable(..), Proxy(..),
     Maybe(..), isNothing, fromJust,
     Ix(..),
     Int,Int8,Int16,Int32,Int64,
     Word,Word8,Word16,Word32,Word64,
-    Seq
+    Integer,
+    Rational(..),
+    Fractional(..),
+    Floating(..), RealFloat(..),
+    Double , Double#, Float, Float#
+    
 )
 where
 import Control.Category (Category((.), id))
@@ -68,6 +76,10 @@ import Data.Typeable(Typeable(..),Proxy(..))
 import Data.Word(Word,Word8,Word16,Word32,Word64)
 import Data.Function(const)
 import Data.Semigroup(Arg,ArgMin,ArgMax)
+import Data.Ratio
+import GHC.Float
+import GHC.Num
+import GHC.Real(Fractional(..))
 import qualified Data.Map.Strict as Map
 
 -- | Folds a structure projected into a 'Monoid' by a supplied function

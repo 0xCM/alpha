@@ -15,7 +15,7 @@ module Alpha
   
 ) where
     
-import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero)
+import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(/),(**))
 
 import Alpha.Canonical as Canonical
 import Alpha.Text as Text

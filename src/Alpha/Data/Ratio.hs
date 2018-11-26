@@ -1,14 +1,13 @@
 module Alpha.Data.Ratio
 (
-    Ratio, numerator, denominator, ratio, (%)
+    Ratio,numerator,denominator, ratio, (%)
 )
 where
 
 import Alpha.Base
 import Data.Ratio(numerator,denominator)
-import qualified GHC.Real as GR
-import qualified Data.Ratio as DR
 import Alpha.Data.Asci
+import qualified Data.Ratio as DR
 
 -- Newtype abstraction over base-defined ratio
 newtype Ratio n = Ratio (DR.Ratio n)
@@ -19,10 +18,10 @@ instance (Show n) => Show (Ratio n) where
                 
 -- Forms the 'Ratio' of two integral values        
 ratio::(Integral n) => n -> n -> Ratio n
-ratio m n =  Ratio $  (GR.%) m n
+ratio m n =  Ratio $  (DR.%) m n
 
 -- Infix operator synonym for 'mod' function
 (%)::(Integral n) => n -> n -> n
-(%) = GR.mod
+(%) = mod
 
 infixl 5 %

@@ -18,7 +18,7 @@ import qualified Data.Text as Text
 
 import qualified Alpha.Data.List as List
 import Numeric(showIntAtBase)
-import Alpha.Base
+import Alpha.Base hiding (div)
 import Alpha.Canonical
 import Alpha.Text.Text
 import Alpha.Text.Format

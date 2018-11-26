@@ -42,7 +42,7 @@ class SeqStream a => Streamer a where
 
 instance Sequential (Stream e) e where    
     listed s = S.takeWhile (\_ -> True) s
-    take i s = fromList $ S.take (int i) s
+    take i s = fromList $ S.take (fromIntegral i) s
     split = S.partition
     while pred src = undefined
     tail = S.tail

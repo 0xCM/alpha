@@ -11,7 +11,8 @@
 module Alpha.Data.Bit 
 (
     Bit,Toggle(..),ToBit(..),
-    on, off,
+    on, isOn,
+    off, isOff,
     fromBool
 )
 where
@@ -29,7 +30,7 @@ data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable)
     
 newtype Bit = Bit Flag
-    deriving (Eq, Generic, Data, Typeable)
+    deriving (Eq, Ord, Generic, Data, Typeable)
 
 class ToBit a where
     bit::a -> Bit    
@@ -38,11 +39,21 @@ type family Toggle t | t -> t where
     Toggle 0 = 0
     Toggle 1 = 1    
             
+-- | Constructs a 'Bit' in the 'Off' state    
 off::Bit
 off = Bit Off
 
+-- | Returns true if off, false otherwise
+isOff::Bit -> Bool
+isOff (Bit flag) = flag == Off
+
+-- | Constructs a 'Bit' in the 'On' state    
 on::Bit
 on = Bit On
+
+-- | Returns true if on, false otherwise
+isOn::Bit -> Bool
+isOn (Bit flag) = flag == On
 
 bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr

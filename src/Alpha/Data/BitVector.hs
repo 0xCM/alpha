@@ -37,7 +37,7 @@ import Numeric
 import Alpha.TypeLevel.Nats
 import Alpha.TypeLevel.Some
 import Alpha.Text.Format
-import Alpha.Canonical hiding(index, (+),(-), (*))
+import Alpha.Canonical hiding(index, (+), (-), (*), abs)
 import Alpha.Text.Combinators
 import Alpha.Data.Numbers
 import Alpha.Base
@@ -343,7 +343,7 @@ instance KnownNat w => Bits (BitVector w) where
 instance KnownNat w => FiniteBits (BitVector w) where
   finiteBitSize = bvWidth
 
-instance KnownNat w => Num (BitVector w) where
+instance (KnownNat w) => Num (BitVector w) where
   (+)         = bvAdd
   (*)         = bvMul
   abs         = bvAbs

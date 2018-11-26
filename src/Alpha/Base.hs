@@ -13,8 +13,6 @@ module Alpha.Base
     module FB,
     module CB,
     module Text.Show,
-    Float, Float#, 
-    Double, Double#,
     ByteString.ByteString,    
     IO,
     Set,

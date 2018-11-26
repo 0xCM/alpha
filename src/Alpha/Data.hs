@@ -11,6 +11,7 @@ module Alpha.Data
 where
 
 import Alpha.Data.Asci as X
+import Alpha.Data.Bit as X
 import Alpha.Data.Bits as X
 import Alpha.Data.BitVector as X
 import Alpha.Data.ByteString as X
@@ -18,7 +19,6 @@ import Alpha.Data.Coproduct as X
 import Alpha.Data.Enum as X
 import Alpha.Data.Func as X
 import Alpha.Data.Index as X
-import Alpha.Data.Gate as X
 import Alpha.Data.Grammar as X
 import Alpha.Data.Matrix as X
 import Alpha.Data.Maybe as X
