@@ -10,7 +10,6 @@ module Alpha.Canonical.Containers
     Filterable(..),
     Sequential(..),
     Setwise(..)
-
 )
 where
 
@@ -18,10 +17,15 @@ import Alpha.Base
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Operators
     
--- / Characterizes a container 'c' holding elements of type e
+-- / Characterizes a container 'c' dispensing elements of type e
 class Container c e | c -> e where
+    -- | Constructs a container from a list of elements
+    contain::[e] -> c
+
     -- | Constructs a container with exactly one element
     singleton::e -> c
+    singleton e = contain [e]
+
 
 -- | Characterizes types whose values can be treated as sets
 class (Container c e) => Setwise c e where
@@ -35,11 +39,9 @@ class (Container c e) => Setwise c e where
 class (Container c e) => Filterable c e where
     -- | Excludes elements that don't satisfy a predicate
     filter::UnaryPredicate e ->  c -> c
-                    
-class (Container c e) => Sequential c e | c -> e where 
 
-    -- | Returns the items as a list
-    listed::c -> [e]
+
+class (Container c e) => Sequential c e | c -> e where 
     
     -- | Takes a n items from the front if they exist, othwise takes all
     take::(Integral n) => n -> c -> Seq e
@@ -57,3 +59,6 @@ class (Container c e) => Sequential c e | c -> e where
 
     -- | Skips the first n elements and yields the remainder, if any
     skip::Integral n => n -> c -> c
+
+list::(IsList a) => a -> [Item a]
+list = toList

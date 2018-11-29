@@ -62,9 +62,10 @@ covector src = Row(V.fromList src)
 instance Length (Vector n a) where
     length = convert . V.length . unsized
 
-instance Indexed (Vector n a) Int a where
-    item (Col a) i = a V.! i
-    item (Row a) i = a V.! i
+instance Indexed (Vector n a) Int where
+    type Found (Vector n a) Int = a
+    lookup (Col a) i = a V.! i
+    lookup(Row a) i = a V.! i
 
 instance Vectored (a,a) a where
     col (x1, x2) = Col $ V.fromList [x1, x2]

@@ -91,8 +91,12 @@ enclose left content right = splat [format left, format content, format right]
 embrace::(Formattable a) => a -> Text
 embrace content = enclose lbrace content rbrace
 
+paren::(Formattable a) => a -> Text
+paren content = enclose lparen content rparen
+
+
 instance Container Text Text where
-    singleton x = x
+    contain x = Text.concat x
 
 -- Determines whether a block of text contains a specified substring
 textContains::Text -> Text -> Bool

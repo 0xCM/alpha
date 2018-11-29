@@ -10,6 +10,7 @@ module Alpha.Text.Symbols where
 import Data.Text
 import Alpha.Base
 import Alpha.Canonical
+import Alpha.Text.Asci
 
 -- | Produces "."
 dot::Text
@@ -65,11 +66,11 @@ rbrace = "}"
 
 -- | Produces "{"
 lparen::Text
-lparen = "("
+lparen = LParen
 
 -- | Produces "}"
 rparen::Text
-rparen = ")"
+rparen = RParen
 
 -- | Produces "/"
 fslash::Text

@@ -10,36 +10,38 @@
 
 module Alpha.Canonical.Classes 
 (
+    Appendable(..),
+    Assembly(..),
+    Boolean(..),
     Concatenable(..),
-    Decomposable(..),
-    ToString(..),
-    Formattable(..),
-    FromText(..),
-    Counted(..),
-    Jailbreak(..),
+    Chunkable(..),
+    Collapsible(..),
     Convertible(..),
+    Counted(..),
+    Decomposable(..),
+    Dimensional(..),
+    Formattable(..),
+    Faceted(..),
+    FiniteMembership(..),
+    FromText(..),
     Indexed(..),
-    Packable(..),
+    IndexedChoice(..),
+    Jailbreak(..),
     Length(..),
+    Packable(..),
     Proxy(..),
     ToLines(..),
-    Boolean(..),
     Reifiable(..),
-    Chunkable(..),
-    Faceted(..),
-    Flow(..), Coflow(..),
-    Collapsible(..),
     Reversible(..),
     OrderedEnum(..),
-    Assembly(..),
     Membership(..),
-    FiniteMembership(..),
+    Transposable(..),
     Tupled(..),
-    IndexedChoice(..),
-    Appendable(..),
+    ToString(..),
     Prependable(..),
     FiniteIntegral,
-    Dimensional(..)
+    Partitioner(..),
+    Zippable(..)
 )
 where
 import qualified Data.Text as T
@@ -49,7 +51,7 @@ import Alpha.Base
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Operators
 import GHC.TypeLits
-import qualified Data.List as L
+import qualified Data.List as List
 
 type FiniteIntegral n = (Integral n, FiniteBits n)
 
@@ -141,7 +143,7 @@ class FiniteMembership a b where
     members::a -> [b]    
 
 -- | Characterizes a finite container or other type that contains elements
--- that can be partitioned     
+-- that can be separated into groups of possibly different sizes
 class Chunkable a where
     chunk::Int -> a -> [a]
     
@@ -151,9 +153,19 @@ class Jailbreak m a where
     
 -- Removes a layer of structure 
 -- In the case of a monoid, 'reduce' reduces to 'fold', pun intended
-class Collapsible a b where
-    collapse::a -> b
+class Collapsible a where
+    type Collapsed a
+    collapse::a -> Collapsed a
     
+-- Characterizes structures that support a notion of duality such that
+-- transpose . transpose = id
+-- Canonical examples are vectors and matrices
+class Transposable a where
+    type Transposed a
+    type Transposed a = a
+
+    transpose::a -> Transposed a
+
 -- | Codifies a (directed) conversion relationship between an input value and output value
 class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
@@ -167,22 +179,15 @@ class Packable a b where
     -- Restores an a-value from a b-value
     unpack::b -> a    
     
--- | Characterizes a container of type c holding elements of type e indexed by type i    
-class Indexed c i e where
-    item::c -> i -> e
+-- | Characterizes a structure of type s holding elements indexed by a value of type i
+class Indexed s i where
+    type Found s i
+    lookup::s -> i -> Found s i
 
-    (!)::c -> i -> e
-    (!) = item
+    (!)::s -> i -> Found s i
+    (!) = lookup
             
--- A flow from a --> b
-class Flow a b where
-    flow::a -> (a -> b) -> b
-    flow = (|>)
-
--- A covariant from b --> a
-class Coflow a b where
-    coflow::(b -> a) -> b -> a
-    coflow = (<|)
+infixr 0 !
 
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
@@ -193,7 +198,7 @@ class (KnownSymbol f) => Faceted f v where
     facetName::Text
     facetName =  symstr @f |> T.pack
           
--- Captures the assertion that values of a type a can be partitioned by
+-- Captures the assertion that values of a type a can be categorized by
 -- values of an enumerable type c
 class (Enum c) => Classifiable a c where
     classify::(a -> c) -> [a] -> [(c,a)]
@@ -207,6 +212,18 @@ class IndexedChoice a where
 class Dimensional a where
     type Dimension a
     dimension::a -> Dimension a
+    
+class Partitioner a where
+    partition::Int -> [a] -> [[a]]
+    partition width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
+
+instance Partitioner a
+
+-- Characterizes a composition and pairing of heterogenous values
+class Zippable a b where
+    type Zipped a b
+
+    zip::Combiner a b (Zipped a b) -> Zipped a b
     
     
 --From Wadler's Propositions as Types:
@@ -240,13 +257,6 @@ type a :&: b = Conjunct a b
 data Implies a b = Implies (a->b)
 
 type a :-> b = Implies a b        
-
--- class (Membership a) => SmallSet a where
---     member::a -> Bool
---     member _ = True
-
--- instance SmallSet a
-    
 
 instance Jailbreak Maybe a where
     escape x = fromJust x

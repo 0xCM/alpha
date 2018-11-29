@@ -1,3 +1,4 @@
+{-# LANGUAGE NoStarIsType #-}
 -----------------------------------------------------------------------------
 -- | Base Data.* modules
 -- Copyright   :  (c) 0xCM, 2018
@@ -10,7 +11,9 @@ module Alpha.Data.Base
 (
     Arg, ArgMin, ArgMax,
     FiniteBits(..),
+    ByteString,    
     Bool(..),(&&), (||), not, otherwise,
+    Coercible(..), Coercion(..),
     Monoid(..),
     Dual(..), Endo(..), All(..), Any(..), Sum(..),
     Groupoid(..),
@@ -20,8 +23,8 @@ module Alpha.Data.Base
     Either(..),
     IsString,
     Ord, Ordering,
-    const,
-    Coercible(..), coerce,
+    ($),
+    undefined, id, const,    
     Semigroup(..), Min(..), Max(..), First(..), Last(..),
     Data(..),
     Type,
@@ -30,21 +33,33 @@ module Alpha.Data.Base
     Default(..),
     Eq(..),
     Seq,
+    Set,
     Traversable(..),
     Typeable(..), Proxy(..),
     Maybe(..), isNothing, fromJust,
     Ix(..),
     Int,Int8,Int16,Int32,Int64,
     Word,Word8,Word16,Word32,Word64,
-    Integer,
+    Integer, Natural,
+    Num, 
+
     Rational(..),
     Fractional(..),
-    Floating(..), RealFloat(..),
-    Double , Double#, Float, Float#
+    Floating(..), RealFloat(..), RealFrac(..),
+    Double , Double#, Float, Float#,
+    Generic(..),
+    Generic1(..),    
+    IsList(..),    
+    Bounded,minBound,maxBound,
+    Enum,fromEnum,toEnum,
+    Integral, Real, mod, fromIntegral,
+    type (+), type (-), type (*),
+    KnownNat, SomeNat, Nat, SomeSymbol, KnownSymbol, natVal, natVal', symbolVal, symbolVal',
+    Symbol, 
+    Show(..), Read(..)
     
 )
 where
-import Control.Category (Category((.), id))
 import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Bits(FiniteBits(..))
 import Data.Char(Char,chr,intToDigit)
@@ -77,9 +92,25 @@ import Data.Word(Word,Word8,Word16,Word32,Word64)
 import Data.Function(const)
 import Data.Semigroup(Arg,ArgMin,ArgMax)
 import Data.Ratio
+import Data.Set(Set)
+import Data.Coerce(Coercible(..))
+import Data.Type.Coercion
+import Data.ByteString(ByteString)
 import GHC.Float
 import GHC.Num
-import GHC.Real(Fractional(..))
+import GHC.Real(Fractional(..),RealFrac(..))
+import GHC.TypeLits(type (+), type (-), type (*), type (^))
+import GHC.TypeLits(KnownNat, SomeNat, Nat,natVal, natVal', symbolVal, symbolVal',SomeSymbol,KnownSymbol)
+import GHC.Generics(Generic(..),Generic1(..))
+import GHC.Types(Symbol)
+import GHC.Show(Show(..))
+import GHC.Read(Read(..))
+import GHC.Base(($),undefined, id)
+import GHC.Num(Num,Integer)
+import GHC.Exts(IsList(..))
+import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
+import GHC.Real(Real, Integral, mod, fromIntegral)
+
 import qualified Data.Map.Strict as Map
 
 -- | Folds a structure projected into a 'Monoid' by a supplied function

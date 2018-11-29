@@ -6,7 +6,7 @@ where
 
 import Alpha.Base
 import Data.Ratio(numerator,denominator)
-import Alpha.Data.Asci
+import Alpha.Text.Asci
 import qualified Data.Ratio as DR
 
 -- Newtype abstraction over base-defined ratio

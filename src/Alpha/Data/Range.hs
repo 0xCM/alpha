@@ -19,8 +19,8 @@ import Alpha.Canonical
 instance (Ord a) => Spanned (R.Range a) a where
     span min max = R.SpanRange min max    
     
-instance Ord a => Container (R.Range a) a where
-    singleton = R.SingletonRange
+-- instance Ord a => Container (R.Range a) a where
+--     singleton = R.SingletonRange
 
 -- instance (Ord a, Enum a) =>  Setwise [R.Range a] a where
 --     union = R.union

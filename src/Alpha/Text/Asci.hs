@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Data.Asci where
+module Alpha.Text.Asci where
 
 pattern D0 = "0"
 pattern D1 = "1"

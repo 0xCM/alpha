@@ -7,27 +7,19 @@
 {-# LANGUAGE DataKinds #-}
 module Alpha.Canonical.Operators
 (
-    Operator(..), BinaryOperator, UnaryOperator, TernaryOperator,
+    Arital(..),
+    Compositional(..),
+    Combinable(..), Combiner(..),
+    BinaryOperator, UnaryOperator, TernaryOperator,
     Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,    
-    (<|),(|>), ifelse, left,right, symstr, associator,
+    (<|),(|>), ifelse, left,right, symstr, 
     Function, BinaryFunc, UnaryFunc, TernaryFunc,
-    type (~>), Hom, Dom, Cod,
-    Arital(..),Compositional(..), Invertible(..), 
-    Inversion(..), inversion
-    
+    type (~>), Hom, Dom, Cod
 
+    
 )
 where
-import Data.Bool
-import Data.Either
-import Data.Functor
-import Data.String
-import Data.Proxy
-import Data.Kind
-import GHC.Natural
-import GHC.TypeLits
-import Data.Function
-import Prelude(fromIntegral)
+import Alpha.Base
 
 -- A synonym for a unary function
 type Function a b = a -> b
@@ -47,6 +39,33 @@ type family Cod f :: Type where
 
 type family Composition a c where
     Composition (Function b c) (Function a b) = Function a c
+
+newtype Combiner a b c = Combiner (a -> b -> c)
+
+
+uncombine::Combiner a b c -> (a -> b -> c)
+uncombine (Combiner f) = f
+
+-- Represents a transformation accepting potentially heterogenous types 
+-- a and b and producing a value representing their combination
+class Combinable a b where
+    type Combined a b
+    
+    combiner::Combiner a b (Combined a b)
+        
+    -- Combines two heterogenous values into one
+    combine::a -> b -> Combined a b
+    combine a b = f a b 
+        where (Combiner f)  =  combiner 
+    {-# INLINE combine #-}
+
+    -- Infix alias for 'combine'
+    (>.<)::a -> b -> Combined a b
+    (>.<) = combine        
+    {-# INLINE (>.<) #-}
+
+infixr 0 >.<
+
     
 -- Characterizes function composition
 class Compositional a b c where
@@ -88,29 +107,22 @@ type BinaryPredicate a = BinaryFunc a a Bool
 -- Characterizes a logical predicate that requires three arguments for saturation
 type TernaryPredicate a = TernaryFunc a a a Bool
 
--- Generalizes arity-specific operators
-type family Operator (n::Nat) a  where
-    Operator 1 (a,a) =     UnaryOperator a
-    Operator 2 (a,a,a) =   BinaryOperator a
-    Operator 3 (a,a,a,a) = TernaryOperator a
-
--- | Characterizes types whose values can be inverted
--- Note that the operation is not necessarily closed over its
--- domain, but is however total
-class Invertible a b where
-    invert::a -> b
+-- Characterizes structures with which a binary operator is associated
+class Operative a where
     
--- Specifies an arital operator
-class (KnownNat n, Arital n a) => Operative n a where
-    operator::Operator n a
 
+-- Characterizes structures with which an associative binary operator is associated
+class (Operative a) => Associative (id::Symbol) a where
+    bop::BinaryOperator a
+
+-- Characterizes structures with which an associative binary operator is associated
+class (Operative a) => Commutative (id::Symbol) a where
+    cop::BinaryOperator a
+    
 -- Specifies an arital predicate 
 class (KnownNat n, Arital n a) => Predicative n a where
     predicate::Predicate n a
-
--- Captures a pair of functions (f,g) such that f . g = g . f = id
-newtype Inversion a b = Inversion (a -> b, b -> a)
-    
+                    
 instance Arital 1 (UnaryOperator a)    
 instance Arital 2 (BinaryOperator a)
 instance Arital 3 (TernaryOperator a)
@@ -124,7 +136,8 @@ type family Predicate (n::Nat)  a | a -> a where
 instance Arital 1 (UnaryPredicate a)    
 instance Arital 2 (BinaryPredicate a)
 instance Arital 3 (TernaryPredicate a)
-        
+
+
 -- | If the first input value is true, returns the 2nd input value,
 -- otherwise, returns the third input value
 ifelse::Bool -> a -> a -> a
@@ -153,19 +166,3 @@ infixr 0 <|
 -- | Produces a strong for a symbol
 symstr :: forall s. KnownSymbol s => String
 symstr = symbolVal @s Proxy
-
--- | Computes both left and right-associative applications
--- If an operator is associtive, these values will coincide
-associator::BinaryOperator a -> (a, a, a) -> (a,a)
-associator op (x,y,z) =  (left,right) where
-    xy = op x y 
-    yz = op y z
-    left =  op xy z
-    right = op x yz
-
--- | Produces an inversion from complementary inverses    
-inversion::(a -> b) -> (b -> a) -> Inversion a b
-inversion f g = Inversion(f,g)
-
-instance Invertible (Inversion a b) (Inversion b a) where
-    invert (Inversion (f, g)) = Inversion (g, f)

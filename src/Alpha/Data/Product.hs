@@ -459,37 +459,37 @@ instance Nullary8 a1 a2 a3 a4 a5 a6 a7 a8 => Nullary (Product8 a1 a2 a3 a4 a5 a6
 instance Nullary9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Nullary (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where
     zero = prod (zero,zero,zero,zero,zero,zero,zero,zero,zero)
 
-type Invertible2 a1 a2 = (Invertible a1 a1, Invertible a2 a2)
-type Invertible3 a1 a2 a3 = (Invertible2 a1 a2, Invertible a3 a3)
-type Invertible4 a1 a2 a3 a4 = (Invertible3 a1 a2 a3, Invertible a4 a4)
-type Invertible5 a1 a2 a3 a4 a5 = (Invertible4 a1 a2 a3 a4, Invertible a5 a5)
-type Invertible6 a1 a2 a3 a4 a5 a6 = (Invertible5 a1 a2 a3 a4 a5, Invertible a6 a6)
-type Invertible7 a1 a2 a3 a4 a5 a6 a7 = (Invertible6 a1 a2 a3 a4 a5 a6, Invertible a7 a7)
-type Invertible8 a1 a2 a3 a4 a5 a6 a7 a8 = (Invertible7 a1 a2 a3 a4 a5 a6 a7, Invertible a8 a8)
-type Invertible9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Invertible8 a1 a2 a3 a4 a5 a6 a7 a8, Invertible a9 a9)
+type Invertible2 a1 a2 = (Invertible a1, Invertible a2)
+type Invertible3 a1 a2 a3 = (Invertible2 a1 a2, Invertible a3)
+type Invertible4 a1 a2 a3 a4 = (Invertible3 a1 a2 a3, Invertible a4)
+type Invertible5 a1 a2 a3 a4 a5 = (Invertible4 a1 a2 a3 a4, Invertible a5)
+type Invertible6 a1 a2 a3 a4 a5 a6 = (Invertible5 a1 a2 a3 a4 a5, Invertible a6)
+type Invertible7 a1 a2 a3 a4 a5 a6 a7 = (Invertible6 a1 a2 a3 a4 a5 a6, Invertible a7)
+type Invertible8 a1 a2 a3 a4 a5 a6 a7 a8 = (Invertible7 a1 a2 a3 a4 a5 a6 a7, Invertible a8)
+type Invertible9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Invertible8 a1 a2 a3 a4 a5 a6 a7 a8, Invertible a9)
         
-instance Invertible2 a1 a2 => Invertible (Product2 a1 a2) (Product2 a1 a2) where
+instance Invertible2 a1 a2 => Invertible (Product2 a1 a2) where
     invert (Product2 a1 a2) 
         = Product2 (invert a1) (invert a2)    
-instance Invertible3 a1 a2 a3 => Invertible (Product3 a1 a2 a3) (Product3 a1 a2 a3) where
+instance Invertible3 a1 a2 a3 => Invertible (Product3 a1 a2 a3) where
     invert (Product3 a1 a2 a3) 
         = Product3 (invert a1) (invert a2) (invert a3)
-instance Invertible4 a1 a2 a3 a4 => Invertible (Product4 a1 a2 a3 a4) (Product4 a1 a2 a3 a4) where
+instance Invertible4 a1 a2 a3 a4 => Invertible (Product4 a1 a2 a3 a4) where
     invert (Product4 a1 a2 a3 a4) 
         = Product4 (invert a1) (invert a2) (invert a3) (invert a4)
-instance Invertible5 a1 a2 a3 a4 a5 => Invertible (Product5 a1 a2 a3 a4 a5) (Product5 a1 a2 a3 a4 a5) where
+instance Invertible5 a1 a2 a3 a4 a5 => Invertible (Product5 a1 a2 a3 a4 a5) where
     invert (Product5 a1 a2 a3 a4 a5) 
         = Product5 (invert a1) (invert a2) (invert a3) (invert a4) (invert a5)
-instance Invertible6 a1 a2 a3 a4 a5 a6 => Invertible (Product6 a1 a2 a3 a4 a5 a6) (Product6 a1 a2 a3 a4 a5 a6) where
+instance Invertible6 a1 a2 a3 a4 a5 a6 => Invertible (Product6 a1 a2 a3 a4 a5 a6) where
     invert (Product6 a1 a2 a3 a4 a5 a6) 
         = Product6 (invert a1) (invert a2) (invert a3) (invert a4) (invert a5) (invert a6)
-instance Invertible7 a1 a2 a3 a4 a5 a6 a7 => Invertible (Product7 a1 a2 a3 a4 a5 a6 a7) (Product7 a1 a2 a3 a4 a5 a6 a7) where
+instance Invertible7 a1 a2 a3 a4 a5 a6 a7 => Invertible (Product7 a1 a2 a3 a4 a5 a6 a7) where
     invert (Product7 a1 a2 a3 a4 a5 a6 a7) 
         = Product7 (invert a1) (invert a2) (invert a3) (invert a4) (invert a5) (invert a6) (invert a7)
-instance Invertible8 a1 a2 a3 a4 a5 a6 a7 a8 => Invertible (Product8 a1 a2 a3 a4 a5 a6 a7 a8) (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where
+instance Invertible8 a1 a2 a3 a4 a5 a6 a7 a8 => Invertible (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where
     invert (Product8 a1 a2 a3 a4 a5 a6 a7 a8) 
         = Product8 (invert a1) (invert a2) (invert a3) (invert a4) (invert a5) (invert a6) (invert a7) (invert a8)
-instance Invertible9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Invertible (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where
+instance Invertible9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Invertible (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where
     invert (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) 
         = Product9 (invert a1) (invert a2) (invert a3) (invert a4) (invert a5) (invert a6) (invert a7) (invert a8) (invert a9)        
 

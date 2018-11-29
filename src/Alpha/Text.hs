@@ -16,6 +16,7 @@ module Alpha.Text
     module Text
     
 ) where
+import Alpha.Text.Asci as X
 import Alpha.Text.Char as Char
 import Alpha.Text.Combinators as Combinators
 import Alpha.Text.Format as Format

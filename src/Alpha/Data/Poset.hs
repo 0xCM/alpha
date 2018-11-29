@@ -16,7 +16,7 @@ poset::(Ord a, PartialOrder a) => [a] -> Poset a
 poset = Poset . S.fromList
 
 instance (Eq a, Ord a, PartialOrder a) => Container (Poset a) a where
-    singleton x = poset [x]    
+    contain x = poset x  
 
 instance (Eq a, Ord a, PartialOrder a) => Setwise (Poset a) a where
     union (Poset s1) (Poset s2) = Poset $ S.union s1 s2 

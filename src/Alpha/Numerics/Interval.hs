@@ -15,8 +15,6 @@ import qualified Numeric.Interval as I
 import Alpha.Base
 import Alpha.Canonical hiding( (...))
 
-instance (Ord a) => Container (Interval a) a where
-    singleton = I.singleton
 
 instance (Eq a) => Nullary (Interval a) where
     zero = I.empty

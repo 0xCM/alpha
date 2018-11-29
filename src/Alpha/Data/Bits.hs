@@ -8,7 +8,6 @@
 
 module Alpha.Data.Bits 
 (
-    SizedBits(..),
     toggled, bitcount, bitsplat,
     (.^.), (.~.), (.<<.), (.>>.), (.?.),
     lobyte,hibyte
@@ -25,7 +24,6 @@ import Alpha.Data.Bit
 import Alpha.Data.Natural
 import GHC.TypeLits
 
-class (Sized n, FiniteBits a) => SizedBits n a where
     
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> bit

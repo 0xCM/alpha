@@ -13,7 +13,7 @@ module Alpha.Data.Set
 where
 import Alpha.Base
 import qualified Data.Text as T
-import qualified Alpha.Data.Asci as Ascii
+import qualified Alpha.Text.Asci as Ascii
 import Alpha.Canonical
 import qualified Data.Set as S
 import Data.Set(Set)
@@ -27,7 +27,7 @@ instance (Show a) => Formattable (Set a) where
         where braces y = T.append Ascii.LBrace (T.append y Ascii.RBrace)
             
 instance (Ord a) => Container (Set a) a where
-    singleton = S.singleton
+    contain = S.fromList
     
 instance Counted (Set a) where
     count = fromIntegral . S.size
@@ -40,7 +40,8 @@ instance (Ord e) => Setwise (Set e) e where
 instance (Ord a) => Filterable (Set a) a where
     filter = S.filter
     
-instance (Ord a) => Collapsible (Set (Set a)) (Set a) where
+instance (Ord a) => Collapsible (Set (Set a)) where
+    type Collapsed (Set (Set a)) = Set a
     collapse = S.unions . toList
 
 instance (Ord a) => Membership (Set a) a where

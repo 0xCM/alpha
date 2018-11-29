@@ -19,7 +19,7 @@ module Alpha.Functor.Base
     Bifoldable(..), bisum,    
     Biapplicative(..), biliftA3,traverseBia, sequenceBia, traverseBiaWith,         
     Bitraversable(..),
-    Bifunctor(..), 
+    Bifunctor(bimap), 
     Biapply(..),(<<$>>),(<<..>>),
     
     Category(..),
@@ -35,7 +35,7 @@ module Alpha.Functor.Base
     Foldable(..), 
     Traversable(..), feval,
 
-    ProductF(..), pair,
+    ProductF(..), fprod,
     SumF(..), lsum, rsum,
     IdentityF(..), identity
     
@@ -91,8 +91,8 @@ type IdentityF = Identity
 type Opposite = Op
 
 -- Constructs a product functor
-pair::(Functor f, Functor g) => f a -> g a -> ProductF f g a
-pair = Product.Pair
+fprod::(Functor f, Functor g) => f a -> g a -> ProductF f g a
+fprod = Product.Pair
 
 -- Constructs a left functorial sum
 lsum::(Functor f, Functor g) => f a -> SumF f g a

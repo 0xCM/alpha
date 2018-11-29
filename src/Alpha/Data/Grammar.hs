@@ -4,7 +4,7 @@ import Alpha.Base
 import Alpha.Canonical
 import qualified Data.List as List
 import Alpha.Text.Combinators
-import Alpha.Data.Asci
+import Alpha.Text.Asci
 
 -- An indivisible constituent
 newtype Atom a = Atom a

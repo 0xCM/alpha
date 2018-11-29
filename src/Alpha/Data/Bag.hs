@@ -21,7 +21,7 @@ instance Counted (Bag a) where
     count = fromIntegral . MS.size
 
 instance (Ord a) => Container (Bag a) a where        
-    singleton = MS.singleton
+    contain = MS.fromList
 
 instance (Ord a) => Setwise (Bag a) a where
     intersect = MS.intersection

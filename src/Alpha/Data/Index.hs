@@ -24,6 +24,3 @@ index2 = (Index @i, Index @j)
 index3::forall (i::Nat) (j::Nat) (k::Nat). Index3 i j k
 index3 = (Index @i, Index @j, Index @k)
 
-type FiniteMultiIndex i j n = UniProduct n (NatPair i j)
-
-type FiniteIndex i j = FiniteMultiIndex i j 1

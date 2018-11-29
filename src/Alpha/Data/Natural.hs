@@ -4,10 +4,9 @@
 
 module Alpha.Data.Natural
 (
-    Sized(..),
-    Natural, NatPair, 
+    TypedNat, 
     Zero, One, Next, Add, Sub,Mul,
-    natural, natpair, natdec, natinc, natadd, natsub, natmul, natmod
+    natural, natdec, natinc, natadd, natsub, natmul, natmod
 )
 where
 
@@ -21,7 +20,7 @@ import Alpha.TypeLevel.Proxy
 import Alpha.Canonical(Formattable(..))
 
 -- Unifies type and value-level naturals
-newtype Natural k = Natural N.Natural
+newtype TypedNat k = TypedNat N.Natural
     deriving (Num)
 
 class KnownNat n => Sized n where
@@ -29,52 +28,43 @@ class KnownNat n => Sized n where
     size = s where
         n = natural @n
         s = integral n
-        integral::Natural k -> Int
-        integral (Natural x) = fromIntegral x
+        integral::TypedNat k -> Int
+        integral (TypedNat x) = fromIntegral x
         
-
--- | Determines a pair of typed natural numbers    
-data NatPair (i::Nat) (j::Nat) 
-    = NatPair (Natural i) (Natural j)
-
-type Zero = Natural 0
-type One =  Natural 1
-type Next n = Natural (n + 1)
-type Add m n = Natural (m + n)
-type Sub m n  = Natural (m - n)
-type Mul m n = Natural (m * n)
+type Zero = TypedNat 0
+type One =  TypedNat 1
+type Next n = TypedNat (n + 1)
+type Add m n = TypedNat (m + n)
+type Sub m n  = TypedNat (m - n)
+type Mul m n = TypedNat (m * n)
     
 -- | Constructs a typed nat
-natural :: forall n. KnownNat n => Natural n
+natural :: forall n. KnownNat n => TypedNat n
 natural = fromIntegral (natVal (proxy @n))
 
--- | Constructs a typed nat pair
-natpair::forall r c. (KnownNat r, KnownNat c) => NatPair r c
-natpair = NatPair (natural @r) ( natural @c)
-
 -- | Decrements a nat
-natdec::forall (n::Nat). Natural(n+1) -> Natural n
-natdec (Natural i) = Natural (i - 1)
+natdec::forall (n::Nat). TypedNat(n+1) -> TypedNat n
+natdec (TypedNat i) = TypedNat (i - 1)
 
 -- | Increments a nat
-natinc::forall (n::Nat). Natural(n) -> Natural (n+1)
-natinc (Natural i) = Natural (i + 1)
+natinc::forall (n::Nat). TypedNat(n) -> TypedNat (n+1)
+natinc (TypedNat i) = TypedNat (i + 1)
 
 -- | Adds two nats
-natadd::forall (m::Nat) (n::Nat). Natural m -> Natural n -> Natural (m + n)
-natadd (Natural i) (Natural j) = Natural (i + j)
+natadd::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m + n)
+natadd (TypedNat i) (TypedNat j) = TypedNat (i + j)
 
 -- | Nat subtraction
-natsub::forall (m::Nat) (n::Nat). Natural m -> Natural n -> Natural (m - n)
-natsub (Natural i) (Natural j) = Natural (i - j)
+natsub::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m - n)
+natsub (TypedNat i) (TypedNat j) = TypedNat (i - j)
 
 -- | Nat multiplication
-natmul::forall (m::Nat) (n::Nat). Natural m -> Natural n -> Natural (m * n)
-natmul (Natural i) (Natural j) = Natural (i * j)
+natmul::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m * n)
+natmul (TypedNat i) (TypedNat j) = TypedNat (i * j)
 
 -- | Nat mod
-natmod::forall (m::Nat) (n::Nat). Natural m -> Natural n -> Natural (Mod m n)
-natmod (Natural i) (Natural j) = Natural (i `R.mod` j)
+natmod::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (Mod m n)
+natmod (TypedNat i) (TypedNat j) = TypedNat (i `R.mod` j)
 
-instance Show (Natural k) where
-    show (Natural i) = show i 
+instance Show (TypedNat k) where
+    show (TypedNat i) = show i 

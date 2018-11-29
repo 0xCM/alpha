@@ -10,21 +10,18 @@ module Alpha.Data.List
     splitAt,
     mapi,
     intersperse,
-    last,
-    head,
-    takeWhile,
+    last,    
     cycle,
-    any,
-    all,
     tails,    
     inits,
     reduce,
+    head,
     scan,
     (List.++)
 ) where
 import qualified Data.List as List
 import Data.Functor
-import Data.List(intersperse,last,head,takeWhile,cycle,partition,any,all)
+import Data.List(intersperse,last,head,cycle)
 import GHC.Real hiding(reduce)
 --import Prelude((-))
 import Alpha.Base hiding(zero)
@@ -89,9 +86,8 @@ instance Prependable [a] [a] where
 instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]
     concat x y = x List.++ y
-        
+    
 instance (Eq a) => Sequential [a] a where
-    listed = id
     take i src = fromList $ List.take (fromIntegral i) src
     split = List.partition
     tail = List.tail
@@ -104,12 +100,13 @@ instance (Eq a) => Filterable [a] a where
 instance Length [a] where
     length x = List.length x |> convert
 
-instance Collapsible [[a]] [a] where
+instance Collapsible [[a]] where
+    type Collapsed [[a]] = [a]
     collapse = List.concat    
 
 instance (Eq a) => Container [a] a where
-    singleton x = [x]    
-
+    contain x = x
+    
 instance Reversible [a] [a] where
     reverse = List.reverse
 

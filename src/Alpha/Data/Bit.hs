@@ -20,11 +20,9 @@ where
 import Foreign.Storable (Storable, poke, peek, sizeOf, alignment)
 import Foreign.Ptr (Ptr, castPtr)
 import Data.Bool hiding(bool)
-import Alpha.GHC.Base
+import Alpha.Base
 import Alpha.Canonical
 import Data.Bits(Bits(..))
-import Prelude(undefined)
-import Alpha.Base
 
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable)
@@ -74,7 +72,7 @@ instance Show Flag where
     show On = "1"
     show Off = "0"
 
-instance Invertible Bit Bit where
+instance Invertible Bit where
     invert (Bit On) = off
     invert (Bit Off) = on
 

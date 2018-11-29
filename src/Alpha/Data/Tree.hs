@@ -10,7 +10,8 @@ import Alpha.Base
 import Alpha.Canonical
 import Data.Tree
 
-instance Collapsible (Tree a) [a] where
+instance Collapsible (Tree a) where
+    type Collapsed (Tree a) = [a]
     collapse = flatten
 
 tree::(b -> (a, [b])) -> b-> Tree a

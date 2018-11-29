@@ -8,7 +8,8 @@
 module Alpha.Data.ByteString
 (
     bytes,
-    segment, segments,
+    segment, 
+    segments,
     bytestring
 )
 where
@@ -50,7 +51,7 @@ type instance Lazy EG.ByteString = LZ.ByteString
 
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
-bytes::(Indexed a Int Word8) => Int -> Int -> a -> [Word8]
+bytes::(Indexed a Int) => Int -> Int -> a -> [Found a Int]
 bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
 
 segment::(Int,Int) -> EG.ByteString -> EG.ByteString
@@ -96,8 +97,9 @@ instance Concatenable EG.ByteString EG.ByteString where
 instance Length EG.ByteString where
     length = convert . EG.length 
 
-instance Indexed EG.ByteString Int Word8 where    
-    item = EG.index
+instance Indexed EG.ByteString Int where 
+    type Found EG.ByteString Int = Word8   
+    lookup = EG.index
 
 instance Packable [Word8] LZ.ByteString where
     pack = LZ.pack
@@ -110,8 +112,9 @@ instance Concatenable LZ.ByteString LZ.ByteString where
 instance Length LZ.ByteString where
     length = convert . LZ.length 
 
-instance Indexed LZ.ByteString Int Word8 where    
-    item x n = LZ.index x (int64 n)
+instance Indexed LZ.ByteString Int where    
+    type Found LZ.ByteString Int = Word8   
+    lookup x n = LZ.index x (int64 n)
 
 instance Convertible EG.ByteString [Word8] where
     convert source = source |> bytes 0 (length source - 1) 

@@ -18,11 +18,9 @@ import Prelude(fst,snd)
     
 
 instance Container (Seq a) a where
-    singleton = S.singleton
-
+    contain x = S.fromList x
 
 instance Sequential (Seq a) a where    
-    listed = toList
     take n s =  S.take (fromIntegral n) s
     tail s = snd $ S.splitAt 1 s
     while = S.takeWhileL 

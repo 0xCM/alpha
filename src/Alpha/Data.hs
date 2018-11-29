@@ -10,7 +10,6 @@ module Alpha.Data
 )
 where
 
-import Alpha.Data.Asci as X
 import Alpha.Data.Bit as X
 import Alpha.Data.Bits as X
 import Alpha.Data.BitVector as X
@@ -20,9 +19,10 @@ import Alpha.Data.Enum as X
 import Alpha.Data.Func as X
 import Alpha.Data.Index as X
 import Alpha.Data.Grammar as X
-import Alpha.Data.Matrix as X
+import Alpha.Data.Table as X
 import Alpha.Data.Maybe as X
 import Alpha.Data.Message as X
+--import Alpha.Data.Natural as X
 import Alpha.Data.Numbers as X
 import Alpha.Data.Poset as X
 import Alpha.Data.Product as X

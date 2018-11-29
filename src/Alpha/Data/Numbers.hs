@@ -24,7 +24,8 @@ module Alpha.Data.Numbers
     fromInteger,
     sub',
 
-    numerator, denominator, ratio
+    numerator, denominator, ratio, 
+    rational, fractional
 
 )
 where
@@ -100,6 +101,15 @@ word64 n = convert n
 ratio::(Integral n) => n -> n -> Ratio n
 ratio m n =  (DR.%) m n
 {-# INLINE ratio #-}
+
+-- Forms a 'Rational' number from a 'Real number
+rational::(Real r) => r -> Rational
+rational = toRational
+{-# INLINE rational #-} 
+
+fractional::(Real r, Fractional f) => r -> f
+fractional = realToFrac
+{-# INLINE fractional #-} 
 
 -- Determines whether m is evenly divisible by n
 divides::(Integral a) => a -> a -> Bool
@@ -585,52 +595,37 @@ instance Unital CDouble where
 
 -- Invertible
 -------------------------------------------------------------------------------
-instance Invertible Int Int where 
+instance Invertible Int where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Int8 Int8 where 
+instance Invertible Int8 where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Int16 Int16 where 
+instance Invertible Int16 where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Int32 Int32 where 
+instance Invertible Int32 where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Int64 Int64 where 
+instance Invertible Int64 where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Integer Integer where 
-    invert x = zero - x
-    {-# INLINE invert #-}    
-instance Invertible Word Int where 
-    invert x = zero - (int x)
-    {-# INLINE invert #-}
-instance Invertible Word8 Int8 where 
-    invert x = zero - (int8 x)
-    {-# INLINE invert #-}
-instance Invertible Word16 Int16 where 
-    invert x = zero - (int16 x)
-    {-# INLINE invert #-}
-instance Invertible Word32 Int32 where 
-    invert x = zero - (int32 x)
-    {-# INLINE invert #-}
-instance Invertible Word64 Int64 where 
-    invert x = zero - (int64 x)
-    {-# INLINE invert #-}
-instance (Integral a) => Invertible (Ratio a) (Ratio a) where 
+instance Invertible Integer where 
     invert x = zero - x
     {-# INLINE invert #-}    
-instance Invertible Float Float where 
+instance (Integral a) => Invertible (Ratio a) where 
+    invert x = zero - x
+    {-# INLINE invert #-}    
+instance Invertible Float where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible Double Double where 
+instance Invertible Double where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible CFloat CFloat where 
+instance Invertible CFloat where 
     invert x = zero - x
     {-# INLINE invert #-}
-instance Invertible CDouble CDouble where 
+instance Invertible CDouble where 
     invert x = zero - x
     {-# INLINE invert #-}
 
@@ -1091,6 +1086,9 @@ instance NaturallyPowered Word32 where
 instance NaturallyPowered Word64 where 
     pow = (^)
     {-# INLINE pow #-}
+instance (Integral n) => NaturallyPowered (Ratio n) where 
+    pow = (^)
+    {-# INLINE pow #-}    
 instance NaturallyPowered Float where 
     pow = (^)
     {-# INLINE pow #-}
@@ -1177,6 +1175,14 @@ instance Group Int32
 instance Group Int64
 instance (Integral a) => Group (Ratio a)
 
+instance AbelianSemigroup Integer
+instance AbelianSemigroup Int
+instance AbelianSemigroup Int8
+instance AbelianSemigroup Int16
+instance AbelianSemigroup Int32
+instance AbelianSemigroup Int64
+instance (Integral a) => AbelianSemigroup (Ratio a)
+
 instance AbelianGroup Integer
 instance AbelianGroup Int
 instance AbelianGroup Int8
@@ -1192,24 +1198,6 @@ instance Ring Int16
 instance Ring Int32
 instance Ring Int64
 instance (Integral a) => Ring (Ratio a)
-
-instance TotalOrder Natural
-instance TotalOrder Integer
-instance TotalOrder Int
-instance TotalOrder Int8
-instance TotalOrder Int16
-instance TotalOrder Int32
-instance TotalOrder Int64
-instance TotalOrder Word
-instance TotalOrder Word8
-instance TotalOrder Word16
-instance TotalOrder Word32
-instance TotalOrder Word64
-instance TotalOrder Float
-instance TotalOrder Double
-instance TotalOrder CFloat
-instance TotalOrder CDouble
-instance (Integral a, TotalOrder a) => TotalOrder (Ratio a)
 
 instance Numeric Natural
 instance Numeric Integer

@@ -3,11 +3,15 @@
 module Alpha.Canonical.Algebra
 (    
     NonEmpty,
+    Sign(..), Signed(..), Unsigned(..),SignedIntegral(..),UnsignedIntegral(..),
+    NaturallyPowered(..), IntegrallyPowered(..), ApproximatelyPowered(..),
+    Invertible(..), Inverter(..), 
     Additive(..),
     Subtractive(..),
     Negatable(..),
     Multiplicative(..),
     Divisible(..),
+    AbelianSemigroup(..),
     Unital(..),
     Semigroupoid(..),
     Groupoid(..),
@@ -23,7 +27,9 @@ module Alpha.Canonical.Algebra
     Degenerate(..),
     Monoidal(..),
     JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
-    Sign(..), positive, negative, sign,
+    HMultiplicative(..),
+    associator, commutator, inverter,
+    positive, negative, sign,
     dual, minimal, maximal, endo, endoply, cartesian, alt
 )
 where
@@ -51,6 +57,45 @@ import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 import qualified Data.Monoid as Monoid
 
+-- Classifies unsigned numeric types
+class (Num a) => Unsigned a where
+
+-- Classifies signednumeric types    
+class (Num a) => Signed a where
+
+-- Identifies signed integral types
+class (Integral i, Signed i) => SignedIntegral i where
+
+-- Classifies usigned integral types    
+class (Integral i, Unsigned i) => UnsignedIntegral i where
+    
+class NaturallyPowered a where
+    pow::(UnsignedIntegral p) => a -> p -> a
+
+    (^)::(UnsignedIntegral p) => a -> p -> a
+    (^) = pow
+    {-# INLINE (^) #-}
+
+infixr 8 ^
+
+class (Fractional a) => IntegrallyPowered a where
+    powi::(Integral p) => a -> p -> a
+
+    (^^)::(Integral p) => a -> p -> a
+    (^^) = powi
+    {-# INLINE (^^) #-}
+
+infixr 8 ^^
+
+class (Floating a) => ApproximatelyPowered a where
+    powa::a -> a -> a
+
+    (**)::a -> a -> a
+    (**) = powa
+    {-# INLINE (**) #-}
+
+infixr 8 **
+        
 -- / Characterizes types for which unary negation may be defined
 class Negatable a b where
     -- | Negates the operand
@@ -64,7 +109,7 @@ class Subtractive a where
     -- | Infix synonym for 'sub'    
     (-)::BinaryOperator a
     (-) = sub
-    
+    {-# INLINE (-) #-}
 
 infixl 6 -    
 
@@ -75,6 +120,7 @@ class Additive a where
     -- | Infix synonym for 'add'    
     (+)::BinaryOperator a
     (+) = add
+    {-# INLINE (+) #-}
 
 infixl 6 +
 
@@ -86,10 +132,22 @@ class Multiplicative a where
     -- | Infix synonym for 'mul'
     (*)::BinaryOperator a
     (*) = mul
+    {-# INLINE (*) #-}
 
 infixl 7 *
 
+-- | Characterizes heterogenous multiplication
+class HMultiplicative a b where
+    type HProduct a b
     
+    hmul::a -> b -> HProduct a b
+
+    (>*<)::a -> b -> HProduct a b
+    (>*<) = hmul
+    {-# INLINE (>*<) #-}
+    
+infixl 7 >*<
+
 -- / Characterizes a type that supports a notion of division
 class Divisible a where
     -- | Divides the first value by the second
@@ -98,6 +156,7 @@ class Divisible a where
     -- | Infix synonym for 'div'
     (/)::BinaryOperator a
     (/) = div
+    {-# INLINE (/) #-}
 
 infixl 7 /
 
@@ -128,7 +187,7 @@ class Unital a where
 class (Eq a) => Setoid a where
     equals::BinaryPredicate a
     equals x y = x == y
-    
+            
 -- / Characterizes types for which a greatest lower bound can
 -- be identified, with bounded intervals being the canonical
 -- example
@@ -157,17 +216,29 @@ class (Ord b) => Spanned a b where
     (...) = span
 
 infixl 5 ...
+    
+
+
+-- | Captures a unary operator that produces the inverse of an invertible element
+newtype Inverter a = Inverter (UnaryOperator a)
+
+-- | Characterizes types whose values are closed under inversion
+class Invertible a where
+    invert::a -> a
 
 -- A finitely presented permutation: A bijection from [1..n] 
 data Permutation a = Permutation (Map Natural a) (Map a Natural)
 
 class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a where
 
+class Semigroup a => AbelianSemigroup a where    
+
 -- | A group is a monoid together with an inversion operator (-)
 -- such that for every element g there exists a unique elment -g where g + (-g) = 0
-class (Unital a, Nullary a, Semigroup a, Subtractive a, Invertible a a) => Group a where    
+class (Unital a, Nullary a, Semigroup a, Subtractive a, Invertible a, NaturallyPowered a) => Group a where    
 
-class (Group a, Additive a) => AbelianGroup a where
+-- | A group for which the related commutator is always satisfied
+class (Group a, AbelianSemigroup a) => AbelianGroup a where
     
 class (AbelianGroup a, Multiplicative a, Unital a) => Ring a where
         
@@ -224,3 +295,27 @@ negative = Negative
 -- Computes the sign of a value
 sign::(TotalOrder a, Nullary a) => a -> Sign
 sign a = ifelse (a >= zero) positive negative
+
+-- | Produces an interver from a unary operator
+inverter::UnaryOperator a -> Inverter a
+inverter = Inverter
+
+-- | Constructs a commutator for a binary operator
+-- See https://en.wikipedia.org/wiki/Commutator
+commutator::(Invertible a) => BinaryOperator a -> (a -> a -> a)
+commutator o =  \x y ->  o (o (invert x) (invert y)) (o x y) where
+
+-- | Computes both left and right-associative applications
+-- If an operator is associtive, these values will coincide
+associator::BinaryOperator a -> (a, a, a) -> (a,a)
+associator o (x,y,z) =  (left,right) where
+    xy = o x y 
+    yz = o y z
+    left =  o xy z
+    right = o x yz
+
+-- | Determines whether a binary operator is associative with respect
+-- to a test triple    
+associates::(Eq a) => BinaryOperator a -> (a, a, a) -> Bool
+associates o triple = x == y where
+    (x,y) = associator o triple

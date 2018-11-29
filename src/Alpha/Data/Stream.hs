@@ -40,8 +40,8 @@ class SeqStream a => Streamer a where
     -- Constructs a stream via opaque function calls
     blackbox::(() -> a) -> Stream a
 
+    
 instance Sequential (Stream e) e where    
-    listed s = S.takeWhile (\_ -> True) s
     take i s = fromList $ S.take (fromIntegral i) s
     split = S.partition
     while pred src = undefined
@@ -50,6 +50,7 @@ instance Sequential (Stream e) e where
 
 instance Container (Stream e) e where
     singleton x = S.cycle [x]
+    contain [x] = S.cycle [x]
 
 instance Streamer (Stream s)  where
     intersperse = S.intersperse
