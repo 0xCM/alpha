@@ -631,55 +631,61 @@ instance Invertible CDouble where
 
 -- Negatable 
 -------------------------------------------------------------------------------
-instance Negatable Natural Integer where 
+instance Negatable Natural where 
+    type Negated Natural = Integer 
     negate x = zero - (integer x)
     {-# INLINE negate #-}
-instance Negatable Integer Integer where 
+instance Negatable Integer where 
     negate = negateInteger
     {-# INLINE negate #-}
-instance Negatable Int Int where 
+instance Negatable Int where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Int8 Int8 where 
+instance Negatable Int8 where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Int16 Int16 where 
+instance Negatable Int16 where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Int32 Int32 where 
+instance Negatable Int32 where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Int64 Int64 where 
+instance Negatable Int64 where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Word Int where 
+instance Negatable Word where 
+    type Negated Word = Int
     negate x = zero- (int x)
     {-# INLINE negate #-}
-instance Negatable Word8 Int8 where 
+instance Negatable Word8 where 
+    type Negated Word8 = Int8
     negate x = zero - (int8 x)
     {-# INLINE negate #-}
-instance Negatable Word16 Int16 where 
+instance Negatable Word16 where 
+    type Negated Word16 = Int16
     negate x = zero - (int16 x)
     {-# INLINE negate #-}
-instance Negatable Word32 Int32 where 
+instance Negatable Word32 where 
+    type Negated Word32 = Int32
     negate x = zero - (int32 x)
     {-# INLINE negate #-}
-instance Negatable Word64 Int64 where 
+instance Negatable Word64 where 
+    type Negated Word64 = Int64
     negate x = zero - (int64 x)
     {-# INLINE negate #-}
-instance (Integral a) => Negatable (Ratio a) (Ratio a) where 
+instance (Integral a) => Negatable (Ratio a) where 
     negate x = zero - x
     {-# INLINE negate #-}    
-instance Negatable Float Float where 
+instance Negatable Float where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable Double Double where 
+instance Negatable Double where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable CFloat CFloat where 
+instance Negatable CFloat where 
     negate = negate'
     {-# INLINE negate #-}
-instance Negatable CDouble CDouble where 
+instance Negatable CDouble where 
     negate = negate'
     {-# INLINE negate #-}
 

@@ -12,7 +12,9 @@ module Alpha.Canonical.Classes
 (
     Appendable(..),
     Assembly(..),
+    Accumulator(..),
     Boolean(..),
+    Computable(..),
     Concatenable(..),
     Chunkable(..),
     Collapsible(..),
@@ -150,7 +152,13 @@ class Chunkable a where
 -- / Breaking the chains..
 class Jailbreak m a where
     escape::m a -> a
+
+instance Jailbreak Maybe a where
+    escape x = fromJust x
     
+instance Length a => Measurable 1 a where
+    measure = length
+        
 -- Removes a layer of structure 
 -- In the case of a monoid, 'reduce' reduces to 'fold', pun intended
 class Collapsible a where
@@ -225,7 +233,18 @@ class Zippable a b where
 
     zip::Combiner a b (Zipped a b) -> Zipped a b
     
-    
+class Computable a where
+    type Computation a
+
+    compute::a -> Computation a
+
+-- | Accumulation over a structure    
+class Accumulator a where
+    type Accumulation a
+
+    accumulate::a -> Accumulation a
+        
+
 --From Wadler's Propositions as Types:
 --Disjunction A ∨ B corresponds to a disjoint sum A + B, that
 --is, a variant with two alternatives. A proof of the proposition
@@ -258,9 +277,4 @@ data Implies a b = Implies (a->b)
 
 type a :-> b = Implies a b        
 
-instance Jailbreak Maybe a where
-    escape x = fromJust x
-    
-instance Length a => Measurable 1 a where
-    measure = length
     

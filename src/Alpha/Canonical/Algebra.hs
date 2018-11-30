@@ -3,16 +3,22 @@
 module Alpha.Canonical.Algebra
 (    
     NonEmpty,
+
     Sign(..), Signed(..), Unsigned(..),SignedIntegral(..),UnsignedIntegral(..),
+    
     NaturallyPowered(..), IntegrallyPowered(..), ApproximatelyPowered(..),
+    
     Invertible(..), Inverter(..), 
-    Additive(..),
+    
+    Additive(..), HAdditive(..),
+    Multiplicative(..), HMultiplicative(..), 
+
     Subtractive(..),
     Negatable(..),
-    Multiplicative(..),
+    Unital(..),    
     Divisible(..),
+
     AbelianSemigroup(..),
-    Unital(..),
     Semigroupoid(..),
     Groupoid(..),
     Group(..), 
@@ -27,7 +33,6 @@ module Alpha.Canonical.Algebra
     Degenerate(..),
     Monoidal(..),
     JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
-    HMultiplicative(..),
     associator, commutator, inverter,
     positive, negative, sign,
     dual, minimal, maximal, endo, endoply, cartesian, alt
@@ -97,9 +102,12 @@ class (Floating a) => ApproximatelyPowered a where
 infixr 8 **
         
 -- / Characterizes types for which unary negation may be defined
-class Negatable a b where
+class Negatable a where
+    type Negated a
+    type Negated a = a
+
     -- | Negates the operand
-    negate::a -> b
+    negate::a -> Negated a
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -124,6 +132,22 @@ class Additive a where
 
 infixl 6 +
 
+-- | Characterizes heterogenous addition
+class HAdditive a b where
+    type HSum a b
+    
+    hadd::a -> b -> HSum a b
+
+    (>+<)::a -> b -> HSum a b
+    (>+<) = hadd
+    {-# INLINE (>+<) #-}
+    
+infixl 6 >+<
+
+instance (Additive a) => HAdditive a a where
+    type HSum a a = a
+    hadd = add
+
 -- / Characterizes a type that supports a notion of multiplication    
 class Multiplicative a where
     -- | Multiplies the first value by the second
@@ -147,6 +171,10 @@ class HMultiplicative a b where
     {-# INLINE (>*<) #-}
     
 infixl 7 >*<
+
+-- instance (Multiplicative a) => HMultiplicative a a where
+--     type HProduct a a = a
+--     hmul = mul
 
 -- / Characterizes a type that supports a notion of division
 class Divisible a where
@@ -217,8 +245,6 @@ class (Ord b) => Spanned a b where
 
 infixl 5 ...
     
-
-
 -- | Captures a unary operator that produces the inverse of an invertible element
 newtype Inverter a = Inverter (UnaryOperator a)
 

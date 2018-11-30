@@ -42,7 +42,6 @@ type family Composition a c where
 
 newtype Combiner a b c = Combiner (a -> b -> c)
 
-
 uncombine::Combiner a b c -> (a -> b -> c)
 uncombine (Combiner f) = f
 

@@ -11,7 +11,8 @@ module Alpha
     module Numeric,
     module System,
     module Text,
-    module Types
+    module Types,
+    module Generics
   
 ) where
     
@@ -25,6 +26,7 @@ import Alpha.System as System
 import Alpha.Numeric as Numeric
 import Alpha.Claim as Claim
 import Alpha.Types as Types
+import Alpha.Generics.Newtype as Generics
 
 
 
