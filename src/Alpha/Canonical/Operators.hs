@@ -14,12 +14,24 @@ module Alpha.Canonical.Operators
     Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,    
     (<|),(|>), ifelse, left,right, symstr, 
     Function, BinaryFunc, UnaryFunc, TernaryFunc,
-    type (~>), Hom, Dom, Cod
+    type (~>), Hom, 
+
+    Dom(..), Cod(..), Morphism(..), Morphic(..), 
+    SymbolPair(..),
+    LeftScalar(..), RightScalar(..), Scalar(..),
+    Flippable(..),
+
+    endoply, cartesian, dual, endo
 
     
 )
 where
 import Alpha.Base
+import qualified GHC.Base as GB
+import qualified Data.Map as Map
+
+
+type SymbolPair s t = (KnownSymbol s, KnownSymbol t)
 
 -- A synonym for a unary function
 type Function a b = a -> b
@@ -29,21 +41,62 @@ type Hom a b = a ~> b
 
 type instance (a ~> b) = Function a b
 
--- Represents a function domain
-type family Dom f :: Type where
-    Dom (Function a b) = a
-    
--- Represents a function codomain
-type family Cod f :: Type where
-    Cod (Function a b) = b
-
 type family Composition a c where
     Composition (Function b c) (Function a b) = Function a c
 
+-- Defines a function a -> b
+data Morphism a b 
+    = RuleMorphism (a -> b)    -- ^ | Specifies a morphism via a mapping rule
+    | PairMorphism (Map a b)  -- ^ | Specifies a morphism via an explicit list of ordered pairs
+
+type family Dom f 
+
+type family Cod f     
+
+type instance Dom (Morphism a b) = a
+type instance Cod (Morphism a b) = b
+
+-- Characterizes a function f
+class Morphic f  where    
+    -- The characterized function expressed via standard form
+    morphism::f -> Morphism (Dom f) (Cod f)
+
+    fx::f -> Dom f -> Cod f
+    fx f x = undefined --(eval' morphism) x
+    
+        where
+            eval'::Morphism (Dom f) (Cod f) -> Dom f -> Cod f
+            eval' (RuleMorphism g) = undefined
+            eval' (PairMorphism pairs) = undefined
+         
+
+-- Note that the category of left modules over a ring R is isomorphic to
+-- the category or right modules over the opposite ring R^op
+
+class LeftScalar k a where
+    type LeftScaled k a
+
+    scaleL::k -> a -> LeftScaled k a
+
+    (*.)::k -> a -> LeftScaled k a
+    (*.) = scaleL
+
+infixl 5 *.
+
+class RightScalar a k where
+    type RightScaled a k
+
+    scaleR::a -> k -> RightScaled a k
+
+    (.*)::a -> k -> RightScaled a k
+    (.*) = scaleR
+
+infixl 5 .*
+
+class (LeftScalar k a, RightScalar a k) => Scalar k a where
+
 newtype Combiner a b c = Combiner (a -> b -> c)
 
-uncombine::Combiner a b c -> (a -> b -> c)
-uncombine (Combiner f) = f
 
 -- Represents a transformation accepting potentially heterogenous types 
 -- a and b and producing a value representing their combination
@@ -64,7 +117,6 @@ class Combinable a b where
     {-# INLINE (>.<) #-}
 
 infixr 0 >.<
-
     
 -- Characterizes function composition
 class Compositional a b c where
@@ -105,26 +157,10 @@ type BinaryPredicate a = BinaryFunc a a Bool
 
 -- Characterizes a logical predicate that requires three arguments for saturation
 type TernaryPredicate a = TernaryFunc a a a Bool
-
--- Characterizes structures with which a binary operator is associated
-class Operative a where
-    
-
--- Characterizes structures with which an associative binary operator is associated
-class (Operative a) => Associative (id::Symbol) a where
-    bop::BinaryOperator a
-
--- Characterizes structures with which an associative binary operator is associated
-class (Operative a) => Commutative (id::Symbol) a where
-    cop::BinaryOperator a
-    
--- Specifies an arital predicate 
-class (KnownNat n, Arital n a) => Predicative n a where
-    predicate::Predicate n a
-                    
-instance Arital 1 (UnaryOperator a)    
-instance Arital 2 (BinaryOperator a)
-instance Arital 3 (TernaryOperator a)
+        
+class Flippable a where
+    type Flipped a    
+    flip::a -> Flipped a
     
 -- Generalizes arity-specific predicates
 type family Predicate (n::Nat)  a | a -> a where
@@ -132,10 +168,8 @@ type family Predicate (n::Nat)  a | a -> a where
     Predicate 2 (a,a,Bool) =   BinaryPredicate a
     Predicate 3 (a,a,a,Bool) = TernaryPredicate a
 
-instance Arital 1 (UnaryPredicate a)    
-instance Arital 2 (BinaryPredicate a)
-instance Arital 3 (TernaryPredicate a)
-
+uncombine::Combiner a b c -> (a -> b -> c)
+uncombine (Combiner f) = f
 
 -- | If the first input value is true, returns the 2nd input value,
 -- otherwise, returns the third input value
@@ -165,3 +199,27 @@ infixr 0 <|
 -- | Produces a strong for a symbol
 symstr :: forall s. KnownSymbol s => String
 symstr = symbolVal @s Proxy
+
+-- Applies an endomorphism
+endoply::Endo a -> a -> a
+endoply (Endo f) x = f x
+
+-- Constructs a (claimed) endomorphism
+endo::(a -> a) -> Endo a
+endo f = Endo f    
+
+-- Takes the cartesian product of two lists
+cartesian::[a] -> [a] -> [(a,a)]
+cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
+        
+dual::Monoid a => [a] -> Dual a
+dual src = fold (fmap  Dual src)
+
+instance (Ord a, Ord b) => Flippable (Map a b) where
+    type Flipped (Map a b) = Map b a
+    flip m = Map.toList m |> fmap (\(y,z) -> (z,y)) |> Map.fromList
+  
+instance Flippable (a -> b -> c) where
+    type Flipped (a -> b -> c) = b -> a -> c
+    flip = GB.flip    
+            

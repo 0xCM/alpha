@@ -1,13 +1,21 @@
-module Alpha.Text.Text where
+module Alpha.Text.Text
+(
+    text
+)
+where
 
-import Text.Show
+--import Text.Show
 import qualified Data.Text as T
 import qualified Data.String as S
 import Alpha.Canonical
+import Alpha.Base
 import Alpha.Data.Numbers
 import Data.Text(Text)
 import Data.Char(Char)
 import qualified Data.List as List
+
+text::(Show s) => s -> Text
+text = pack . show
 
 instance Length T.Text where
     length t =   convert (T.length t)
@@ -39,7 +47,6 @@ instance Appendable Text Text where
 instance Prependable Text Text where
     type Prepended Text Text = Text
     prepend x y = T.append y x 
-
         
 instance Concatenable Text Char where
     type Concatenated Text Char = Text

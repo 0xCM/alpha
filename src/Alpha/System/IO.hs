@@ -35,14 +35,18 @@ import Alpha.Data.Message
 import Alpha.Text as Text
 
 
--- | Renders a line of text to standard out 
-out :: Show s => s -> IO()
-out s = print s
+-- | Renders a showable to standard out 
+out'::Show s => s -> IO()
+out' s = print s
 
 -- | Renders text to standard out
-out' :: Show s => s -> IO()
-out' s = putStr (show s)
-    
+out::(ToString s) => s -> IO()
+out s = P.putStr (string s)
+
+-- | Renders a line-feed to standard out
+endl::IO()
+endl = P.putStrLn ""
+
 -- | Reads the lines of text from a file
 readLines::FilePath -> [Text]
 readLines x = x |> show |> T.readFile |> shredIO |> lines
@@ -81,7 +85,7 @@ folders x = x |> dir
 log::Message a -> IO()
 log (Message severity text _) = do
     setSGR [SetColor Foreground intensity color]
-    text |> out
+    text |> out'
     setSGR [Reset]
     where (intensity, color) = case severity of
                     Trivia -> (Dull, Black)

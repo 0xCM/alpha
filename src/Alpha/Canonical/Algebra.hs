@@ -1,114 +1,64 @@
-{-# LANGUAGE DataKinds #-}
-
+{-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Algebra
 (    
-    NonEmpty,
-
-    Sign(..), Signed(..), Unsigned(..),SignedIntegral(..),UnsignedIntegral(..),
-    
-    NaturallyPowered(..), IntegrallyPowered(..), ApproximatelyPowered(..),
-    
-    Invertible(..), Inverter(..), 
-    
-    Additive(..), HAdditive(..),
-    Multiplicative(..), HMultiplicative(..), 
-
+    Sign(..),     
+    Signable(..),    
+    Invertible(..),    
+    Additive(..), 
+    HAdditive(..),
+    Multiplicative(..), 
+    HMultiplicative(..), 
     Subtractive(..),
-    Negatable(..),
     Unital(..),    
     Divisible(..),
-
     AbelianSemigroup(..),
     Semigroupoid(..),
     Groupoid(..),
     Group(..), 
     AbelianGroup(..),
+    Semiring(..),
     Ring(..),
-    Ord,
     Setoid(..),
-    Infimum(..),
-    Supremum(..),
-    Nullary(..), null,
-    Spanned(..),
-    Degenerate(..),
-    Monoidal(..),
-    JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
-    associator, commutator, inverter,
-    positive, negative, sign,
-    dual, minimal, maximal, endo, endoply, cartesian, alt
+    Nullary(..), 
+    LeftModule(..), 
+    RightModule(..),
+    associator, commutator, reduce, minimal, maximal,
+    positive, negative,
+    alt, null
 )
 where
-import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
-import Algebra.Lattice(Lattice(..))   
 import Data.Functor.Product
 import Data.Function
 import Data.Foldable hiding(null)
 import Data.Semigroupoid
 import Data.Ord(Ord)
 import Data.List.NonEmpty hiding(span)
-
 import GHC.Base(NonEmpty)
 import GHC.Show(Show)
 import GHC.TypeLits
 import GHC.Num(Num,Natural)
 import GHC.Real(Integral)
 import GHC.Generics
-
 import qualified Prelude as P
 import qualified Data.Vector as V
-
 import Alpha.Data.Base
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 import qualified Data.Monoid as Monoid
+import qualified Data.List as List
 
--- Classifies unsigned numeric types
-class (Num a) => Unsigned a where
+-- Characterizes structures with which an associative binary operator is associated
+class Associative a where
 
--- Classifies signednumeric types    
-class (Num a) => Signed a where
+-- Characterizes structures with which a commutative binary operator is associated
+class Commutative a where
 
--- Identifies signed integral types
-class (Integral i, Signed i) => SignedIntegral i where
-
--- Classifies usigned integral types    
-class (Integral i, Unsigned i) => UnsignedIntegral i where
+-- Characterizes a structure with which two operators are associated:
+--  The distributor (*) and codistributor (+)  are binary operators such that
+-- a1 * (a2 + a3) = a1*a2 + a1*a3 (left distributive)
+-- (a1 + a2) * a3 = a1*a3 + a2*a3 (right distributive)
+class Distributive a where
     
-class NaturallyPowered a where
-    pow::(UnsignedIntegral p) => a -> p -> a
-
-    (^)::(UnsignedIntegral p) => a -> p -> a
-    (^) = pow
-    {-# INLINE (^) #-}
-
-infixr 8 ^
-
-class (Fractional a) => IntegrallyPowered a where
-    powi::(Integral p) => a -> p -> a
-
-    (^^)::(Integral p) => a -> p -> a
-    (^^) = powi
-    {-# INLINE (^^) #-}
-
-infixr 8 ^^
-
-class (Floating a) => ApproximatelyPowered a where
-    powa::a -> a -> a
-
-    (**)::a -> a -> a
-    (**) = powa
-    {-# INLINE (**) #-}
-
-infixr 8 **
-        
--- / Characterizes types for which unary negation may be defined
-class Negatable a where
-    type Negated a
-    type Negated a = a
-
-    -- | Negates the operand
-    negate::a -> Negated a
-
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
@@ -131,8 +81,9 @@ class Additive a where
     {-# INLINE (+) #-}
 
 infixl 6 +
+instance (Additive a) => Commutative a
 
--- | Characterizes heterogenous addition
+-- | Characterizes pairs of types that support a notion multiplication
 class HAdditive a b where
     type HSum a b
     
@@ -143,10 +94,6 @@ class HAdditive a b where
     {-# INLINE (>+<) #-}
     
 infixl 6 >+<
-
-instance (Additive a) => HAdditive a a where
-    type HSum a a = a
-    hadd = add
 
 -- / Characterizes a type that supports a notion of multiplication    
 class Multiplicative a where
@@ -160,7 +107,10 @@ class Multiplicative a where
 
 infixl 7 *
 
--- | Characterizes heterogenous multiplication
+instance (Multiplicative a) => Associative a
+instance (Additive a, Multiplicative a) => Distributive a
+
+-- | Characterizes pairs of types that support a notion multiplication
 class HMultiplicative a b where
     type HProduct a b
     
@@ -187,26 +137,25 @@ class Divisible a where
     {-# INLINE (/) #-}
 
 infixl 7 /
-
     
--- Characterizes types that are inhabited by 'degenerate' values
--- Examples include empty lists, mathematical intervals 
--- that represent a single value, etc. What precicely constitutes a 
--- a degenerate value for a given type is implementation-defined
--- See https://en.wikipedia.org/wiki/Degeneracy_(mathematics)
-class Degenerate a where
-    -- Test for degeneracy
-    degenerate::a -> Bool     
+-- class Structured (a::Type) where
+--     type Element a 
+--     type Element a = a
+
+-- Tests whether a value is equal to the canonical zero
+null::(Eq a, Nullary a)=>a -> Bool
+null a = a == zero
 
 -- Characterizes types that are inhabited by a canonical 0/empty value    
 -- Note that there is no intent to link nullary and degenerate values
 -- although they will at times coincide
 class Nullary a where
-    -- Specifies the canonical a-valued 0
+    -- Specifies the canonical 0 for an element relative to a structure
     zero::a
-
--- Characterizes types that are inhabited by the concept of singularity
-class Unital a where
+    
+-- Characterizes types or structures that are inhabited by the concept of singularity
+class Unital (a::Type) where
+    -- Specifies the canonical 1 for an element relative to a structure
     one::a
     
 -- / Characterizes a setoid where the required equivalence relation is 
@@ -215,94 +164,52 @@ class Unital a where
 class (Eq a) => Setoid a where
     equals::BinaryPredicate a
     equals x y = x == y
-            
--- / Characterizes types for which a greatest lower bound can
--- be identified, with bounded intervals being the canonical
--- example
--- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
-class Infimum a b where
-    -- / The greatest lower bound
-    infimum::a -> b
-    
--- / Characterizes types for which a least upper bound can
--- be identified, with bounded intervals being the canonical
--- example
--- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
-class Supremum a b where
-    -- / The least upper bound
-    supremum::a -> b
-    
--- | Characterizes a type that contains a relatively contiguous
--- set of values bound by least and greatest values
-class (Ord b) => Spanned a b where
-    
-    -- | Creates a b-value bound by a min and max value
-    span::b -> b -> a
-    
-    -- | The span operator, an infix synonym for 'span'
-    (...)::b -> b -> a
-    (...) = span
 
-infixl 5 ...
-    
--- | Captures a unary operator that produces the inverse of an invertible element
-newtype Inverter a = Inverter (UnaryOperator a)
-
--- | Characterizes types whose values are closed under inversion
+-- | Characterizes types whose values are closed under inversion with respect to a multiplicative operator
 class Invertible a where
     invert::a -> a
 
--- A finitely presented permutation: A bijection from [1..n] 
-data Permutation a = Permutation (Map Natural a) (Map a Natural)
+class (Unital a, Invertible a, Monoid a) => Group a where    
 
-class (Unital a, Nullary a, Semigroup a, Monoid a) => Monoidal a where
-
-class Semigroup a => AbelianSemigroup a where    
-
--- | A group is a monoid together with an inversion operator (-)
--- such that for every element g there exists a unique elment -g where g + (-g) = 0
-class (Unital a, Nullary a, Semigroup a, Subtractive a, Invertible a, NaturallyPowered a) => Group a where    
+class (Semigroup a, Additive a, Subtractive a) => AbelianSemigroup a where    
 
 -- | A group for which the related commutator is always satisfied
-class (Group a, AbelianSemigroup a) => AbelianGroup a where
+class (Group a, Additive a, Subtractive a, Nullary a) => AbelianGroup a where
+
+-- | Almost A ring; elements are not required though to have an additive inverse
+class (Additive a, Multiplicative a, Unital a, Nullary a, Monoid a ) => Semiring a where
+
+-- | A ring (with identity)
+-- See https://en.wikipedia.org/wiki/Ring_(mathematics)     
+class (Group a, Additive a, Subtractive a, Nullary a, Unital a, Multiplicative a, Unital a) 
+    => Ring a where
+
+-- | A left module over a ring r
+class (Ring r, AbelianGroup g, LeftScalar r g) => LeftModule r g where
     
-class (AbelianGroup a, Multiplicative a, Unital a) => Ring a where
+-- | A right module over a ring r
+class (Ring r, AbelianGroup g, RightScalar g r) => RightModule g r where
         
-data Sign = Positive | Negative
+        
+data Sign = Negative | Neutral | Positive
     deriving (Show,Ord,Eq)
 
--- Alias for semigroupoid composition operator
-compose::(Semigroupoid c) => c j k -> c i j -> c i k
-compose = o
-
+-- Characterizes type for which signs may be computed
+-- Alternately, characterizes types whose values may be 
+-- partitioned into three disjoint subsets, one called 'Negative'
+-- one 'Positive' the other 'Neutral'
+class Signable a where
+    sign::a -> Sign
+                    
 reduce::Semigroup a => [a] -> a
 reduce (x:xs) = sconcat (x :| xs)
-        
-dual::Monoid a => [a] -> Dual a
-dual src = fold (fmap  Dual src)
 
 minimal::(Ord a, Semigroup a) => [a] -> Min a
 minimal (x:xs) = sconcat (fmap Min (x :| xs) ) 
 
 maximal::(Ord a, Semigroup a) => [a] -> Max a
 maximal (x:xs) = sconcat (fmap Max (x :| xs) ) 
-
--- Constructs a (claimed) endomorphism
-endo::(a -> a) -> Endo a
-endo f = Endo f    
-
--- Applies an endomorphism
-endoply::Endo a -> a -> a
-endoply (Endo f) x = f x
-
--- Takes the cartesian product of two lists
-cartesian::[a] -> [a] -> [(a,a)]
-cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
-
--- Tests whether a value is equal to the canonical zero
-null::(Eq a, Nullary a) => a -> Bool
-null a = a == zero
-
+    
 -- Lifts the input into the Alt monoid
 -- Example:
 -- alt Nothing  <> alt (Just 4) <> alt (Just 7)
@@ -318,13 +225,13 @@ positive = Positive
 negative::Sign
 negative = Negative
 
--- Computes the sign of a value
-sign::(TotalOrder a, Nullary a) => a -> Sign
-sign a = ifelse (a >= zero) positive negative
+-- Produces a 'Sign' of neutral polarity
+neutral::Sign
+neutral = Neutral
 
--- | Produces an interver from a unary operator
-inverter::UnaryOperator a -> Inverter a
-inverter = Inverter
+-- Alias for semigroupoid composition operator
+compose::(Semigroupoid c) => c j k -> c i j -> c i k
+compose = o
 
 -- | Constructs a commutator for a binary operator
 -- See https://en.wikipedia.org/wiki/Commutator

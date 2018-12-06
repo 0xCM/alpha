@@ -11,8 +11,6 @@
 
 module Alpha.Data.Numbers
 (    
-    SizedInt(..), 
-    SizedWord(..),
     Integral(quot, rem, mod, quotRem, divMod),
     Num(signum),
 
@@ -431,6 +429,7 @@ instance Absolutist CDouble where
     abs = N.abs 
     {-# INLINE abs #-}
 
+
 -- Nullary
 -------------------------------------------------------------------------------
 instance Nullary Natural where 
@@ -488,55 +487,55 @@ instance Nullary CDouble where
 -- Monoid
 -------------------------------------------------------------------------------
 instance Monoid Natural where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Integer where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Int where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Int8 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Int16 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Int32 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Int64 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Word where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Word8 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Word16 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Word32 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Word64 where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance (Integral a) => Monoid (Ratio a) where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}    
 instance Monoid Float where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid Double where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid CFloat where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 instance Monoid CDouble where 
-    mempty = zero
+    mempty = 0
     {-# INLINE mempty #-}
 
 -- Unital
@@ -596,44 +595,44 @@ instance Unital CDouble where
 -- Invertible
 -------------------------------------------------------------------------------
 instance Invertible Int where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Int8 where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Int16 where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Int32 where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Int64 where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Integer where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}    
 instance (Integral a) => Invertible (Ratio a) where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}    
 instance Invertible Float where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible Double where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible CFloat where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 instance Invertible CDouble where 
-    invert x = zero - x
+    invert x = 0 - x
     {-# INLINE invert #-}
 
 -- Negatable 
 -------------------------------------------------------------------------------
 instance Negatable Natural where 
     type Negated Natural = Integer 
-    negate x = zero - (integer x)
+    negate x = 0 - (integer x)
     {-# INLINE negate #-}
 instance Negatable Integer where 
     negate = negateInteger
@@ -655,26 +654,26 @@ instance Negatable Int64 where
     {-# INLINE negate #-}
 instance Negatable Word where 
     type Negated Word = Int
-    negate x = zero- (int x)
+    negate x = 0 - (int x)
     {-# INLINE negate #-}
 instance Negatable Word8 where 
     type Negated Word8 = Int8
-    negate x = zero - (int8 x)
+    negate x = 0 - (int8 x)
     {-# INLINE negate #-}
 instance Negatable Word16 where 
     type Negated Word16 = Int16
-    negate x = zero - (int16 x)
+    negate x = 0 - (int16 x)
     {-# INLINE negate #-}
 instance Negatable Word32 where 
     type Negated Word32 = Int32
-    negate x = zero - (int32 x)
+    negate x = 0 - (int32 x)
     {-# INLINE negate #-}
 instance Negatable Word64 where 
     type Negated Word64 = Int64
-    negate x = zero - (int64 x)
+    negate x = 0 - (int64 x)
     {-# INLINE negate #-}
 instance (Integral a) => Negatable (Ratio a) where 
-    negate x = zero - x
+    negate x = 0 - x
     {-# INLINE negate #-}    
 instance Negatable Float where 
     negate = negate'
@@ -1141,6 +1140,253 @@ instance IntegrallyPowered CDouble where
     powi = (^^)
     {-# INLINE powi #-}
 
+
+-- Signable
+-------------------------------------------------------------------------------
+
+
+--Computes the sign of a value
+sign'::(Num a,Ord a) => a -> Sign
+sign' a | a < 0  = Negative
+        | a > 0 = Positive
+        | a == 0 = Neutral
+
+instance Signable Natural where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Integer where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Int where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Int8 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Int16 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Int32 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Int64 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Word where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Word8 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Word16 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Word32 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Word64 where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Float where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable Double where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable CFloat where 
+    sign = sign'
+    {-# INLINE sign #-}
+instance Signable CDouble where 
+    sign = sign'
+    {-# INLINE sign #-}
+
+-- LeftScalar 
+-------------------------------------------------------------------------------
+
+instance LeftScalar Natural Natural where
+    type LeftScaled Natural Natural = Natural 
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Integer Integer where 
+    type LeftScaled Integer Integer = Integer
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Int Int where 
+    type LeftScaled Int Int = Int
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Int8 Int8 where 
+    type LeftScaled Int8 Int8 = Int8
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Int16 Int16 where 
+    type LeftScaled Int16 Int16 = Int16
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Int32 Int32 where 
+    type LeftScaled Int32 Int32 = Int32
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Int64 Int64 where 
+    type LeftScaled Int64 Int64 = Int64
+    scaleL = (*)    
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Word Word where 
+    type LeftScaled Word Word  = Word
+    scaleL = (*)    
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Word8 Word8 where 
+    type LeftScaled Word8 Word8 = Word8
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Word16 Word16 where 
+    type LeftScaled Word16 Word16 = Word16
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Word32 Word32 where 
+    type LeftScaled Word32 Word32 = Word32    
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Word64 Word64 where 
+    type LeftScaled Word64 Word64 = Word64
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Float Float where 
+    type LeftScaled Float Float = Float    
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar Double Double where 
+    type LeftScaled Double Double = Double
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar CFloat CFloat where 
+    type LeftScaled CFloat CFloat = CFloat    
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+instance LeftScalar CDouble CDouble where 
+    type LeftScaled CDouble CDouble = CDouble    
+    scaleL = (*)
+    {-# INLINE scaleL #-}
+
+-- RightScalar 
+-------------------------------------------------------------------------------
+
+instance RightScalar Natural Natural where
+    type RightScaled Natural Natural = Natural 
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Integer Integer where 
+    type RightScaled Integer Integer = Integer
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Int Int where 
+    type RightScaled Int Int = Int
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Int8 Int8 where 
+    type RightScaled Int8 Int8 = Int8
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Int16 Int16 where 
+    type RightScaled Int16 Int16 = Int16
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Int32 Int32 where 
+    type RightScaled Int32 Int32 = Int32
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Int64 Int64 where 
+    type RightScaled Int64 Int64 = Int64
+    scaleR = (*)    
+    {-# INLINE scaleR #-}
+
+instance RightScalar Word Word where 
+    type RightScaled Word Word  = Word
+    scaleR = (*)    
+    {-# INLINE scaleR #-}
+
+instance RightScalar Word8 Word8 where 
+    type RightScaled Word8 Word8 = Word8
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Word16 Word16 where 
+    type RightScaled Word16 Word16 = Word16
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Word32 Word32 where 
+    type RightScaled Word32 Word32 = Word32    
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Word64 Word64 where 
+    type RightScaled Word64 Word64 = Word64
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Float Float where 
+    type RightScaled Float Float = Float    
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar Double Double where 
+    type RightScaled Double Double = Double
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar CFloat CFloat where 
+    type RightScaled CFloat CFloat = CFloat    
+    scaleR = (*)
+    {-# INLINE scaleR #-}
+
+instance RightScalar CDouble CDouble where 
+    type RightScaled CDouble CDouble = CDouble    
+    scaleR = (*)
+    {-# INLINE scaleR #-}    
+
+
+-- Semiring (+) (*)
+-------------------------------------------------------------------------------
+instance Semiring Natural
+instance Semiring Integer
+instance Semiring Int
+instance Semiring Int8
+instance Semiring Int16
+instance Semiring Int32
+instance Semiring Int64
+instance Semiring Word
+instance Semiring Word8
+instance Semiring Word16
+instance Semiring Word32
+instance Semiring Word64
+instance (Integral a, TotalOrder a) => Semiring (Ratio a)
+instance Semiring Float
+instance Semiring Double
+instance Semiring CFloat
+instance  Semiring CDouble
+
 instance Unsigned Natural
 instance Unsigned Word
 instance Unsigned Word8
@@ -1222,3 +1468,4 @@ instance Numeric Float
 instance Numeric Double
 instance Numeric CFloat
 instance Numeric CDouble
+

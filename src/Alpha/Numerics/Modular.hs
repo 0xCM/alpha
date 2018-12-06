@@ -11,6 +11,7 @@ where
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Data.Numbers
+import qualified Data.Set as Set
 
 data Base (n::Nat) = Base
 
@@ -25,39 +26,43 @@ base10 = based @10
 
 base16 = based @16
 
--- |Represents the ring of integers mod n
+-- | Represents the ring of integers mod n
 data Zn (n::Nat) = Zn Integer
+    deriving (Eq, Ord)
 
-data Residue (n::Nat) m = Residue (Zn n)  m 
+data Residue (n::Nat) = Residue (Zn n) Integer
+    deriving (Eq, Ord)
 
 -- Constructs a representation for the ring of integers mod n
 zN::forall n. KnownNat n => Zn n
 zN = Zn (natVal (Proxy @n))
 
-modulus::(KnownNat n, Integral m) => Zn n -> m
-modulus (Zn n) = (fromInteger n)
+modulus::forall n.KnownNat n => Zn n -> Integer
+modulus (Zn n) = (fromInteger n) `mod` (natVal (Proxy @n))
 
-residue::(KnownNat n, Integral m) => m -> Residue n m
+residue::(KnownNat n) => Integer -> Residue n 
 residue m = Residue (zN) m
 
 -- See https://github.com/TikhonJelvis/modular-arithmetic/blob/master/src/Data/Modular.hs
 
 -- | The canonical least residues modulo n
 -- See https://en.wikipedia.org/wiki/Modular_arithmetic for terminology
-residues::KnownNat n => Zn n -> [Integer]    
-residues (Zn n) = [0..(n-1)] 
-
-type ModN n m = (KnownNat n, Integral m, Additive m)
+residues::KnownNat n => Zn n -> [Residue n]    
+residues (Zn n) = fmap residue [0..(n-1)] 
 
 instance KnownNat n => Show (Zn n) where
     show _ = "Z/" ++ nn where
         nn = show (natVal (Proxy @n))
 
-instance KnownNat n => FiniteMembership (Zn n) Integer where    
-    members = residues
+instance  KnownNat n => Membership (Zn n) where    
+    type Member (Zn n) = Residue n
+    members s = residues s |> Set.fromList
 
-instance (Show m, ModN n m) => Show(Residue n m) where
+instance KnownNat n => Show (Residue n) where
     show (Residue zN m) = (show m) ++ " " ++ (show zN)
 
-instance (ModN n m) => Additive (Residue n m) where
+instance KnownNat n => Additive (Residue n) where
     add (Residue zN a) (Residue _ b) = residue( (a + b) `mod` (modulus zN) )
+
+instance KnownNat n => Multiplicative (Residue n) where
+    mul (Residue zN a) (Residue _ b) = residue( (a * b) `mod` (modulus zN) )    

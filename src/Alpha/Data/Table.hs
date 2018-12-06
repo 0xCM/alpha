@@ -45,12 +45,18 @@ table' elements = MatrixTable $ M.fromLists elements
 --instance Container (MatrixTable m n a)    
 instance (Show a) => Show(MatrixTable m n a) where
     show (MatrixTable m) = show m
-    
-instance forall m n a.  (KnownNat m, KnownNat n) => Container (MatrixTable m n a) a where
-    contain elements = p |> table'
+
+instance forall m n a.NatPair m n  =>  IsList (MatrixTable m n a) where
+    type Item (MatrixTable m n a) = a
+    toList (MatrixTable m) = M.toList m
+    fromList elements = p |> table'
         where 
-            width = int $ natVal $ Proxy @n 
-            p = partition width elements
+            width = int $ nat @n
+            p = partition width elements 
+
+instance forall m n a. (KnownNat m, KnownNat n) => Container (MatrixTable m n a) where
+    contain = fromList
+    contents = toList
 
 instance forall m n a. (KnownNat m, KnownNat n, Nullary a, Num a) => Nullary (MatrixTable m n a) where
     zero = MatrixTable (M.zero rv cv) where

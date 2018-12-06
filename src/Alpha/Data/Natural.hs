@@ -4,67 +4,88 @@
 
 module Alpha.Data.Natural
 (
-    TypedNat, 
-    Zero, One, Next, Add, Sub,Mul,
-    natural, natdec, natinc, natadd, natsub, natmul, natmod
+    TypedNat(..),     
+    NatPair(..), nat2,
+    NatTriple(..), nat3,
+    NatQuad(..), nat4,
+    NatSpan(..), natspan,
+    NatPaired(..), natpair,
+    nat, natdec, natinc, natadd, natsub, natmul
 )
 where
 
-import qualified GHC.Natural as N
-import GHC.Real as R
-import GHC.TypeNats (type (<=), type (<=?), type(*), type (+), type (^), type (-), Mod)
-import GHC.TypeLits(natVal)
-import GHC.Num hiding(Natural)
 import Alpha.Base
 import Alpha.TypeLevel.Proxy
-import Alpha.Canonical(Formattable(..))
+import Alpha.Canonical
+import Alpha.Data.Numbers
 
--- Unifies type and value-level naturals
-newtype TypedNat k = TypedNat N.Natural
-    deriving (Num)
 
-class KnownNat n => Sized n where
-    size::Int
-    size = s where
-        n = natural @n
-        s = integral n
-        integral::TypedNat k -> Int
-        integral (TypedNat x) = fromIntegral x
-        
-type Zero = TypedNat 0
-type One =  TypedNat 1
-type Next n = TypedNat (n + 1)
-type Add m n = TypedNat (m + n)
-type Sub m n  = TypedNat (m - n)
-type Mul m n = TypedNat (m * n)
+-- Unifies type naturals and value-level integers
+newtype TypedNat k = TypedNat Int
+    deriving (Num,ToInt)
+
+-- | Represents a contiguous range of natural numbers inclusively between m and n
+newtype NatSpan m n = NatSpan [Int]    
+
+-- | Represents a pair of natural numbers (m,n)
+newtype NatPaired m n = NatPaired (Int,Int)
+
+-- | Alias for a pair of 'KnownNat' constraints    
+type NatPair m n = (KnownNat m, KnownNat n)  
+
+-- | Alias for a tuple of 'KnownNat' constraints
+type NatTriple m n p = (NatPair m n, KnownNat p)
+
+-- | Alias for a quadruple of 'KnownNat' constraints    
+type NatQuad m n p q = (NatPair m n, NatPair p q)
     
--- | Constructs a typed nat
-natural :: forall n. KnownNat n => TypedNat n
-natural = fromIntegral (natVal (proxy @n))
+-- | Computes the 'Int' value corresponding to a type-level nat
+nat::forall m. KnownNat m => Int
+nat = natVal (proxy @m) |> int
+
+-- | Computes a pair of 'Int' values corresponding to a pair of type-level nats
+nat2::forall m n. NatPair m n => (Int,Int)
+nat2 = (nat @m, nat @n)
+
+-- | Computes a triple of 'Int' values corresponding to 3 type-level nats
+nat3::forall m n p. NatTriple m n p => (Int,Int,Int)
+nat3 = (nat @m, nat @n, nat @p)
+
+-- | Computes a 4-tuple of 'Int' values corresponding to 4 type-level nats
+nat4::forall m n p q. NatQuad m n p q => (Int,Int,Int,Int)
+nat4 = (nat @m, nat @n, nat @p, nat @q)
 
 -- | Decrements a nat
-natdec::forall (n::Nat). TypedNat(n+1) -> TypedNat n
-natdec (TypedNat i) = TypedNat (i - 1)
+natdec:: forall n. (KnownNat n) => TypedNat(n - 1)
+natdec = TypedNat $ nat @n - 1
 
 -- | Increments a nat
-natinc::forall (n::Nat). TypedNat(n) -> TypedNat (n+1)
-natinc (TypedNat i) = TypedNat (i + 1)
+natinc::forall n. (KnownNat n) => TypedNat(n + 1)
+natinc = TypedNat $ nat @n + 1
 
 -- | Adds two nats
-natadd::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m + n)
-natadd (TypedNat i) (TypedNat j) = TypedNat (i + j)
+natadd::forall m n. (NatPair m n) => TypedNat (m + n)
+natadd = TypedNat $ nat @m + nat @n
 
 -- | Nat subtraction
-natsub::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m - n)
-natsub (TypedNat i) (TypedNat j) = TypedNat (i - j)
+natsub::forall m n. (NatPair m n) => TypedNat (m - n)
+natsub = TypedNat $ nat @m - nat @n
 
 -- | Nat multiplication
-natmul::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (m * n)
-natmul (TypedNat i) (TypedNat j) = TypedNat (i * j)
+natmul::forall m n. (NatPair m n) => TypedNat (m * n)
+natmul = TypedNat $ nat @m * nat @n
 
--- | Nat mod
-natmod::forall (m::Nat) (n::Nat). TypedNat m -> TypedNat n -> TypedNat (Mod m n)
-natmod (TypedNat i) (TypedNat j) = TypedNat (i `R.mod` j)
+natmod::forall m n. (NatPair m n) => TypedNat (m % n)
+natmod = TypedNat ((nat @m) % (nat @n ))
+
+-- | Constructs a 'Span' of natural numbers
+natspan::forall m n. NatPair m n => NatSpan m n
+natspan = NatSpan [(nat @m)..(nat @n)]
+
+-- | Constructs a pair of natural numbers
+natpair::forall m n. NatPair m n => NatPaired m n
+natpair = NatPaired <| pair (nat @m) (nat @n)
 
 instance Show (TypedNat k) where
     show (TypedNat i) = show i 
+

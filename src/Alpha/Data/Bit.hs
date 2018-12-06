@@ -10,7 +10,7 @@
 
 module Alpha.Data.Bit 
 (
-    Bit,Toggle(..),ToBit(..),
+    Bit,ToBit(..),
     on, isOn,
     off, isOff,
     fromBool
@@ -32,22 +32,18 @@ newtype Bit = Bit Flag
 
 class ToBit a where
     bit::a -> Bit    
-    
-type family Toggle t | t -> t where
-    Toggle 0 = 0
-    Toggle 1 = 1    
-            
+        
 -- | Constructs a 'Bit' in the 'Off' state    
 off::Bit
 off = Bit Off
 
--- | Returns true if off, false otherwise
-isOff::Bit -> Bool
-isOff (Bit flag) = flag == Off
-
 -- | Constructs a 'Bit' in the 'On' state    
 on::Bit
 on = Bit On
+
+-- | Returns true if off, false otherwise
+isOff::Bit -> Bool
+isOff (Bit flag) = flag == Off
 
 -- | Returns true if on, false otherwise
 isOn::Bit -> Bool
@@ -60,6 +56,60 @@ fromBool :: Bool -> Bit
 fromBool False = off
 fromBool True = on
 
+instance ToInt Bit where
+    int (Bit flag) = ifelse (flag == On) 1 0
+
+instance ToWord Bit where
+    word (Bit flag) = ifelse (flag == On) 1 0
+    
+instance FromInt Bit where
+    fromInt i = ifelse (i /= 0) on off
+
+instance FromWord Bit where
+    fromWord i = ifelse (i /= 0) on off
+    
+instance Multiplicative Bit where
+    mul (Bit On) (Bit On) = on
+    mul _ _ = off
+
+instance Additive Bit where
+    add (Bit On) (Bit On) = off
+    add (Bit On) (Bit Off) = on
+    add (Bit Off) (Bit On) = on
+    add (Bit Off) (Bit Off) = off
+
+instance Subtractive Bit where
+    sub (Bit On) (Bit On) = off
+    sub (Bit On) (Bit Off) = on
+    sub (Bit Off) (Bit On) = on
+    sub (Bit Off) (Bit Off) = off
+    
+instance Invertible Bit where 
+    invert (Bit On) = off
+    invert (Bit Off) = on
+    
+    {-# INLINE invert #-}
+    
+instance Semigroup Bit where
+    (<>) = (+)
+    {-# INLINE (<>) #-}    
+
+instance Absolutist Bit where 
+    abs = id
+    {-# INLINE abs #-}
+
+instance Nullary Bit where
+    zero = off
+    {-# INLINE zero #-}
+
+instance Unital Bit where
+    one = on
+    {-# INLINE one #-}
+
+instance Monoid Bit where 
+    mempty = off
+    {-# INLINE mempty #-}
+
 instance Boolean Bit where
     bool (Bit On) = True
     bool (Bit Off) = False
@@ -71,10 +121,6 @@ instance ToBit Bool where
 instance Show Flag where
     show On = "1"
     show Off = "0"
-
-instance Invertible Bit where
-    invert (Bit On) = off
-    invert (Bit Off) = on
 
 instance Show Bit where
     show (Bit Off) = "0"
@@ -127,5 +173,3 @@ instance Bits Bit where
 
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
-  
-

@@ -15,7 +15,6 @@ import qualified Numeric.Interval as I
 import Alpha.Base
 import Alpha.Canonical hiding( (...))
 
-
 instance (Eq a) => Nullary (Interval a) where
     zero = I.empty
 

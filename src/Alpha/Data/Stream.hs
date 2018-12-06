@@ -21,7 +21,7 @@ import Alpha.Data.Numbers
 import Alpha.Data.Seq
 
 
-type SeqStream e = Sequential (Stream e) e
+type SeqStream e = Sequential (Stream e) 
 
 class SeqStream a => Streamer a where    
 
@@ -40,17 +40,22 @@ class SeqStream a => Streamer a where
     -- Constructs a stream via opaque function calls
     blackbox::(() -> a) -> Stream a
 
-    
-instance Sequential (Stream e) e where    
-    take i s = fromList $ S.take (fromIntegral i) s
-    split = S.partition
-    while pred src = undefined
-    tail = S.tail
-    skip n s = S.drop (fromIntegral n) s
+instance IsList (Stream a) where
+    type Item (Stream a) = a
+    toList = S.takeWhile (\_ -> True)
+    fromList [x] = S.cycle [x]
 
-instance Container (Stream e) e where
+instance Container (Stream e) where
     singleton x = S.cycle [x]
     contain [x] = S.cycle [x]
+    contents s = S.takeWhile (\_ -> True) s
+        
+instance Sequential (Stream e) where    
+    take i s = fromList $ S.take (fromIntegral i) s
+    split = S.partition
+    while p s = undefined
+    tail = S.tail
+    skip n s = S.drop (fromIntegral n) s
 
 instance Streamer (Stream s)  where
     intersperse = S.intersperse
@@ -58,6 +63,6 @@ instance Streamer (Stream s)  where
     cycle (x:xs) = S.cycle(x :| xs)
     blackbox f = S.iterate (\_ -> f ()) (f())        
 
-instance (Eq a) => Filterable (Stream a) a where
+instance (Eq a) => Filterable (Stream a) where
     filter = S.filter
     

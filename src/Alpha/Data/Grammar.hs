@@ -44,6 +44,10 @@ alphabet x = Alphabet (count x) x
 phrase::Atoms a -> Phrase a k
 phrase input = Phrase (count input) input
 
+-- Defines an alphabet consisting of the digits 0-9    
+digital :: Alphabet a String
+digital = alphabet $ atoms [D0, D1, D2, D3, D4, D5, D6, D7, D8, D9]
+
 instance Decomposable (Atoms a) (Atom a)  where
     decompose (Atoms x) = x
 
@@ -59,8 +63,4 @@ instance (Ord a, Concatenable a a) => Concatenable (Atom a) (Atom a) where
 
 instance Counted (Atoms a) where
     count (Atoms a) = (List.length a) |> fromIntegral
-
--- Defines an alphabet consisting of the digits 0-9    
-digital :: Alphabet a String
-digital = alphabet $ atoms [D0, D1, D2, D3, D4, D5, D6, D7, D8, D9]
     

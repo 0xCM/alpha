@@ -19,16 +19,15 @@ module Alpha.Canonical.Classes
     Chunkable(..),
     Collapsible(..),
     Convertible(..),
-    Counted(..),
     Decomposable(..),
     Dimensional(..),
     Formattable(..),
     Faceted(..),
-    FiniteMembership(..),
     FromText(..),
     Indexed(..),
     IndexedChoice(..),
     Jailbreak(..),
+    Membership(..),
     Length(..),
     Packable(..),
     Proxy(..),
@@ -36,7 +35,6 @@ module Alpha.Canonical.Classes
     Reifiable(..),
     Reversible(..),
     OrderedEnum(..),
-    Membership(..),
     Transposable(..),
     Tupled(..),
     ToString(..),
@@ -129,21 +127,11 @@ class Boolean a where
 class FromText a where
     -- | Materializes an 'a'-value from text
     fromText::Text -> a
-    
--- | Defines membership predicated on the ability to be counted by an existential machine
-class Counted a where
-    -- | Counts the number of items within the purview of the subject
-    count::(Integral n) => a -> n
 
--- | Characterizes types that present membersip in the form of a predicate    
-class Membership c e where
-    member::e -> c -> Bool
-
--- | Characterizes finitely-presented types, i.e. types for which there are fintely many inhabitants    
-class FiniteMembership a b where
-    -- Retrieves the members of 'a'
-    members::a -> [b]    
-
+class Membership s where
+    type Member s
+    members::s -> Set (Member s) 
+        
 -- | Characterizes a finite container or other type that contains elements
 -- that can be separated into groups of possibly different sizes
 class Chunkable a where
@@ -228,11 +216,22 @@ class Partitioner a where
 instance Partitioner a
 
 -- Characterizes a composition and pairing of heterogenous values
-class Zippable a b where
-    type Zipped a b
-
-    zip::Combiner a b (Zipped a b) -> Zipped a b
+class Zippable a b c where
     
+    -- The left source type
+    type LeftZip a b c
+
+    -- The right source type
+    type RightZip a b c
+
+    -- The result type
+    type Zipped a b c
+
+    -- The combining operator
+    type Zipper a b c
+    
+    zip::Zipper a b c -> LeftZip a b c -> RightZip a b c -> Zipped a b c
+        
 class Computable a where
     type Computation a
 
@@ -275,6 +274,4 @@ type a :&: b = Conjunct a b
 --of type A returns a value of type B.
 data Implies a b = Implies (a->b)
 
-type a :-> b = Implies a b        
-
-    
+type a :-> b = Implies a b

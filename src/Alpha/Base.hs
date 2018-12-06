@@ -15,7 +15,6 @@ module Alpha.Base
     IO,
     Storable,
     div,
-    flip,
     (++)
 
     
@@ -29,4 +28,4 @@ import Alpha.Control.Base as CB
 import Foreign.Storable(Storable)
 import Alpha.Text.Base as TB
 import System.IO(IO)
-import Prelude(flip, div)
+import Prelude(div)

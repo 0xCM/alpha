@@ -46,9 +46,6 @@ import Alpha.Canonical hiding(range)
 import Alpha.Data.Maybe
 import Alpha.Data.Bits
 
-type instance Strict EG.ByteString = EG.ByteString
-type instance Lazy EG.ByteString = LZ.ByteString
-
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
 bytes::(Indexed a Int) => Int -> Int -> a -> [Found a Int]

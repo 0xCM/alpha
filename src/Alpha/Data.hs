@@ -22,12 +22,12 @@ import Alpha.Data.Grammar as X
 import Alpha.Data.Table as X
 import Alpha.Data.Maybe as X
 import Alpha.Data.Message as X
---import Alpha.Data.Natural as X
 import Alpha.Data.Numbers as X
+import Alpha.Data.Natural as X
 import Alpha.Data.Poset as X
 import Alpha.Data.Product as X
 import Alpha.Data.Proxy as X
-import Alpha.Data.Records as X
+--import Alpha.Data.Records as X
 import Alpha.Data.Reflection as X
 import Alpha.Data.Related as X
 import Alpha.Data.Range as X

@@ -22,28 +22,34 @@ import Data.Set(Set)
 set::Ord a => [a] -> Set a
 set = S.fromList
 
+instance (Ord a) => Container (Set a) where
+    contain = S.fromList
+    contents = S.toList
+
 instance (Show a) => Formattable (Set a) where
     format x =  braces (T.pack (show x))
         where braces y = T.append Ascii.LBrace (T.append y Ascii.RBrace)
             
-instance (Ord a) => Container (Set a) a where
-    contain = S.fromList
-    
 instance Counted (Set a) where
     count = fromIntegral . S.size
 
-instance (Ord e) => Setwise (Set e) e where
+instance (Ord a) => Setwise (Set a) where
     union = S.union
     intersect = S.intersection
     delta  = S.difference 
 
-instance (Ord a) => Filterable (Set a) a where
+instance (Ord a) => Filterable (Set a) where
     filter = S.filter
+
     
 instance (Ord a) => Collapsible (Set (Set a)) where
     type Collapsed (Set (Set a)) = Set a
     collapse = S.unions . toList
 
-instance (Ord a) => Membership (Set a) a where
-    member = S.member
+-- instance (Ord a) => Membership (Set a) where
+--     type Member (Set a) = a
+--     member = S.member
     
+instance (Ord a) => FiniteContainer (Set a) where
+    
+instance (Ord a) => FiniteSet (Set a) where

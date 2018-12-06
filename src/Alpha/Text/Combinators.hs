@@ -2,14 +2,13 @@
 
 module Alpha.Text.Combinators
 (    
-    dot, dots, space, colon, semi, comma, 
+    dot, dots, space, spaces, colon, semi, comma, 
     fslash, bslash, larrow, rarrow,
     enclose, splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,embrace,
     prefixIfMissing, suffixIfMissing, zpadL, padL, toText,
     hexstring,showBasedInt,bitstring,bitstringN,
-    tuplestring,
-    textlen, Text.intersperse
+    tuplestring,textlen, intersperse, Text.replicate
     
 )
  where
@@ -84,19 +83,15 @@ leftOfFirst match subject
         segments -> segments |> List.head |> just
 
 -- | Fences content between a left and right bondary
-enclose::(Formattable l, Formattable c, Formattable r) => l -> c -> r -> Text
-enclose left content right = splat [format left, format content, format right]
+enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
+enclose left right content = splat [format left, format content, format right]
 
 -- | Fences content between a left and right brace
 embrace::(Formattable a) => a -> Text
-embrace content = enclose lbrace content rbrace
+embrace content = enclose lbrace rbrace content 
 
 paren::(Formattable a) => a -> Text
-paren content = enclose lparen content rparen
-
-
-instance Container Text Text where
-    contain x = Text.concat x
+paren content = enclose lparen rparen content 
 
 -- Determines whether a block of text contains a specified substring
 textContains::Text -> Text -> Bool
@@ -147,3 +142,9 @@ tuplestring::(Formattable a) => [a] -> Text
 tuplestring src =  Text.concat [lparen, content, rparen]
     where content = Text.concat (fmap format (List.intersperse comma flist))
           flist = fmap format src
+
+spaces::(Integral n) => n -> Text
+spaces n = replicate n space          
+
+intersperse::(Formattable a) => Char -> [a] -> Text
+intersperse c items = items |> fmap format |> Text.concat |> Text.intersperse c

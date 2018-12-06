@@ -28,7 +28,7 @@ module Alpha.Functor.Base
     Contravariant(..), phantom, ($<), (>$<),  (>$$<),
     Opposite, opposite,
 
-    Distributive(..), cotraverse,
+    DistributiveF, fdistribute, cotraverse,
     Extend(..),
     Monad(..),
     Functor(..), (<$>), ($>),
@@ -74,6 +74,7 @@ import Data.Bitraversable(Bitraversable(..))
 import Data.Biapplicative(Biapplicative((<<*>>), bipure, biliftA2, (*>>), (<<*)))
 import Data.Biapplicative(biliftA3,traverseBia, sequenceBia, traverseBiaWith)
 
+type DistributiveF f = Distributive f
 
 -- A synonym for the Alt functor
 type AltF = Alt
@@ -93,6 +94,9 @@ type Opposite = Op
 -- Constructs a product functor
 fprod::(Functor f, Functor g) => f a -> g a -> ProductF f g a
 fprod = Product.Pair
+
+fdistribute::(DistributiveF g, Functor f) => f (g a) -> g (f a)
+fdistribute = distribute
 
 -- Constructs a left functorial sum
 lsum::(Functor f, Functor g) => f a -> SumF f g a

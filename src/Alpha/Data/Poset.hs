@@ -15,10 +15,17 @@ newtype Poset a = Poset (Set a)
 poset::(Ord a, PartialOrder a) => [a] -> Poset a
 poset = Poset . S.fromList
 
-instance (Eq a, Ord a, PartialOrder a) => Container (Poset a) a where
-    contain x = poset x  
+instance (Ord a, PartialOrder a) =>  IsList (Poset a) where
+    type Item (Poset a) = a
+    toList (Poset s) = S.toList s    
+    fromList = poset
 
-instance (Eq a, Ord a, PartialOrder a) => Setwise (Poset a) a where
+instance (Eq a, Ord a, PartialOrder a) => Container (Poset a) where
+    contain x = poset x  
+    contents (Poset s) = S.toList s
+
+instance (Eq a, Ord a, PartialOrder a) => Setwise (Poset a) where
     union (Poset s1) (Poset s2) = Poset $ S.union s1 s2 
     intersect (Poset s1) (Poset s2) = Poset $ S.intersection s1 s2
     delta (Poset s1) (Poset s2) =  Poset $ S.difference s1 s2
+

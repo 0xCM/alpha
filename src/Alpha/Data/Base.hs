@@ -41,7 +41,7 @@ module Alpha.Data.Base
     Int,Int8,Int16,Int32,Int64,
     Word,Word8,Word16,Word32,Word64,
     Integer, Natural,
-    Num, 
+    Num, signum,
 
     Rational(..),
     Fractional(..),
@@ -53,7 +53,8 @@ module Alpha.Data.Base
     Bounded,minBound,maxBound,
     Enum,fromEnum,toEnum,
     Integral, Real, mod, fromIntegral,
-    type (+), type (-), type (*),
+    (%),
+    type (+), type (-), type (*), Mod, type (%), Div, type (/),
     KnownNat, SomeNat, Nat, SomeSymbol, KnownSymbol, natVal, natVal', symbolVal, symbolVal',
     Symbol, 
     Show(..), Read(..)
@@ -91,15 +92,15 @@ import Data.Typeable(Typeable(..),Proxy(..))
 import Data.Word(Word,Word8,Word16,Word32,Word64)
 import Data.Function(const)
 import Data.Semigroup(Arg,ArgMin,ArgMax)
-import Data.Ratio
 import Data.Set(Set)
 import Data.Coerce(Coercible(..))
 import Data.Type.Coercion
 import Data.ByteString(ByteString)
 import GHC.Float
 import GHC.Num
+import Data.Ratio(Rational(..))
 import GHC.Real(Fractional(..),RealFrac(..))
-import GHC.TypeLits(type (+), type (-), type (*), type (^))
+import GHC.TypeLits(type (+), type (-), type (*), type (^), Mod, Div)
 import GHC.TypeLits(KnownNat, SomeNat, Nat,natVal, natVal', symbolVal, symbolVal',SomeSymbol,KnownSymbol)
 import GHC.Generics(Generic(..),Generic1(..))
 import GHC.Types(Symbol)
@@ -120,3 +121,18 @@ foldby = foldMap
 -- | Produces an associative array for a list of key-value pairs
 associate::(Ord k) => [(k,v)] -> Map k v
 associate = Map.fromList
+
+-- Modulus infix operator synonm
+type (%) m n = Mod m n
+
+-- Infix operator synonym for 'mod' function
+(%)::(Integral n) => n -> n -> n
+(%) = mod
+
+infixl 7 %
+
+-- Division infix operator synonm
+type (/) m n = Div m n
+
+infixl 7 /
+

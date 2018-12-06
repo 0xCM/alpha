@@ -3,8 +3,6 @@
 -- Copyright   :  (c) 0xCM, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
--- Stability   :  experimental
--- Portability :  portable
 -----------------------------------------------------------------------------
 module Alpha.Data.Range 
 (
@@ -16,8 +14,14 @@ import Data.Ord
 import Alpha.Base
 import Alpha.Canonical
 
-instance (Ord a) => Spanned (R.Range a) a where
-    span min max = R.SpanRange min max    
+-- instance (Ord a) => Infimum (R.Range a) a where
+--     infimum (R.SpanRange x _) r = x
+
+-- instance (Ord a) => Supremum (R.Range a) a where
+--     supremum (IntegralSpan s) = List.last s
+
+-- instance (Ord a) => Spanned (R.Range a) a where
+--     span min max = R.SpanRange min max    
     
 -- instance Ord a => Container (R.Range a) a where
 --     singleton = R.SingletonRange

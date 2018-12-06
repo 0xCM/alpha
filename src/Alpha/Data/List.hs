@@ -14,9 +14,9 @@ module Alpha.Data.List
     cycle,
     tails,    
     inits,
-    reduce,
+    --reduce,
     head,
-    scan,
+    --scan,
     (List.++)
 ) where
 import qualified Data.List as List
@@ -41,7 +41,7 @@ splitAt = List.genericSplitAt
 -- | Applies an indexed function to a list
 mapi::(Integral i, Nullary i, Subtractive i) => ((i, a)->b) -> [a] -> [b]
 mapi f l = fmap f z where 
-        idx = [zero..upper]
+        idx = [0..upper]
         upper  = (length l) - 1
         z = List.zip idx l
 
@@ -56,24 +56,27 @@ inits = (List.filter (\x -> length x /= 0 )) . List.inits
 -- The reduction operator // takes a binary operator ⊕ on its left and a vector
 -- x of values on its right. The meaning of ⊕//x for x = [a,b,...z] is the value a⊕b⊕...⊕z
 -- See [Y1987TWOX]
-reduce::(Nullary a) => (a -> a -> a) -> [a] -> a
-reduce op (a:b:tail) =  op (op a b)  (reduce op tail)
-reduce op (a:[]) = a
-reduce op [] = zero
 
-(//)::(Nullary a) => (a -> a -> a) -> [a] -> a
-(//) = reduce
-infixl 5 //
+-- reduce::(AbelianGroup a) => (a -> a -> a) -> [a] -> a
+-- reduce op (a:b:tail) =  op (op a b)  (reduce op tail)
+-- reduce op (a:[]) = a
+-- reduce op [] = zero
+
+-- (//)::(AbelianGroup a) => (a -> a -> a) -> [a] -> a
+-- (//) = reduce
+-- infixl 5 //
 
 -- The scan operator \\ takes a binary operator ⊕ on its left and a vector
 -- x ov values on the right and is defined by ⊕\\x for x = [a,b,...z] is the value [a,a⊕b,...,a⊕b..⊕z]
 -- See [Y1987TWOX]
-scan::(Nullary a) => (a -> a -> a) -> [a] -> [a]
-scan op x = fmap (reduce op) (inits x)
 
-(\\)::(Nullary a) => (a -> a -> a) -> [a] -> [a]
-(\\) = scan
-infixl 6 \\
+-- scan::(AbelianGroup a) => (a -> a -> a) -> [a] -> [a]
+-- scan op x = fmap (reduce op) (inits x)
+
+-- (\\)::(AbelianGroup a) => (a -> a -> a) -> [a] -> [a]
+-- (\\) = scan
+-- infixl 6 \\
+
 
 instance Appendable [a] [a]where
     type Appended [a] [a] = [a]
@@ -87,14 +90,14 @@ instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]
     concat x y = x List.++ y
     
-instance (Eq a) => Sequential [a] a where
+instance (Eq a) => Sequential [a] where
     take i src = fromList $ List.take (fromIntegral i) src
     split = List.partition
     tail = List.tail
     while = List.takeWhile    
     skip n s = List.drop (fromIntegral n) s
 
-instance (Eq a) => Filterable [a] a where
+instance (Eq a) => Filterable [a] where
     filter = List.filter
 
 instance Length [a] where
@@ -104,12 +107,13 @@ instance Collapsible [[a]] where
     type Collapsed [[a]] = [a]
     collapse = List.concat    
 
-instance (Eq a) => Container [a] a where
+instance (Eq a) => Container [a] where
     contain x = x
+    contents = id
     
 instance Reversible [a] [a] where
     reverse = List.reverse
-
+    
 instance Nullary [a] where
     zero = []
 
@@ -120,8 +124,17 @@ instance Assembly [a] a where
     assemble = id
     disassemble = id
 
-instance (Eq a) => Setwise [a] a where
+instance (Eq a) => Setwise [a] where
     union = List.union
     intersect = List.intersect
     delta =  List.union
+    
+instance Zippable [a] [b] [c] where
+    type LeftZip [a] [b] [c] = [a]
+    type RightZip [a] [b] [c] = [b]
+    type Zipped [a] [b] [c] = [c]    
+    type Zipper [a] [b] [c] = a -> b -> c
+
+    zip = List.zipWith
+        
     

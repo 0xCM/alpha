@@ -442,8 +442,8 @@ type Nullary7 a1 a2 a3 a4 a5 a6 a7 = (Nullary6 a1 a2 a3 a4 a5 a6, Nullary a7)
 type Nullary8 a1 a2 a3 a4 a5 a6 a7 a8 = (Nullary7 a1 a2 a3 a4 a5 a6 a7, Nullary a8)
 type Nullary9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Nullary8 a1 a2 a3 a4 a5 a6 a7 a8, Nullary a9)
         
-instance Nullary2 a1 a2 => Nullary (Product2 a1 a2) where
-    zero = prod (zero,zero)
+instance (Nullary a1, Nullary a2) => Nullary (Product2 a1 a2) where
+    zero =  prod (zero,zero)
 instance Nullary3 a1 a2 a3 => Nullary (Product3 a1 a2 a3) where
     zero = prod (zero,zero,zero)    
 instance Nullary4 a1 a2 a3 a4 => Nullary (Product4 a1 a2 a3 a4) where
@@ -502,7 +502,7 @@ type Unital7 a1 a2 a3 a4 a5 a6 a7 = (Unital6 a1 a2 a3 a4 a5 a6, Unital a7)
 type Unital8 a1 a2 a3 a4 a5 a6 a7 a8 = (Unital7 a1 a2 a3 a4 a5 a6 a7, Unital a8)
 type Unital9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Unital8 a1 a2 a3 a4 a5 a6 a7 a8, Unital a9)
     
-instance Unital2 a1 a2 => Unital (Product2 a1 a2) where
+instance (Unital a1, Unital a2) => Unital (Product2 a1 a2) where
     one = prod (one,one)
 instance Unital3 a1 a2 a3 => Unital (Product3 a1 a2 a3) where
     one = prod (one,one,one)    
@@ -528,16 +528,24 @@ type Semigroup7 a1 a2 a3 a4 a5 a6 a7 = (Semigroup6 a1 a2 a3 a4 a5 a6, Additive a
 type Semigroup8 a1 a2 a3 a4 a5 a6 a7 a8 = (Semigroup7 a1 a2 a3 a4 a5 a6 a7, Additive a8, Semigroup a8)
 type Semigroup9 a1 a2 a3 a4 a5 a6 a7 a8 a9 = (Semigroup8 a1 a2 a3 a4 a5 a6 a7 a8, Additive a9, Semigroup a9)
 
-instance Semigroup2 a1 a2 => Semigroup (Product2 a1 a2) where (<>) x y = x + y
-instance Semigroup3 a1 a2 a3 => Semigroup (Product3 a1 a2 a3) where (<>) x y = x + y
-instance Semigroup4 a1 a2 a3 a4 => Semigroup (Product4 a1 a2 a3 a4) where (<>) x y = x + y
-instance Semigroup5 a1 a2 a3 a4 a5 => Semigroup (Product5 a1 a2 a3 a4 a5) where (<>) x y = x + y
-instance Semigroup6 a1 a2 a3 a4 a5 a6 => Semigroup (Product6 a1 a2 a3 a4 a5 a6) where (<>) x y = x + y
-instance Semigroup7 a1 a2 a3 a4 a5 a6 a7 => Semigroup (Product7 a1 a2 a3 a4 a5 a6 a7) where (<>) x y = x + y
-instance Semigroup8 a1 a2 a3 a4 a5 a6 a7 a8 => Semigroup (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where (<>) x y = x + y
-instance Semigroup9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Semigroup (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where (<>) x y = x + y
+instance Semigroup2 a1 a2 => Semigroup (Product2 a1 a2) where 
+    (<>) x y = x + y
+instance Semigroup3 a1 a2 a3 => Semigroup (Product3 a1 a2 a3) where 
+    (<>) x y = x + y
+instance Semigroup4 a1 a2 a3 a4 => Semigroup (Product4 a1 a2 a3 a4) where 
+    (<>) x y = x + y
+instance Semigroup5 a1 a2 a3 a4 a5 => Semigroup (Product5 a1 a2 a3 a4 a5) where 
+    (<>) x y = x + y
+instance Semigroup6 a1 a2 a3 a4 a5 a6 => Semigroup (Product6 a1 a2 a3 a4 a5 a6) where 
+    (<>) x y = x + y
+instance Semigroup7 a1 a2 a3 a4 a5 a6 a7 => Semigroup (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+    (<>) x y = x + y
+instance Semigroup8 a1 a2 a3 a4 a5 a6 a7 a8 => Semigroup (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+    (<>) x y = x + y
+instance Semigroup9 a1 a2 a3 a4 a5 a6 a7 a8 a9 => Semigroup (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+    (<>) x y = x + y
 
-type Monoid2 a1 a2 = (Monoid a1, Monoid a2, Nullary2 a1 a2, Additive2 a1 a2)
+type Monoid2 a1 a2 = (Monoid a1, Monoid a2, Nullary a1, Nullary a2, Additive2 a1 a2)
 type Monoid3 a1 a2 a3 = (Monoid2 a1 a2, Nullary a3, Monoid a3, Additive a3)
 type Monoid4 a1 a2 a3 a4 = (Monoid3 a1 a2 a3, Nullary a4, Monoid a4, Additive a4)
 type Monoid5 a1 a2 a3 a4 a5 = (Monoid4 a1 a2 a3 a4, Nullary a5, Monoid a5, Additive a5)

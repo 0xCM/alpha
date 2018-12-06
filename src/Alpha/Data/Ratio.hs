@@ -1,6 +1,6 @@
 module Alpha.Data.Ratio
 (
-    Ratio,numerator,denominator, ratio, (%)
+    Ratio,numerator,denominator, ratio
 )
 where
 
@@ -20,8 +20,3 @@ instance (Show n) => Show (Ratio n) where
 ratio::(Integral n) => n -> n -> Ratio n
 ratio m n =  Ratio $  (DR.%) m n
 
--- Infix operator synonym for 'mod' function
-(%)::(Integral n) => n -> n -> n
-(%) = mod
-
-infixl 5 %

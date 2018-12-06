@@ -116,6 +116,6 @@ pattern Dot = "."
 pattern Comma = ","
 pattern Semi = ";"
 pattern Colon = ":"
-
+pattern EOL = "\n"
 
 
