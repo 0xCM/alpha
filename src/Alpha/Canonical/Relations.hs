@@ -2,31 +2,45 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Relations
 (    
+    Element(..),
     Relation(..),
     Equivalence(..),
     PartialOrd(..),
     PartialOrder(..),
-    TotalOrder(..),
-    Pairing(..),
-    Infimum(..),
-    Supremum(..),
-    Spanned(..), 
-    IntegralSpan(..),
-    Degenerate(..),    
+    Setoid(..),    
     JoinSemiLattice(..), 
     MeetSemiLattice(..), 
     Lattice(..),
-
+    Membership(..),
+    Counted(..),
+    Tupled(..), 
+    Tupelizer(..),
+    Reifiable(..),
+    Cloneable(..),
+    Chunkable(..),
+    Convertible(..),
+    Jailbreak(..),
+    minimal, maximal,
     (<=), (<), (>=), (>),
-    min, max, swap
+    min, max, 
 ) where
 import Algebra.PartialOrd 
 import Alpha.Base
 import Alpha.Canonical.Operators
+import Alpha.Canonical.Element
 import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
 import Algebra.Lattice(Lattice(..))   
+import Data.List.NonEmpty hiding(span)
 import qualified Data.List as List
 import qualified Prelude as P
+
+-- Represents a family of types that can be represented as tuples
+type family Tupled a
+
+-- Characterizes types from which tuples can be constructed    
+class Tupelizer a where
+    -- | Forms a tuple from the source value
+    tuple::a -> Tupled a
 
 -- Characterizes a relation on a set s    
 class Relation a where
@@ -37,8 +51,14 @@ class Relation a where
     -- Infix synonym for 'relator'
     (~~)::BinaryPredicate a
     (~~) = relator
+    infixl 6 ~~
 
-infixl 6 ~~
+-- / Characterizes a setoid where the required equivalence relation is 
+-- interpreteted as equality
+-- See https://en.wikipedia.org/wiki/Setoid
+class (Eq a) => Setoid a where
+    equals::BinaryPredicate a
+    equals x y = x == y
 
 -- Characterizes preorders that are symmetric, and hence 
 -- define equivalence relations: a ~= b => b ~= a
@@ -51,69 +71,55 @@ class (PartialOrd a, Relation a) =>  PartialOrder a where
 
     (~<=)::BinaryPredicate a
     (~<=) = leq
+    infix 4 ~<=
 
-infix 4 ~<=
 
-type TotalOrder a = Ord a
+class Membership s where
 
--- / Characterizes types for which a greatest lower bound can
--- be identified, with bounded intervals being the canonical
--- example
--- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
-class Infimum a b where
-    -- / The greatest lower bound
-    infimum::a -> b
+    members::s -> Set (Element s) 
+        
+-- Captures the assertion that values of a type a can be categorized by
+-- values of an enumerable type c
+class (Enum c) => Classifiable a c where
+    classify::(a -> c) -> [a] -> [(c,a)]
     
--- / Characterizes types for which a least upper bound can
--- be identified, with bounded intervals being the canonical
--- example
--- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
-class Supremum a b where
-    -- / The least upper bound
-    supremum::a -> b
-
--- | Characterizes a type that contains a relatively contiguous
--- set of values bound by least and greatest values
-class (Ord b, Supremum a b, Infimum a b) => Spanned a b where
     
-    -- | Creates a b-value bound by a min and max value
-    span::b -> b -> a
+-- | Defines membership predicated on the ability to be counted by an existential machine
+class Counted a where
+    -- | Counts the number of items within the purview of the subject
+    count::(Integral n) => a -> n
+
+
+-- Characterizes a family of singleton types 'a' for which the type's single inhabitant
+-- is reifiable
+class Reifiable (a::k) r where
+    reify::r 
+        
+-- Characterizes a value 'a' than can be duplicated according to a specification 'b'  
+-- yielding a structure 'Cloned a b' that encloses the duplicates
+class Cloneable a b where
+    type Cloned a b
     
-    -- | The span operator, an infix synonym for 'span'
-    (...)::b -> b -> a
-    (...) = span
+    clone::a -> b -> Cloned a b
 
-infixl 5 ...
-
-newtype IntegralSpan a = IntegralSpan [a]
-
--- Characterizes types that are inhabited by 'degenerate' values
--- Examples include empty lists, mathematical intervals 
--- that represent a single value, etc. What precicely constitutes a 
--- a degenerate value for a given type is implementation-defined
--- See https://en.wikipedia.org/wiki/Degeneracy_(mathematics)
-class Degenerate a where
-    -- Test for degeneracy
-    degenerate::a -> Bool     
-
--- | Represents an ordered relationshp between two elements
-class Pairing a b where
-    -- Specifies the type of a pair
-    type Paired a b    
-
-    -- | Pairs two elements
-    pair::a -> b -> Paired a b
-
-    --- | Extracts the first of the paired elements
-    first::Paired a b -> a
+-- | Characterizes a finite container or other type that contains elements
+-- that can be separated into groups of possibly different sizes
+class Chunkable a where
+    chunk::Int -> a -> [a]
     
-    --- | Extracts the second of the paired elements
-    second::Paired a b -> b
+-- / Breaking the chains..
+class Jailbreak m a where
+    escape::m a -> a
+            
+-- | Codifies a (directed) conversion relationship between an input value and output value
+class Convertible a b where
+    -- | Requires that an 'a' value be converted to a 'b' value
+    convert::a -> b    
 
--- | The canonical/obligatory swap function    
-swap::(Pairing a b, Pairing b a) => Paired a b -> Paired b a
-swap x = pair (second x) (first x)
-
+            
+instance Jailbreak Maybe a where
+    escape x = fromJust x
+        
 (<=)::(Ord a) => BinaryPredicate a
 (<=) a b= a P.<= b
 infix 4 <=
@@ -129,7 +135,6 @@ infix 4 >
 (>=)::(Ord a) => BinaryPredicate a
 (>=) a b = a P.>= b
 
-
 between::(Ord a) => TernaryPredicate a
 between x a b = x >= a || x <= b
 infix 4 >=    
@@ -137,20 +142,12 @@ infix 4 >=
 min::(Ord a) => a -> a -> a
 min x y = ifelse (x <= y) x y
 
+minimal::(Ord a, Semigroup a) => [a] -> Min a
+minimal (x:xs) = Min <$> (x :| xs) |> sconcat
+
 max::(Ord a) => a -> a -> a
 max x y = ifelse (x >= y) x y
-    
-instance (Ord a, Integral a) => Infimum (IntegralSpan a) a where
-    infimum (IntegralSpan s) = List.head s
 
-instance (Ord a, Integral a) => Supremum (IntegralSpan a) a where
-    supremum (IntegralSpan s) = List.last s
-        
-instance (Ord a, Integral a) => Spanned (IntegralSpan a) a where
-    span min max = IntegralSpan [min .. max]
-    
-instance Pairing a b where
-    type Paired a b = (a,b)    
-    first (a,b) = a
-    second (a,b) = b
-    pair a b = (a,b)
+maximal::(Ord a, Semigroup a) => [a] -> Max a
+maximal (x:xs) = Max <$> (x :| xs) |> sconcat
+

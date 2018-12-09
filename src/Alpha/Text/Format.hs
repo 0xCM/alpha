@@ -1,20 +1,14 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE AllowAmbiguousTypes #-}
---{-# LANGUAGE UndecidableInstances #-}
-
 module Alpha.Text.Format  where
-import qualified Data.List as List
-import qualified Data.Text as T
 import Alpha.Base
 import Alpha.Canonical
+import qualified Alpha.Text.Asci as Asci
+
+import qualified Data.List as List
+import qualified Data.Text as T
 
 -- Lists of showable things are formattable        
 instance (Formattable a) => Formattable [a] where
-    format x = x |> fmap format |> T.concat
+    format x = x |> (<$>) format |> T.concat
 
 instance Formattable String where
     format = T.pack 
@@ -46,3 +40,7 @@ instance Formattable Double where
 instance Formattable Float where
     format = T.pack . show
             
+instance (Show a) => Formattable (Set a) where
+    format x =  braces (T.pack (show x))
+        where braces y = T.append Asci.LBrace (T.append y Asci.RBrace)
+                    

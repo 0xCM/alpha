@@ -5,6 +5,7 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 module Alpha.Text.Asci where
+import Alpha.Base
 
 pattern D0 = "0"
 pattern D1 = "1"
@@ -16,8 +17,9 @@ pattern D6 = "6"
 pattern D7 = "7"
 pattern D8 = "8"
 pattern D9 = "9"
-pattern Digits <- [D0, D1, D2, D3, D4, D5, D6, D7, D8, D9]
 
+digits::[Text]
+digits = [D0, D1, D2, D3, D4, D5, D6, D7, D8, D9]
 
 pattern Au = "A"
 pattern Bu = "B"
@@ -46,9 +48,10 @@ pattern Xu = "X"
 pattern Yu = "Y"
 pattern Zu = "Z"
 
-pattern AuZu <- [Au, Bu, Cu, Du, Eu, Fu, Gu, Hu, Iu, 
-                 Ju, Ku, Lu, Mu, Nu, Ou, Pu, Qu, Ru, 
-                 Su, Tu, Uu, Vu, Wu, Xu, Yu, Zu]
+upper::[Text]
+upper = [Au, Bu, Cu, Du, Eu, Fu, Gu, Hu, Iu, 
+        Ju, Ku, Lu, Mu, Nu, Ou, Pu, Qu, Ru, 
+        Su, Tu, Uu, Vu, Wu, Xu, Yu, Zu]
 
 
 pattern Al = "a"
@@ -77,28 +80,38 @@ pattern Wl = "w"
 pattern Xl = "x"
 pattern Yl = "y"
 pattern Zl = "z"
-               
-pattern AlZl <- [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
-                Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
-                Sl, Tl, ll, Vl, Wl, Xl, Yl, Zl]
+
+lower::[Text]
+lower = [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
+        Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
+        Sl, Tl, Ul, Vl, Wl, Xl, Yl, Zl]
 
 
 pattern LBrace = "{"
 pattern RBrace = "}"
-pattern Braces <- [LBrace, RBrace]
+
+braces::(Text,Text)
+braces = (LBrace, RBrace)
 
 pattern LBrack = "["
 pattern RBrack = "]"
-pattern Brackets <- [LBrack,RBrack]
 
-pattern FSlash = "/"
+brackets::(Text,Text)
+brackets = (LBrack,RBrack)
+
 pattern BSlash = "\\"
-pattern Slashes <- [FSlash,BSlash]
+pattern FSlash = "/"
+
+slashes::(Text,Text)
+slashes = (BSlash,FSlash)
 
 pattern LParen = "("
 pattern RParen = ")"
-pattern Parens <- [LParen,RParen]
 
+parens::(Text,Text)
+parens = (LParen,RParen)
+
+pattern Space = " "
 pattern Tick = "`"
 pattern Tilde = "~"
 pattern Bang = "!"
@@ -109,6 +122,7 @@ pattern Caret = "^"
 pattern Amp = "&"
 pattern Ast = "*"
 pattern Dash = "-"
+pattern Underscore = "_"
 pattern Plus = "+"
 pattern Und = "_"
 pattern Eq = "="
@@ -117,5 +131,8 @@ pattern Comma = ","
 pattern Semi = ";"
 pattern Colon = ":"
 pattern EOL = "\n"
+pattern Less = "<"
+pattern Greater = ">"
+pattern Equal = "="
 
 

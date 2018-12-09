@@ -6,10 +6,9 @@
 -----------------------------------------------------------------------------
 module Alpha.System
 (
-    module Files,
-    module IO
+    module X
 )
 where
 
-import Alpha.System.Files as Files
-import Alpha.System.IO as IO
+import Alpha.System.Files as X
+import Alpha.System.IO as X

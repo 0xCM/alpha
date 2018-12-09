@@ -28,4 +28,3 @@ instance (Eq a, Ord a, PartialOrder a) => Setwise (Poset a) where
     union (Poset s1) (Poset s2) = Poset $ S.union s1 s2 
     intersect (Poset s1) (Poset s2) = Poset $ S.intersection s1 s2
     delta (Poset s1) (Poset s2) =  Poset $ S.difference s1 s2
-

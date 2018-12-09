@@ -98,54 +98,54 @@ newtype RelativeFolderPath = RelativeFolderPath Text
 
 instance PathComponent RelativeFolderPath where
     path (RelativeFolderPath x) = x
-    
-instance Concatenable DriveLetter FolderName where
-    type Concatenated DriveLetter FolderName = FolderPath
-    concat x y = splat [path x, fslash, path y] |> folder
 
-instance Concatenable DriveLetter RelativeFolderPath where
-    type Concatenated DriveLetter RelativeFolderPath = FolderPath
-    concat x y = splat [path x, fslash, path y] |> folder
+type instance Concatenated DriveLetter FolderName = FolderPath
+type instance Concatenated DriveLetter RelativeFolderPath = FolderPath
+type instance Concatenated DriveLetter FileName = FilePath 
+type instance Concatenated DriveLetter RelativeFilePath = FilePath 
+type instance Concatenated FolderPath FolderName = FolderPath
+type instance Concatenated FolderPath FileName = FilePath
+type instance Concatenated FolderPath RelativeFolderPath = FolderPath
+type instance Concatenated FolderPath RelativeFilePath = FilePath
+type instance Concatenated FileName FileExtension = FilePath
+type instance Concatenated FilePath FileExtension = FilePath
+type instance Concatenated FileExtension FileExtension = FileExtension
 
-instance Concatenable DriveLetter FileName where
-    type Concatenated DriveLetter FileName = FilePath 
-    concat x y = splat [path x, fslash, path y] |> file
+instance Appendable DriveLetter FolderName where
+    append x y = splat [path x, fslash, path y] |> folder
 
-instance Concatenable DriveLetter RelativeFilePath where
-    type Concatenated DriveLetter RelativeFilePath = FilePath 
-    concat x y = splat [path x, fslash, path y] |> file
+instance Appendable DriveLetter RelativeFolderPath where
+    append x y = splat [path x, fslash, path y] |> folder
 
-instance Concatenable FolderPath FolderName where
-    type Concatenated FolderPath FolderName = FolderPath
-    concat x y = splat [path x, fslash, path y] |> folder
+instance Appendable DriveLetter FileName where
+    append x y = splat [path x, fslash, path y] |> file
+
+instance Appendable DriveLetter RelativeFilePath where
+    append x y = splat [path x, fslash, path y] |> file
+
+instance Appendable FolderPath FolderName where
+    append x y = splat [path x, fslash, path y] |> folder
         
-instance Concatenable FolderPath FileName where
-    type Concatenated FolderPath FileName = FilePath
-    concat x y = splat [path x, fslash, path y] |> file
+instance Appendable FolderPath FileName where
+    append x y = splat [path x, fslash, path y] |> file
 
-instance Concatenable FolderPath RelativeFolderPath where
-    type Concatenated FolderPath RelativeFolderPath = FolderPath
-    concat x y = splat [path x, fslash, path y] |> folder
+instance Appendable FolderPath RelativeFolderPath where
+    append x y = splat [path x, fslash, path y] |> folder
 
-instance Concatenable FolderPath RelativeFilePath where
-    type Concatenated FolderPath RelativeFilePath = FilePath
-    concat x y = splat [path x, fslash, path y] |> file
+instance Appendable FolderPath RelativeFilePath where
+    append x y = splat [path x, fslash, path y] |> file
             
-instance Concatenable FileName FileExtension where
-    type Concatenated FileName FileExtension = FilePath
-    concat x y = splat [path x, dot, path y] |> file
+instance Appendable FileName FileExtension where
+    append x y = splat [path x, dot, path y] |> file
 
 -- / path + ext = path.ext
-instance Concatenable FilePath FileExtension where
-    type Concatenated FilePath FileExtension = FilePath
-    concat x y = splat [path x, dot, path y] |> file
+instance Appendable FilePath FileExtension where
+    append x y = splat [path x, dot, path y] |> file
     
 -- | ext1 + ext2 = ext1.ext2    
-instance Concatenable FileExtension FileExtension where
-    type Concatenated FileExtension FileExtension = FileExtension
-    concat x y = splat [path x, dot, path y] |> extension
+instance Appendable FileExtension FileExtension where
+    append x y = splat [path x, dot, path y] |> extension
 
---type Extensionable = (# FileName | FilePath | RelativeFilePath #)    
 
 -- | Constructs a 'DriveLetter'    
 drive::Char -> DriveLetter

@@ -8,7 +8,7 @@ module Alpha.Control.Base
 (
     Monad(..),
     NFData(..), force, ($!!), deepseq,
-    
+    Category,
     Comonad(..)
     , liftW     -- :: Comonad w => (a -> b) -> w a -> w b
     , wfix      -- :: Comonad w => w (w a -> a) -> a
@@ -31,7 +31,7 @@ module Alpha.Control.Base
     , ($>)      -- :: Functor f => f a -> b -> f b
 )
 where
-
+import Control.Category
 import Control.Monad
 import Control.Comonad
 import Control.DeepSeq

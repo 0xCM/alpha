@@ -11,18 +11,14 @@
 
 module Alpha.Data.Vector
 (
-    Vector(..), 
-    Vectored(..), 
-    Covectored(..),
-    unsized, 
-    vector    
+     
 )
 where
 import qualified Data.Vector as V
 import Alpha.Base
 import Alpha.Data.Product
 import Alpha.Canonical
-import Alpha.Data.Numbers
+import Alpha.Data.Conversion
 import qualified Data.List as List
 
 -- | Represents a sized vector
@@ -40,6 +36,8 @@ class Vectored a b where
 class Covectored a b where
     -- Creates a row vector from an a-value
     row::a -> Vector n b
+
+type instance Element (Vector n a) = a    
 
 -- | Removes the size adornment from a sized vector
 unsized::Vector n a -> V.Vector a
@@ -59,11 +57,20 @@ vector src = Col(V.fromList src)
 covector::[a] -> Vector n a
 covector src = Row(V.fromList src)
 
+instance IsList (Vector n a) where
+    type Item (Vector n a) = a
+    toList (Col v) = V.toList v
+    toList (Row v) = V.toList v
+
+    fromList = vector
+
+instance Container (Vector n a) where
+    contain = vector
+
 instance Length (Vector n a) where
     length = convert . V.length . unsized
 
 instance Indexed (Vector n a) Int where
-    type Found (Vector n a) Int = a
     lookup (Col a) i = a V.! i
     lookup(Row a) i = a V.! i
 

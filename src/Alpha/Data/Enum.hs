@@ -15,17 +15,18 @@ module Alpha.Data.Enum
 )
 where
 import GHC.Enum
-import Data.List(head, length, zip)
+import qualified Data.List as List
+import Alpha.Base
 import Alpha.Canonical
-import Alpha.Data.List
+
 
 -- | Retrieves the first value of an enum
 firstValue::(Enum e) => e
 firstValue = toEnum 0
 
 -- | Retrieves the last value of a bounded enum
-lastValue::(Bounded e, Enum e) => e
-lastValue = head (reverse enumValues) where
+lastValue::(Bounded e, Enum e, Eq e) => e
+lastValue = head (reverse enumValues)
 
 -- | Retrieves all values of a bounded enum
 enumValues::(Bounded e, Enum e) => [e]

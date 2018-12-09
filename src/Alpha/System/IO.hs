@@ -11,29 +11,39 @@ module Alpha.System.IO
     isFile,files,
     isFolder,folders,dir,
     print, out, out',
-    shredIO,IO
+    shredIO,IO,
+    HexLine(..),
+    readHexFile,
+    hexline,
+    RefCell(..),
+    Cellular(..)
 )
 where
-
 import System.IO(print, putStr)
 import System.IO.Unsafe
 import System.Console.ANSI
 import Control.Monad.Primitive
+import Data.IORef
+
 import qualified Prelude as P
 import qualified Data.ByteString as ByteString
-import qualified Data.List as List
 import qualified System.Directory as D
 import qualified Data.Text.IO as T
 
-import qualified Alpha.Data.List as List
+
 import Alpha.Base
 import Alpha.Text.Combinators
-import Alpha.Data.Numbers
 import Alpha.Canonical
 import Alpha.System.Files
 import Alpha.Data.Message
 import Alpha.Text as Text
 
+newtype HexLine = HexLine (Int, Text)
+    deriving (Eq,Ord)
+
+-- | Just say "no" to the monolithic imprisonment of IO
+shredIO :: IO a -> a
+shredIO = unsafeDupablePerformIO 
 
 -- | Renders a showable to standard out 
 out'::Show s => s -> IO()
@@ -73,13 +83,13 @@ dir (FolderPath x)
 files::FolderPath -> [FilePath]    
 files x = x |> dir 
             |> fmap file
-            |> List.filter isFile 
+            |> filter isFile 
             
 -- | Returns the subfolders that are contained in a specified parent folder
 folders::FolderPath -> [FolderPath]    
 folders x = x |> dir
               |> fmap folder
-              |> List.filter isFolder
+              |> filter isFolder
                                         
 
 log::Message a -> IO()
@@ -95,9 +105,36 @@ log (Message severity text _) = do
                     Fatal -> (Vivid, Red)        
 
 
+instance Show HexLine where
+    show (HexLine (i,t)) = show t
+                
+-- | Create a numbered line of hextext
+hexline :: Int -> Text -> HexLine
+hexline i t = HexLine (i,t)
+
+-- | Reads a hextext file
+readHexFile :: FilePath -> [HexLine]
+readHexFile path 
+    =   path  |> readLines |> mapi (\(i,t) -> hexline (i+1) t)                    
+
 instance Jailbreak IO a where
     escape = shredIO
 
 instance (PrimBase m) => Jailbreak m a where
-    escape x = x |> unsafeInlinePrim
-                    
+    escape x = x |> unsafeInlinePrim                    
+
+
+newtype RefCell a = RefCell (IORef a)
+
+class Cellular a where
+    createcell::a -> RefCell a
+    createcell = RefCell . shredIO . newIORef
+
+    readcell::RefCell a -> a
+    readcell (RefCell x) = shredIO $ readIORef x
+
+    writecell::RefCell a -> a -> ()
+    writecell (RefCell x) y = shredIO $ writeIORef x y
+
+    updatecell::RefCell a -> (a -> (a,b)) -> b
+    updatecell (RefCell x) f = shredIO $ atomicModifyIORef' x f        

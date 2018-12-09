@@ -12,17 +12,33 @@ import Alpha.Base
 import Alpha.Canonical
 import Alpha.Text.Asci
 
+
+repeat::Integral i => i -> Text -> Text
+repeat i t = replicate (fromIntegral i) t
+
 -- | Produces "."
 dot::Text
 dot = "."
 
--- Produces "..."
-dots::Text
-dots = "..."
+-- | Produces text containing a specified number of "." characters
+dots::Integral i => i -> Text
+dots i = repeat i dot
+
+-- | Produces "-"
+dash::Text
+dash = "-"
+
+-- | Produces text containing a specified number of "-" characters
+dashes::Integral i => i -> Text
+dashes i = repeat i dash
 
 -- | Produces " "
 space::Text
 space = " "
+
+-- | Produces text containing a specified number of spaces
+spaces::Integral i => i -> Text
+spaces i = repeat i space
 
 -- | Produces ":"
 colon::Text

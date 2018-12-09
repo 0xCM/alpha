@@ -4,7 +4,7 @@
 module Alpha.Data.Product
 (
     Product, UniProduct, 
-    Productive(..), Factored(..),
+    Productive(..), --Factorable(..),
     
     Product1(..), Product2(..), Product3(..), Product4(..), Product5(..),
     Product6(..), Product7(..), Product8(..), Product9(..),
@@ -18,7 +18,7 @@ module Alpha.Data.Product
     
 ) where
 import Alpha.Base hiding(zero)
-import Alpha.Canonical
+import Alpha.Canonical hiding(Factorable)
 import Alpha.Text.Combinators
 import qualified Control.Category as C
 import qualified Data.Vector as V
@@ -173,18 +173,6 @@ type a !*! b = Product2 a b
 (!*!) = Product2
 infixl 5 !*!
 
-type family a !~! b  where
-    (Product2 a1 a2) !~! (Product2 a3 a4) = Product4 a1 a2 a3 a4
-    (Product2 a1 a2) !~! (Product3 a3 a4 a5) = Product5 a1 a2 a3 a4 a5
-    (Product2 a1 a2) !~! (Product4 a3 a4 a5 a6) = Product6 a1 a2 a3 a4 a5 a6
-    (Product2 a1 a2) !~! (Product5 a3 a4 a5 a6 a7) = Product7 a1 a2 a3 a4 a5 a6 a7
-    (Product2 a1 a2) !~! (Product6 a3 a4 a5 a6 a7 a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8
-    (Product2 a1 a2) !~! (Product7 a3 a4 a5 a6 a7 a8 a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
-    (Product3 a1 a2 a3) !~! (Product2 a4 a5) = Product5 a1 a2 a3 a4 a5
-    (Product3 a1 a2 a3) !~! (Product3 a4 a5 a6) = Product6 a1 a2 a3 a4 a5 a6
-    (Product3 a1 a2 a3) !~! (Product4 a4 a5 a6 a7) = Product7 a1 a2 a3 a4 a5 a6 a7
-    (Product3 a1 a2 a3) !~! (Product5 a4 a5 a6 a7 a8) = Product8 a1 a2 a3 a4 a5 a6 a7 a8
-    (Product3 a1 a2 a3) !~! (Product6 a4 a5 a6 a7 a8 a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
 
 -- Defines a family of uniform products, i.e., products where factors are homogenous     
 type family UniProduct (n::Nat) a = r | r -> n a where
@@ -221,122 +209,132 @@ instance Productive (a1,a2,a3,a4,a5,a6,a7,a8) where
 instance Productive (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
     prod (a1,a2,a3,a4,a5,a6,a7,a8,a9) = Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9
     
-instance Tupled 2 (Product2 a1 a2) (a1,a2) where
+type instance Tupled (Product2 a1 a2) = (a1,a2)    
+type instance Tupled (Product3 a1 a2 a3) = (a1,a2,a3)    
+type instance Tupled (Product4 a1 a2 a3 a4) = (a1,a2,a3,a4)    
+type instance Tupled (Product5 a1 a2 a3 a4 a5) = (a1,a2,a3,a4,a5)
+type instance Tupled (Product6 a1 a2 a3 a4 a5 a6) = (a1,a2,a3,a4,a5,a6)
+type instance Tupled (Product7 a1 a2 a3 a4 a5 a6 a7) = (a1,a2,a3,a4,a5,a6,a7)
+type instance Tupled (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = (a1,a2,a3,a4,a5,a6,a7,a8)
+type instance Tupled (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = (a1,a2,a3,a4,a5,a6,a7,a8,a9)
+
+
+instance Tupelizer (Product2 a1 a2) where
     tuple (Product2 a1 a2) = (a1,a2)     
-instance Tupled 3 (Product3 a1 a2 a3) (a1,a2,a3) where
+instance Tupelizer (Product3 a1 a2 a3) where
     tuple (Product3 a1 a2 a3) = (a1,a2, a3) 
-instance Tupled 4 (Product4 a1 a2 a3 a4) (a1,a2,a3,a4) where
+instance Tupelizer (Product4 a1 a2 a3 a4) where
     tuple (Product4 a1 a2 a3 a4) = (a1,a2,a3,a4) 
-instance Tupled 5 (Product5 a1 a2 a3 a4 a5) (a1,a2,a3,a4,a5) where
+instance Tupelizer (Product5 a1 a2 a3 a4 a5) where
     tuple (Product5 a1 a2 a3 a4 a5) = (a1,a2,a3,a4,a5)         
-instance Tupled 6 (Product6 a1 a2 a3 a4 a5 a6) (a1,a2,a3,a4,a5,a6) where
+instance Tupelizer (Product6 a1 a2 a3 a4 a5 a6) where
     tuple (Product6 a1 a2 a3 a4 a5 a6) = (a1,a2,a3,a4,a5,a6)         
-instance Tupled 7 (Product7 a1 a2 a3 a4 a5 a6 a7) (a1,a2,a3,a4,a5,a6,a7) where
+instance Tupelizer (Product7 a1 a2 a3 a4 a5 a6 a7) where
     tuple (Product7 a1 a2 a3 a4 a5 a6 a7) = (a1,a2,a3,a4,a5,a6,a7)
-instance Tupled 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) (a1,a2,a3,a4,a5,a6,a7,a8) where
+instance Tupelizer (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where
     tuple (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = (a1,a2,a3,a4,a5,a6,a7,a8)
-instance Tupled 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) (a1,a2,a3,a4,a5,a6,a7,a8,a9) where
+instance Tupelizer (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9)  where
     tuple (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = (a1,a2,a3,a4,a5,a6,a7,a8,a9)            
 
 -- Characterizes a componentized type a with n components indexed by j
-class Factored (j::Nat) a where    
+class Factorable (j::Nat) a where    
     -- | Extracts the j-th component from a product
     project::a -> Factor j a
 
-instance Factored 1 (Product2 a1 a2) where 
+instance Factorable 1 (Product2 a1 a2) where 
     project (Product2 a1 a2) = a1    
-instance Factored 2 (Product2 a1 a2) where 
+instance Factorable 2 (Product2 a1 a2) where 
     project (Product2 a1 a2) = a2
     
-instance Factored 1 (Product3 a1 a2 a3) where 
+instance Factorable 1 (Product3 a1 a2 a3) where 
     project (Product3 a1 a2 a3) = a1
-instance Factored 2 (Product3 a1 a2 a3) where 
+instance Factorable 2 (Product3 a1 a2 a3) where 
     project (Product3 a1 a2 a3) = a2
-instance Factored 3 (Product3 a1 a2 a3) where 
+instance Factorable 3 (Product3 a1 a2 a3) where 
     project (Product3 a1 a2 a3) = a3
 
-instance Factored 1 (Product4 a1 a2 a3 a4) where 
+instance Factorable 1 (Product4 a1 a2 a3 a4) where 
     project (Product4 a1 a2 a3 a4) = a1
-instance Factored 2 (Product4 a1 a2 a3 a4) where 
+instance Factorable 2 (Product4 a1 a2 a3 a4) where 
     project (Product4 a1 a2 a3 a4) = a2
-instance Factored 3 (Product4 a1 a2 a3 a4) where 
+instance Factorable 3 (Product4 a1 a2 a3 a4) where 
     project (Product4 a1 a2 a3 a4) = a3    
-instance Factored 4 (Product4 a1 a2 a3 a4) where 
+instance Factorable 4 (Product4 a1 a2 a3 a4) where 
     project (Product4 a1 a2 a3 a4) = a4
 
-instance Factored 1 (Product5 a1 a2 a3 a4 a5) where 
+instance Factorable 1 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 a1 a2 a3 a4 a5) = a1
-instance Factored 2 (Product5 a1 a2 a3 a4 a5) where 
+instance Factorable 2 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 a1 a2 a3 a4 a5) = a2
-instance Factored 3 (Product5 a1 a2 a3 a4 a5) where 
+instance Factorable 3 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 a1 a2 a3 a4 a5) = a3    
-instance Factored 4 (Product5 a1 a2 a3 a4 a5) where 
+instance Factorable 4 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 a1 a2 a3 a4 a5) = a4
-instance Factored 5 (Product5 a1 a2 a3 a4 a5) where 
+instance Factorable 5 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 a1 a2 a3 a4 a5) = a5
 
-instance Factored 1 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 1 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a1
-instance Factored 2 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 2 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a2
-instance Factored 3 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 3 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a3    
-instance Factored 4 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 4 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a4
-instance Factored 5 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 5 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a5
-instance Factored 6 (Product6 a1 a2 a3 a4 a5 a6) where 
+instance Factorable 6 (Product6 a1 a2 a3 a4 a5 a6) where 
     project (Product6 a1 a2 a3 a4 a5 a6) = a6
 
-instance Factored 1 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 1 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a1
-instance Factored 2 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 2 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a2
-instance Factored 3 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 3 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a3    
-instance Factored 4 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 4 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a4
-instance Factored 5 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 5 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a5
-instance Factored 6 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 6 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a6
-instance Factored 7 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
+instance Factorable 7 (Product7 a1 a2 a3 a4 a5 a6 a7) where 
     project (Product7 a1 a2 a3 a4 a5 a6 a7) = a7
 
-instance Factored 1 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 1 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a1
-instance Factored 2 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 2 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a2
-instance Factored 3 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 3 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a3    
-instance Factored 4 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 4 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a4
-instance Factored 5 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 5 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a5
-instance Factored 6 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 6 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a6
-instance Factored 7 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 7 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a7
-instance Factored 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
+instance Factorable 8 (Product8 a1 a2 a3 a4 a5 a6 a7 a8) where 
     project (Product8 a1 a2 a3 a4 a5 a6 a7 a8) = a8
 
-instance Factored 1 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 1 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a1
-instance Factored 2 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 2 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a2
-instance Factored 3 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 3 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a3    
-instance Factored 4 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 4 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a4
-instance Factored 5 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 5 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a5
-instance Factored 6 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 6 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a6
-instance Factored 7 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 7 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a7
-instance Factored 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
-instance Factored 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
+instance Factorable 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9
                 
 instance Arital 2 (Product2 a1 a2)

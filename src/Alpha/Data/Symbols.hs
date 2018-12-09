@@ -35,7 +35,7 @@ typeSymbol = someSymbolVal
 
 -- | Forms a list of 'SomeSymbol' values from a list of'String'
 typeSymbols::[String] ->[SomeSymbol]
-typeSymbols s = fmap typeSymbol s
+typeSymbols s = typeSymbol <$> s
         
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val

@@ -34,19 +34,21 @@ import Unsafe.Coerce
 import Text.Printf
 import Numeric
 
-import Alpha.TypeLevel.Nats
-import Alpha.TypeLevel.Some
+import Alpha.Types.Nats
+import Alpha.Types.Some
 import Alpha.Text.Format
-import Alpha.Canonical hiding(index, (+), (-), (*), abs)
+import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod)
 import Alpha.Text.Combinators
-import Alpha.Data.Numbers
 import Alpha.Base
+import Alpha.Data.Conversion
+import GHC.Real(mod)
 
 data BitVector (w :: Nat) :: Type where
   BV :: NatRepr w -> Integer -> BitVector w
 
 class (KnownNat w) => ToBitVector a w where
   bv::a -> BitVector w
+  
   
 -- | Construct a bit vector with a particular width, where the width is inferrable
 -- from the type context. The 'Integer' input (an unbounded data type, hence with an
@@ -307,6 +309,8 @@ bvSextWithRepr :: NatRepr w'
 bvSextWithRepr repr bv = BV repr (truncBits width (bvIntegerS bv))
   where width = natValue repr
 
+type instance Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
+
 instance Formattable (BitVector w) where
   format (BV w x ) = bitstringN (repVal w) x
 
@@ -379,9 +383,8 @@ instance ToBitVector Word32 32 where
 instance ToBitVector Word64 64 where
   bv x = bitvector (fromIntegral x)
 
-instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2)  where
-  type Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
-  concat = bvConcat
+instance (KnownNat w1, KnownNat w2) => Appendable (BitVector w1) (BitVector w2)  where
+  append = bvConcat
 
 instance KnownNat w => Length (BitVector w) where
   length  = convert . finiteBitSize  

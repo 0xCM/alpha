@@ -2,20 +2,21 @@
 
 module Alpha.Text.Combinators
 (    
-    dot, dots, space, spaces, colon, semi, comma, 
+    dot, dots, space, colon, semi, comma, 
     fslash, bslash, larrow, rarrow,
     enclose, splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,embrace,
-    prefixIfMissing, suffixIfMissing, zpadL, padL, toText,
+    prefixIfMissing, suffixIfMissing, zpadL, padL,
     hexstring,showBasedInt,bitstring,bitstringN,
-    tuplestring,textlen, intersperse, Text.replicate
+    tuplestring,textlen, parenthetical, spaced,
+    suffix,prefix
     
 )
  where
 
 import qualified Data.Text as Text
 
-import qualified Alpha.Data.List as List
+import qualified Data.List as List
 import Numeric(showIntAtBase)
 import Alpha.Base hiding (div)
 import Alpha.Canonical
@@ -23,7 +24,10 @@ import Alpha.Text.Text
 import Alpha.Text.Format
 import Alpha.Text.Symbols
 import Alpha.Data.Maybe
-import Alpha.Data.Numbers 
+import Alpha.Native
+import qualified Alpha.Text.Asci as Asci
+
+
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -54,8 +58,8 @@ padL n c s
 zpadL :: (Integral n) => n -> Text -> Text
 zpadL n s = padL (fromIntegral n) "0" s    
 
-toText ::String -> Text
-toText s = Text.pack s
+-- toText ::String -> Text
+-- toText s = Text.pack s
 
 replicate::(Integral n) => n -> Text -> Text
 replicate n t =  Text.replicate (fromIntegral n) t
@@ -67,6 +71,10 @@ textlen t = t |> Text.length |> fromIntegral
 -- | Concatenates a list of 'Text' values
 splat::[Text] -> Text
 splat = Text.concat
+
+-- | Surrounds the input text within a space on each side
+spaced::Text -> Text
+spaced t = Asci.Space <> t <> Asci.Space
 
 -- | Returns the text that follows the last occurrence of a specified pattern, if any
 rightOfLast::Text -> Text -> Maybe Text
@@ -90,12 +98,19 @@ enclose left right content = splat [format left, format content, format right]
 embrace::(Formattable a) => a -> Text
 embrace content = enclose lbrace rbrace content 
 
-paren::(Formattable a) => a -> Text
-paren content = enclose lparen rparen content 
+parenthetical::(Formattable a) => a -> Text
+parenthetical content = enclose lparen rparen content 
 
 -- Determines whether a block of text contains a specified substring
 textContains::Text -> Text -> Bool
 textContains match subject = Text.isInfixOf match subject    
+
+suffix::Text -> Text -> Text
+suffix = concat
+
+prefix::Text -> Text -> Text
+prefix a b = concat b a
+
 
 -- | Conditionally prepends the subject with a prefix
 prefixIfMissing::Text -> Text -> Text
@@ -140,11 +155,6 @@ bitstringN w n = showBasedInt 2 n |> zpadL w
 -- Formats a list of formattable items as a tuple
 tuplestring::(Formattable a) => [a] -> Text
 tuplestring src =  Text.concat [lparen, content, rparen]
-    where content = Text.concat (fmap format (List.intersperse comma flist))
-          flist = fmap format src
+    where content = Text.concat (format <$> (weave comma flist))
+          flist = format <$> src
 
-spaces::(Integral n) => n -> Text
-spaces n = replicate n space          
-
-intersperse::(Formattable a) => Char -> [a] -> Text
-intersperse c items = items |> fmap format |> Text.concat |> Text.intersperse c

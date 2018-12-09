@@ -5,7 +5,6 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE ViewPatterns #-}
 
 module Alpha.Data.Sum
 (
@@ -90,7 +89,6 @@ type a !+! b = Sum2 a b
 (+!)::b -> a !+! b
 (+!) = Sum22
 
-
 instance IndexedChoice (Sum2 a1 a2) where
     choiceix (Sum21 _) = 1
     choiceix (Sum22 _) = 2
@@ -133,9 +131,6 @@ instance Functor (Sum2 a1) where
     fmap _ (Sum21 a1) = Sum21 a1
     fmap f (Sum22 a2) = Sum22 (f a2)
 
--- instance Alt (Sum2 a1) where
---     f <!> (Sum21 a1) = f <$> a1
---     f <!> (Sum22 a2) = f <$> a2
     
 instance Applicative (Sum2 a1) where
     pure            = Sum22
@@ -170,11 +165,6 @@ instance Apply (Sum2 a1) where
     Sum22 _  .> Sum21 a1  = Sum21 a1
     Sum22 _  .> Sum22 a2  = Sum22 a2
       
-
--- instance Alt (Sum3 a1 a2) where
---     f <!> (Sum31 a1) = Sum31 (f a1)
---     f <!> (Sum32 a2) = Sum32 (f a2)    
---     f <!> (Sum33 a3) = Sum32 (f a3)        
 
 instance Functor (Sum3 a1 a2) where
     fmap _ (Sum31 a1) = Sum31 a1

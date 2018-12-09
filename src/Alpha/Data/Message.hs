@@ -14,7 +14,7 @@ module Alpha.Data.Message
 ) where
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Data.Numbers
+
 
 
 -- Defines a severity classifier

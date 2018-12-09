@@ -10,52 +10,83 @@
 
 module Alpha.Data.Bit 
 (
-    Bit,ToBit(..),
+    Bit(..),
+    ToBit(..), 
+    ToBitString(..),
+    Flag(..),
     on, isOn,
     off, isOff,
     fromBool
 )
 where
     
-import Foreign.Storable (Storable, poke, peek, sizeOf, alignment)
-import Foreign.Ptr (Ptr, castPtr)
-import Data.Bool hiding(bool)
 import Alpha.Base
 import Alpha.Canonical
+import Alpha.Data.Conversion
 import Data.Bits(Bits(..))
+import Alpha.Text.Text
+import Alpha.Text.Format
+import Alpha.Text.Combinators(parenthetical,suffix,spaced,prefix)
+import qualified Data.List as List
 
 data {-# CTYPE "HsBool" #-} Flag = On | Off
-    deriving (Eq, Enum, Ord, Generic, Data, Typeable)
+    deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read)
     
 newtype Bit = Bit Flag
-    deriving (Eq, Ord, Generic, Data, Typeable)
+    deriving (Eq, Ord, Generic, Data, Typeable, Read)
+
+newtype BitString = BitString [Bit]   
+    deriving (Eq, Ord, Generic, Data, Typeable, Read)
 
 class ToBit a where
     bit::a -> Bit    
+
+class ToBitString a where
+    bits::a -> BitString
         
 -- | Constructs a 'Bit' in the 'Off' state    
 off::Bit
 off = Bit Off
+{-# INLINE off #-}
 
 -- | Constructs a 'Bit' in the 'On' state    
 on::Bit
 on = Bit On
+{-# INLINE on #-}
 
 -- | Returns true if off, false otherwise
 isOff::Bit -> Bool
 isOff (Bit flag) = flag == Off
+{-# INLINE isOff #-}
 
 -- | Returns true if on, false otherwise
 isOn::Bit -> Bool
 isOn (Bit flag) = flag == On
+{-# INLINE isOn #-}
 
 bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr
+{-# INLINE bitref' #-}
+
 
 fromBool :: Bool -> Bit
 fromBool False = off
 fromBool True = on
+{-# INLINE fromBool #-}
 
+instance Formattable BitString where
+    format (BitString bits) =  format <$> bits |> collapse |> prefix n
+        where n =  List.length bits |> format |> parenthetical |> spaced
+
+instance ToInteger BitString where
+    integer = undefined
+
+instance Show BitString where
+    show = string . format
+
+instance Additive BitString where
+    add (BitString s1) (BitString s2) = BitString <| s1 <> s2
+    
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
 
@@ -118,6 +149,14 @@ instance ToBit Bool where
     bit True = on
     bit False = off    
 
+instance Formattable Flag where
+    format On = "1"
+    format Off = "0"
+
+instance Formattable Bit where
+    format (Bit Off) = "0"
+    format _ = "1"
+        
 instance Show Flag where
     show On = "1"
     show Off = "0"
@@ -173,3 +212,64 @@ instance Bits Bit where
 
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
+
+    
+bits'::(Integral a) => a -> a -> BitString
+bits' b i = BitString $ doIt (quotRem i b) []  where
+
+    doIt (n,d) r = seq c $
+        case n of
+        0 -> r'
+        _ -> doIt (quotRem n b) r' 
+        where
+            c  = ifelse (d == 0) off on
+            r' = c : r            
+
+instance ToBitString Int where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+    
+instance ToBitString Int8 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+
+instance ToBitString Int16 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+
+instance ToBitString Int32 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+        
+instance ToBitString Int64 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+
+instance ToBitString Integer where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+    
+instance ToBitString Word where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+    
+instance ToBitString Word8 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+
+instance ToBitString Word16 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+
+instance ToBitString Word32 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+        
+instance ToBitString Word64 where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+        
+instance ToBitString Natural where
+    bits i = bits' 2 i
+    {-# INLINE bits #-}
+        

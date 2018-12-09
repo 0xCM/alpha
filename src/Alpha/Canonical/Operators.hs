@@ -7,31 +7,34 @@
 {-# LANGUAGE DataKinds #-}
 module Alpha.Canonical.Operators
 (
+    BinaryOperator, UnaryOperator, TernaryOperator,
+    Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,  Comparer,
+
     Arital(..),
     Compositional(..),
-    Combinable(..), Combiner(..),
-    BinaryOperator, UnaryOperator, TernaryOperator,
-    Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,    
-    (<|),(|>), ifelse, left,right, symstr, 
+    (<|),(|>), ifelse, left,right, symstr,     
+    Functional(..),
     Function, BinaryFunc, UnaryFunc, TernaryFunc,
     type (~>), Hom, 
 
     Dom(..), Cod(..), Morphism(..), Morphic(..), 
     SymbolPair(..),
-    LeftScalar(..), RightScalar(..), Scalar(..),
     Flippable(..),
 
-    endoply, cartesian, dual, endo
+    endoply, cartesian, dual, endo, scompose,associative, associator,
 
-    
+    Computable(..),
+    Iterable(..)
 )
 where
 import Alpha.Base
-import qualified GHC.Base as GB
+import Data.Semigroupoid
+import Alpha.Native
+import Alpha.Canonical.Element
+
+import qualified Data.Stream.Infinite as Stream
 import qualified Data.Map as Map
-
-
-type SymbolPair s t = (KnownSymbol s, KnownSymbol t)
+import qualified Data.List as List
 
 -- A synonym for a unary function
 type Function a b = a -> b
@@ -56,6 +59,9 @@ type family Cod f
 type instance Dom (Morphism a b) = a
 type instance Cod (Morphism a b) = b
 
+class Functional f where    
+    func::f -> Function a r
+
 -- Characterizes a function f
 class Morphic f  where    
     -- The characterized function expressed via standard form
@@ -70,53 +76,6 @@ class Morphic f  where
             eval' (PairMorphism pairs) = undefined
          
 
--- Note that the category of left modules over a ring R is isomorphic to
--- the category or right modules over the opposite ring R^op
-
-class LeftScalar k a where
-    type LeftScaled k a
-
-    scaleL::k -> a -> LeftScaled k a
-
-    (*.)::k -> a -> LeftScaled k a
-    (*.) = scaleL
-
-infixl 5 *.
-
-class RightScalar a k where
-    type RightScaled a k
-
-    scaleR::a -> k -> RightScaled a k
-
-    (.*)::a -> k -> RightScaled a k
-    (.*) = scaleR
-
-infixl 5 .*
-
-class (LeftScalar k a, RightScalar a k) => Scalar k a where
-
-newtype Combiner a b c = Combiner (a -> b -> c)
-
-
--- Represents a transformation accepting potentially heterogenous types 
--- a and b and producing a value representing their combination
-class Combinable a b where
-    type Combined a b
-    
-    combiner::Combiner a b (Combined a b)
-        
-    -- Combines two heterogenous values into one
-    combine::a -> b -> Combined a b
-    combine a b = f a b 
-        where (Combiner f)  =  combiner 
-    {-# INLINE combine #-}
-
-    -- Infix alias for 'combine'
-    (>.<)::a -> b -> Combined a b
-    (>.<) = combine        
-    {-# INLINE (>.<) #-}
-
-infixr 0 >.<
     
 -- Characterizes function composition
 class Compositional a b c where
@@ -126,7 +85,7 @@ class Compositional a b c where
 -- Characterizes type with which an arity is associated
 class KnownNat n => Arital n a where
     arity::a -> Natural
-    arity _ = fromIntegral (natVal (Proxy @n))
+    arity _ = fromIntegral (nat @n)
     
 -- A synonym for a function that saturates with 1 argument
 type UnaryFunc a1 r = a1 -> r
@@ -158,6 +117,9 @@ type BinaryPredicate a = BinaryFunc a a Bool
 -- Characterizes a logical predicate that requires three arguments for saturation
 type TernaryPredicate a = TernaryFunc a a a Bool
         
+-- | Defines a heterogenous comparison operation    
+type Comparer a b = a -> b -> Bool    
+
 class Flippable a where
     type Flipped a    
     flip::a -> Flipped a
@@ -167,10 +129,15 @@ type family Predicate (n::Nat)  a | a -> a where
     Predicate 1 (a,Bool) =     UnaryPredicate a
     Predicate 2 (a,a,Bool) =   BinaryPredicate a
     Predicate 3 (a,a,a,Bool) = TernaryPredicate a
+        
+class Computable a where
+    type Computation a
 
-uncombine::Combiner a b c -> (a -> b -> c)
-uncombine (Combiner f) = f
-
+    compute::a -> Computation a
+    
+class Iterable a where
+    iterate :: UnaryOperator (Element a) -> (Element a) -> a
+    
 -- | If the first input value is true, returns the 2nd input value,
 -- otherwise, returns the third input value
 ifelse::Bool -> a -> a -> a
@@ -215,11 +182,36 @@ cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
 dual::Monoid a => [a] -> Dual a
 dual src = fold (fmap  Dual src)
 
+-- Alias for semigroupoid composition operator
+scompose::(Semigroupoid c) => c j k -> c i j -> c i k
+scompose = o
+
+-- | Computes both left and right-associative applications
+-- If an operator is associtive, these values will coincide
+associator::BinaryOperator a -> (a, a, a) -> (a,a)
+associator o (x,y,z) =  (left,right) where
+    xy = o x y 
+    yz = o y z
+    left =  o xy z
+    right = o x yz
+
+-- | Determines whether a binary operator is associative with respect
+-- to a test triple    
+associative::(Eq a) => BinaryOperator a -> (a, a, a) -> Bool
+associative o triple = x == y where
+    (x,y) = associator o triple
+    
 instance (Ord a, Ord b) => Flippable (Map a b) where
     type Flipped (Map a b) = Map b a
     flip m = Map.toList m |> fmap (\(y,z) -> (z,y)) |> Map.fromList
   
 instance Flippable (a -> b -> c) where
     type Flipped (a -> b -> c) = b -> a -> c
-    flip = GB.flip    
+    flip = flip'
             
+instance Iterable (Stream a) where
+    iterate = Stream.iterate    
+
+instance Iterable [a] where
+    iterate = List.iterate    
+        

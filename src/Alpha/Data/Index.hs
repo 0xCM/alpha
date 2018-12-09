@@ -3,14 +3,17 @@
 module Alpha.Data.Index where
 
 import Alpha.Base
+import Alpha.Canonical
 import Alpha.Data.Product
-import Alpha.Data.Natural
+
+
+import qualified Data.List as List
 
 data Index (i::Nat) = Index
     
-instance KnownNat i => Show(Index i) where
+instance forall i. KnownNat i => Show(Index i) where
     show x = show val where
-        val = natVal (Proxy::Proxy i)
+        val = nat @i
 
 type family Index2 (i::Nat) (j::Nat) where
     Index2 i j = (Index i, Index j)

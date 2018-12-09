@@ -16,14 +16,14 @@ module Alpha.Data.Func
     
     CFunc(..),
     SFunc(..),
-    Func(..), Functional,
+    --Func(..), Functional,
     NFunc(..), NFx(..)
 
 )
 where
 
 import Alpha.Base
-import Alpha.Canonical
+import Alpha.Canonical hiding(Func,Functional)
 import Alpha.Data.Product
 import Alpha.Data.Sum
 import qualified Data.Tuple as Tuple

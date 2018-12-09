@@ -4,29 +4,19 @@
 module Alpha
 ( 
     module Base,
-    module Canonical,
-    module Claim,
-    module Data,
-    module IO,
-    module Numeric,
-    module System,
-    module Text,
-    module Types,
-    module Generics
+    module X,
   
 ) where
     
-import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(/),(**))
+import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(**))
 
-import Alpha.Canonical as Canonical
-import Alpha.Text as Text
-import Alpha.IO as IO
-import Alpha.Data as Data
-import Alpha.System as System
-import Alpha.Numeric as Numeric
-import Alpha.Claim as Claim
-import Alpha.Types as Types
-import Alpha.Generics.Newtype as Generics
+import Alpha.Canonical as X
+import Alpha.Text as X
+import Alpha.Data as X
+import Alpha.System as X
+import Alpha.Claim as X
+import Alpha.Types as X
+
 
 
 
