@@ -1,6 +1,3 @@
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE NoImplicitPrelude #-}
-
 module Alpha
 ( 
     module Base,
@@ -11,10 +8,10 @@ module Alpha
 import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(**))
 
 import Alpha.Canonical as X
-import Alpha.Text as X
+import Alpha.Claim as X
 import Alpha.Data as X
 import Alpha.System as X
-import Alpha.Claim as X
+import Alpha.Text as X
 import Alpha.Types as X
 
 
