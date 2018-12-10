@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Data.Functor
+module Alpha.Base.Functors
 (
     Arrow(..), (^>>), (<<^), (>>^), (^<<), (>>>), (<<<),
     ArrowLoop(..),
@@ -32,7 +32,8 @@ module Alpha.Data.Functor
     Extend(..),
     Monad(..),
     Functor(..), (<$>), ($>),
-    Foldable, foldMap, fold, foldr, foldr', foldl, foldl',
+    Foldable, foldMap, fold, foldr, foldr', foldl, foldl', foldby,
+ 
     Traversable(..), feval,
 
     ProductF(..), fprod,
@@ -73,6 +74,8 @@ import Data.Bifoldable(Bifoldable(..),bisum)
 import Data.Bitraversable(Bitraversable(..))
 import Data.Biapplicative(Biapplicative((<<*>>), bipure, biliftA2, (*>>), (<<*)))
 import Data.Biapplicative(biliftA3,traverseBia, sequenceBia, traverseBiaWith)
+
+import Data.Monoid(Monoid)
 
 type DistributiveF f = Distributive f
 
@@ -119,3 +122,7 @@ feval = sequenceA
 
 opposite::(b -> a) -> Opposite a b
 opposite f = Op {getOp = f}
+
+-- | Folds a structure projected into a 'Monoid' by a supplied function
+foldby :: (Monoid m, Foldable t) => (a -> m) -> t a -> m
+foldby = foldMap

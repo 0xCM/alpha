@@ -15,22 +15,12 @@ module Alpha.Data.Conversion
     word8, word16, word32, word64,
     ratio, rational, fractional,
 
-    FromDouble(..), ToDouble(..),
-    FromInt(..), ToInt(..),
-    ToWord(..), FromWord(..),
-    ToInteger(..),
-    ToNatural(..), FromNatural(..),
-    Doubly(..),
-    Negatable(..),
     
 )
 where
-import Data.Kind(Type)
 import GHC.Num hiding (abs) 
 import GHC.Real hiding (mod)
-import GHC.TypeLits
-import GHC.Float(double2Float,float2Double)
-import Prelude(realToFrac)
+--import Prelude(realToFrac)
 
 import qualified GHC.Num as N
 import qualified Data.List as L
@@ -42,50 +32,8 @@ import Data.Ratio(Ratio(..))
 
 import Numeric((**))
 import Alpha.Base hiding(zero)
-import Alpha.Text.Format
 import Alpha.Canonical hiding((+),(*),(-),(^),(^^),(**), range)
 import Alpha.Native
-
--- | Characterizies a type whose values can be materialized from 'Double' values
-class FromDouble d where
-    -- | Converts a 'Double' value to a 'd' value
-    fromDouble::Double -> d
-
--- | Characterizies a type whose values can be converted to 'Double' values
-class ToDouble d where
-    -- / Converts a 'd' value to a 'Double' value
-    double::d -> Double
-
--- | Characterizies a type whose values can be converted to machine-sized 'Int' values
-class ToInt d where
-    int::d -> Int  
-
--- | Characterizies a type whose values can be materialized from machine-sized 'Int' values
-class FromInt a where
-    fromInt::Int -> a
-    
--- | Characterizies a type whose values can be converted to arbitrary-sized 'Integer' values
-class ToInteger d where
-    integer::d -> Integer
-
--- | Characterizies a type whose values can be converted to machine-sized 'Word' values
-class ToWord d where
-    word::d -> Word
-
--- | Characterizies a type whose values can be materialized from machine-sized 'Word' values
-class FromWord a where
-    fromWord::Word -> a
-
--- | Characterizies a type whose values can be converted to 'Natural' values
-class ToNatural d where
-    natural::d -> Natural
-
--- | Characterizies a type whose values can be materialized from 'Natural' values
-class FromNatural a where
-    fromNatural::Natural -> a
-
--- | Characterizies a type whose values can be converted to/from 'Double' values    
-type Doubly a = (ToDouble a, FromDouble a)
 
 -- | Constructs a list of Int values from a list of Integral values
 ints::(ToInt n) => [n] -> [Int]

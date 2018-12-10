@@ -36,7 +36,6 @@ import Numeric
 
 import Alpha.Types.Nats
 import Alpha.Types.Some
-import Alpha.Text.Format
 import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod)
 import Alpha.Text.Combinators
 import Alpha.Base

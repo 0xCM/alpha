@@ -1,9 +1,4 @@
-module Alpha.Canonical.Element
-(
-
-    Element(..),
-
-)
+module Alpha.Canonical.Element(Element(..))
 where
 import Alpha.Base
 
@@ -14,6 +9,7 @@ type instance Element (Bag a) = a
 type instance Element (Seq a) = a
 type instance Element (Stream a) = a
 type instance Element (Map a b) = (a,b)
+type instance Element (Vector a) = a
 
 
 

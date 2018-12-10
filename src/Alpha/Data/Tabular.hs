@@ -13,10 +13,9 @@ where
 import qualified Data.Matrix as M
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Data.Product
 import Alpha.Data.Conversion
 import Alpha.Data.NatK
-
+import qualified Data.Text as Text
 import qualified Data.List as List
 
 -- | Characterizes a rectangular array of data
@@ -78,7 +77,7 @@ instance forall m n a. (KnownNat m, KnownNat n) => Dimensional (DataTable m n a)
     dimension (DataTable m) = (natg @m, natg @n) where
         
 instance Show a => Formattable (DataTable m n a) where
-    format = pack . show
+    format = Text.pack . show
 
 instance forall m n a.KnownNatPair m n  => Indexed (DataTable m n a) (Int,Int) where
     lookup (DataTable m) (r,c) = M.getElem r c m

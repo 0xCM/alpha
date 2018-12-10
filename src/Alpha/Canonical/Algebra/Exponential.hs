@@ -17,7 +17,7 @@ import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Algebra.Polarity
+import Alpha.Canonical.Algebra.Orientation
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous 
 -- exponentiation

@@ -7,6 +7,7 @@ module Alpha.Canonical.Algebra.Nullary
 import Alpha.Base hiding(div)
 import Alpha.Canonical.Operators
 import Alpha.Native
+import qualified Numeric.Interval as I
 
 
 import qualified Data.List as List
@@ -26,6 +27,9 @@ null a = a == zero
 instance Nullary [a] where
     zero = []
 
+instance (Eq a) => Nullary (Interval a) where
+    zero = I.empty
+    
 -- Nullary numbers
 -------------------------------------------------------------------------------
 instance Nullary Natural where 

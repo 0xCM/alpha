@@ -12,6 +12,7 @@ module Alpha.Canonical.Collective.Indexed
 ) where
 import Alpha.Base
 import qualified Data.List as List
+import qualified Data.Vector as Vector
 import qualified Data.Sequence as Sequence
 import Alpha.Canonical.Element
 
@@ -37,4 +38,7 @@ instance (Eq a) => Indexed [a] Int where
     
 instance Indexed (Seq a) Int where
     lookup = Sequence.index
+    
+instance Indexed (Vector a) Int where
+    lookup = (Vector.!)
     

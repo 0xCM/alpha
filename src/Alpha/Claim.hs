@@ -16,7 +16,6 @@ module Alpha.Claim
 where
 
 import Alpha.Base
-import Alpha.Types.Symbol
 
 
 -- | Specifies the result of evaluating a claim
@@ -31,8 +30,8 @@ data Evaluation (a::Symbol) =
     -- show' (Failure) =  (symbolVal (Proxy @s)) ++ " -> Failure"
 
 instance KnownSymbol s => Show (Evaluation s) where
-  show (Success) =  symbol @s ++ " -> Success"
-  show (Failure) =  symbol @s ++ " -> Failure"
+  show (Success) =  symbol @s <> " -> Success"
+  show (Failure) =  symbol @s <> " -> Failure"
 
 
 -- | Relates a symbol to a claim

@@ -10,27 +10,22 @@ module Alpha.Canonical.Operators
     BinaryOperator, UnaryOperator, TernaryOperator,
     Predicate(..), UnaryPredicate, BinaryPredicate, TernaryPredicate,  Comparer,
 
-    Arital(..),
-    Compositional(..),
     (<|),(|>), ifelse, left,right, symstr,     
     Functional(..),
     Function, BinaryFunc, UnaryFunc, TernaryFunc,
-    type (~>), Hom, 
-
-    Dom(..), Cod(..), Morphism(..), Morphic(..), 
     SymbolPair(..),
-    Flippable(..),
+    Computable(..),
+    Iterable(..),
 
     endoply, cartesian, dual, endo, scompose,associative, associator,
 
-    Computable(..),
-    Iterable(..)
 )
 where
 import Alpha.Base
 import Data.Semigroupoid
 import Alpha.Native
 import Alpha.Canonical.Element
+
 
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Map as Map
@@ -39,54 +34,9 @@ import qualified Data.List as List
 -- A synonym for a unary function
 type Function a b = a -> b
 
-type family (a ~> b)
-type Hom a b = a ~> b
-
-type instance (a ~> b) = Function a b
-
-type family Composition a c where
-    Composition (Function b c) (Function a b) = Function a c
-
--- Defines a function a -> b
-data Morphism a b 
-    = RuleMorphism (a -> b)    -- ^ | Specifies a morphism via a mapping rule
-    | PairMorphism (Map a b)  -- ^ | Specifies a morphism via an explicit list of ordered pairs
-
-type family Dom f 
-
-type family Cod f     
-
-type instance Dom (Morphism a b) = a
-type instance Cod (Morphism a b) = b
-
 class Functional f where    
     func::f -> Function a r
-
--- Characterizes a function f
-class Morphic f  where    
-    -- The characterized function expressed via standard form
-    morphism::f -> Morphism (Dom f) (Cod f)
-
-    fx::f -> Dom f -> Cod f
-    fx f x = undefined --(eval' morphism) x
-    
-        where
-            eval'::Morphism (Dom f) (Cod f) -> Dom f -> Cod f
-            eval' (RuleMorphism g) = undefined
-            eval' (PairMorphism pairs) = undefined
-         
-
-    
--- Characterizes function composition
-class Compositional a b c where
-    compose::Hom b c -> Hom a b -> Hom a c
-    compose g f = g . f
-
--- Characterizes type with which an arity is associated
-class KnownNat n => Arital n a where
-    arity::a -> Natural
-    arity _ = fromIntegral (nat @n)
-    
+            
 -- A synonym for a function that saturates with 1 argument
 type UnaryFunc a1 r = a1 -> r
 
@@ -120,9 +70,6 @@ type TernaryPredicate a = TernaryFunc a a a Bool
 -- | Defines a heterogenous comparison operation    
 type Comparer a b = a -> b -> Bool    
 
-class Flippable a where
-    type Flipped a    
-    flip::a -> Flipped a
     
 -- Generalizes arity-specific predicates
 type family Predicate (n::Nat)  a | a -> a where
@@ -201,13 +148,6 @@ associative::(Eq a) => BinaryOperator a -> (a, a, a) -> Bool
 associative o triple = x == y where
     (x,y) = associator o triple
     
-instance (Ord a, Ord b) => Flippable (Map a b) where
-    type Flipped (Map a b) = Map b a
-    flip m = Map.toList m |> fmap (\(y,z) -> (z,y)) |> Map.fromList
-  
-instance Flippable (a -> b -> c) where
-    type Flipped (a -> b -> c) = b -> a -> c
-    flip = flip'
             
 instance Iterable (Stream a) where
     iterate = Stream.iterate    

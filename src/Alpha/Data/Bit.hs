@@ -25,8 +25,7 @@ import Alpha.Canonical
 import Alpha.Data.Conversion
 import Data.Bits(Bits(..))
 import Alpha.Text.Text
-import Alpha.Text.Format
-import Alpha.Text.Combinators(parenthetical,suffix,spaced,prefix)
+
 import qualified Data.List as List
 
 data {-# CTYPE "HsBool" #-} Flag = On | Off
@@ -213,63 +212,63 @@ instance Bits Bit where
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
 
-    
-bits'::(Integral a) => a -> a -> BitString
-bits' b i = BitString $ doIt (quotRem i b) []  where
 
-    doIt (n,d) r = seq c $
+bitstring::(Integral a) => a -> BitString
+bitstring i = BitString $ bitstring' (quotRem i 2) []  where
+    bitstring' (n,d) r = seq c $
         case n of
         0 -> r'
-        _ -> doIt (quotRem n b) r' 
+        _ -> bitstring' (quotRem n 2) r' 
         where
             c  = ifelse (d == 0) off on
             r' = c : r            
+        
 
 instance ToBitString Int where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
     
 instance ToBitString Int8 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
 
 instance ToBitString Int16 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
 
 instance ToBitString Int32 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
         
 instance ToBitString Int64 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
 
 instance ToBitString Integer where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
     
 instance ToBitString Word where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
     
 instance ToBitString Word8 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
 
 instance ToBitString Word16 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
 
 instance ToBitString Word32 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
         
 instance ToBitString Word64 where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
         
 instance ToBitString Natural where
-    bits i = bits' 2 i
+    bits = bitstring
     {-# INLINE bits #-}
         

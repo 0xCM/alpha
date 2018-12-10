@@ -9,11 +9,6 @@ import Network.Socket
 
 import Alpha.Canonical
 
--- instance (b ~ ST s (STRef s a)) => Packable a b where
---     pack = newSTRef
-    
-    
-
 -- | Creates a mutable reference cell in the current state thread
 spack:: a -> ST s (STRef s a)    
 spack = newSTRef

@@ -50,8 +50,8 @@ type instance Raised (NatK m) (NatK n) = NatK (m ^ n)
 type instance Infimum (NatKSpan m n) = NatK m
 type instance Supremum (NatKSpan m n) = NatK n
 type instance Span (NatK m) (NatK n) = NatKSpan m n
-type instance Paired (NatK m) (NatK n) = NatKPair m n
 type instance Factored (NatKPair m n) = (NatK m, NatK n)
+type instance Paired (NatK m) (NatK n) (NatKPair m n) = NatKPair m n
 
 -- | Computes the value-level representation of a type-level nat
 natK::forall k. KnownNat k => NatK k
@@ -114,11 +114,12 @@ instance forall k. KnownNat k => Formattable (NatK k) where
 instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
 
-instance forall m n. (KnownNatPair m n) =>  Pairing (NatK m) (NatK n) where    
+
+instance forall m n. (KnownNatPair m n) =>  Pairing (NatK m) (NatK n) (NatKPair m n) where    
     pair _ _ = NatKPair (natK @m, natK @n)
     first _ = natK @m
     second _ = natK @n
-
+    
 instance forall m n. (KnownNatPair m n) =>  Factorable (NatKPair m n) where    
     factor (NatKPair (m,n)) = (m,n)
         

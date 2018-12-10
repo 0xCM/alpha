@@ -1,6 +1,7 @@
 module Alpha.Native
 (
-    sub', add', div', divf', negate', mul', abs', pow', pow'', powa',mod', flip'
+    sub', add', div', divf', negate', mul', abs', pow', pow'', powa',mod', flip',
+    out',
 
 ) where
 --import Alpha.Base
@@ -8,6 +9,8 @@ import GHC.Num(Num, (+),(-),(*),negate,abs)
 import GHC.Real(div,(/),(^),(^^), mod,Fractional,Integral)
 import GHC.Float(Floating,(**))
 import GHC.Base(flip)
+import System.IO(IO,print)
+import GHC.Show(Show)
 
 sub'::(Num a) => a -> a -> a
 sub' = (-)
@@ -55,4 +58,8 @@ mod' = mod
 
 flip'::(a -> b -> c) -> b -> a -> c
 flip' = flip
+
+-- | Renders a showable to standard out 
+out'::Show s => s -> IO()
+out' s = print s
 

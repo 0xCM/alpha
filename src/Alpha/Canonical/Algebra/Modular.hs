@@ -6,12 +6,14 @@ module Alpha.Canonical.Algebra.Modular
     Modulo(..), Modular(..), HModular(..),
 
     Zn, BasedInt,
+    Base(..),
     zN, modulus, residues,residue,
     based, base2, base10, base16,
-
+    base, digits,
 ) where
 import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Text
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Divisive
@@ -19,11 +21,17 @@ import Alpha.Canonical.Algebra.Nullary
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
+import qualified Data.Vector as Vector
+
 import qualified Data.List as List
 import qualified Data.Set as Set
 
+-- Represents a numeric base
+newtype Base b = Base Natural
+    deriving(Show,Eq,Ord,Num)
+
 -- | Represents an integer with a particular base
-data BasedInt (n::Nat) i = BasedInt !i
+data BasedInt (b::Nat) i = BasedInt !i
 
 -- | Represents the ring of integers mod n
 data Zn (n::Nat) = Zn Integer
@@ -31,6 +39,10 @@ data Zn (n::Nat) = Zn Integer
 
 data Residue (n::Nat) = Residue (Zn n) Integer
     deriving (Eq, Ord)
+
+-- Represents a sequence of digits expressed with respect to a
+-- particular basis    
+newtype Digits b = Digits [Char]    
 
 -- Represents a family of type pairs that support a notion of the first 
 -- type 'mod' the second type. Intended to represent to the result of the 
@@ -114,6 +126,8 @@ modulus (Zn n) = n `mod` (natg @n)
 residue::(KnownNat n) => Integer -> Residue n 
 residue m = Residue (zN) m
 
+--rebase::forall m n i. (KnownNat m, KnownNat n, Integral i) => BasedInt n i -> BasedInt m i
+
 -- See https://github.com/TikhonJelvis/modular-arithmetic/blob/master/src/Data/Modular.hs
 
 -- | The canonical least residues modulo n
@@ -121,27 +135,69 @@ residue m = Residue (zN) m
 residues::KnownNat n => Zn n -> [Residue n]    
 residues (Zn n) = residue <$> [0..(n-1)] 
 
+base::forall b. KnownNat b => Base b
+base = Base $ natg @b
+
+--encoding64::Vector.Vector Char
+--See https://en.wikipedia.org/wiki/Base64 for table
+    
+encoding::Vector.Vector Char
+encoding = 
+    ['0','1','2','3','4','5','6','7','8','9',
+     'A','B','C','D','E','F','G','H','I','J',
+     'K','L','M','N','O','P','Q','R','S','T',
+     'U','V','W','X','Y','Z']
+
+encode::(Integral i) => i -> Char
+encode i = encoding Vector.! (fromIntegral i)
+
+digits::forall b i. (KnownNat b, Integral i) => i -> Digits b
+digits i = Digits $ recurse (quotRem i b) []  
+    where
+        b = natg @b
+        recurse (n,d) r = seq c $
+            case n of
+            0 -> r'
+            _ -> recurse (quotRem n b) r' 
+            where
+                c  = encode d
+                r' = c : r            
+
 instance KnownNat n => Show (Zn n) where
-    show _ = "Z/" ++ nn where
+    show _ = "Z/" <> nn where
         nn = show $ nat @n
 
-instance forall n i. (KnownNat n, Show i, Integral i) => Show (BasedInt n i) where
-    show (BasedInt i) = (show i) ++ " (Base " ++ (show (nat @n)) ++ ")"
+instance forall b i. (KnownNat b, Formattable i) => Formattable (BasedInt b i) where
+    format (BasedInt i) = format i <> b where
+        b = format (nat @b) |> parenthetical |> spaced
 
+instance forall b i. (KnownNat b, Formattable i) => Show(BasedInt b i) where
+    show = string . format
+    
+instance forall b. KnownNat b => Formattable (Digits b ) where
+    format (Digits n) = format n <> b where 
+        b = format (nat @b) |> parenthetical |> spaced
+
+instance forall b. KnownNat b => Show (Digits b ) where
+    show = string . format
+        
 instance  KnownNat n => Membership (Zn n) where    
     members s = residues s |> Set.fromList
 
 instance KnownNat n => Show (Residue n) where
-    show (Residue zN m) = (show m) ++ " " ++ (show zN)
+    show (Residue zN m) = (show m) <> " " <> (show zN)
 
 instance KnownNat n => Additive (Residue n) where
-    add (Residue zN a) (Residue _ b) = residue( (a + b) `mod` (modulus zN) )
+    add (Residue zN a) (Residue _ b) 
+        = residue( (a + b) % (modulus zN) )
 
 instance KnownNat n => Subtractive (Residue n) where
-    sub (Residue zN a) (Residue _ b) = residue( (a - b) `mod` (modulus zN) )
+    sub (Residue zN a) (Residue _ b) 
+        = residue( (a - b) % (modulus zN) )
     
 instance KnownNat n => Multiplicative (Residue n) where
-    mul (Residue zN a) (Residue _ b) = residue( (a * b) `mod` (modulus zN) )    
+    mul (Residue zN a) (Residue _ b) 
+        = residue( (a * b) % (modulus zN) )    
 
 instance Modular Natural where 
     mod = mod'

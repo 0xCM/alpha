@@ -1,24 +1,29 @@
 module Alpha.Canonical.Algebra.Pairing
 (
-    Paired(..), Pairing(..)
 
+    Paired(..), Pairing(..),
 ) where
 
 
-type family Paired a b = r | r -> a b    
+-- Codifies a ternary relationship among three types:
+-- The first type, the second type and the unification of
+-- the two types as a pair
+type family Paired a b c = r | r -> a b c    
 
--- | Represents an ordered relationshp between two elements
-class Pairing a b where
+-- Codifies, at the value level, a ternary relatioship among
+-- three types: The first type, second type and the unification 
+-- of the two types as a pair
+class Pairing a b c where
 
     -- | Pairs two elements
-    pair::a -> b -> Paired a b
+    pair::a -> b -> Paired a b c
 
     --- | Extracts the first of the paired elements
-    first::Paired a b -> a
+    first::Paired a b c -> a
     
     --- | Extracts the second of the paired elements
-    second::Paired a b -> b
+    second::Paired a b c -> b
 
-    swap::(Pairing b a) => Paired a b -> Paired b a
+    swap::(Pairing b a c) => Paired a b c -> Paired b a c
     swap x = pair (second x) (first x)
     

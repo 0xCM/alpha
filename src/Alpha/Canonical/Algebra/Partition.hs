@@ -9,11 +9,14 @@ module Alpha.Canonical.Algebra.Partition
 ) where
 import Alpha.Base
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Extremal
 import qualified Data.List as List
+import qualified Numeric.Interval as I
 
 type family Span a b
-
 type instance Span (Min a) (Max a) = IntegralSpan a    
+type instance Span (Interval a) (Interval a) = Interval a
+
 type instance Element (IntegralSpan a) = a
 
 -- | Characterizes a type that contains a relatively contiguous
@@ -45,4 +48,6 @@ instance (Ord a, Integral a) => Partition (IntegralSpan a)  where
 instance (Ord a, Integral a) => Spanned (Min a) (Max a) where
     span (Min min) (Max max) = IntegralSpan [min .. max]
 
-            
+instance (Ord a) => Spanned (Interval a) (Interval a) where
+    span i1 i2 = (infimum i1) I.... (supremum i2)
+                

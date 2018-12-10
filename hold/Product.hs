@@ -336,7 +336,12 @@ instance Factorable 8 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a8
 instance Factorable 9 (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) where 
     project (Product9 a1 a2 a3 a4 a5 a6 a7 a8 a9) = a9
-                
+       
+-- Characterizes type with which an arity is associated
+class KnownNat n => Arital n a where
+    arity::a -> Natural
+    arity _ = fromIntegral (nat @n)
+    
 instance Arital 2 (Product2 a1 a2)
 instance Arital 3 (Product3 a1 a2 a3)
 instance Arital 4 (Product4 a1 a2 a3 a4)

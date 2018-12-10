@@ -4,27 +4,32 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE MagicHash #-}
 module Alpha.Base
 (
-    module DB,
-    module CB,
-    module DF,
-    IO,
-    div,
-    (++),
-    
-
-    
+    module Algebra,
+    module Common,
+    module Control,
+    module Collections,   
+    module Digits,
+    module Functors,    
+    module Newtype,
+    module Numeric,
+    module System,
+    module Text,
+    module Types,
 ) where
 
---import GHC.Float(Float, Float#, Double, Double#)
-import Data.List as List
-import Alpha.Data.Base as DB hiding( (/))
-import Alpha.Data.Functor as DF
-import Alpha.Control.Base as CB
-import Foreign.Storable(Storable)
-import System.IO(IO)
-import Prelude(div)
-import qualified GHC.Base as GB
+import Alpha.Base.Functors as Functors
+import Alpha.Base.Control as Control
+import Alpha.Base.Digits as Digits
+import Alpha.Base.Algebra as Algebra
+import Alpha.Base.Newtype as Newtype
+import Alpha.Base.Numeric as Numeric
+import Alpha.Base.Collections as Collections
+import Alpha.Base.Text as Text
+import Alpha.Base.Types as Types
+import Alpha.Base.Common as Common
+import Alpha.Base.System as System
+
+
+

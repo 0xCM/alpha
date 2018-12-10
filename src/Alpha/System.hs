@@ -10,5 +10,7 @@ module Alpha.System
 )
 where
 
-import Alpha.System.Files as X
+import Alpha.System.FilePath as X
 import Alpha.System.IO as X
+import Alpha.System.Cellular as X
+import Alpha.System.Log as X

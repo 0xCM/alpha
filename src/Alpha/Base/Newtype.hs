@@ -4,16 +4,7 @@
 -- License     :  Per license
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-
-{-# LANGUAGE CPP                        #-}
-{-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE DefaultSignatures          #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE StandaloneDeriving         #-}
-{-# LANGUAGE TypeFamilies               #-}
-{-# LANGUAGE UndecidableInstances       #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- The 'Newtype' typeclass and related functions.
 -- Primarily pulled from Conor McBride's Epigram work. Some examples:
@@ -47,7 +38,7 @@
 -- instance Newtype Example
 -- This avoids the use of Template Haskell (TH) to get new instances.
 
-module Alpha.Data.Newtype
+module Alpha.Base.Newtype
   ( Newtype(..)
   , op
   , ala
@@ -62,15 +53,21 @@ module Alpha.Data.Newtype
 
 import Control.Applicative
 import Control.Arrow
+import Data.Functor
 import Data.Functor.Compose
 import Data.Functor.Identity
 import Data.Fixed
+import Data.Function
 import Data.Monoid
+import Data.Maybe
+import Data.Bool
+import GHC.Real
+import GHC.Num
 import Data.Ord
 import qualified Data.Semigroup
 import Data.Semigroup (Min(..), Max(..), WrappedMonoid(..), Option(..))
 import GHC.Generics
-import Alpha.Base hiding(Alt,Last,First)
+--import Alpha.Base hiding(Alt,Last,First)
 
 
 -- | Given a newtype @n@, we will always have the same unwrapped type @o@,
@@ -110,6 +107,7 @@ type Unwrapper a b = b -> a
 
 -- | As long as the type @n@ is an instance of Generic, you can create an instance
 -- with just @instance Newtype n@
+-- Requires UndecidableInstances
 class Newtype n where
   type O n :: *
   type O n = GO (Rep n)

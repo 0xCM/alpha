@@ -4,30 +4,30 @@ module Alpha.Text.Combinators
 (    
     dot, dots, space, colon, semi, comma, 
     fslash, bslash, larrow, rarrow,
-    enclose, splat, isPrefix, isSuffix,
-    leftOfFirst, rightOfLast,ltrim,embrace,
-    prefixIfMissing, suffixIfMissing, zpadL, padL,
+    splat, isPrefix, isSuffix,
+    leftOfFirst, rightOfLast,ltrim,
+    zpadL, padL,
     hexstring,showBasedInt,bitstring,bitstringN,
-    tuplestring,textlen, parenthetical, spaced,
-    suffix,prefix
+    tuplestring,textlen, 
+    suffixIfMissing, 
+    prefixIfMissing, 
+    
     
 )
  where
 
-import qualified Data.Text as Text
-
-import qualified Data.List as List
-import Numeric(showIntAtBase)
 import Alpha.Base hiding (div)
 import Alpha.Canonical
+import Alpha.Canonical.Text
+import Alpha.Canonical.Operators
 import Alpha.Text.Text
-import Alpha.Text.Format
 import Alpha.Text.Symbols
-import Alpha.Data.Maybe
 import Alpha.Native
-import qualified Alpha.Text.Asci as Asci
+import qualified Alpha.Canonical.Text.Asci as Asci
 
-
+import qualified Data.Text as Text
+import qualified Data.List as List
+import Numeric(showIntAtBase)
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -72,45 +72,24 @@ textlen t = t |> Text.length |> fromIntegral
 splat::[Text] -> Text
 splat = Text.concat
 
--- | Surrounds the input text within a space on each side
-spaced::Text -> Text
-spaced t = Asci.Space <> t <> Asci.Space
 
 -- | Returns the text that follows the last occurrence of a specified pattern, if any
 rightOfLast::Text -> Text -> Maybe Text
 rightOfLast match subject 
     = case (Text.splitOn match subject) of
-        [] -> none
-        segments -> segments |> List.last |> just
+        [] -> Nothing
+        segments -> segments |> List.last |> Just
 
 -- | Returns the text that precedes the first occurrence of a specified pattern, if any
 leftOfFirst::Text -> Text -> Maybe Text
 leftOfFirst match subject 
     = case (Text.splitOn match subject) of
-        [] -> none
-        segments -> segments |> List.head |> just
-
--- | Fences content between a left and right bondary
-enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
-enclose left right content = splat [format left, format content, format right]
-
--- | Fences content between a left and right brace
-embrace::(Formattable a) => a -> Text
-embrace content = enclose lbrace rbrace content 
-
-parenthetical::(Formattable a) => a -> Text
-parenthetical content = enclose lparen rparen content 
+        [] -> Nothing
+        segments -> segments |> List.head |> Just
 
 -- Determines whether a block of text contains a specified substring
 textContains::Text -> Text -> Bool
 textContains match subject = Text.isInfixOf match subject    
-
-suffix::Text -> Text -> Text
-suffix = concat
-
-prefix::Text -> Text -> Text
-prefix a b = concat b a
-
 
 -- | Conditionally prepends the subject with a prefix
 prefixIfMissing::Text -> Text -> Text
@@ -140,11 +119,11 @@ hexstring n = showBasedInt 16 n |> zpadL width
     where width = 16 |> div (finiteBitSize n)
 
 -- | Constructs a string representation for an integer 'n' based at 'b' 
-showBasedInt:: (Integral n, Show n) => n -> n -> Text
+showBasedInt::(Integral n, Show n) => n -> n -> Text
 showBasedInt b n = showIntAtBase b intToDigit n "" |> Text.pack
 
 -- | Encodes a finite integral value as a base-2 Text
-bitstring :: (Show n, FiniteIntegral n) => n -> Text
+bitstring ::(Show n, FiniteIntegral n) => n -> Text
 bitstring n = showBasedInt 2 n |> zpadL width
     where width = finiteBitSize n
 
@@ -157,4 +136,3 @@ tuplestring::(Formattable a) => [a] -> Text
 tuplestring src =  Text.concat [lparen, content, rparen]
     where content = Text.concat (format <$> (weave comma flist))
           flist = format <$> src
-

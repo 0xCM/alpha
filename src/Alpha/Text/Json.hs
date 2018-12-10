@@ -18,7 +18,6 @@ import Data.Aeson.Encode.Pretty
 import Data.Functor
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Text.Format
 import Alpha.Data.ByteString
         
 

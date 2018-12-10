@@ -10,8 +10,7 @@ module Alpha.Text.Symbols where
 import Data.Text
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Text.Asci
-
+import Alpha.Canonical.Text.Asci
 
 repeat::Integral i => i -> Text -> Text
 repeat i t = replicate (fromIntegral i) t
@@ -143,4 +142,3 @@ nor = "⊽"
 
 neq::Text
 neq = "≠"
-

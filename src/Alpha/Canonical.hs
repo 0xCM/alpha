@@ -11,6 +11,7 @@ import Alpha.Canonical.Operators as X
 import Alpha.Canonical.Relations as X
 import Alpha.Canonical.Collective as X
 import Alpha.Canonical.Text as X
+import Alpha.Canonical.Morphic as X
 
 
 

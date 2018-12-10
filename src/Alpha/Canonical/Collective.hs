@@ -8,7 +8,6 @@ module Alpha.Canonical.Collective
 (
     module X,
 ) where
-import Alpha.Canonical.Oriented as X
 import Alpha.Canonical.Collective.Accumulator as X
 import Alpha.Canonical.Collective.Collapsible as X
 import Alpha.Canonical.Collective.Concatenable as X
@@ -17,6 +16,7 @@ import Alpha.Canonical.Collective.Discrete as X
 import Alpha.Canonical.Collective.Filterable as X
 import Alpha.Canonical.Collective.Groupable as X
 import Alpha.Canonical.Collective.Indexed as X
+import Alpha.Canonical.Collective.Listing as X
 import Alpha.Canonical.Collective.Reductive as X
 import Alpha.Canonical.Collective.Mappable as X
 import Alpha.Canonical.Collective.Setwise as X

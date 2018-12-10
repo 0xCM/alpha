@@ -12,15 +12,12 @@ module Alpha.Canonical.Relations
     MeetSemiLattice(..), 
     Lattice(..),
     Membership(..),
-    Counted(..),
     Tupled(..), 
     Tupelizer(..),
     Reifiable(..),
     Cloneable(..),
     Chunkable(..),
     Convertible(..),
-    Jailbreak(..),
-    minimal, maximal,
     (<=), (<), (>=), (>),
     min, max, 
 ) where
@@ -36,12 +33,15 @@ import qualified Prelude as P
 
 -- Represents a family of types that can be represented as tuples
 type family Tupled a
+type instance Tupled (a1,a2) = (a1,a2)
+type instance Tupled (a1,a2,a3) = (a1,a2,a3)
+type instance Tupled (a1,a2,a3,a4) = (a1,a2,a3,a4)
 
 -- Characterizes types from which tuples can be constructed    
 class Tupelizer a where
     -- | Forms a tuple from the source value
     tuple::a -> Tupled a
-
+    
 -- Characterizes a relation on a set s    
 class Relation a where
 
@@ -83,13 +83,6 @@ class Membership s where
 class (Enum c) => Classifiable a c where
     classify::(a -> c) -> [a] -> [(c,a)]
     
-    
--- | Defines membership predicated on the ability to be counted by an existential machine
-class Counted a where
-    -- | Counts the number of items within the purview of the subject
-    count::(Integral n) => a -> n
-
-
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
 class Reifiable (a::k) r where
@@ -106,19 +99,12 @@ class Cloneable a b where
 -- that can be separated into groups of possibly different sizes
 class Chunkable a where
     chunk::Int -> a -> [a]
-    
--- / Breaking the chains..
-class Jailbreak m a where
-    escape::m a -> a
-            
+                
 -- | Codifies a (directed) conversion relationship between an input value and output value
 class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
     convert::a -> b    
-
             
-instance Jailbreak Maybe a where
-    escape x = fromJust x
         
 (<=)::(Ord a) => BinaryPredicate a
 (<=) a b= a P.<= b
@@ -142,12 +128,13 @@ infix 4 >=
 min::(Ord a) => a -> a -> a
 min x y = ifelse (x <= y) x y
 
-minimal::(Ord a, Semigroup a) => [a] -> Min a
-minimal (x:xs) = Min <$> (x :| xs) |> sconcat
-
 max::(Ord a) => a -> a -> a
 max x y = ifelse (x >= y) x y
 
-maximal::(Ord a, Semigroup a) => [a] -> Max a
-maximal (x:xs) = Max <$> (x :| xs) |> sconcat
+instance Tupelizer (a1,a2) where
+    tuple (a1,a2)  = (a1,a2)
+instance Tupelizer (a1,a2,a3) where
+    tuple (a1,a2,a3)  = (a1,a2,a3)
+instance Tupelizer (a1,a2,a3,a4) where
+    tuple (a1,a2,a3,a4)  = (a1,a2,a3,a4)
 
