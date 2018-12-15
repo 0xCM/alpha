@@ -7,7 +7,6 @@
 module Alpha.Canonical.Collective.Setwise
 (
     Setwise(..),
-
 )
 where
 
@@ -30,23 +29,31 @@ class (Container c) => Setwise c where
     intersect::BinaryOperator c
     -- The set difference operator
     delta::BinaryOperator c
+    -- The set membership test operator
+    subset::Bool -> c -> c -> Bool
     
--- | Characterizes a finite set
-class (Setwise c, FiniteContainer c) => FiniteSet c where    
-
-instance (Ord a) => FiniteSet (Set a) where
-
-instance (Eq a) => Setwise [a] where
+instance (Eq a, Ord a) => Setwise [a] where
     union = List.union
     intersect = List.intersect
     delta =  (List.\\)
+    subset proper candidate source  
+        = subset proper (Set.fromList candidate)  (Set.fromList source)
 
-instance (Ord a) => Setwise (Set a) where
+instance (Ord a) => Setwise (ItemSet a) where
     union = Set.union
     intersect = Set.intersection
     delta  = Set.difference 
+    subset proper candidate source 
+        = ifelse proper 
+            (Set.isProperSubsetOf candidate source) 
+            (Set.isSubsetOf candidate source)
     
-instance (Ord a, PartialOrder a) => Setwise (Bag a) where
+instance (Ord a) => Setwise (Bag a) where
     intersect = Bag.intersection
     delta = Bag.difference
     union = Bag.union        
+    subset proper candidate source 
+        = ifelse proper 
+            (Bag.isProperSubsetOf candidate source) 
+            (Bag.isSubsetOf candidate source)
+

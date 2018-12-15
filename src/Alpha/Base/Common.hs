@@ -13,16 +13,15 @@ module Alpha.Base.Common
     ByteString,    
     Hashable(..),
     Either(..),
-    Maybe(..), isNothing, fromJust,
-    OrderedEnum(..),
+    Maybe(..), isNothing, fromJust, just, none, isNone, isSome,
     Enum, fromEnum, toEnum,
     ($),undefined, id, const,    
-    error,            
+    error, fst, snd,
     Bounded, minBound, maxBound,    
     Ptr, Storable, poke, peek, sizeOf, alignment, castPtr,     
-
+    when,
     seq,
-        
+    
 )
 where
 
@@ -33,13 +32,35 @@ import Data.Function(const)
 import Data.ByteString(ByteString)
 import Data.Ord(Ord)
 import Data.Hashable(Hashable(..))
-import GHC.Base(($),undefined, id, (.),seq)
+import GHC.Natural(Natural(..))
+import GHC.Base(($),undefined, id, (.),seq,when)
 import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
+import GHC.Real(Integral(..))
 import Foreign.Storable(Storable,poke, peek, sizeOf, alignment)
 import Foreign.Ptr (Ptr, castPtr)
-import Prelude(error)
+import Prelude(error,fst,snd)
+import Data.Int
+import Data.Word
+import Data.Bool
 
--- Synonym for combined Ord and Enum constraints
-type OrderedEnum a = (Enum a, Ord a)    
+    
+-- | Constructs a valued 'Maybe'
+just :: a -> Maybe a
+just x = Just x
 
+-- | Constructs a non-valued 'Maybe'
+none :: Maybe a
+none = Nothing
+
+-- | Determines whether the 'Maybe' is non-valued
+isNone :: Maybe b -> Bool
+isNone = isNothing
+
+-- | Determines whether the 'Maybe' is non-valued
+isSome :: Maybe b -> Bool
+isSome = not . isNothing
+
+
+
+    
 

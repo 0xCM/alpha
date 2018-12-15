@@ -6,7 +6,6 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE UndecidableInstances #-}
 
 module Alpha.Data.Bit 
 (
@@ -16,15 +15,15 @@ module Alpha.Data.Bit
     Flag(..),
     on, isOn,
     off, isOff,
-    fromBool
 )
 where
     
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Data.Conversion
 import Data.Bits(Bits(..))
 import Alpha.Text.Text
+import Alpha.Canonical.Algebra.Invertible
+import Alpha.Canonical.Algebra.Unital
 
 import qualified Data.List as List
 
@@ -36,6 +35,9 @@ newtype Bit = Bit Flag
 
 newtype BitString = BitString [Bit]   
     deriving (Eq, Ord, Generic, Data, Typeable, Read)
+
+type instance Unsigned Bit = Bit
+instance Unsignable Bit
 
 class ToBit a where
     bit::a -> Bit    
@@ -67,11 +69,15 @@ bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr
 {-# INLINE bitref' #-}
 
-
-fromBool :: Bool -> Bit
-fromBool False = off
-fromBool True = on
-{-# INLINE fromBool #-}
+bitstring::(Integral a) => a -> BitString
+bitstring i = BitString $ bitstring' (quotRem i 2) []  where
+    bitstring' (n,d) r = seq c $
+        case n of
+        0 -> r'
+        _ -> bitstring' (quotRem n 2) r' 
+        where
+            c  = ifelse (d == 0) off on
+            r' = c : r            
 
 instance Formattable BitString where
     format (BitString bits) =  format <$> bits |> collapse |> prefix n
@@ -83,37 +89,44 @@ instance ToInteger BitString where
 instance Show BitString where
     show = string . format
 
-instance Additive BitString where
-    add (BitString s1) (BitString s2) = BitString <| s1 <> s2
-    
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
+    {-# INLINE int #-}
 
 instance ToWord Bit where
     word (Bit flag) = ifelse (flag == On) 1 0
-    
+    {-# INLINE word #-}
+
 instance FromInt Bit where
     fromInt i = ifelse (i /= 0) on off
+    {-# INLINE fromInt #-}
 
 instance FromWord Bit where
     fromWord i = ifelse (i /= 0) on off
-    
+    {-# INLINE fromWord #-}
+
+-- Follows the logic of "and"    
 instance Multiplicative Bit where
     mul (Bit On) (Bit On) = on
     mul _ _ = off
+    {-# INLINE mul #-}
 
+instance Unital Bit where
+    one = on
+    {-# INLINE one #-}
+    
+-- Follows the logic of "or"
 instance Additive Bit where
-    add (Bit On) (Bit On) = off
+    add (Bit On) (Bit On) = on
     add (Bit On) (Bit Off) = on
     add (Bit Off) (Bit On) = on
     add (Bit Off) (Bit Off) = off
+    {-# INLINE add #-}
 
-instance Subtractive Bit where
-    sub (Bit On) (Bit On) = off
-    sub (Bit On) (Bit Off) = on
-    sub (Bit Off) (Bit On) = on
-    sub (Bit Off) (Bit Off) = off
-    
+instance Nullary Bit where    
+    zero = off
+    {-# INLINE zero #-}
+
 instance Invertible Bit where 
     invert (Bit On) = off
     invert (Bit Off) = on
@@ -124,34 +137,32 @@ instance Semigroup Bit where
     (<>) = (+)
     {-# INLINE (<>) #-}    
 
-instance Absolutist Bit where 
+instance Absolute Bit where 
     abs = id
     {-# INLINE abs #-}
 
-instance Nullary Bit where
-    zero = off
-    {-# INLINE zero #-}
-
-instance Unital Bit where
-    one = on
-    {-# INLINE one #-}
 
 instance Monoid Bit where 
     mempty = off
     {-# INLINE mempty #-}
 
+instance Group Bit
+instance Semiring Bit
+
 instance Boolean Bit where
     bool (Bit On) = True
     bool (Bit Off) = False
-    
+    {-# INLINE bool #-}
+
 instance ToBit Bool where
     bit True = on
-    bit False = off    
+    bit False = off
+    {-# INLINE bit #-}    
 
 instance Formattable Flag where
     format On = "1"
     format Off = "0"
-
+    
 instance Formattable Bit where
     format (Bit Off) = "0"
     format _ = "1"
@@ -170,8 +181,11 @@ instance Bounded Bit where
 
 instance Enum Bit where
     fromEnum (Bit b) = fromEnum b
+    {-# INLINE fromEnum #-}
+
     toEnum = Bit . toEnum
-    
+    {-# INLINE toEnum #-}
+
 instance Storable Bit where
     sizeOf _ = 1
     alignment _ = 1
@@ -183,22 +197,29 @@ instance Storable Bit where
 instance Bits Bit where
     (.&.) (Bit On) (Bit On) = on
     (.&.) _ _ = off
+    {-# INLINE (.&.) #-}
 
     (.|.) (Bit Off) (Bit Off) = off
     (.|.) _ _ = on
-    
+    {-# INLINE (.|.) #-}
+
     xor (Bit On) (Bit Off) = on
     xor (Bit Off) (Bit On) = on
     xor _ _ = off
+    {-# INLINE xor #-}
 
     complement   = invert
-    
+    {-# INLINE complement #-}
+
     shift x i = x
-    
+    {-# INLINE shift #-}
+
     rotate x i = x
+    {-# INLINE rotate #-}
 
     bit 0 = off
     bit 1 = on
+    {-# INLINE bit #-}
 
     bitSize _     = 1
 
@@ -211,17 +232,6 @@ instance Bits Bit where
 
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
-
-
-bitstring::(Integral a) => a -> BitString
-bitstring i = BitString $ bitstring' (quotRem i 2) []  where
-    bitstring' (n,d) r = seq c $
-        case n of
-        0 -> r'
-        _ -> bitstring' (quotRem n 2) r' 
-        where
-            c  = ifelse (d == 0) off on
-            r' = c : r            
         
 
 instance ToBitString Int where

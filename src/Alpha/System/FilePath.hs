@@ -21,7 +21,7 @@ where
 import Alpha.Text
 import Alpha.Canonical
 import Alpha.Base
-import Alpha.Data.Maybe
+
 
 
 -- | Represents some part of a path, i.e. a full path, a folder name,
@@ -123,7 +123,7 @@ getExtension' x = case (x |> rightOfLast dot) of
         _ -> none
 
 instance PathComponent DriveLetter where
-    path (DriveLetter x) = concat (format x )  colon        
+    path (DriveLetter x) = (format x ) <>  colon        
 instance PathComponent FilePath where
     path (FilePath x) = x
 instance PathComponent FolderPath where

@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Collective.Concatenable
+module Alpha.Canonical.Collective.Appendable
 (
     Appendable(..), 
     Prependable(..),
@@ -27,13 +27,9 @@ type instance Concatenated Text Char = Text
 type instance Concatenated Char Text = Text
 type instance Concatenated Char Char = Text
 
-
 -- | Characterizes a pair whose terms can be related via an append operation
 class Appendable a b where
     append::a -> b -> Concatenated a b
-
-    concat::a -> b -> Concatenated a b
-    concat = append
 
     (+++) :: a -> b -> Concatenated a b
     (+++) x y = append x y
@@ -43,8 +39,7 @@ class Appendable a b where
 class Prependable a b where
     prepend::a -> b -> Concatenated a b
 
-
-instance Appendable [a] [a]where
+instance Appendable [a] [a] where
     append = (List.++)
     
 instance Prependable [a] [a] where

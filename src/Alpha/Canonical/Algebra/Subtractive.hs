@@ -1,7 +1,7 @@
 module Alpha.Canonical.Algebra.Subtractive
 (
     
-    Delta(..), Subtractive(..), HSubtractive(..)
+    Delta(..), Subtractive(..), Bisubtractive(..)
     
 ) where
 import Alpha.Base hiding(div)
@@ -26,13 +26,13 @@ class Subtractive a where
     infixl 6 -    
 
 -- / Characterizes a pair of type that supports a notion of heterogenious subtraction
-class HSubtractive a b where
+class Bisubtractive a b where
     -- | Calculates the difference between the first value and the second
-    hsub::a -> b -> Delta a b
+    bisub::a -> b -> Delta a b
 
     -- | Infix synonym for 'hsub'        
     (>-<)::a -> b -> Delta a b
-    (>-<) = hsub
+    (>-<) = bisub
     infixl 6 >-<    
     
 -- Subtractive

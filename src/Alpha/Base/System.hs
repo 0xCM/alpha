@@ -10,7 +10,7 @@ module Alpha.Base.System
     IO, IOMode(..), hClose, hFileSize, openFile, print, putStr,
     PrimBase(..),PrimMonad(..),PrimState(..),
     IORef, readIORef, writeIORef, atomicModifyIORef', newIORef,
-    
+    unsafeDupablePerformIO,
     shredIO, shredPrim, 
     unsafeCoerce,
     readFileText', readFileBytes',

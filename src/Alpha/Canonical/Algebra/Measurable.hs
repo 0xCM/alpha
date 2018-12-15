@@ -2,15 +2,16 @@ module Alpha.Canonical.Algebra.Measurable
 (
     Measurable(..),
     Dimensional(..),    
-    Length(..),
-    Vapid(..),
-    Counted(..)
+    Length(..)
 
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
+
 import qualified Data.List as List
 import qualified Data.Text as Text
+import qualified Data.MultiSet as Bag
+import qualified Data.Set as Set
 
 -- | Characterizes measurable things, in the spirit, but not formally, of Lebesque
 class Measurable (n::Nat) a where
@@ -24,32 +25,15 @@ class Dimensional a where
 
 class Length a where    
     length::forall b. (Num b) => a -> b
-    
--- | Defines membership predicated on the ability to be counted by an existential machine
-class Counted a where
-    -- | Counts the number of items within the purview of the subject
-    count::(Integral n) => a -> n
-
--- Characterizes types that are inhabited by 'degenerate'  or "empty" values
--- Examples include empty lists, mathematical intervals 
--- that represent a single value, etc. What precicely constitutes a 
--- a degenerate value for a given type is implementation-defined
--- See https://en.wikipedia.org/wiki/Degeneracy_(mathematics)
-class Vapid a where
-    empty::a -> Bool
-
+        
 instance Length a => Measurable 1 a where
-    measure = length
-    
+    measure = length    
 instance Length [a] where
     length x = List.length x |> fromIntegral
-    
-instance Vapid [a] where
-    empty a = List.length a == 0
-    
+
+
 instance Length Text where
-    length t =   Text.length t |> fromIntegral
-    
+    length t =   Text.length t |> fromIntegral    
 instance Length Char where
     length c = 1
-    
+        

@@ -19,7 +19,6 @@ import Data.Bits hiding(bit)
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Text.Combinators
-import Alpha.Data.Conversion
 import Alpha.Data.Bit
 import GHC.TypeLits
 

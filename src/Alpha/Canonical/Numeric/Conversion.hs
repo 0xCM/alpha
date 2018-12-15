@@ -1,39 +1,68 @@
------------------------------------------------------------------------------
--- | Defines the elementary number-related API surface
--- Copyright   :  (c) 0xCM, 2018
--- License     :  MIT
--- Maintainer  :  0xCM00@gmail.com
------------------------------------------------------------------------------
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeFamilyDependencies #-}
-
-module Alpha.Data.Conversion
-(    
+module Alpha.Canonical.Numeric.Conversion
+(
+    FromDouble(..), ToDouble(..),
+    FromInt(..), ToInt(..),
+    ToWord(..), FromWord(..),
+    ToInteger(..),
+    ToNatural(..), FromNatural(..),
+    Doubly(..),
+    ToIntegral(..),
     int8, int16, int32, int64,
     word8, word16, word32, word64,
     ratio, rational, fractional,
 
-    
-)
-where
-import GHC.Num hiding (abs) 
-import GHC.Real hiding (mod)
---import Prelude(realToFrac)
-
-import qualified GHC.Num as N
-import qualified Data.List as L
-import qualified Data.Text as Text
-import qualified Data.Ratio as DR
-import qualified GHC.Real as Real
-import qualified GHC.Float as Float
-import Data.Ratio(Ratio(..))
-
-import Numeric((**))
-import Alpha.Base hiding(zero)
-import Alpha.Canonical hiding((+),(*),(-),(^),(^^),(**), range)
+) where
+import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Operators
+import Alpha.Canonical.Relations
+
+import qualified Data.Ratio as DR
+
+-- | Characterizies a type whose values can be converted to/from 'Double' values    
+type Doubly a = (ToDouble a, FromDouble a)
+
+-- | Characterizies a type whose values can be materialized from 'Double' values
+class FromDouble d where
+    -- | Converts a 'Double' value to a 'd' value
+    fromDouble::Double -> d
+
+-- | Characterizies a type whose values can be converted to 'Double' values
+class ToDouble d where
+    -- / Converts a 'd' value to a 'Double' value
+    double::d -> Double
+
+-- | Characterizies a type whose values can be converted to machine-sized 'Int' values
+class ToInt d where
+    int::d -> Int  
+
+-- | Characterizies a type whose values can be materialized from machine-sized 'Int' values
+class FromInt a where
+    fromInt::Int -> a
+    
+class ToIntegral a where
+    integral::(Integral b) => a -> b
+        
+-- | Characterizies a type whose values can be converted to arbitrary-sized 'Integer' values
+class ToInteger d where
+    integer::d -> Integer
+
+-- | Characterizies a type whose values can be converted to machine-sized 'Word' values
+class ToWord d where
+    word::d -> Word
+
+-- | Characterizies a type whose values can be materialized from machine-sized 'Word' values
+class FromWord a where
+    fromWord::Word -> a
+
+-- | Characterizies a type whose values can be converted to 'Natural' values
+class ToNatural d where
+    natural::d -> Natural
+
+-- | Characterizies a type whose values can be materialized from 'Natural' values
+class FromNatural a where
+    fromNatural::Natural -> a
+
 
 -- | Constructs a list of Int values from a list of Integral values
 ints::(ToInt n) => [n] -> [Int]
@@ -87,16 +116,38 @@ ratio m n =  (DR.%) m n
 
 -- Forms a 'Rational' number from a 'Real' number
 rational::(Real r) => r -> Rational
-rational = toRational
+rational = toRational'
 {-# INLINE rational #-} 
 
 -- Produces a 'Fractional' number from a 'Real' number
 fractional::(Real r, Fractional f) => r -> f
-fractional = realToFrac
+fractional = realToFrac'
 {-# INLINE fractional #-} 
-
-instance (Integral a, Num b) => Convertible a b where
-    convert = fromIntegral
+    
+instance ToIntegral Int where
+    integral = fromIntegral    
+instance ToIntegral Int8 where
+    integral = fromIntegral    
+instance ToIntegral Int16 where
+    integral = fromIntegral    
+instance ToIntegral Int32 where
+    integral = fromIntegral    
+instance ToIntegral Int64 where
+    integral = fromIntegral    
+instance ToIntegral Integer where
+    integral = fromIntegral    
+instance ToIntegral Word where
+    integral = fromIntegral    
+instance ToIntegral Word8 where
+    integral = fromIntegral    
+instance ToIntegral Word16 where
+    integral = fromIntegral    
+instance ToIntegral Word32 where
+    integral = fromIntegral    
+instance ToIntegral Word64 where
+    integral = fromIntegral    
+instance ToIntegral Natural where
+    integral = fromIntegral    
 
 -- FromDouble
 -------------------------------------------------------------------------------
@@ -189,8 +240,8 @@ instance ToDouble Word64 where
     {-# INLINE double #-}    
 instance (Integral a, ToDouble a) => ToDouble (Ratio a) where 
     double x = divf' n d where
-        n = double <| numerator x
-        d = double <| denominator x        
+        n = double <| numerator' x
+        d = double <| denominator' x        
     {-# INLINE double #-}        
 instance ToDouble Float where 
     double = float2Double
@@ -510,3 +561,7 @@ instance ToNatural CFloat where
 instance ToNatural CDouble where 
     natural = truncate
     {-# INLINE natural #-}
+
+instance (Integral a, Num b) => Convertible a b where
+    convert = fromIntegral
+    

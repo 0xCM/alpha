@@ -4,12 +4,13 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Collective.Zippable
+module Alpha.Canonical.Collective.Transformations
 (
-    Zippable(..)
+    Zippable(..), Groupable(..)
 ) where
 
 import Alpha.Base
+import Alpha.Canonical.Element
 import qualified Data.List as List
 
 -- Characterizes a composition and pairing of heterogenous values
@@ -29,6 +30,13 @@ class Zippable a b c where
     
     zip::Zipper a b c -> LeftZip a b c -> RightZip a b c -> Zipped a b c
     
+class Groupable c where
+    group::(Element c -> Element c -> Bool) -> c -> [[Element c]]
+                
+instance Groupable [a] where
+    group = List.groupBy
+
+    
 instance Zippable [a] [b] [c] where
     type LeftZip [a] [b] [c] = [a]
     type RightZip [a] [b] [c] = [b]
@@ -36,5 +44,6 @@ instance Zippable [a] [b] [c] where
     type Zipper [a] [b] [c] = a -> b -> c
 
     zip = List.zipWith
+
 
 

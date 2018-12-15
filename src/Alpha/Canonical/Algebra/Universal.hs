@@ -11,11 +11,17 @@ module Alpha.Canonical.Algebra.Universal
 
 import Alpha.Base
 import Alpha.Canonical.Element
+import Alpha.Canonical.Operators
+
 import qualified Data.List as List
+import qualified Data.Set as Set
 
 class Universal c where
     all::(Element c -> Bool) -> c -> Bool
 
 instance Universal [a] where
     all = List.all
+    
+instance Universal (ItemSet a) where
+    all pred s = s |> Set.toList |> List.all pred
     

@@ -5,7 +5,7 @@ module Alpha
   
 ) where
     
-import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(**))
+import Alpha.Base as Base hiding((<=),(>=),(<),(>),zero,div,(**),empty)
 
 import Alpha.Canonical as X
 import Alpha.Claim as X

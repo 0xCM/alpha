@@ -13,6 +13,3 @@ instance Cloneable Int Text where
     clone = T.replicate
     
 
-instance Weavable Char Text where
-    weave = T.intersperse
-    

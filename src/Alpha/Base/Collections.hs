@@ -11,12 +11,12 @@ module Alpha.Base.Collections
     HashMap, 
     Tree, Forest,
     Seq, 
-    Set,
+    ItemSet,
     Bag,
     Map, associate,
     IsList(..),   
     Stream,
-    Ix(..),
+    Ix,
     NonEmpty(..),
     Vector,
 
@@ -38,11 +38,12 @@ import Data.List.NonEmpty(NonEmpty((:|)) )
 import GHC.Exts(IsList(..))
 import Data.Ord
 
-
 import qualified Data.MultiSet as MS
 import qualified Data.Map.Strict as Map
 
 type Bag a = MS.MultiSet a
+type ItemSet a = Set a
+
 
 -- | Produces an associative array for a list of key-value pairs
 associate::(Ord k) => [(k,v)] -> Map k v

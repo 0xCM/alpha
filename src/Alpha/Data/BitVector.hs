@@ -36,10 +36,9 @@ import Numeric
 
 import Alpha.Types.Nats
 import Alpha.Types.Some
-import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod)
+import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod,rem)
 import Alpha.Text.Combinators
 import Alpha.Base
-import Alpha.Data.Conversion
 import GHC.Real(mod)
 
 data BitVector (w :: Nat) :: Type where

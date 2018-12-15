@@ -11,6 +11,7 @@ module Alpha.Canonical.Collective.Filterable
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
+import Alpha.Canonical.Relations.Predicates
 import Alpha.Canonical.Collective.Containers
 
 import qualified Data.List as List  
@@ -39,7 +40,7 @@ instance (Eq a) => Filterable [a] where
 instance Filterable (Seq a) where
     filter = Seq.filter
         
-instance (Ord a) => Filterable (Set a) where
+instance (Ord a) => Filterable (ItemSet a) where
     filter = Set.filter
 
 -- | Excludes a specified subset of list elements from the result list

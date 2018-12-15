@@ -7,12 +7,10 @@ module Alpha.Canonical.Algebra.Semiring
 import Alpha.Base    
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Unital
-import Alpha.Canonical.Algebra.Nullary
 import Alpha.Canonical.Algebra.Monoid
 
 -- | Almost A ring; elements are not required though to have an additive inverse
-class (Additive a, Multiplicative a, Unital a, Nullary a, Monoid a ) 
+class (Additive a, Multiplicative a) 
     => Semiring a where
 
 -- Semiring (+) (*)
@@ -34,3 +32,5 @@ instance Semiring Float
 instance Semiring Double
 instance Semiring CFloat
 instance  Semiring CDouble
+
+instance (Ord a,Multiplicative a) => Semiring (ItemSet a)

@@ -36,12 +36,12 @@ newtype HexLine = HexLine (Int, Text)
     deriving (Eq,Ord)
 
 class Identifier a where
-    type Identity a
-    identity::a -> Identity a    
+    type Identified a
+    identity::a -> Identified a    
 
 class Source a where
     type Emitted a
-    read::Identity a -> s -> Emitted a
+    read::Identified a -> s -> Emitted a
 
 class Target a where
     type Received a

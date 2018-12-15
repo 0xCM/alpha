@@ -13,17 +13,13 @@ module Alpha.Data.ByteString
     bytestring
 )
 where
-import System.IO.Unsafe
+import Alpha.Base
+import Alpha.Text.Combinators
+import Alpha.Canonical hiding(range)
+import Alpha.Data.Bits
 import System.Entropy
-import Data.Word
-import Data.Int
-import Data.Functor
-import Data.Function
-import Data.Bool
-import Data.Tuple
-import Data.Eq
-
-import Data.List(takeWhile,head)
+import Data.Ix(range)
+--import Data.List(takeWhile,head)
 
 import qualified Data.Text as Text
 import qualified Data.ByteString.Lazy as LBS
@@ -31,20 +27,9 @@ import qualified Data.ByteString.Lazy.Char8 as LC8
 import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString as EG
 import qualified Data.ByteString.Lazy as LZ
-
-import Data.Ix(range)
-import GHC.Enum
-import GHC.Real
-import GHC.Exts
-import GHC.TypeLits(natVal, KnownNat)
 import qualified Data.Ix as Ix
 import qualified Data.List as L
 
-import Alpha.Data.Conversion
-import Alpha.Text.Combinators
-import Alpha.Canonical hiding(range)
-import Alpha.Data.Maybe
-import Alpha.Data.Bits
 
 type instance Concatenated EG.ByteString EG.ByteString = EG.ByteString
 type instance Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
@@ -113,7 +98,7 @@ instance Length EG.ByteString where
     length = convert . EG.length 
 
 instance Indexed EG.ByteString Int where 
-    lookup = EG.index
+    at = EG.index
 
 instance Packable [Word8] LZ.ByteString where
     pack = LZ.pack
@@ -126,12 +111,11 @@ instance Length LZ.ByteString where
     length = convert . LZ.length 
 
 instance Indexed LZ.ByteString Int where    
-    lookup x n = LZ.index x (int64 n)
+    at x n = LZ.index x (int64 n)
 
-    
 instance Convertible EG.ByteString [Word8] where
     convert source = source |> bytes 0 (length source - 1) 
 
 instance Chunkable EG.ByteString where
-    chunk n = takeWhile (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
+    chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
         

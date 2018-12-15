@@ -12,8 +12,10 @@ import Alpha.Native
 class LeftScalar k a where
     type LeftScaled k a
 
+    -- | Left-multiplication of a by a scalar k
     scaleL::k -> a -> LeftScaled k a
 
+    -- | Left-multiplication of a by a scalar k
     (*.)::k -> a -> LeftScaled k a
     (*.) = scaleL
     infixl 5 *.
@@ -21,8 +23,10 @@ class LeftScalar k a where
 class RightScalar a k where
     type RightScaled a k
 
+    -- | Right-multiplication of a by a scalar k    
     scaleR::a -> k -> RightScaled a k
 
+    -- | Right-multiplication of a by a scalar k    
     (.*)::a -> k -> RightScaled a k
     (.*) = scaleR
     infixl 5 .*

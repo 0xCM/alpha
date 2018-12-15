@@ -9,7 +9,7 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Base.Digits 
 (
-
+    
 ) where
 
 import GHC.Real

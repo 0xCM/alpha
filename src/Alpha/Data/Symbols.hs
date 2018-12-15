@@ -11,9 +11,7 @@
 
 module Alpha.Data.Symbols 
 (
-    typeSymbol,
-    typeSymbols,
-    facetVal
+    FacetValue(..), facetVal
 
 ) where
 import Data.Functor
@@ -26,16 +24,6 @@ import qualified Data.Text as T
 
 data FacetValue f v = FacetValue v
 
-symstr :: forall s. KnownSymbol s => String
-symstr = symbolVal @s Proxy
-
--- | Forms a 'SomeSymbol' value from a 'String'
-typeSymbol::String -> SomeSymbol
-typeSymbol = someSymbolVal
-
--- | Forms a list of 'SomeSymbol' values from a list of'String'
-typeSymbols::[String] ->[SomeSymbol]
-typeSymbols s = typeSymbol <$> s
         
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val

@@ -15,8 +15,6 @@ module Alpha.Data.Message
 import Alpha.Base
 import Alpha.Canonical
 
-
-
 -- Defines a severity classifier
 data Severity =
      Trivia -- Verbose

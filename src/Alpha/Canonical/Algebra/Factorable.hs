@@ -5,8 +5,6 @@ module Alpha.Canonical.Algebra.Factorable
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Relations
-import Alpha.Canonical.Operators
 
 type family Factored a = r | r -> a
 

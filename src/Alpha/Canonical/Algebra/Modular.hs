@@ -1,26 +1,31 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Alpha.Canonical.Algebra.Modular
 (
-    Modulo(..), Modular(..), HModular(..),
+    Modulo(..), Modular(..), Bimodular(..),
 
     Zn, BasedInt,
     Base(..),
     zN, modulus, residues,residue,
     based, base2, base10, base16,
     base, digits,
+
+    (/%), (/%%)
 ) where
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Text
+import Alpha.Canonical.Element
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Divisive
-import Alpha.Canonical.Algebra.Nullary
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
+import Alpha.Canonical.Algebra.Nullary
+import Alpha.Canonical.Algebra.Unital
 import qualified Data.Vector as Vector
 
 import qualified Data.List as List
@@ -68,14 +73,23 @@ type instance Element (Zn n) = Residue n
 
 class (Nullary a, Eq a, Divisive a) => Modular a where
     -- | Calculates the remainder of dividing the first operand by the second
+    rem::BinaryOperator a
+
     mod::BinaryOperator a
 
-    -- | Infix synonym for 'mod'
+    -- | Infix synonym for 'rem'
     (%)::BinaryOperator a
-    (%) = mod
+    (%) = rem
     {-# INLINE (%) #-}
     infix 8 %
 
+    -- | Infix synonym for 'mod'
+    (%%)::BinaryOperator a
+    (%%) = mod
+    {-# INLINE (%%) #-}
+    infix 8 %%
+
+    
     -- Determines whether m is evenly Divisive by n
     divides::a -> a -> Bool
     divides m n = m % n == zero
@@ -85,21 +99,31 @@ class (Nullary a, Eq a, Divisive a) => Modular a where
     -- Divisive by n
     modpart::(Ix a) => (a, a) -> a -> [a]
     modpart (min,max) n 
-        = range (min, max) 
+        = range' (min, max) 
         |> (<$>) (\j -> case divides j n of True -> j; _ -> zero)
         |> List.filter (\j -> j /= zero)
     {-# INLINE modpart #-}      
 
-class HModular a b where
+class Bimodular a b where
     -- | Calculates the remainder of dividing the first operand by the second
-    hmod::a -> b -> Modulo a b
+    bimod::a -> b -> Modulo a b
 
-    -- | Infix synonym for 'hmod'
+    -- | Infix synonym for 'bimod'
     (>%<)::a -> b -> Modulo a b
-    (>%<) = hmod
+    (>%<) = bimod
     {-# INLINE (>%<) #-}
     infix 8 >%<
 
+(/%)::(Integral n) => n -> n -> (n,n)
+(/%) = quotRem
+{-# INLINE (/%) #-}
+infixl 5 /%
+
+(/%%)::(Integral n) => n -> n -> (n,n)
+(/%%) = divMod
+{-# INLINE (/%%) #-}
+infixl 5 /%%
+        
 -- | Constructs an integer with a specified base
 based::forall (n::Nat) i. (Integral i) => i -> BasedInt n i
 based i = BasedInt i
@@ -121,7 +145,7 @@ zN::forall n. KnownNat n => Zn n
 zN = Zn $ natg @n
 
 modulus::forall n.KnownNat n => Zn n -> Integer
-modulus (Zn n) = n `mod` (natg @n)
+modulus (Zn n) = mod' n (natg @n)
 
 residue::(KnownNat n) => Integer -> Residue n 
 residue m = Residue (zN) m
@@ -180,7 +204,9 @@ instance forall b. KnownNat b => Formattable (Digits b ) where
 
 instance forall b. KnownNat b => Show (Digits b ) where
     show = string . format
-        
+
+instance  KnownNat n => Set (Zn n)
+
 instance  KnownNat n => Membership (Zn n) where    
     members s = residues s |> Set.fromList
 
@@ -191,6 +217,9 @@ instance KnownNat n => Additive (Residue n) where
     add (Residue zN a) (Residue _ b) 
         = residue( (a + b) % (modulus zN) )
 
+instance KnownNat n => Nullary (Residue n) where        
+    zero = residue 0
+
 instance KnownNat n => Subtractive (Residue n) where
     sub (Residue zN a) (Residue _ b) 
         = residue( (a - b) % (modulus zN) )
@@ -199,39 +228,77 @@ instance KnownNat n => Multiplicative (Residue n) where
     mul (Residue zN a) (Residue _ b) 
         = residue( (a * b) % (modulus zN) )    
 
+instance KnownNat n => Unital (Residue n) where        
+    one = residue 1
+
 instance Modular Natural where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Integer where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Int where 
-    mod = mod'
+    rem = rem'
+    {-# INLINE rem #-}
+    mod = mod'    
     {-# INLINE mod #-}
+
 instance Modular Int8 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Int16 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Int32 where 
-    mod = mod'
+    rem = rem'
+    {-# INLINE rem #-}
+    mod = mod'    
     {-# INLINE mod #-}
+
 instance Modular Int64 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Word where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Word8 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Word16 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Word32 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}
+
 instance Modular Word64 where 
+    rem = rem'
+    {-# INLINE rem #-}
     mod = mod'
     {-# INLINE mod #-}

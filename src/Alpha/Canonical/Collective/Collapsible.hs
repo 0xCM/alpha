@@ -12,7 +12,7 @@ import qualified Data.Set as Set
 
 type family Collapsed a
 
-type instance Collapsed (Set (Set a)) = Set a        
+type instance Collapsed (ItemSet (ItemSet a)) = ItemSet a        
 type instance Collapsed [[a]] = [a]
 type instance Collapsed [a] = a
 type instance Collapsed (Tree a) = [a]
@@ -25,7 +25,7 @@ class Collapsible a where
 instance Collapsible (Tree a) where
     collapse = Tree.flatten
 
-instance (Ord a) => Collapsible (Set (Set a)) where
+instance (Ord a) => Collapsible (ItemSet (ItemSet a)) where
     collapse = Set.unions . toList
         
 instance Collapsible [[a]] where

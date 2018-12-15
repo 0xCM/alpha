@@ -1,16 +1,9 @@
-module Alpha.Canonical.Algebra.Semigroup
-(
-    AbelianSemigroup(..)
-) where
+module Alpha.Canonical.Algebra.Semigroup where
 import Alpha.Base 
 import Alpha.Native
 
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Additive
-
-class (Semigroup a, Additive a, Subtractive a) 
-    => AbelianSemigroup a where    
-
         
 -- Semigroup
 -------------------------------------------------------------------------------
@@ -66,17 +59,3 @@ instance Semigroup CDouble where
     (<>) = add'
     {-# INLINE (<>) #-}
 
-instance AbelianSemigroup Int
-instance AbelianSemigroup Int8
-instance AbelianSemigroup Int16
-instance AbelianSemigroup Int32
-instance AbelianSemigroup Int64
-instance AbelianSemigroup Integer
-instance AbelianSemigroup Word
-instance AbelianSemigroup Word8
-instance AbelianSemigroup Word16
-instance AbelianSemigroup Word32
-instance AbelianSemigroup Word64
-instance AbelianSemigroup Natural
-instance (Integral a) => AbelianSemigroup (Ratio a)
-    

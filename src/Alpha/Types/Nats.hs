@@ -25,7 +25,6 @@ import qualified GHC.Natural as TN
 import qualified GHC.TypeLits as TL
 import Alpha.Types.Some
 import Alpha.Types.Common
-import Alpha.Data.Conversion
 
 newtype NatRepr (n::Nat) = NatRepr {
    natValue :: Integer

@@ -87,6 +87,7 @@ asciL::[Text]
 asciL = [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
         Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
         Sl, Tl, Ul, Vl, Wl, Xl, Yl, Zl]
+        
 
 
 pattern LBrace = "{"::Text
@@ -136,5 +137,6 @@ pattern EOL = "\n"::Text
 pattern Less = "<"::Text
 pattern Greater = ">"::Text
 pattern Equal = "="::Text
+
 
 

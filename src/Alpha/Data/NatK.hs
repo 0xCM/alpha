@@ -14,7 +14,6 @@ module Alpha.Data.NatK
 
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Data.Conversion
     
 -- Unifies type naturals and value-level integers
 newtype NatK k = NatK Integer    
@@ -141,30 +140,30 @@ instance forall m. (KnownNat m) => Incrementable (NatK m) where
     inc (NatK m)  = m + 1 |> NatK
     {-# INLINE inc #-}
     
-instance forall m n. (KnownNatPair m n) =>  HModular (NatK m) (NatK n) where    
-    hmod::NatK m -> NatK n -> Modulo (NatK m) (NatK n)
-    hmod (NatK m) (NatK n) = m % n |> NatK
-    {-# INLINE hmod #-}
+instance forall m n. (KnownNatPair m n) =>  Bimodular (NatK m) (NatK n) where    
+    bimod::NatK m -> NatK n -> Modulo (NatK m) (NatK n)
+    bimod (NatK m) (NatK n) = m % n |> NatK
+    {-# INLINE bimod #-}
 
-instance forall m n. (KnownNatPair m n) =>  HMultiplicative (NatK m) (NatK n) where    
-    hmul::NatK m -> NatK n -> Biproduct (NatK m) (NatK n)
-    hmul (NatK m) (NatK n) = m * n |> NatK
-    {-# INLINE hmul #-}
+instance forall m n. (KnownNatPair m n) =>  Bimultiplicative (NatK m) (NatK n) where    
+    bimul::NatK m -> NatK n -> Biproduct (NatK m) (NatK n)
+    bimul (NatK m) (NatK n) = m * n |> NatK
+    {-# INLINE bimul #-}
 
-instance forall m n. (KnownNatPair m n) =>  HAdditive (NatK m) (NatK n) where    
-    hadd::NatK m -> NatK n -> Bisum (NatK m) (NatK n)
-    hadd (NatK m) (NatK n) = m + n |> NatK
-    {-# INLINE hadd #-}
+instance forall m n. (KnownNatPair m n) =>  Biadditive (NatK m) (NatK n) where    
+    biadd::NatK m -> NatK n -> Bisum (NatK m) (NatK n)
+    biadd (NatK m) (NatK n) = m + n |> NatK
+    {-# INLINE biadd #-}
 
-instance forall m n. (KnownNatPair m n) =>  HSubtractive (NatK m) (NatK n) where    
-    hsub::NatK m -> NatK n -> Delta (NatK m) (NatK n)
-    hsub (NatK m) (NatK n) = m - n |> NatK
-    {-# INLINE hsub #-}
+instance forall m n. (KnownNatPair m n) =>  Bisubtractive (NatK m) (NatK n) where    
+    bisub::NatK m -> NatK n -> Delta (NatK m) (NatK n)
+    bisub (NatK m) (NatK n) = m - n |> NatK
+    {-# INLINE bisub #-}
 
-instance forall m n. (KnownNatPair m n) =>  HDivisive (NatK m) (NatK n) where    
-    hdiv::NatK m -> NatK n -> Quotient (NatK m) (NatK n)
-    hdiv (NatK m) (NatK n) = m * n |> NatK
-    {-# INLINE hdiv #-}
+instance forall m n. (KnownNatPair m n) =>  Bidivisive (NatK m) (NatK n) where    
+    bidiv::NatK m -> NatK n -> Quotient (NatK m) (NatK n)
+    bidiv (NatK m) (NatK n) = m * n |> NatK
+    {-# INLINE bidiv #-}
 
 instance forall m n. (KnownNatPair m n) =>  Powered (NatK m) (NatK n) where    
     raise (NatK m) (NatK n) = (natural m) ^ (natural n) |> fromNatural |> NatK

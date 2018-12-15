@@ -2,8 +2,6 @@
 :set -XMultiParamTypeClasses
 :set -XTypeSynonymInstances
 :set -XOverloadedStrings
-:set -XOverloadedLists
-:set -XGeneralizedNewtypeDeriving
 :set -XDeriveDataTypeable
 :set -XDeriveGeneric
 :set -XTypeFamilies

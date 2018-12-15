@@ -24,24 +24,7 @@ where
 
 import Alpha.Base
 import Alpha.Canonical hiding(Func,Functional)
--- import Alpha.Data.Product
--- import Alpha.Data.Sum
 import qualified Data.Tuple as Tuple
-
-
--- instance Compositional (b,c) (a,b) (b,c)        
-
--- -- Synonym for an 'uncurried' function
--- type Uncurried a b c = Function (a, b) c
-
--- -- Synonym for an 'curried' function
--- type Curried a b c =  a -> b -> c
-
--- curry::Uncurried a b c -> Curried a b c
--- curry = Tuple.curry
-
--- uncurry::Curried a b c -> Uncurried a b c
--- uncurry = Tuple.uncurry
 
 -- A synonym for a constant function
 type Func0 r  = r

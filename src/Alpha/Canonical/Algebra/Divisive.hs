@@ -1,8 +1,6 @@
 module Alpha.Canonical.Algebra.Divisive
 (
-    Quotient(..), Divisive(..), HDivisive(..), 
-    
-
+    Quotient(..), Divisive(..), Bidivisive(..),     
 ) where
 import Alpha.Base hiding(div)
 import Alpha.Native
@@ -46,51 +44,51 @@ class Divisive a where
     infixl 8 /    
 
 -- | Characterizes pairs of types that support a notion of division
-class HDivisive a b where
+class Bidivisive a b where
     -- | Divides the first value by the second        
-    hdiv::a -> b -> Quotient a b
+    bidiv::a -> b -> Quotient a b
 
     -- | Infix synonym for 'hdiv'
     (>/<)::a -> b -> Quotient a b
-    (>/<) = hdiv
+    (>/<) = bidiv
     {-# INLINE (>/<) #-}        
     infixl 8 >/<
 
 instance Divisive Natural where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Integer where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Int where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Int8 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Int16 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Int32 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Int64 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Word where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Word8 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Word16 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Word32 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance Divisive Word64 where 
-    div = div'
+    div = quot
     {-# INLINE div #-}
 instance (Integral a) => Divisive (Ratio a) where 
     div = divf'
@@ -110,54 +108,54 @@ instance Divisive CDouble where
 
 -- HDivisive
 -------------------------------------------------------------------------------
-instance HDivisive Natural Natural where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Integer Integer where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Int Int where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Int8 Int8 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Int16 Int16 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Int32 Int32 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Int64 Int64 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Word Word where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Word8 Word8 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Word16 Word16 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Word32 Word32 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance HDivisive Word64 Word64 where 
-    hdiv = div'
-    {-# INLINE hdiv #-}
-instance (Integral a) => HDivisive (Ratio a) (Ratio a) where 
-    hdiv = divf'    
-    {-# INLINE hdiv #-}
-instance HDivisive Float Float where 
-    hdiv = divf'
-    {-# INLINE hdiv #-}
-instance HDivisive Double Double where 
-    hdiv = divf'
-    {-# INLINE hdiv #-}
-instance HDivisive CFloat CFloat where 
-    hdiv = divf'
-    {-# INLINE hdiv #-}
-instance HDivisive CDouble CDouble where 
-    hdiv = divf'
-    {-# INLINE hdiv #-}
+instance Bidivisive Natural Natural where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Integer Integer where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Int Int where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Int8 Int8 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Int16 Int16 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Int32 Int32 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Int64 Int64 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Word Word where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Word8 Word8 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Word16 Word16 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Word32 Word32 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance Bidivisive Word64 Word64 where 
+    bidiv = div'
+    {-# INLINE bidiv #-}
+instance (Integral a) => Bidivisive (Ratio a) (Ratio a) where 
+    bidiv = divf'    
+    {-# INLINE bidiv #-}
+instance Bidivisive Float Float where 
+    bidiv = divf'
+    {-# INLINE bidiv #-}
+instance Bidivisive Double Double where 
+    bidiv = divf'
+    {-# INLINE bidiv #-}
+instance Bidivisive CFloat CFloat where 
+    bidiv = divf'
+    {-# INLINE bidiv #-}
+instance Bidivisive CDouble CDouble where 
+    bidiv = divf'
+    {-# INLINE bidiv #-}

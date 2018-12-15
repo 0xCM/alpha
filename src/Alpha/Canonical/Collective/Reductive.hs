@@ -6,19 +6,29 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Collective.Reductive
 (
-    Reductive(..),
-    inits,
-
+    reduce, scan, inits, 
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
+import Alpha.Canonical.Element
+import Alpha.Canonical.Collective.Containers
+import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Nullary
 
 import qualified Data.List as List
 
-class Reductive a where
-    type Reduced a
+-- | Identical to List.inits except that the empty list is excluded from the result
+inits'::[a] -> [[a]]
+inits' = (List.filter (\x -> List.length x /= 0 )) . List.inits
 
+inits::(IsList a) => a -> [[Item a]]
+inits x = fromList $ inits' $ toList x
+
+
+type family Reduced a
+type instance Reduced [a] = a
+
+class Reductive a where
     -- The reduction operator // takes a binary operator ⊕ on its left and a vector
     -- x of values on its right. The meaning of ⊕//x for x = [a,b,...z] is the value a⊕b⊕...⊕z
     -- See [Y1987TWOX]
@@ -39,11 +49,10 @@ class Reductive a where
 
 
 -- | Identical to List.inits except that the empty list is excluded from the result
-inits::[a] -> [[a]]
-inits = (List.filter (\x -> List.length x /= 0 )) . List.inits
+-- inits::[a] -> [[a]]
+-- inits = (List.filter (\x -> List.length x /= 0 )) . List.inits
 
 instance (Nullary a) => Reductive [a] where
-    type Reduced [a] = a
 
     reduce::BinaryOperator a -> [a] -> a
     reduce op (a:b:tail) =  op (op a b)  (reduce op tail)

@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.101
+version:             0.0.116
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -39,11 +39,11 @@ default-extensions:
   MultiWayIf
   NoImplicitPrelude
   OverloadedLabels
-  OverloadedLists
   OverloadedStrings
   ParallelListComp
   PatternSynonyms
   PolyKinds
+  PostfixOperators
   QuasiQuotes
   RankNTypes
   RecursiveDo

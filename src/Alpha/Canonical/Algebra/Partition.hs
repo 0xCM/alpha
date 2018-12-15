@@ -8,8 +8,8 @@ module Alpha.Canonical.Algebra.Partition
 
 ) where
 import Alpha.Base
+import Alpha.Canonical.Element
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Extremal
 import qualified Data.List as List
 import qualified Numeric.Interval as I
 
@@ -26,7 +26,6 @@ class (Ord a, Ord b) => Spanned a b where
     -- | Creates a contiguous span between supplied endpoints
     span::a -> b -> Span a b
     
-
     -- | The span operator, an infix synonym for 'span'
     (...)::a -> b -> Span a b
     (...) = span

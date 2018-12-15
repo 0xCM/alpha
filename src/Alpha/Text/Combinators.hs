@@ -8,7 +8,7 @@ module Alpha.Text.Combinators
     leftOfFirst, rightOfLast,ltrim,
     zpadL, padL,
     hexstring,showBasedInt,bitstring,bitstringN,
-    tuplestring,textlen, 
+    textlen, 
     suffixIfMissing, 
     prefixIfMissing, 
     
@@ -96,14 +96,14 @@ prefixIfMissing::Text -> Text -> Text
 prefixIfMissing match subject 
     = case isPrefix match subject of
         True -> subject
-        False -> concat match subject
+        False -> match <> subject
 
 -- | Conditionally appends a suffix to the subject
 suffixIfMissing::Text -> Text -> Text
 suffixIfMissing match subject 
     = case isSuffix match subject of
         True -> subject
-        False -> concat match subject
+        False -> match <> subject
 
 -- | Removes leading occurrence of match and returns the result; otherwise, 
 -- returns the input value
@@ -114,7 +114,7 @@ ltrim match subject =
         _ -> subject
 
 -- | Encodes a finite integral value as a base-16 Text
-hexstring :: (Show n, FiniteIntegral n) => n -> Text
+hexstring :: (Show n, Integral n, FiniteBits n) => n -> Text
 hexstring n = showBasedInt 16 n |> zpadL width
     where width = 16 |> div (finiteBitSize n)
 
@@ -123,7 +123,7 @@ showBasedInt::(Integral n, Show n) => n -> n -> Text
 showBasedInt b n = showIntAtBase b intToDigit n "" |> Text.pack
 
 -- | Encodes a finite integral value as a base-2 Text
-bitstring ::(Show n, FiniteIntegral n) => n -> Text
+bitstring ::(Show n, Integral n, FiniteBits n) => n -> Text
 bitstring n = showBasedInt 2 n |> zpadL width
     where width = finiteBitSize n
 
@@ -131,8 +131,3 @@ bitstring n = showBasedInt 2 n |> zpadL width
 bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitstringN w n = showBasedInt 2 n |> zpadL w
 
--- Formats a list of formattable items as a tuple
-tuplestring::(Formattable a) => [a] -> Text
-tuplestring src =  Text.concat [lparen, content, rparen]
-    where content = Text.concat (format <$> (weave comma flist))
-          flist = format <$> src

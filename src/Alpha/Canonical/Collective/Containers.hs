@@ -4,6 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Collective.Containers
 (
     Container(..),
@@ -20,6 +21,7 @@ import Alpha.Canonical.Relations
 
 import Alpha.Canonical.Collective.Discrete
 import Alpha.Canonical.Collective.Sequential
+import Alpha.Canonical.Collective.Counted
 
 import qualified Data.List as List
 import qualified Data.Sequence as Seq
@@ -27,6 +29,7 @@ import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Tree as Tree
+import qualified Data.Vector as Vector
 
 -- / Characterizes a container 'c' dispensing elements of type e
 class (IsList c) => Container c where
@@ -64,21 +67,15 @@ tree::(b -> (a, [b])) -> b-> Tree a
 tree = Tree.unfoldTree
 
 -- Constructs a set from a list
-set::Ord a => [a] -> Set a
+set::Ord a => [a] -> ItemSet a
 set = Set.fromList
 
 countDistinct::Bag a -> Int
 countDistinct = Bag.distinctSize
 
 
-
 testTree = tree (\x -> (x, [1..x])) 5
 
-instance Counted (Set a) where
-    count = fromIntegral . Set.size
-    
-instance Counted (Bag a) where
-    count = fromIntegral . Bag.size    
 
 instance IsList (Stream a) where
     type Item (Stream a) = a
@@ -94,25 +91,27 @@ instance Container (Stream e) where
     contain [x] = Stream.cycle [x]
     contents s = Stream.takeWhile (\_ -> True) s
         
-instance (Ord a) => FiniteContainer (Set a) where    
+instance (Ord a) => FiniteContainer (ItemSet a) where    
     
-instance (Ord a, PartialOrder a) =>  IsList (Bag a) where
+instance (Ord a) =>  IsList (Bag a) where
     type Item (Bag a) = a
     toList = Bag.toList
     fromList = bag
     
-instance (Ord a, PartialOrder a) => Container (Bag a) where        
-    contain = Bag.fromList
-    contents = Bag.toList
-    
+instance (Ord a) => Container (Bag a)
+
 instance (Eq a) => Container [a] where
     contain x = x
     contents = id
     
-instance (Ord a) => Container (Set a) where
+instance (Ord a) => Container (ItemSet a) where
     contain = Set.fromList
     contents = Set.toList
     
 instance Container (Seq a) where
     contain x = Seq.fromList x
     contents = toList    
+
+instance Container (Vector a)
+
+instance (Ord k) => Container (Map k v)

@@ -13,7 +13,7 @@ newtype DisjointUnion a b = DisjointUnion (a, b)
 
 type instance Paired a b (DisjointUnion a b) = (DisjointUnion a b)
 
-instance Pairing (Set a) (Set b) (DisjointUnion (Set a) (Set b)) where
+instance Pairing (ItemSet a) (ItemSet b) (DisjointUnion (ItemSet a) (ItemSet b)) where
     pair a b = DisjointUnion (a, b)
     first (DisjointUnion (a,b)) = a
     second (DisjointUnion (a,b)) = b

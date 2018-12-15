@@ -10,19 +10,20 @@ module Alpha.Base.Algebra
     Arg, ArgMin, ArgMax,
     Bool(..),(&&), (||), not, otherwise,
     Monoid(..),
-    Dual(..), Endo(..), All(..), Any(..), Sum(..),
+    Dual(..), Endo(..), All(..), Any(..),
     Semigroup(..), Min(..), Max(..), First(..), Last(..),
     Groupoid(..),
     Semigroupoid(..), 
     TotalOrder, Ord, Ordering,
     Functor(..),
-    Eq(..),
+    Eq(..), (!=),
+    Bounded(..), Enum(..)
 
 )
 where
 import Data.Eq(Eq(..),(==),(/=))
 import Data.Monoid(Monoid(mempty, mappend,mconcat))
-import Data.Monoid(Dual(..), Endo(..), All(..), Any(..),  Sum(..),Alt(..))    
+import Data.Monoid(Dual(..), Endo(..), All(..), Any(..),  Alt(..))    
 import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Functor(Functor(..))
 import Data.Groupoid(Groupoid(..))
@@ -30,6 +31,7 @@ import Data.Semigroup(Semigroup(..), Min(..), Max(..), First(..), Last(..),(<>),
 import Data.Ord(Ord,Ordering)    
 import Data.Semigroupoid(Semigroupoid(..))
 import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl')
+import GHC.Enum(Bounded(..),Enum(..))
 
 type TotalOrder a = Ord a
 
