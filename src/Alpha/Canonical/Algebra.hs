@@ -3,7 +3,6 @@ module Alpha.Canonical.Algebra(module X) where
 import Alpha.Canonical.Algebra.Additive as X
 import Alpha.Canonical.Algebra.Boolean as X
 import Alpha.Canonical.Algebra.Combinable as X
-import Alpha.Canonical.Algebra.Comparable as X
 import Alpha.Canonical.Algebra.Digit as X
 import Alpha.Canonical.Algebra.Divisive as X
 import Alpha.Canonical.Algebra.DisjointUnion as X
@@ -29,6 +28,7 @@ import Alpha.Canonical.Algebra.Successive as X
 import Alpha.Canonical.Algebra.Semigroup as X
 import Alpha.Canonical.Algebra.Semiring as X
 import Alpha.Canonical.Algebra.Universal as X
+import Alpha.Canonical.Algebra.Unital as X
 
 
             

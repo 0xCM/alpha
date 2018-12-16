@@ -48,11 +48,3 @@ instance Digital 7
 instance Digital 8
 instance Digital 9
 
--- instance forall b n. (KnownNat b, Integral n) => ToInteger (Digits b n) where
---     integer = fromIntegral . undigits
--- instance forall b n. (KnownNat b, Integral n) => ToNatural (Digits b n) where
---     natural = fromIntegral . undigits    
--- instance forall b n. (KnownNat b, Integral n) => ToWord (Digits b n) where
---     word = fromIntegral . undigits        
--- instance forall b n. (KnownNat b, Integral n) => ToInt (Digits b n) where
---     int = fromIntegral . undigits            

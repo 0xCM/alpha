@@ -1,22 +1,29 @@
 module Alpha.Canonical.Algebra.Negatable
 (    
     Negatable(..),
-
+    Negated(..), 
+    Binegatable(..),
 )
 where
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Relations.Tuples
 
+-- Defines a family of types that represent the result of applying a
+-- (potentially) heterogeneous negation operation
+type family Negated a
+
+
+-- / Characterizes types for which unary negation is defined
+class Binegatable a where
+    -- | Negates the operand    
+    binegate::a -> Negated a
+
 
 -- / Characterizes types for which unary negation is be defined
 class Negatable a where
-    -- The range of negation
-    type Negated a
-    type Negated a = a
-
     -- | Negates the operand    
-    negate::a -> Negated a
+    negate::a -> a
 
 -- Negatable 
 -------------------------------------------------------------------------------
@@ -61,24 +68,35 @@ type Negatable3 a1 a2 a3 = (Negatable2 a1 a2, Negatable a3)
 type Negatable4 a1 a2 a3 a4 = (Negatable3 a1 a2 a3, Negatable a4)
 type Negatable5 a1 a2 a3 a4 a5 = (Negatable4 a1 a2 a3 a4, Negatable a5)
 
-type NegatedTuple2 a1 a2 = Tuple2 (Negated a1) (Negated a2)
-type NegatedTuple3 a1 a2 a3 = Tuple3 (Negated a1) (Negated a2) (Negated a3)
-type NegatedTuple4 a1 a2 a3 a4 = Tuple4 (Negated a1) (Negated a2) (Negated a3) (Negated a4)   
-type NegatedTuple5 a1 a2 a3 a4 a5 = Tuple5 (Negated a1) (Negated a2) (Negated a3) (Negated a4) (Negated a5)  
-
-instance Negatable2 a1 a2 => Negatable (Tuple2 a1 a2) where
-    type Negated (Tuple2 a1 a2) = NegatedTuple2 a1 a2
+instance Negatable2 a1 a2 => Negatable (Tuple2 a1 a2) where    
     negate (a1,a2) = (negate a1, negate a2)
 
 instance Negatable3 a1 a2 a3 => Negatable (Tuple3 a1 a2 a3) where
-    type Negated (Tuple3 a1 a2 a3) = NegatedTuple3 a1 a2 a3
     negate (a1,a2,a3) = (negate a1, negate a2, negate a3)
 
 instance Negatable4 a1 a2 a3 a4 => Negatable (Tuple4 a1 a2 a3 a4) where
-    type Negated (Tuple4 a1 a2 a3 a4) = NegatedTuple4 a1 a2 a3 a4
     negate (a1,a2,a3,a4) = (negate a1, negate a2, negate a3, negate a4)
 
 instance Negatable5 a1 a2 a3 a4 a5  => Negatable (Tuple5 a1 a2 a3 a4 a5)  where
-    type Negated (Tuple5 a1 a2 a3 a4 a5) = NegatedTuple5 a1 a2 a3 a4 a5
     negate (a1,a2,a3,a4,a5) = (negate a1, negate a2, negate a3, negate a4, negate a5)
                     
+type instance Negated Integer = Integer
+type instance Negated Int = Int
+type instance Negated Int8 = Int8
+type instance Negated Int16 = Int16
+type instance Negated Int32 = Int32
+type instance Negated Int64 = Int64
+type instance Negated (Ratio a) = Ratio a
+type instance Negated Float = Float
+type instance Negated Double = Double
+type instance Negated CFloat = CFloat
+type instance Negated CDouble = CDouble
+
+type instance Negated Natural = Integer
+type instance Negated Word = Int
+type instance Negated Word8 = Int8
+type instance Negated Word16 = Int16
+type instance Negated Word32 = Int32
+type instance Negated Word64 = Int64
+
+    

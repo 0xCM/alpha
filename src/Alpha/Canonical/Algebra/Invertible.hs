@@ -11,3 +11,6 @@ import Alpha.Native
 class Invertible a where
     invert::a -> a
 
+instance Integral a => Invertible (Ratio a) where
+    invert 0 = 0
+    invert x = recip x

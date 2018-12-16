@@ -38,9 +38,9 @@ type KnownNatQuad m n p q = (KnownNatPair m n, KnownNatPair p q)
 
 type instance Element (NatKPair m n) = Integer
 type instance Element (NatKSpan m n) = Integer
-type instance Bisum (NatK m) (NatK n) = NatK(m + n)
-type instance Biproduct (NatK m) (NatK n) = NatK(m * n)
-type instance Delta (NatK m) (NatK n) = NatK(m - n)
+type instance Summed (NatK m) (NatK n) = NatK(m + n)
+type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
+type instance Subtracted (NatK m) (NatK n) = NatK(m - n)
 type instance Quotient (NatK m) (NatK n) = NatK (m / n)
 type instance Modulo (NatK m) (NatK n) = NatK (m % n)
 type instance Decrement (NatK m) = NatK (m - 1)
@@ -113,7 +113,6 @@ instance forall k. KnownNat k => Formattable (NatK k) where
 instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
 
-
 instance forall m n. (KnownNatPair m n) =>  Pairing (NatK m) (NatK n) (NatKPair m n) where    
     pair _ _ = NatKPair (natK @m, natK @n)
     first _ = natK @m
@@ -121,6 +120,7 @@ instance forall m n. (KnownNatPair m n) =>  Pairing (NatK m) (NatK n) (NatKPair 
     
 instance forall m n. (KnownNatPair m n) =>  Factorable (NatKPair m n) where    
     factor (NatKPair (m,n)) = (m,n)
+    unfactor (m,n) = NatKPair (m,n)
         
 instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where    
     span::NatK m -> NatK n -> Span (NatK m) (NatK n)
@@ -146,17 +146,17 @@ instance forall m n. (KnownNatPair m n) =>  Bimodular (NatK m) (NatK n) where
     {-# INLINE bimod #-}
 
 instance forall m n. (KnownNatPair m n) =>  Bimultiplicative (NatK m) (NatK n) where    
-    bimul::NatK m -> NatK n -> Biproduct (NatK m) (NatK n)
+    bimul::NatK m -> NatK n -> Multiplied(NatK m) (NatK n)
     bimul (NatK m) (NatK n) = m * n |> NatK
     {-# INLINE bimul #-}
 
 instance forall m n. (KnownNatPair m n) =>  Biadditive (NatK m) (NatK n) where    
-    biadd::NatK m -> NatK n -> Bisum (NatK m) (NatK n)
+    biadd::NatK m -> NatK n -> Summed (NatK m) (NatK n)
     biadd (NatK m) (NatK n) = m + n |> NatK
     {-# INLINE biadd #-}
 
 instance forall m n. (KnownNatPair m n) =>  Bisubtractive (NatK m) (NatK n) where    
-    bisub::NatK m -> NatK n -> Delta (NatK m) (NatK n)
+    bisub::NatK m -> NatK n -> Subtracted (NatK m) (NatK n)
     bisub (NatK m) (NatK n) = m - n |> NatK
     {-# INLINE bisub #-}
 
@@ -165,27 +165,37 @@ instance forall m n. (KnownNatPair m n) =>  Bidivisive (NatK m) (NatK n) where
     bidiv (NatK m) (NatK n) = m * n |> NatK
     {-# INLINE bidiv #-}
 
-instance forall m n. (KnownNatPair m n) =>  Powered (NatK m) (NatK n) where    
-    raise (NatK m) (NatK n) = (natural m) ^ (natural n) |> fromNatural |> NatK
-    {-# INLINE raise #-}
+instance Nullary (NatK 0) where    
+    zero::NatK 0
+    zero = natK @0    
+    {-# INLINE zero #-}
+
+instance Unital (NatK 1) where    
+    one::NatK 1
+    one = natK @1    
+    {-# INLINE one #-}
+        
+-- instance forall m . (KnownNat m) => Powered (NatK m) where    
+--     pow (NatK m) n = (natural m) ^ (natural n) |> fromNatural |> NatK
+--     {-# INLINE pow #-}
     
-instance forall m n. (KnownNatPair m n) =>  IsLT (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  LT (NatK m) (NatK n) where    
     lt (NatK m) (NatK n) = m < n 
     {-# INLINE lt #-}
 
-instance forall m n. (KnownNatPair m n) =>  IsGT (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  GT (NatK m) (NatK n) where    
     gt (NatK m) (NatK n) = m > n 
     {-# INLINE gt #-}
 
-instance forall m n. (KnownNatPair m n) =>  IsEQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  EQ (NatK m) (NatK n) where    
     eq (NatK m) (NatK n) = m == n 
     {-# INLINE eq #-}
         
-instance forall m n. (KnownNatPair m n) =>  IsLTEQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  LTEQ (NatK m) (NatK n) where    
     lteq (NatK m) (NatK n) = m <= n 
     {-# INLINE lteq #-}
 
-instance forall m n. (KnownNatPair m n) =>  IsGTEQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  GTEQ (NatK m) (NatK n) where    
     gteq (NatK m) (NatK n) = m >= n 
     {-# INLINE gteq #-}
     

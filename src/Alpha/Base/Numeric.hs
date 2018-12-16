@@ -14,8 +14,8 @@ module Alpha.Base.Numeric
     Integral, quot, quotRem, divMod, gcd,lcm,
     Floating, pi, exp, log, sin, cos, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt,
     double2Float, float2Double,
-    Fractional, recip, fromRational, frac,
-    Rational(..), Ratio(..), 
+    Fractional, recip, fromRational, divf,
+    Ratio, frac,
     Real,fromIntegral,
     RealFrac, properFraction, truncate, round, ceiling, floor,realToFrac,
     RealFloat, floatRadix, floatDigits, floatRange, decodeFloat, encodeFloat, exponent, significand, scaleFloat, isNaN, isIEEE, isInfinite, isDenormalized, isNegativeZero, atan2,
@@ -29,7 +29,7 @@ module Alpha.Base.Numeric
 ) where
 import Data.Int(Int,Int8,Int16,Int32,Int64)
 import Data.Word(Word,Word8,Word16,Word32,Word64)
-import Data.Ratio(Ratio(..), Rational(..))
+import Data.Ratio(Ratio, (%))
 import GHC.Num(Num,Integer,fromInteger,signum,Natural)
 import GHC.Real(Fractional(..),RealFrac(..),Real, fromIntegral)
 import GHC.Real(Integral(..), gcd, lcm, rem, quot, mod,  divMod, quotRem,)
@@ -40,7 +40,11 @@ import Foreign.C(CDouble,CFloat)
 import Numeric.Interval(Interval, (+/-),width)
 
 -- | Infix alias for the base fractional division operator (/)
-frac::(Fractional a) => a -> a -> a
-frac = (/)
-{-# INLINE frac #-}
+divf::(Fractional a) => a -> a -> a
+divf = (/)
+{-# INLINE divf #-}
 
+-- Defines a rational number as a fraction
+frac::(Integral n) => n -> n -> Ratio n
+frac m n =  m % n
+{-# INLINE frac #-}

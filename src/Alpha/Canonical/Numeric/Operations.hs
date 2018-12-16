@@ -76,11 +76,11 @@ instance Absolute UCDouble where
     abs = id
     {-# INLINE abs #-}
 
-nextB::(BoundedIntegral n,Additive n) => n -> Maybe n
-nextB n = ifelse (n == maxBound) none (just (n + 1))
+-- nextB::(BoundedIntegral n,Additive n) => n -> Maybe n
+-- nextB n = ifelse (n == maxBound) none (just (n + 1))
 
-priorB::(BoundedIntegral n,Subtractive n) => n -> Maybe n
-priorB n = ifelse (n == minBound) none (just (n - 1))
+-- priorB::(BoundedIntegral n,Subtractive n) => n -> Maybe n
+-- priorB n = ifelse (n == minBound) none (just (n - 1))
     
 
 instance Enumerable Integer where
@@ -96,44 +96,44 @@ instance Integral n => Enumerable (Ratio n) where
     prior n = ifelse (n > 0) (just(n - 1)) none
         
 instance Enumerable Word where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Word8 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Word16 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Word32 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Word64 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Int where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Int8 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Int16 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Int32 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance Enumerable Int64 where
-    next = nextB
-    prior = priorB
+    next n = ifelse (n == maxBound) none (just (n + 1))
+    prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance InvariantSet Int where
     invariants =  [minBound .. maxBound]                

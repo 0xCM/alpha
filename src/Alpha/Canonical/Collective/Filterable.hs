@@ -11,7 +11,6 @@ module Alpha.Canonical.Collective.Filterable
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Relations.Predicates
 import Alpha.Canonical.Collective.Containers
 
 import qualified Data.List as List  

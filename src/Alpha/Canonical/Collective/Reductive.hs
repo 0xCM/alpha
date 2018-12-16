@@ -6,12 +6,13 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Collective.Reductive
 (
-    reduce, scan, inits, 
+    Reduced(..),
+    Reductive(..),
+    inits, 
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Element
-import Alpha.Canonical.Collective.Containers
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Nullary
 

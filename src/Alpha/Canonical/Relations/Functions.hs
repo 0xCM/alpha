@@ -6,83 +6,91 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Functions
 (
-    PairFunc(..), Pairs(..),
-    Func, UnaryFunc, CartesianFunc, BinaryFunc, TernaryFunc, Functional(..),
-    Compositional(..), Composition(..)
-
+    Dom(..),
+    Cod(..),
+    Composition(..), 
+    Compositional(..), 
+    Function(..),
+    Functional(..)
+    
 ) where
 import Alpha.Base
+import Alpha.Canonical.Operators
+import Alpha.Canonical.Relations.Relation
+import Control.Category(Category(..))
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.List as List
 
--- A synonym for the canonical unary function type
-type Func a b = a -> b
-
--- | Defines a collection of ordered pairs    
-newtype Pairs a b = Pairs [(a,b)]
-    deriving (Show,Eq,Ord,Generic)
-instance Newtype (Pairs a b)
 
 -- | Defines a collection of ordered pairs, no two of which have the
 -- same first term and is thus, by definition, a function    
 newtype PairFunc a b = PairFunc (Map a b)
-    deriving (Show,Eq,Ord,Generic)
+    deriving (Generic,Eq,Ord,Show)
 instance Newtype (PairFunc a b)
 
--- | Characterizes types from which functions may be extracted
-class Functional (f::Type->Type->Type) (a::Type) (b::Type) where    
-    func::f a b -> Func a b
-    
-    
--- | Synonym for function that saturates with 1 argument
-type UnaryFunc a b = Func a b
+newtype WrapFunc a b = WrapFunc (Func a b)
+    deriving (Generic)
+instance Newtype (WrapFunc a b)
 
--- | Synonym for endomorphism
-type EndoFunc a = Func a a
-
--- | Synonym for function that saturates with 1 cartesian argument
--- that aligns with the following definiion:
--- A **Cartesian function** is any function whose domain consists
--- of 2-tuples, i.e., f:(a,b) -> c 
-type CartesianFunc a b c = Func (a,b) c
-
--- | Synonym for function that saturates with 2 heterogenous arguments
--- that aligns with the follwing definition
--- A **binary function** is a function that accepts two arguments and
--- produces a value. Note that a binary function cannot be cartesian
--- nor conversely.
-type BinaryFunc a b c = a -> b -> c
-
--- | Function synonym that saturates with 3 heterogenous arguments
-type TernaryFunc a b c d = a -> b -> c -> d
-
-
-instance (Eq a, Eq b) => Functional Pairs a b where
-    func (Pairs pairs) =  \a -> Maybe.fromJust $ List.lookup a pairs
-
-instance Ord a => Functional PairFunc a b where    
-    func (PairFunc m) =  (Map.!) m
-
-class Compositional g f where
-    compose::g -> f -> Composition g f
-
+-- | Defines a family of types that specify function composition
+-- Mor precisely, given a function g whose domain coincides with
+-- the codomain of a function f the 'Composition' type of g and f
+-- is the type of the function h:Dom f -> Cod g where h = g . f
 type family Composition g f
 type instance Composition (Func b c) (Func a b) = Func a c
-type instance Composition (PairFunc b c) (PairFunc a b) = PairFunc a c
-        
-instance Compositional (Func b c) (Func a b) where
-    compose g f = g . f    
+type instance Composition (Map b c) (Map a b) = Map a c
+type instance Composition (WrapFunc b c) (WrapFunc a b) = WrapFunc a c
+
+-- | Characterizes function composition    
+class Compositional g f where
+    compose::g -> f -> Composition g f
     
-instance (Ord a, Ord b) => Compositional (PairFunc b c) (PairFunc a b) where
-    compose mg mf = mh where
-        f = func mf
-        g = func mg
+-- Defines a family of types that specify function domains
+type family Dom f 
+type instance Dom (Func a b) = a
+type instance Dom (Map a b) = a
+type instance Dom (WrapFunc a b) = a
+
+-- Defines a family of types that specify function codomains
+type family Cod f     
+type instance Cod (Func a b) = b
+type instance Cod (Map a b) = b
+type instance Cod (WrapFunc a b) = b
+
+-- | Defines a family of types that specify function definitions
+data family Function f      
+data instance Function (Func a b) = FreeFunction (a -> b)
+data instance Function (Map a b)  = PairFunction (Map a b)
+data instance Function (WrapFunc a b)  = WrapFunction (WrapFunc a b)
+
+class Functional f where    
+    func::Function f -> Func (Dom f) (Cod f)
+
+instance forall f a b. (Ord a, a ~ Dom f, b ~ Cod f, f ~ Map a b) => Functional (Map a b) where    
+    func (PairFunction m) = g
+        where
+            g::Dom f -> Cod f
+            g x = m Map.! x
+
+instance forall f a b. (a ~ Dom f, b ~ Cod f, f ~ Map a b) => Functional (Func a b) where    
+    func (FreeFunction f) = f
+
+instance forall f a b. (a ~ Dom f, b ~ Cod f, f ~ WrapFunc a b) => Functional (WrapFunc a b) where    
+    func (WrapFunction f) = unwrap f
+                        
+instance (Ord a, Ord b) => Compositional (Map b c) (Map a b) where
+    compose mg mf= mh where
+        f = func' mf
+        g = func' mg
         h = g . f
-        z = (\a -> (a, h a)) <$> Map.keys (unwrap mf)
-        mh = PairFunc $ Map.fromList z
+        z = (\a -> (a, h a)) <$> Map.keys mf
+        mh = Map.fromList z
+        func' m =  (Map.!) m
 
-newtype FComposition f g a = FComposition ( f (g a) )
-
-instance (Functor f, Functor g) => Functor (FComposition f g) where
-    fmap f (FComposition x) = FComposition (fmap (fmap f) x )
+instance Compositional (WrapFunc b c) (WrapFunc a b) where
+    compose g f = wrap $ (unwrap g) . (unwrap f)
+        
+instance Category WrapFunc where
+    id = wrap (\x -> x)
+    (.) = compose        

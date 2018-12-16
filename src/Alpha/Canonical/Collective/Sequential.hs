@@ -11,7 +11,6 @@ module Alpha.Canonical.Collective.Sequential
 
 import Alpha.Base
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Relations.Predicates
 import Alpha.Canonical.Element
 
 import qualified Data.List as List

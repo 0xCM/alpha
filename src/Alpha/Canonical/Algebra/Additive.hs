@@ -1,28 +1,28 @@
 module Alpha.Canonical.Algebra.Additive
 (
-    Bisum(..), Additive(..), Biadditive(..),    
+    Additive(..),
+    Summed(..), 
+    Biadditive(..),    
     
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
 import Alpha.Native
+import Alpha.Canonical.Operators
+import Alpha.Canonical.Relations.Tuples
 
 import qualified Data.Set as Set
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous addition
 -- where a type instance is the addition result type
-type family Bisum a b
+type family Summed a b
 
--- | Characterizes a type that supports a notion of  *commutative* addition      
--- Thus, the following invariant must hold:
--- forall a b => add a b = add b a
+-- | Characterizes a type that supports a notion of  addition      
 class Additive a where
     -- | Adds the first operand with the second
-    add::BinaryOperator a
-    
-    
+    add::a -> a -> a
+        
     -- | Infix synonym for 'add'    
-    (+)::BinaryOperator a
+    (+)::a -> a -> a
     (+) = add
     {-# INLINE (+) #-}
     infixl 6 +
@@ -32,14 +32,14 @@ class Additive a where
 -- hadd a + b != b + a
 class Biadditive a b where
     -- | Adds the first operand with the second
-    biadd::a -> b -> Bisum a b
+    biadd::a -> b -> Summed a b
 
     -- | Infix synonym for 'hadd'
-    (>+<)::a -> b -> Bisum a b
+    (>+<)::a -> b -> Summed a b
     (>+<) = biadd
     {-# INLINE (>+<) #-}
     infixl 6 >+<
-
+    
 instance (Ord a) =>  Additive (ItemSet a) where
     add = union'
     {-# INLINE add #-}
@@ -113,8 +113,6 @@ instance Additive CDouble where
     {-# INLINE add #-}
 
     
--- Additive tuples
--------------------------------------------------------------------------------
 type Additive2 a1 a2 = (Additive a1, Additive a2)
 type Additive3 a1 a2 a3 = (Additive2 a1 a2, Additive a3)
 type Additive4 a1 a2 a3 a4 = (Additive3 a1 a2 a3, Additive a4)
@@ -131,3 +129,29 @@ instance Additive4 a1 a2 a3 a4 => Additive (a1,a2,a3,a4) where
 
 instance Additive5 a1 a2 a3 a4 a5 => Additive (a1,a2,a3,a4,a5) where
     add (x1,x2,x3,x4,x5) (y1,y2,y3,y4,y5) = (x1 + y1, x2 + y2,x3 + y3, x4 + y4,x5 + y5)
+
+type instance Summed Natural Natural = Natural
+type instance Summed Integer Integer = Integer
+type instance Summed Int Int = Int
+type instance Summed Int8 Int8 = Int8
+type instance Summed Int16 Int16 = Int16
+type instance Summed Int32 Int32 = Int32
+type instance Summed Int64 Int64 = Int64
+type instance Summed Word Word = Word
+type instance Summed Word8 Word8 = Word8
+type instance Summed Word16 Word16 = Word16
+type instance Summed Word32 Word32 = Word32
+type instance Summed Word64 Word64 = Word64
+type instance Summed (Ratio a) (Ratio a) = Ratio a
+type instance Summed Float Float = Float
+type instance Summed Double Double = Double
+type instance Summed CFloat CFloat = CFloat
+type instance Summed CDouble CDouble = CDouble
+type instance Summed (ItemSet a) (ItemSet a) = ItemSet a
+
+type UniSum a = Summed a a
+type instance Summed (Tuple2 a1 a2) (Tuple2 a1 a2) = Tuple2 (UniSum a1) (UniSum a2)
+type instance Summed (Tuple3 a1 a2 a3) (Tuple3 a1 a2 a3) = Tuple3 (UniSum a1) (UniSum a2) (UniSum a3)
+type instance Summed (Tuple4 a1 a2 a3 a4) (Tuple4 a1 a2 a3 a4) = Tuple4 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4)
+type instance Summed (Tuple5 a1 a2 a3 a4 a5) (Tuple5 a1 a2 a3 a4 a5) = Tuple5 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4) (UniSum a5)
+    

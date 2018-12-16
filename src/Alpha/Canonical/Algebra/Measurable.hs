@@ -1,8 +1,9 @@
 module Alpha.Canonical.Algebra.Measurable
 (
     Measurable(..),
-    Dimensional(..),    
-    Length(..)
+    Dimension(..), Dimensional(..),    
+    Length(..),
+    
 
 ) where
 import Alpha.Base
@@ -13,6 +14,8 @@ import qualified Data.Text as Text
 import qualified Data.MultiSet as Bag
 import qualified Data.Set as Set
 
+type family Dimension a
+
 -- | Characterizes measurable things, in the spirit, but not formally, of Lebesque
 class Measurable (n::Nat) a where
     measure::forall b. (Num b) => a -> b
@@ -20,7 +23,6 @@ class Measurable (n::Nat) a where
 -- Characterizes a type for which a notion of dimensionality 
 -- can be defined, e.g., an array, matrix or more generally a tensor
 class Dimensional a where
-    type Dimension a
     dimension::a -> Dimension a
 
 class Length a where    

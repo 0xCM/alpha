@@ -27,6 +27,7 @@ module Alpha.Base.Functors
     Distributive, distribute, collect, cotraverse,
     Extend, duplicated, extended,
     Functor, fmap, (<$>), ($>), (<$),
+    Functorial(..),
     Foldable, foldMap, fold, foldr, foldr', foldl, foldl', foldby, 
     Identity, identity,
     Monad, (>>=),
@@ -66,6 +67,11 @@ import Data.Biapplicative(Biapplicative, (<<*>>), bipure, biliftA2, (*>>), (<<*)
 import Data.Monoid(Monoid)
 
 
+-- Captures two functors which can be used to make a third via composition
+newtype Functorial f g a = Functorial ( f (g a) )
+
+instance (Functor f, Functor g) => Functor (Functorial f g) where
+    fmap f (Functorial x) = Functorial (fmap (fmap f) x )
 
 -- -- A synonym for the Sum functor
 -- type SumF = Sum.Sum

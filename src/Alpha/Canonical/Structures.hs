@@ -1,5 +1,6 @@
 module Alpha.Canonical.Structures 
 (
+    Structure(..),
     Unital(..),
     Nullary(..),
     Invertible(..),
@@ -12,19 +13,35 @@ where
 
 import Alpha.Canonical.Element
 
-class (Membership s) => Unital s where
-    one::Element s
+class Structure a where
+    elements::a -> [Element a]
 
-class (Membership s) => Nullary s where
-    zero::Element s
+instance Set (Structure a)
+
+
+class (Structure a) => Multiplicative a where
+    (*)::Element a -> Element a -> Element a
+
+class (Structure a) => Unital a where
+    one::Element a
     
-class (Membership s) => Invertible s where
-    invert::Element s -> Element s    
+class (Structure a) => Invertible a where
+    invert::Element a -> Element a    
+        
+class (Structure a) => Additive a where
+    (+)::Element a -> Element a -> Element a
 
-class (Membership s) => Semigroup s where
-    (<>)::Element s -> Element s -> Element s
+class (Structure s) => Nullary s where
+    zero::Element a
+    
+class (Structure a) => Negatable a where
+    negate::Element a -> Element a    
+        
 
-class (Unital s, Semigroup s) => Monoid s where    
-    mempty::Element s
+class (Multiplicative s) => Semigroup s where
+    
+class (Semigroup a, Unital a) => Monoid a where    
 
-class (Monoid s, Invertible s) => Group s
+class (Monoid s, Invertible s) => Group s where
+
+class (Multiplicative a, Unital a, Additive a, Nullary a) => Semiring a

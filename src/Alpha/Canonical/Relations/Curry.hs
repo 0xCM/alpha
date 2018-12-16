@@ -11,7 +11,8 @@ module Alpha.Canonical.Relations.Curry
 ) where
 
 import Alpha.Base
-import Alpha.Canonical.Relations.Functions
+import Alpha.Canonical.Operators
+
 
 -- | Represents an injective family of type-level functions that produce
 -- uncurried types

@@ -1,18 +1,19 @@
 module Alpha.Canonical.Algebra.Subtractive
 (
     
-    Delta(..), Subtractive(..), Bisubtractive(..)
+    Subtractive(..), 
+    Subtracted(..), 
+    Bisubtractive(..)
     
 ) where
 import Alpha.Base hiding(div)
 import Alpha.Canonical.Operators
 import Alpha.Native
 
-
 -- | Represents a family of types that support a notion of (potentially) heterogeneous 
 -- subtraction where the instance type is the result type of applying a 
 -- conforming subtraction operation
-type family Delta a b
+type family Subtracted a b
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -28,12 +29,13 @@ class Subtractive a where
 -- / Characterizes a pair of type that supports a notion of heterogenious subtraction
 class Bisubtractive a b where
     -- | Calculates the difference between the first value and the second
-    bisub::a -> b -> Delta a b
+    bisub::a -> b -> Subtracted a b
 
     -- | Infix synonym for 'hsub'        
-    (>-<)::a -> b -> Delta a b
+    (>-<)::a -> b -> Subtracted a b
     (>-<) = bisub
     infixl 6 >-<    
+
     
 -- Subtractive
 -------------------------------------------------------------------------------
@@ -89,3 +91,21 @@ instance Subtractive CDouble where
     sub = sub'
     {-# INLINE sub #-}
 
+type instance Subtracted Natural Natural = Natural
+type instance Subtracted Integer Integer = Integer
+type instance Subtracted Int Int = Int
+type instance Subtracted Int8 Int8 = Int8
+type instance Subtracted Int16 Int16 = Int16
+type instance Subtracted Int32 Int32 = Int32
+type instance Subtracted Int64 Int64 = Int64
+type instance Subtracted Word Word = Word
+type instance Subtracted Word8 Word8 = Word8
+type instance Subtracted Word16 Word16 = Word16
+type instance Subtracted Word32 Word32 = Word32
+type instance Subtracted Word64 Word64 = Word64
+type instance Subtracted (Ratio a) (Ratio a) = Ratio a
+type instance Subtracted Float Float = Float
+type instance Subtracted Double Double = Double
+type instance Subtracted CFloat CFloat = CFloat
+type instance Subtracted CDouble CDouble = CDouble
+    

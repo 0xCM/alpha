@@ -1,6 +1,6 @@
 module Alpha.Native
 (
-    sub', add', div', divf', negate', mul', abs', pow', pow'', powa',mod', flip',
+    sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational'
 
 ) where
@@ -32,9 +32,6 @@ div'::(Integral a) => a -> a -> a
 div' = div
 {-# INLINE div' #-}
 
-divf'::(Fractional a) => a -> a -> a
-divf' = (/)
-{-# INLINE divf' #-}
 
 negate'::(Num a) => a -> a
 negate' = negate

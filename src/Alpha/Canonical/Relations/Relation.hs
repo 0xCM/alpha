@@ -10,10 +10,10 @@ module Alpha.Canonical.Relations.Relation
     JoinSemiLattice(..), 
     MeetSemiLattice(..), 
     Lattice(..),
-    Membership(..),
     Convertible(..),
     Distinguished, distinguish,
-    Related, relate
+    Related, relate,
+    Pairs(..)
     
 
 ) where
@@ -21,7 +21,6 @@ import Algebra.PartialOrd
 import Alpha.Base
 import Alpha.Canonical.Element
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Relations.Predicates
 import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
 import Algebra.Lattice(Lattice(..))   
 
@@ -66,6 +65,11 @@ newtype Distinguished a = Distinguished a
     deriving(Generic,Show)
 
 instance Newtype (Distinguished a)
+
+-- | Defines a collection of ordered pairs    
+newtype Pairs a b = Pairs [(a,b)]
+    deriving (Show,Eq,Ord,Generic)
+instance Newtype (Pairs a b)
 
 distinguish::a -> Distinguished a
 distinguish = Distinguished

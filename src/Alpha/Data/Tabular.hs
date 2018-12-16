@@ -31,20 +31,21 @@ class Tabular a where
 newtype DataTable m n a = DataTable (M.Matrix a)    
     deriving (Eq, NFData, Functor, Semigroup, Monoid, Applicative, Foldable, Traversable, Num) 
     
-instance Tabular (DataTable m n a) where
-    type Table (DataTable m n a) = DataTable m n a
-    type TableSource (DataTable m n a) = [[a]]
-    table = table'
-
 type instance Element (DataTable m n a) = a
     
 -- | Specifies the form of the matrix dimension type
 type TableDim = (Int, Int)
 
+type instance Dimension (DataTable m n a) = TableDim
 
 table'::forall m n a. [[a]] -> DataTable m n a
 table' elements = DataTable $ M.fromLists elements
     
+instance Tabular (DataTable m n a) where
+    type Table (DataTable m n a) = DataTable m n a
+    type TableSource (DataTable m n a) = [[a]]
+    table = table'
+
 --instance Container (DataTable m n a)    
 instance (Show a) => Show(DataTable m n a) where
     show (DataTable m) = show m
@@ -85,8 +86,6 @@ instance forall m a. (KnownNat m, Unital a, Num a) => Unital (DataTable m m a) w
     one = DataTable $ M.identity (natg @m) 
         
 instance forall m n a. (KnownNat m, KnownNat n) => Dimensional (DataTable m n a) where
-    type Dimension (DataTable m n a) = TableDim
-
     dimension (DataTable m) = (natg @m, natg @n) where
         
 instance Show a => Formattable (DataTable m n a) where

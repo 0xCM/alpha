@@ -9,11 +9,12 @@ module Alpha.Canonical.Numeric.Conversion
     ToIntegral(..),
     int8, int16, int32, int64,
     word8, word16, word32, word64,
-    ratio, rational, fractional,
+    rational, fractional,
 
 ) where
 import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Numeric.Class
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 
@@ -109,14 +110,10 @@ word64::(Integral n) => n -> Word64
 word64 n = convert n
 {-# INLINE word64 #-}
 
--- Forms the 'Ratio' of two integral values        
-ratio::(Integral n) => n -> n -> Ratio n
-ratio m n =  (DR.%) m n
-{-# INLINE ratio #-}
 
 -- Forms a 'Rational' number from a 'Real' number
-rational::(Real r) => r -> Rational
-rational = toRational'
+rational::(Real r) => r -> (Ratio Integer)
+rational x = toRational' x
 {-# INLINE rational #-} 
 
 -- Produces a 'Fractional' number from a 'Real' number
@@ -239,7 +236,7 @@ instance ToDouble Word64 where
     double = fromIntegral
     {-# INLINE double #-}    
 instance (Integral a, ToDouble a) => ToDouble (Ratio a) where 
-    double x = divf' n d where
+    double x = divf n d where
         n = double <| numerator' x
         d = double <| denominator' x        
     {-# INLINE double #-}        

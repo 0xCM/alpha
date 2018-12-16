@@ -25,6 +25,5 @@ class InvariantSet s where
     invariants::[s]
 
 instance Set (ItemSet a)
-instance Set (InvariantSet s)
-instance Set (Membership s)
-
+instance Set (InvariantSet a)
+instance Set (Membership a)

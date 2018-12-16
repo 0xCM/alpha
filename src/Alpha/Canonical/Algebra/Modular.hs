@@ -4,8 +4,9 @@
 
 module Alpha.Canonical.Algebra.Modular
 (
-    Modulo(..), Modular(..), Bimodular(..),
-
+    Modular(..), 
+    Modulo(..), 
+    Bimodular(..),
     Zn, BasedInt,
     Base(..),
     zN, modulus, residues,residue,
@@ -38,6 +39,12 @@ newtype Base b = Base Natural
 -- | Represents an integer with a particular base
 data BasedInt (b::Nat) i = BasedInt !i
 
+-- Represents a family of type pairs that support a notion of the first 
+-- type 'mod' the second type. Intended to represent to the result of the 
+-- modulus operation on integers, a paritioning of a set by a subset or
+-- more generally, quotient groups and similar
+type family Modulo a b
+
 -- | Represents the ring of integers mod n
 data Zn (n::Nat) = Zn Integer
     deriving (Eq, Ord)
@@ -49,27 +56,9 @@ data Residue (n::Nat) = Residue (Zn n) Integer
 -- particular basis    
 newtype Digits b = Digits [Char]    
 
--- Represents a family of type pairs that support a notion of the first 
--- type 'mod' the second type. Intended to represent to the result of the 
--- modulus operation on integers, a paritioning of a set by a subset or
--- more generally, quotient groups and similar
-type family Modulo a b
-
--- Homogenous Modulo type
--------------------------------------------------------------------------------
-type instance Modulo Int Int = Int
-type instance Modulo Int8 Int8 = Int8
-type instance Modulo Int16 Int16 = Int16
-type instance Modulo Int32 Int32 = Int32
-type instance Modulo Int64 Int64 = Int64
-type instance Modulo Integer Integer = Integer
-type instance Modulo Word Word = Word
-type instance Modulo Word8 Word8 = Word8
-type instance Modulo Word16 Word16 = Word16
-type instance Modulo Word32 Word32 = Word32
-type instance Modulo Word64 Word64 = Word64
-type instance Modulo Natural Natural = Natural
 type instance Element (Zn n) = Residue n
+type instance Summed (Zn n) (Zn n) = Zn n
+type instance Summed (Residue n) (Residue n) = Residue n
 
 class (Nullary a, Eq a, Divisive a) => Modular a where
     -- | Calculates the remainder of dividing the first operand by the second
@@ -104,6 +93,7 @@ class (Nullary a, Eq a, Divisive a) => Modular a where
         |> List.filter (\j -> j /= zero)
     {-# INLINE modpart #-}      
 
+
 class Bimodular a b where
     -- | Calculates the remainder of dividing the first operand by the second
     bimod::a -> b -> Modulo a b
@@ -113,7 +103,7 @@ class Bimodular a b where
     (>%<) = bimod
     {-# INLINE (>%<) #-}
     infix 8 >%<
-
+    
 (/%)::(Integral n) => n -> n -> (n,n)
 (/%) = quotRem
 {-# INLINE (/%) #-}
