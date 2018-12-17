@@ -16,7 +16,7 @@ module Alpha.Canonical.Relations.Functions
 ) where
 import Alpha.Base
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Relations.Relation
+import Alpha.Canonical.Relations.Related
 import Control.Category(Category(..))
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe

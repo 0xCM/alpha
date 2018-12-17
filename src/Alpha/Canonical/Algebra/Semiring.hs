@@ -35,4 +35,3 @@ instance Semiring Double
 instance Semiring CFloat
 instance  Semiring CDouble
 
-instance (Ord a, Unital a, Multiplicative a) => Semiring (ItemSet a)

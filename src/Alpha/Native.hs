@@ -1,7 +1,8 @@
 module Alpha.Native
 (
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
-    out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational'
+    out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
+    and',or',not'
 
 ) where
 --import Alpha.Base
@@ -16,7 +17,7 @@ import Data.Ord(Ord)
 import Data.Maybe(fromJust)
 import Data.Ratio(Ratio(..),Rational)
 import Numeric.Interval(Interval, interval)
-
+import Data.Bool(Bool(..), (&&), (||), not)
 import Data.Set(Set)
 import qualified Data.Set as Set
 
@@ -104,3 +105,16 @@ realToFrac' = realToFrac
 
 toRational'::(Real r) => r -> Rational
 toRational' = toRational
+{-# INLINE toRational' #-}
+
+and'::Bool -> Bool -> Bool
+and' = (&&)
+{-# INLINE and' #-}
+
+or'::Bool -> Bool -> Bool
+or' = (&&)
+{-# INLINE or' #-}
+
+not'::Bool -> Bool
+not' = not
+{-# INLINE not' #-}

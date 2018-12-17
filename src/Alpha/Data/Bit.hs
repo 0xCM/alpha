@@ -21,20 +21,24 @@ where
 import Alpha.Base
 import Alpha.Canonical
 import Data.Bits(Bits(..))
-import Alpha.Text.Text
-import Alpha.Canonical.Algebra.Invertible
-import Alpha.Canonical.Algebra.Unital
-
 import qualified Data.List as List
 
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read)
-    
+
+
 newtype Bit = Bit Flag
-    deriving (Eq, Ord, Generic, Data, Typeable, Read)
+    deriving (Eq, Ord, Generic, Data, Typeable, Read,
+        Disjunctive, Conjunctive, Invertive, Logical, 
+        JoinSemiLattice,MeetSemiLattice, Lattice
+        )
+
+
+
 
 newtype BitString = BitString [Bit]   
     deriving (Eq, Ord, Generic, Data, Typeable, Read)
+instance Newtype (BitString)
 
 type instance Unsigned Bit = Bit
 instance Unsignable Bit
@@ -79,6 +83,37 @@ bitstring i = BitString $ bitstring' (quotRem i 2) []  where
             c  = ifelse (d == 0) off on
             r' = c : r            
 
+instance Disjunctive Flag where
+    On || On = True
+    On || Off = True
+    Off || On = True
+    Off || Off = False
+    {-# INLINE (||) #-}
+
+instance Conjunctive Flag where
+    On && On = True
+    On && Off = False
+    Off && On = False
+    Off && Off = False
+    {-# INLINE (&&) #-}
+
+instance Invertive Flag where
+    not On = False
+    not Off = True
+    {-# INLINE not #-}
+        
+instance Logical Flag    
+
+instance JoinSemiLattice Flag where
+        (\/) x y = ifelse (x || y) On Off
+        {-# INLINE (\/) #-}
+
+instance MeetSemiLattice Flag where
+        (/\) x y = ifelse (x && y) On Off
+        {-# INLINE (/\) #-}
+
+instance Lattice Flag where    
+            
 instance Formattable BitString where
     format (BitString bits) =  format <$> bits |> collapse |> prefix n
         where n =  List.length bits |> format |> parenthetical |> spaced

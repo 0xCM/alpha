@@ -1,6 +1,8 @@
 module Alpha.Canonical.Common
 (
-    Enumerable(..),
+    Successive(..),
+    Antecedent(..),
+    Vacant(..),
     Absolute(..),
     BoundedIntegral(..),
     OrderedEnum(..),
@@ -20,18 +22,37 @@ module Alpha.Canonical.Common
 where
 import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Element
 import qualified Data.List as List
-
+import qualified Data.MultiSet as Bag
 
 -- Synonym for combined Ord and Enum constraints
 type OrderedEnum a = (Enum a, Ord a)    
 
--- Classifies types with which a sign cannot be associated
+-- | Classifies types with which a sign cannot be associated
 class Unsignable a where
-
-class Enumerable a where
+    
+-- / Characterizes a type with which a strictly monotonic sequence 
+-- of ascending values is associated
+class Successive a where
     next::a -> Maybe a
+
+-- / Characterizes a type with which a strictly monotonic sequence 
+-- of descending values is associated
+class Antecedent a where    
     prior::a -> Maybe a
+
+-- / Characterizes a type for which a canonical and unique vacant/void/empty
+-- value exists
+class Vacant a where
+
+    -- | Exhibits the canonical empty value
+    empty::a
+
+    -- | Determines whether a given value is the canonical
+    -- 'empty' value
+    null::a -> Bool
+    
 
 -- Characterizes types that support a notion of absolute/unsigned value
 class Absolute a where
@@ -100,3 +121,6 @@ instance Unsignable Word8
 instance Unsignable Word16
 instance Unsignable Word32
 instance Unsignable Word64
+
+    
+    

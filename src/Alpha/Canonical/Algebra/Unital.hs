@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Unital
 (
     Unital(..)    
@@ -82,8 +81,6 @@ instance Unital CDouble where
     one = 1
     {-# INLINE one #-}
 
-instance (Ord a, Unital a) =>  Unital (ItemSet a) where
-    one = [one]
     
 ---
 type Unital2 a1 a2 = (Unital a1, Unital a2)

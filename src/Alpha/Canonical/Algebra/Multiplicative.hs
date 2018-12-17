@@ -18,11 +18,11 @@ type family Multiplied a b
 class Multiplicative a where
 
     -- | Multiplies the first operand by the second
-    mul::BinaryOperator a
+    mul::BinOp a
 
     
     -- | Infix synonym for 'mul'
-    (*)::BinaryOperator a
+    (*)::BinOp a
     (*) = mul
     {-# INLINE (*) #-}
     infixl 7 *
@@ -109,8 +109,6 @@ instance Multiplicative CDouble where
     {-# INLINE mul #-}
 
 
-instance (Ord a, Multiplicative a) =>  Multiplicative (ItemSet a) where
-    mul = intersect'
     
 type Multiplicative2 a1 a2 = (Multiplicative a1, Multiplicative a2)
 type Multiplicative3 a1 a2 a3 = (Multiplicative2 a1 a2, Multiplicative a3)

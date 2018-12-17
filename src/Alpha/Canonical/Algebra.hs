@@ -25,7 +25,6 @@ import Alpha.Canonical.Algebra.Ring as X
 import Alpha.Canonical.Algebra.Scaled as X
 import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Successive as X
-import Alpha.Canonical.Algebra.Semigroup as X
 import Alpha.Canonical.Algebra.Semiring as X
 import Alpha.Canonical.Algebra.Universal as X
 import Alpha.Canonical.Algebra.Unital as X

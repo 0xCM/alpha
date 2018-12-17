@@ -10,7 +10,6 @@ import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Common
 import Alpha.Canonical.Operators
-import Alpha.Canonical.Algebra.Semigroup
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Monoid

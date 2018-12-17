@@ -1,7 +1,6 @@
 module Alpha.Canonical.Algebra.Combinable
 (
-    Combiner(..), Combinable(..)
-    
+        
 
 ) where
 import Alpha.Base

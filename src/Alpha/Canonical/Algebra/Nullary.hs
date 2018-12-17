@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Nullary
 (
     Nullary(..)
@@ -92,8 +91,6 @@ instance Nullary CDouble where
     zero = 0
     {-# INLINE zero #-}
 
-instance (Ord a) => Nullary (ItemSet a) where
-    zero = []
 
 -- Nullary tuples
 type Nullary2 a1 a2 = (Nullary a1, Nullary a2)

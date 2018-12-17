@@ -22,6 +22,3 @@ class Universal c where
 instance Universal [a] where
     all = List.all
     
-instance Universal (ItemSet a) where
-    all pred s = s |> Set.toList |> List.all pred
-    

@@ -5,7 +5,7 @@ import Alpha.Native
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Common
 import Alpha.Canonical.Element
-import Alpha.Canonical.Relations.Comparison
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Negatable
@@ -76,63 +76,86 @@ instance Absolute UCDouble where
     abs = id
     {-# INLINE abs #-}
 
--- nextB::(BoundedIntegral n,Additive n) => n -> Maybe n
--- nextB n = ifelse (n == maxBound) none (just (n + 1))
-
--- priorB::(BoundedIntegral n,Subtractive n) => n -> Maybe n
--- priorB n = ifelse (n == minBound) none (just (n - 1))
-    
-
-instance Enumerable Integer where
+-- Successive
+-------------------------------------------------------------------------------
+instance Successive Integer where
     next n = just (n + 1)
+
+instance Successive Natural where
+    next n = just (n + 1)
+    
+instance Integral n => Successive (Ratio n) where
+    next n = just (n + 1)
+        
+instance Successive Word where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word8 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word16 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word32 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word64 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int8 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int16 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int32 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int64 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+        
+-- Antecedent
+-------------------------------------------------------------------------------
+instance Antecedent Integer where
     prior n = just (n - 1)
 
-instance Enumerable Natural where
-    next n = just (n + 1)
+instance Antecedent Natural where
     prior n = ifelse (n > 0) (just(n - 1)) none
     
-instance Integral n => Enumerable (Ratio n) where
-    next n = just (n + 1)
+instance Integral n => Antecedent (Ratio n) where
     prior n = ifelse (n > 0) (just(n - 1)) none
         
-instance Enumerable Word where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Word where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Word8 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Word8 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Word16 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Word16 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Word32 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Word32 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Word64 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Word64 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Int where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Int where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Int8 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Int8 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Int16 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Int16 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Int32 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Int32 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
-instance Enumerable Int64 where
-    next n = ifelse (n == maxBound) none (just (n + 1))
+instance Antecedent Int64 where
     prior n = ifelse (n == minBound) none (just (n - 1))
 
 instance InvariantSet Int where
@@ -158,9 +181,3 @@ instance InvariantSet Int64 where
 instance InvariantSet Natural where
     invariants =  [0 .. ]
 
--- instance InvariantSet Integer where
---     invariants =  [x | ] where
-
---         upper = [1::Integer ..]
---         lower = negate <$> upper
-        

@@ -62,18 +62,18 @@ type instance Summed (Residue n) (Residue n) = Residue n
 
 class (Nullary a, Eq a, Divisive a) => Modular a where
     -- | Calculates the remainder of dividing the first operand by the second
-    rem::BinaryOperator a
+    rem::a -> a -> a
 
-    mod::BinaryOperator a
+    mod::a -> a -> a
 
     -- | Infix synonym for 'rem'
-    (%)::BinaryOperator a
+    (%)::a -> a -> a
     (%) = rem
     {-# INLINE (%) #-}
     infix 8 %
 
     -- | Infix synonym for 'mod'
-    (%%)::BinaryOperator a
+    (%%)::a -> a -> a
     (%%) = mod
     {-# INLINE (%%) #-}
     infix 8 %%
@@ -197,8 +197,6 @@ instance forall b. KnownNat b => Show (Digits b ) where
 
 instance  KnownNat n => Set (Zn n)
 
-instance  KnownNat n => Membership (Zn n) where    
-    members s = residues s |> Set.fromList
 
 instance KnownNat n => Show (Residue n) where
     show (Residue zN m) = (show m) <> " " <> (show zN)

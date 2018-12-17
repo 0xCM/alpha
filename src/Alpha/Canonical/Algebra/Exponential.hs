@@ -11,7 +11,7 @@ import Alpha.Native
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Collective.Reductive
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Nullary
+import Alpha.Canonical.Algebra.Unital
 import qualified Data.List as List
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous 
@@ -25,12 +25,12 @@ type instance Raised b Word32 = b
 type instance Raised b Word64 = b
 
 -- | Characterizes a type that can be raised to a natural power
-class (Multiplicative b, Nullary b) =>  Powered b where
+class (Multiplicative b, Unital b) =>  Powered b where
 
     pow::b -> Natural -> Raised b Natural
     pow b p = product where
          factors = List.replicate (fromIntegral p) b
-         product = reduce (*) factors
+         product = reduce one (*) factors
     {-# INLINE pow #-}
 
     -- | Infix synonym for 'pow'

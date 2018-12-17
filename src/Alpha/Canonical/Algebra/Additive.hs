@@ -2,7 +2,7 @@ module Alpha.Canonical.Algebra.Additive
 (
     Additive(..),
     Summed(..), 
-    Biadditive(..),    
+    Biadditive(..),        
     
 ) where
 import Alpha.Base
@@ -16,6 +16,11 @@ import qualified Data.Set as Set
 -- where a type instance is the addition result type
 type family Summed a b
 
+data instance BinaryOperator a = Addition (a -> a -> a)
+addition::(Additive a) => BinaryOperator a
+addition = Addition add
+
+
 -- | Characterizes a type that supports a notion of  addition      
 class Additive a where
     -- | Adds the first operand with the second
@@ -26,6 +31,8 @@ class Additive a where
     (+) = add
     {-# INLINE (+) #-}
     infixl 6 +
+
+
 
 -- | Characterizes pairs of types that support a notion addition and
 -- such addition need not be commutative so, in general,
@@ -40,9 +47,6 @@ class Biadditive a b where
     {-# INLINE (>+<) #-}
     infixl 6 >+<
     
-instance (Ord a) =>  Additive (ItemSet a) where
-    add = union'
-    {-# INLINE add #-}
 
 instance Additive Natural where 
     add = add'
@@ -147,7 +151,7 @@ type instance Summed Float Float = Float
 type instance Summed Double Double = Double
 type instance Summed CFloat CFloat = CFloat
 type instance Summed CDouble CDouble = CDouble
-type instance Summed (ItemSet a) (ItemSet a) = ItemSet a
+
 
 type UniSum a = Summed a a
 type instance Summed (Tuple2 a1 a2) (Tuple2 a1 a2) = Tuple2 (UniSum a1) (UniSum a2)

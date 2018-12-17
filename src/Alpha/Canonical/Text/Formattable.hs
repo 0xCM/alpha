@@ -34,7 +34,7 @@ class Packable a b where
 -- | Characterizes a value that can be rendered in human-readable form
 class Formattable a where
     format ::a -> Text
-
+    
 instance Formattable Text where
     format s = s         
 instance Formattable Char where
@@ -108,18 +108,17 @@ instance Packable String Text where
     pack = Text.pack
     unpack = Text.unpack
         
-instance (Formattable a) => Formattable (ItemSet a) where
-    format x =  braces (format x)
-        where braces y = Text.append "{" (Text.append y "}")
+            
 
--- Lists of formattable things are formattable        
 instance (Formattable a) => Formattable [a] where
     format x = x |> (<$>) format |> Text.concat
 
 instance (Formattable k, Formattable v) => Formattable (Map k v) where
     format m = format $ format  <$> (Map.toList m)
     
-
+instance  (Formattable v, Faceted f v) => Formattable (FacetValue f  v) where
+    format (FacetValue v) =  format v
+    
 type Formattable2 a1 a2 = (Formattable a1, Formattable a2)
 type Formattable3 a1 a2 a3 = (Formattable2 a1 a2, Formattable a3)
 type Formattable4 a1 a2 a3 a4 = (Formattable3 a1 a2 a3, Formattable a4)
@@ -139,12 +138,4 @@ instance (Formattable4 a1 a2 a3 a4) => Formattable (Tuple4 a1 a2 a3 a4) where
 
 instance (Formattable5 a1 a2 a3 a4 a5) => Formattable (Tuple5 a1 a2 a3 a4 a5) where
     format (a1,a2,a3,a4,a5) 
-        = tuplestring [format a1, format a2, format a3, format a4, format a5]
-        
-
-        -- separated = elements |> List.intersperse Comma
-        -- result = separated |> Text.concat
-        
-        
-        
-            
+        = tuplestring [format a1, format a2, format a3, format a4, format a5]    

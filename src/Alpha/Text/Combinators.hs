@@ -12,7 +12,6 @@ module Alpha.Text.Combinators
     suffixIfMissing, 
     prefixIfMissing, 
     
-    
 )
  where
 
@@ -20,14 +19,17 @@ import Alpha.Base hiding (div)
 import Alpha.Canonical
 import Alpha.Canonical.Text
 import Alpha.Canonical.Operators
-import Alpha.Text.Text
 import Alpha.Text.Symbols
 import Alpha.Native
+import Data.Aeson (FromJSON, ToJSON, decode, encode)
+import Data.Aeson.Encode.Pretty
+
 import qualified Alpha.Canonical.Text.Asci as Asci
 
 import qualified Data.Text as Text
 import qualified Data.List as List
 import Numeric(showIntAtBase)
+
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -130,4 +132,8 @@ bitstring n = showBasedInt 2 n |> zpadL width
 -- | Encodes an integral value as a base-2 Text
 bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitstringN w n = showBasedInt 2 n |> zpadL w
+
+instance Cloneable Int Text where
+    type Cloned Int Text = Text
+    clone = Text.replicate
 

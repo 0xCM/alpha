@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLists #-}
+
 module Alpha.Canonical.Relations.Tuples
 (    
     Tupled(..), Tuple2,Tuple3,Tuple4,Tuple5,
@@ -6,6 +8,7 @@ module Alpha.Canonical.Relations.Tuples
 
 ) where
 import Alpha.Base
+import Alpha.Canonical.Element
 
 type Tuple2 a1 a2 = (a1,a2)
 type Tuple3 a1 a2 a3 = (a1,a2,a3)
@@ -23,7 +26,12 @@ type UniTuple2 a = Tuple2 a a
 type UniTuple3 a = Tuple3 a a a
 type UniTuple4 a = Tuple4 a a a a
 type UniTuple5 a = Tuple5 a a a a a
-    
+
+type instance Element (UniTuple2 a) = a
+type instance Element (UniTuple3 a) = a
+type instance Element (UniTuple4 a) = a
+type instance Element (UniTuple5 a) = a
+
 type family UniTupled a = r | r -> a where
     UniTupled (UniTuple2 a) = UniTuple2 a
     UniTupled (UniTuple3 a) = UniTuple3 a
@@ -36,6 +44,9 @@ class Tupeler a where
     -- | Forms a tuple from the source value
     tuple::a -> Tupled a
 
+class UniTupler a where
+    unituple::a -> UniTupled a
+    
 instance Tupeler (Tuple2 a1 a2 ) where
     tuple (a1,a2)  = (a1,a2)
     {-# INLINE tuple #-}
@@ -51,10 +62,7 @@ instance Tupeler (Tuple4 a1 a2 a3 a4) where
 instance Tupeler (Tuple5 a1 a2 a3 a4 a5) where
     tuple (a1,a2,a3,a4,a5)  = (a1,a2,a3,a4,a5)
     {-# INLINE tuple #-}
-        
-class UniTupler a where
-    unituple::a -> UniTupled a
-    
+            
 instance UniTupler (UniTuple2 a) where
     unituple (a1,a2) = (a1,a2)
 
@@ -67,5 +75,27 @@ instance UniTupler (UniTuple4 a) where
 instance UniTupler (UniTuple5 a) where
     unituple (a1,a2,a3,a4,a5) = (a1,a2,a3,a4,a5)            
 
--- instance Functor (UniTuple2 a) where
---     fmap f (a1,a2) = (f a1, f a2)
+instance Listing (UniTuple2 a) where
+    list (a1,a2) = [a1,a2]
+
+instance Listing (UniTuple3 a) where    
+    list (a1,a2,a3) = [a1,a2,a3]    
+
+instance Listing (UniTuple4 a) where
+    list (a1,a2,a3,a4) = [a1,a2,a3,a4]    
+
+instance Listing (UniTuple5 a) where
+    list (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]    
+    
+instance Vectored (UniTuple2 a) where
+    vector (a1,a2) = [a1,a2]
+
+instance Vectored (UniTuple3 a) where    
+    vector (a1,a2,a3) = [a1,a2,a3]    
+
+instance Vectored (UniTuple4 a) where
+    vector (a1,a2,a3,a4) = [a1,a2,a3,a4]    
+
+instance Vectored (UniTuple5 a) where
+    vector (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]    
+        

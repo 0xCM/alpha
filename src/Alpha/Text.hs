@@ -6,8 +6,6 @@
 -----------------------------------------------------------------------------
 module Alpha.Text(module X) where
 import Alpha.Text.Combinators as X
-import Alpha.Text.Json as X
-import Alpha.Text.Text as X
 
 
 

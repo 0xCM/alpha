@@ -18,10 +18,10 @@ type family Quotient a b
 -- / Characterizes a type that supports a notion of division
 class Divisive a where
     -- | Divides the first operand by the second
-    div::BinaryOperator a
+    div::BinOp a
 
     -- | Infix synonym for 'div'
-    (/)::BinaryOperator a
+    (/)::BinOp a
     (/) = div
     {-# INLINE (/) #-}
     infixl 8 /    

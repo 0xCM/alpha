@@ -18,10 +18,10 @@ type family Subtracted a b
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
-    sub::BinaryOperator a
+    sub::BinOp a
 
     -- | Infix synonym for 'sub'    
-    (-)::BinaryOperator a
+    (-)::BinOp a
     (-) = sub
     {-# INLINE (-) #-}
     infixl 6 -    

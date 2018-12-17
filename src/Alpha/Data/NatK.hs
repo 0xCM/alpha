@@ -179,26 +179,26 @@ instance Unital (NatK 1) where
 --     pow (NatK m) n = (natural m) ^ (natural n) |> fromNatural |> NatK
 --     {-# INLINE pow #-}
     
-instance forall m n. (KnownNatPair m n) =>  LT (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  BiLT (NatK m) (NatK n) where    
     lt (NatK m) (NatK n) = m < n 
     {-# INLINE lt #-}
 
-instance forall m n. (KnownNatPair m n) =>  GT (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  BiGT (NatK m) (NatK n) where    
     gt (NatK m) (NatK n) = m > n 
     {-# INLINE gt #-}
 
-instance forall m n. (KnownNatPair m n) =>  EQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  BiEQ (NatK m) (NatK n) where    
     eq (NatK m) (NatK n) = m == n 
     {-# INLINE eq #-}
         
-instance forall m n. (KnownNatPair m n) =>  LTEQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  BiLTEQ (NatK m) (NatK n) where    
     lteq (NatK m) (NatK n) = m <= n 
     {-# INLINE lteq #-}
 
-instance forall m n. (KnownNatPair m n) =>  GTEQ (NatK m) (NatK n) where    
+instance forall m n. (KnownNatPair m n) =>  BiGTEQ (NatK m) (NatK n) where    
     gteq (NatK m) (NatK n) = m >= n 
     {-# INLINE gteq #-}
     
 -- | Provides evidence for the claim that two nats can be compared    
-instance forall m n. (KnownNatPair m n) => Comparable (NatK m) (NatK n) 
+instance forall m n. (KnownNatPair m n) => BiComparable (NatK m) (NatK n) 
     

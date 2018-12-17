@@ -11,12 +11,13 @@ module Alpha.Claim
   Evaluation(..),
   Claim(..),
   success, failure, succeeded, failed, 
-  claimSome, claimNone, claimEqual
+  some, none, equal
 )
 where
 
-import Alpha.Base
-
+import Alpha.Base hiding (none,some,equal)
+import Alpha.Canonical.Text.Formattable
+import qualified Data.Text as Text
 
 -- | Specifies the result of evaluating a claim
 data Evaluation (a::Symbol) =
@@ -24,14 +25,13 @@ data Evaluation (a::Symbol) =
     | Failure
     deriving (Eq,Ord)
 
-
---show'::forall s. KnownSymbol s => Evaluation s -> String
-    -- show' (Success) =  (symbolVal (Proxy @s)) ++ " -> Success"
-    -- show' (Failure) =  (symbolVal (Proxy @s)) ++ " -> Failure"
+instance KnownSymbol s => Formattable (Evaluation s) where
+  format (Success) =  format (symbol @s) <> " -> Success"
+  format (Failure) =  format (symbol @s) <> " -> Failure"
+    
 
 instance KnownSymbol s => Show (Evaluation s) where
-  show (Success) =  symbol @s <> " -> Success"
-  show (Failure) =  symbol @s <> " -> Failure"
+  show = Text.unpack . format
 
 
 -- | Relates a symbol to a claim
@@ -57,20 +57,20 @@ failed True = Failure
 failed False = Success
 
 -- | Claims that 'Maybe' is valued
-claimSome::KnownSymbol s => Maybe a -> Evaluation s
-claimSome x = case isNothing x of
+some::KnownSymbol s => Maybe a -> Evaluation s
+some x = case isNothing x of
             False -> Success
             True -> Failure
 
 -- | Claims that 'Maybe' is non-valued
-claimNone::KnownSymbol s => Maybe a -> Evaluation s
-claimNone x = case isNothing x of
+none::KnownSymbol s => Maybe a -> Evaluation s
+none x = case isNothing x of
             False -> Failure
             True -> Success
 
 -- | Claims that two values are equal
-claimEqual::(KnownSymbol s, Eq a) => a -> a -> Evaluation s
-claimEqual x y = case (x == y) of
+equal::(KnownSymbol s, Eq a) => a -> a -> Evaluation s
+equal x y = case (x == y) of
              True -> Success
              _ -> Failure
 

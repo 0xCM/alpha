@@ -9,6 +9,7 @@ module Alpha.Canonical.Algebra.Partition
 ) where
 import Alpha.Base
 import Alpha.Canonical.Element
+import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations
 import qualified Data.List as List
 import qualified Numeric.Interval as I

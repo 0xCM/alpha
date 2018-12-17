@@ -30,6 +30,3 @@ class Existential c where
 instance Existential [a] where
     any = List.any
     
-instance Existential (ItemSet a) where
-    any pred s = s |> Set.toList |> List.any pred
-    

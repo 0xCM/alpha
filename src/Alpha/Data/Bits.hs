@@ -8,7 +8,7 @@
 
 module Alpha.Data.Bits 
 (
-    toggled, bitcount, bitsplat,
+    toggled, bitcount, 
     (.^.), (.~.), (.<<.), (.>>.), (.?.),
     lobyte,hibyte
     
@@ -35,6 +35,7 @@ type instance Concatenated Natural Natural = Natural
 
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> bit
+{-# INLINE toggled #-}
 
 -- | Delegates to the finiteBitSize function
 bitcount :: (FiniteBits a) => a -> Int

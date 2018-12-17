@@ -10,7 +10,9 @@ module Alpha.Data.ByteString
     bytes,
     segment, 
     segments,
-    bytestring
+    bytestring,
+    json,    
+
 )
 where
 import Alpha.Base
@@ -19,7 +21,8 @@ import Alpha.Canonical hiding(range)
 import Alpha.Data.Bits
 import System.Entropy
 import Data.Ix(range)
---import Data.List(takeWhile,head)
+import Data.Aeson (FromJSON, ToJSON, decode, encode)
+import Data.Aeson.Encode.Pretty
 
 import qualified Data.Text as Text
 import qualified Data.ByteString.Lazy as LBS
@@ -119,3 +122,6 @@ instance Convertible EG.ByteString [Word8] where
 instance Chunkable EG.ByteString where
     chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
         
+-- | Converts json to formatted text    
+json :: ToJSON a => a -> Text
+json value = value |> encodePretty |> format

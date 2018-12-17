@@ -15,5 +15,4 @@ import Alpha.Data.Message as X
 import Alpha.Data.Tabular as X
 import Alpha.Data.NatK as X
 import Alpha.Data.Row as X
-import Alpha.Data.Symbols as X
 import Alpha.Data.Poset as X
