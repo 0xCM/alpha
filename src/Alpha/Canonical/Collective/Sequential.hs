@@ -33,10 +33,10 @@ class Sequential c  where
     -- | Branches the source according to the outcome of a predicate:
     -- Elements that satisfy the predicate are branched right while the
     -- remainder are branched left
-    split::UnaryPredicate (Element c) -> c -> (c, c)
+    split::P1 (Element c) -> c -> (c, c)
 
     -- | Returns elements until a supplied predicate is disatisfied
-    while::UnaryPredicate (Element c) -> c -> c
+    while::P1 (Element c) -> c -> c
 
     -- | Skips the first n elements and yields the remainder, if any
     skip::Integral n => n -> c -> c

@@ -9,8 +9,6 @@ import Alpha.Base
 
 class Universe u where
 
-
-
 class Subset a b where
 
 -- Reflexivity

@@ -18,13 +18,30 @@ type family Subtracted a b
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
-    sub::BinOp a
+    sub::O2 a
 
     -- | Infix synonym for 'sub'    
-    (-)::BinOp a
+    (-)::O2 a
     (-) = sub
     {-# INLINE (-) #-}
     infixl 6 -    
+
+newtype Subtraction a = Subtractive (O2 a)
+    deriving(Generic)
+instance Newtype (Subtraction a)        
+type OpK f a = (f ~ Subtraction a, Subtractive a)
+
+data instance Operator 2 (Subtraction a) 
+    = Subtraction (O2 a)
+
+instance OpK f a => Operative 2 f a where
+    type OpArgs 2 f a = (a,a)
+
+    operator = Subtraction sub 
+    {-# INLINE operator #-}        
+
+    evaluate (a1,a2) =  f a1 a2 where (Subtraction f) = operator 
+    {-# INLINE evaluate #-}        
 
 -- / Characterizes a pair of type that supports a notion of heterogenious subtraction
 class Bisubtractive a b where
@@ -91,21 +108,21 @@ instance Subtractive CDouble where
     sub = sub'
     {-# INLINE sub #-}
 
-type instance Subtracted Natural Natural = Natural
-type instance Subtracted Integer Integer = Integer
-type instance Subtracted Int Int = Int
-type instance Subtracted Int8 Int8 = Int8
-type instance Subtracted Int16 Int16 = Int16
-type instance Subtracted Int32 Int32 = Int32
-type instance Subtracted Int64 Int64 = Int64
-type instance Subtracted Word Word = Word
-type instance Subtracted Word8 Word8 = Word8
-type instance Subtracted Word16 Word16 = Word16
-type instance Subtracted Word32 Word32 = Word32
-type instance Subtracted Word64 Word64 = Word64
-type instance Subtracted (Ratio a) (Ratio a) = Ratio a
-type instance Subtracted Float Float = Float
-type instance Subtracted Double Double = Double
-type instance Subtracted CFloat CFloat = CFloat
-type instance Subtracted CDouble CDouble = CDouble
+-- type instance Subtracted Natural Natural = Natural
+-- type instance Subtracted Integer Integer = Integer
+-- type instance Subtracted Int Int = Int
+-- type instance Subtracted Int8 Int8 = Int8
+-- type instance Subtracted Int16 Int16 = Int16
+-- type instance Subtracted Int32 Int32 = Int32
+-- type instance Subtracted Int64 Int64 = Int64
+-- type instance Subtracted Word Word = Word
+-- type instance Subtracted Word8 Word8 = Word8
+-- type instance Subtracted Word16 Word16 = Word16
+-- type instance Subtracted Word32 Word32 = Word32
+-- type instance Subtracted Word64 Word64 = Word64
+-- type instance Subtracted (Ratio a) (Ratio a) = Ratio a
+-- type instance Subtracted Float Float = Float
+-- type instance Subtracted Double Double = Double
+-- type instance Subtracted CFloat CFloat = CFloat
+-- type instance Subtracted CDouble CDouble = CDouble
     

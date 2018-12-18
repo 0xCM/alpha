@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
--- | A space-efficient represntation of a bit value, adapted from bool8
+-- | 0 1
 -- Copyright   :  (c) 0xCM, 2018 + Contributors per license
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
@@ -23,13 +23,14 @@ import Alpha.Canonical
 import Data.Bits(Bits(..))
 import qualified Data.List as List
 
+-- | Taken from bool8
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read)
 
 
 newtype Bit = Bit Flag
     deriving (Eq, Ord, Generic, Data, Typeable, Read,
-        Disjunctive, Conjunctive, Invertive, Logical, 
+        Disjunctive, Conjunctive, Invertive, Implication, ExclusivelyDisjunct, Substitutive, Propositional, 
         JoinSemiLattice,MeetSemiLattice, Lattice
         )
 
@@ -90,6 +91,13 @@ instance Disjunctive Flag where
     Off || Off = False
     {-# INLINE (||) #-}
 
+instance ExclusivelyDisjunct Flag where
+    lxor On On = False
+    lxor On Off = True
+    lxor Off On = True
+    lxor Off Off = False
+    {-# INLINE lxor #-}
+    
 instance Conjunctive Flag where
     On && On = True
     On && Off = False
@@ -97,12 +105,26 @@ instance Conjunctive Flag where
     Off && Off = False
     {-# INLINE (&&) #-}
 
+instance Implication Flag where
+    implies On On = True
+    implies On Off = False
+    implies Off On = True
+    implies Off Off = True
+    {-# INLINE implies #-}
+
+instance Substitutive Flag where
+    iff On On = True
+    iff On Off = False
+    iff Off On = False
+    iff Off Off = True
+    {-# INLINE iff #-}
+        
 instance Invertive Flag where
     not On = False
     not Off = True
     {-# INLINE not #-}
         
-instance Logical Flag    
+instance Propositional Flag    
 
 instance JoinSemiLattice Flag where
         (\/) x y = ifelse (x || y) On Off
@@ -162,11 +184,11 @@ instance Nullary Bit where
     zero = off
     {-# INLINE zero #-}
 
-instance Invertible Bit where 
-    invert (Bit On) = off
-    invert (Bit Off) = on
+instance Negatable Bit where 
+    negate (Bit On) = off
+    negate (Bit Off) = on
     
-    {-# INLINE invert #-}
+    {-# INLINE negate #-}
     
 instance Semigroup Bit where
     (<>) = (+)
@@ -181,8 +203,6 @@ instance Monoid Bit where
     mempty = off
     {-# INLINE mempty #-}
 
-instance Group Bit
-instance Semiring Bit
 
 instance Boolean Bit where
     bool (Bit On) = True
@@ -243,7 +263,7 @@ instance Bits Bit where
     xor _ _ = off
     {-# INLINE xor #-}
 
-    complement   = invert
+    complement   = negate
     {-# INLINE complement #-}
 
     shift x i = x

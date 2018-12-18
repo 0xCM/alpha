@@ -3,27 +3,30 @@ module Alpha.Canonical.Algebra.Negatable
     Negatable(..),
     Negated(..), 
     Binegatable(..),
-)
-where
+
+) where
 import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Operators
 import Alpha.Canonical.Relations.Tuples
+import Alpha.Canonical.Algebra.Divisive
+
+
+-- | Characterizes types whose values are closed under 
+-- additive negation
+class Negatable a where
+    -- | Negates the operand    
+    negate::a -> a
 
 -- Defines a family of types that represent the result of applying a
 -- (potentially) heterogeneous negation operation
 type family Negated a
-
 
 -- / Characterizes types for which unary negation is defined
 class Binegatable a where
     -- | Negates the operand    
     binegate::a -> Negated a
 
-
--- / Characterizes types for which unary negation is be defined
-class Negatable a where
-    -- | Negates the operand    
-    negate::a -> a
 
 -- Negatable 
 -------------------------------------------------------------------------------
@@ -80,18 +83,6 @@ instance Negatable4 a1 a2 a3 a4 => Negatable (Tuple4 a1 a2 a3 a4) where
 instance Negatable5 a1 a2 a3 a4 a5  => Negatable (Tuple5 a1 a2 a3 a4 a5)  where
     negate (a1,a2,a3,a4,a5) = (negate a1, negate a2, negate a3, negate a4, negate a5)
                     
-type instance Negated Integer = Integer
-type instance Negated Int = Int
-type instance Negated Int8 = Int8
-type instance Negated Int16 = Int16
-type instance Negated Int32 = Int32
-type instance Negated Int64 = Int64
-type instance Negated (Ratio a) = Ratio a
-type instance Negated Float = Float
-type instance Negated Double = Double
-type instance Negated CFloat = CFloat
-type instance Negated CDouble = CDouble
-
 type instance Negated Natural = Integer
 type instance Negated Word = Int
 type instance Negated Word8 = Int8
@@ -99,4 +90,4 @@ type instance Negated Word16 = Int16
 type instance Negated Word32 = Int32
 type instance Negated Word64 = Int64
 
-    
+

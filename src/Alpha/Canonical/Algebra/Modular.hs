@@ -25,8 +25,6 @@ import Alpha.Canonical.Algebra.Divisive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Nullary
-import Alpha.Canonical.Algebra.Unital
 import qualified Data.Vector as Vector
 
 import qualified Data.List as List

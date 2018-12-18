@@ -54,10 +54,10 @@ instance Newtype (Pairs a b)
 -- Characterizes a relation on a set s    
 class Relation a where
     -- Relation adjudicator
-    related::BinaryPredicate a
+    related::P2 a
 
     -- Infix synonym for 'relator'
-    (~~)::BinaryPredicate a
+    (~~)::P2 a
     (~~) = related
     infixl 6 ~~
     
@@ -80,14 +80,14 @@ class Relation a => AntiSymmetric a where
 -- Characterizes a relation that is reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Preorder
 class (Reflexive a, Transitive a) => Preorder a where
-    (~<)::BinaryPredicate a
+    (~<)::P2 a
     (~<) = related
 
 -- Characterizes preorders that are symmetric, and hence 
 -- define equivalence relations: a ~= b => b ~= a
 class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
     -- Equivalence relation adjudicator
-    (~=)::BinaryPredicate a
+    (~=)::P2 a
     (~=) = (~~)
 
 -- | A set together with an equivalence relation
@@ -96,7 +96,7 @@ class (Set a, Equivalence a) => Setoid a where
 
 class (PartialOrd a, Relation a) =>  PartialOrder a where
 
-    (~<=)::BinaryPredicate a
+    (~<=)::P2 a
     (~<=) = leq
     infix 4 ~<=
 
@@ -167,7 +167,7 @@ class (Ord a) => GTEQ a where
     {-# INLINE max #-}
 
 class (GTEQ a, GT a, LTEQ a, LT a) => Comparable a where            
-    between::TernaryPredicate a
+    between::P3 a
     between x a b = x >= a || x <= b
     {-# INLINE between #-}
     

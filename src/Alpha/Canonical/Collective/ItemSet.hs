@@ -13,13 +13,10 @@ import Alpha.Base
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Common
 import Alpha.Canonical.Element
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Vacant
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Algebra.Existential
-import Alpha.Canonical.Algebra.Universal
-import Alpha.Canonical.Algebra.Unital
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Nullary
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Semiring
 import Alpha.Canonical.Algebra.Modular
@@ -116,6 +113,10 @@ instance (Ord a) => Filterable (ItemSet a) where
     filter p s = ItemSet $  Set.filter p  (unwrap s)
     
 -- Algebraic aspects    
+instance Pairing (ItemSet a) (ItemSet b) (DisjointUnion (ItemSet a) (ItemSet b)) where
+    pair a b = DisjointUnion (a, b)
+    first (DisjointUnion (a,b)) = a
+    second (DisjointUnion (a,b)) = b
 
 instance Universal (ItemSet a) where
     all pred s = unwrap s |> Set.toList |> List.all pred

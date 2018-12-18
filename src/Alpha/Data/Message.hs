@@ -10,7 +10,8 @@ module Alpha.Data.Message
 (
     Severity(..),
     Message(..),
-    babble, inform, warn, oops, doom
+    babble, inform, warn, oops, doom,
+    babble', inform', warn', oops', doom'
 ) where
 import Alpha.Base
 import Alpha.Canonical
@@ -45,21 +46,41 @@ construct::Severity -> Text -> Maybe a -> Message a
 construct sev msg payload = Message sev msg payload
 
 -- | Constructs a verbose message with an optional payload
-babble::Text -> Maybe a -> Message a
-babble msg payload = construct Trivia msg payload
+babble'::Text -> Maybe a -> Message a
+babble' msg payload = construct Trivia msg payload
+
+-- | Constructs a verbose message
+babble::Text -> Message ()
+babble msg = babble' msg none
 
 -- | Constructs an informative message with an optional payload
-inform::Text -> Maybe a -> Message a
-inform msg payload = construct Info msg payload
+inform'::Text -> Maybe a -> Message a
+inform' msg payload = construct Info msg payload
+
+-- | Constructs an informative message
+inform::Text -> Message ()
+inform msg = inform' msg none
 
 -- | Constructs an warning message with an optional payload
-warn::Text -> Maybe a -> Message a
-warn msg payload = construct Warn msg payload
+warn'::Text -> Maybe a -> Message a
+warn' msg payload = construct Warn msg payload
+
+-- | Constructs an warning message
+warn::Text ->  Message ()
+warn msg = warn' msg none
 
 -- | Constructs an error message with an optional payload
-oops::Text -> Maybe a -> Message a
-oops msg payload = construct Error msg payload
+oops'::Text -> Maybe a -> Message a
+oops' msg payload = construct Error msg payload
+
+-- | Constructs an error message
+oops::Text -> Message ()
+oops msg = oops' msg none
 
 -- | Constructs an fatal message with an optional payload
-doom::Text -> Maybe a -> Message a
-doom msg payload = construct Fatal msg payload
+doom'::Text -> Maybe a -> Message a
+doom' msg payload = construct Fatal msg payload
+
+-- | Constructs an fatal message with an optional payload
+doom::Text -> Message ()
+doom msg = doom' msg none

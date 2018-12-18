@@ -11,7 +11,6 @@ import Alpha.Native
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Collective.Reductive
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Unital
 import qualified Data.List as List
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous 

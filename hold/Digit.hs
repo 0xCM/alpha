@@ -8,13 +8,12 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Algebra.Digit
 (
-    Digital(..), Digit(..), 
+    
 )
 where
 import Alpha.Base
 import Alpha.Canonical.Text
 import Alpha.Canonical.Operators
---import Alpha.Canonical.Algebra.Numeric
 
 import qualified Data.List as List
 

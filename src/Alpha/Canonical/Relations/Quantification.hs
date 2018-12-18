@@ -4,14 +4,14 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Algebra.Existential
+module Alpha.Canonical.Relations.Quantification
 (
+    Universal(..),
     Existential(..)
 ) where
 
 import Alpha.Base
 import Alpha.Canonical.Element
-import Alpha.Canonical.Operators
 import qualified Data.List as List
 import qualified Data.Set as Set
 
@@ -26,7 +26,13 @@ class Existential c where
     exists::(Eq (Element c)) => Element c -> c -> Bool
     exists = any . (==) 
     
+class Universal c where
+    all::(Element c -> Bool) -> c -> Bool
 
+instance Universal [a] where
+    all = List.all
+        
 instance Existential [a] where
     any = List.any
     
+

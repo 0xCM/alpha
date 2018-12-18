@@ -137,6 +137,6 @@ pattern EOL = "\n"::Text
 pattern Less = "<"::Text
 pattern Greater = ">"::Text
 pattern Equal = "="::Text
-
+pattern Empty = ""::Text
 
 

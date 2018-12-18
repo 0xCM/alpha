@@ -10,11 +10,12 @@ module Alpha.Canonical.Relations.BiComparison
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
 import Alpha.Canonical.Element
+import Alpha.Canonical.Relations.Related
+
 import qualified Numeric.Interval as Interval
 import qualified Prelude as P
-import Alpha.Canonical.Relations.Related
+
 
 -- | Synonym for function that effects heterogenous comparison
 type BiComparer a b = a -> b -> Bool

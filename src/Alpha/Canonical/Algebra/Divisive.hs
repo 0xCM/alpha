@@ -18,13 +18,29 @@ type family Quotient a b
 -- / Characterizes a type that supports a notion of division
 class Divisive a where
     -- | Divides the first operand by the second
-    div::BinOp a
+    div::O2 a
 
     -- | Infix synonym for 'div'
-    (/)::BinOp a
+    (/)::O2 a
     (/) = div
     {-# INLINE (/) #-}
     infixl 8 /    
+
+newtype Division a = Divisive (O2 a)
+    
+type OpK f a = (f ~ Division a, Divisive a)    
+
+data instance Operator 2 (Division a) 
+    = Division (O2 a)
+
+instance OpK f a => Operative 2 f a where
+    type OpArgs 2 f a = (a,a)
+
+    operator = Division div 
+    {-# INLINE operator #-}        
+
+    evaluate (a1,a2) = f a1 a2 where (Division f) = operator 
+    {-# INLINE evaluate #-}        
 
 -- | Characterizes pairs of types that support a notion of division
 class Bidivisive a b where
@@ -89,22 +105,3 @@ instance Divisive CDouble where
     div = divf
     {-# INLINE div #-}
 
-type instance Quotient Natural Natural = Natural
-type instance Quotient Integer Integer = Integer
-type instance Quotient Int Int = Int
-type instance Quotient Int8 Int8 = Int8
-type instance Quotient Int16 Int16 = Int16
-type instance Quotient Int32 Int32 = Int32
-type instance Quotient Int64 Int64 = Int64
-type instance Quotient Word Word = Word
-type instance Quotient Word8 Word8 = Word8
-type instance Quotient Word16 Word16 = Word16
-type instance Quotient Word32 Word32 = Word32
-type instance Quotient Word64 Word64 = Word64
-type instance Quotient (Ratio a) (Ratio a) = Ratio a
-type instance Quotient Float Float = Float
-type instance Quotient Double Double = Double
-type instance Quotient CFloat CFloat = CFloat
-type instance Quotient CDouble CDouble = CDouble
-    
-    

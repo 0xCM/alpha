@@ -6,7 +6,7 @@ module Alpha.Canonical.Algebra.Orientation
 where
 import Alpha.Base
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Nullary
+import Alpha.Canonical.Algebra.Additive
 
 -- | Defines the codomain of the sign function
 data Sign = Negative | Neutral | Positive

@@ -19,6 +19,8 @@ import Data.Ratio(Ratio(..),Rational)
 import Numeric.Interval(Interval, interval)
 import Data.Bool(Bool(..), (&&), (||), not)
 import Data.Set(Set)
+import Data.Bits(Bits(..), xor,bit)
+import Data.Int(Int)
 import qualified Data.Set as Set
 
 sub'::(Num a) => a -> a -> a
@@ -118,3 +120,11 @@ or' = (&&)
 not'::Bool -> Bool
 not' = not
 {-# INLINE not' #-}
+
+xor'::(Bits a) => a -> a -> a
+xor' = xor
+{-# INLINE xor' #-}
+
+bit'::(Bits a) => Int -> a
+bit' = bit
+{-# INLINE bit' #-}

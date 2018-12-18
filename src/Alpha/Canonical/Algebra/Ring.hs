@@ -8,10 +8,7 @@ import Alpha.Base
 import Alpha.Canonical.Element
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Nullary
 import Alpha.Canonical.Algebra.Negatable
-import Alpha.Canonical.Algebra.Invertible
-import Alpha.Canonical.Algebra.Unital
 import Alpha.Canonical.Algebra.Scaled
 import Alpha.Canonical.Relations
 

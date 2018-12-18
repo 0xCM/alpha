@@ -12,7 +12,6 @@ import Alpha.Canonical.Common
 import Alpha.Canonical.Operators
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Monoid
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Divisive
 import Alpha.Canonical.Algebra.Modular

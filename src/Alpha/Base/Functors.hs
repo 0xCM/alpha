@@ -24,7 +24,7 @@ module Alpha.Base.Functors
     Const, fconst,
     Contravariant, phantom, ($<), (>$<),  (>$$<),
     Opposite, opposite,
-    Distributive, distribute, collect, cotraverse,
+    --Distributive, distribute, collect, cotraverse,
     Extend, duplicated, extended,
     Functor, fmap, (<$>), ($>), (<$),
     Functorial(..),

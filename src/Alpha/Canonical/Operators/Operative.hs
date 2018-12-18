@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE PolyKinds #-}
 -----------------------------------------------------------------------------
 -- | 
 -- Copyright   :  (c) 0xCM, 2018
@@ -6,16 +8,17 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Operators.Operative
 (    
-    Operator(..), UnaryOperator, BinaryOperator, TernaryOperator, BinOp,
-
-    BinaryOperative(..), Commutative(..), Associative(..), O2,
+    O1, O2, O3,
+    Operator(..),
+    Operative(..),
+    Commutative(..), 
+    Associative(..),
 
     (<|),(|>), scompose, associator,associative, 
     endoply, cartesian, dual, endo, ifelse, left,right, 
     reduce,
     Iterable(..),
-
-
+    
 ) where
 import Alpha.Base
 import Alpha.Native
@@ -26,36 +29,38 @@ import qualified Data.Map as Map
 import qualified Data.List as List
 import qualified Data.Text as Text
 
--- | Characterizes a type over which function iterates may be computed
-class Iterable a where
-    iterate :: UnaryOperator (Element a) -> (Element a) -> a
+-- | Synonym for unary operator vis-a-vis: 
+-- A *ternary operator* is a total function closed over its domain
+type O1 a = a -> a
 
-
--- | Function synonym  for an operator that saturates with 1 (homogenous)argument
-type UnaryOperator a = a -> a
-
--- | Function synonym for an operator that saturates with 2 (homogenous) arguments
---class BinaryOperator a where
-type BinOp a = a -> a -> a
-data family BinaryOperator a
-
-class BinaryOperative a where
-    o2::BinaryOperator a
-
+-- | Synonym for binary operator vis-a-vis: 
+-- A *binary operator* is a a total function closed over 
+-- an homogenous 2-cartesian domain
 type O2 a = a -> a -> a
 
--- | Function synonym for an operator that saturates with 3 (homogenous) arguments
-type TernaryOperator a = a -> a -> a -> a
+-- | Synonym for ternary operator vis-a-vis: 
+-- A *ternary operator* is a total function closed over 
+-- its homogenous 3-cartesian domain
+type O3 a = a -> a -> a -> a
 
+-- | Defines arity-polymorphic families of operators
+data family Operator (n::Nat) f :: Type
 
-type family Operator (n::Nat) a = r | r -> a where
-    Operator 1 a = UnaryOperator a
-    Operator 2 a = BinOp a
-    Operator 3 a = TernaryOperator a
+-- | Defines capabilities for members of the 'Operator' family
+class Operative (n::Nat) f (a::Type) where
+    type OpArgs n f a
+    operator::Operator n f
+    evaluate::OpArgs n f a -> a 
 
-class Commutative a where
+-- | Classifies commutative binary operators
+class (Operative 2 f a) => Commutative f a where
 
-class Associative a where
+-- | Classifies associative binary operators
+class (Operative 2 f a) => Associative f a where
+        
+-- | Characterizes a type over which function iterates may be computed
+class Iterable a where
+    iterate :: O1 (Element a) -> (Element a) -> a
 
 -- | The forward pipe operator
 (|>) :: a -> (a -> b) -> b
@@ -74,7 +79,7 @@ scompose = o
 
 -- | Computes both left and right-associative applications
 -- If an operator is associtive, these values will coincide
-associator::BinOp a -> (a, a, a) -> (a,a)
+associator::O2 a -> (a, a, a) -> (a,a)
 associator o (x,y,z) =  (left,right) where
     xy = o x y 
     yz = o y z
@@ -83,7 +88,7 @@ associator o (x,y,z) =  (left,right) where
 
 -- | Determines whether a binary operator is associative with respect
 -- to a test triple    
-associative::(Eq a) => BinOp a -> (a, a, a) -> Bool
+associative::(Eq a) => O2 a -> (a, a, a) -> Bool
 associative o triple = x == y where
     (x,y) = associator o triple
 
@@ -117,7 +122,7 @@ cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
 dual::Monoid a => [a] -> Dual a
 dual src = fold (fmap  Dual src)
 
-reduce::a -> BinOp a -> [a] -> a
+reduce::a -> O2 a -> [a] -> a
 reduce id op (a:b:tail) =  op (op a b)  (reduce id op tail)
 reduce id op (a:[]) = a
 reduce id op [] = id

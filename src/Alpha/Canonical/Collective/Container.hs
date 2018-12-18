@@ -65,9 +65,9 @@ class Collapsible a where
 class (Container c) => Filterable c where
 
     -- | Excludes elements that don't satisfy a predicate
-    filter::UnaryPredicate (Item c) -> c -> c
+    filter::P1 (Item c) -> c -> c
 
     -- | Selects a single element that satisfies a predicate
-    single::UnaryPredicate (Item c)-> c -> Item c
+    single::P1 (Item c) -> c -> Item c
     single p c =  List.head $ contents $ filter p c  
 

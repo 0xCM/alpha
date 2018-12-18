@@ -14,7 +14,6 @@ import qualified Data.Matrix as M
 import Alpha.Base
 import Alpha.Canonical
 import Alpha.Data.NatK
-import Alpha.Canonical.Algebra.Unital
 import qualified Data.Text as Text
 import qualified Data.List as List
 
