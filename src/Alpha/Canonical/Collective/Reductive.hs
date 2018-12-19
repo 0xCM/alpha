@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
--- | Abstractions inspired by list-like structure and operations
--- Copyright   :  (c) 0xCM, 2018
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -9,8 +9,8 @@ module Alpha.Canonical.Collective.Reductive
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators hiding(reduce)
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
+import Alpha.Canonical.Functions hiding(reduce)
 import Alpha.Canonical.Algebra.Additive
 
 import qualified Data.List as List

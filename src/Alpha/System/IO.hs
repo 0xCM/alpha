@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
--- | IO Utilities
--- Copyright   :  (c) 0xCM, 2018
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -23,14 +23,17 @@ where
 
 import Alpha.Base
 import Alpha.Native
-import Alpha.Text.Combinators
-import Alpha.Canonical
+import Alpha.Canonical.Text
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Algebra
+import Alpha.Canonical.Collective
 import Alpha.System.FilePath
-import Alpha.Text as Text
+import Alpha.Canonical.Text.Asci
 
-import System.Console.ANSI
+import qualified Data.Text as Text
 import qualified Prelude as P
 import qualified System.Directory as Dir
+import System.Console.ANSI
 
 newtype HexLine = HexLine (Int, Text)
     deriving (Eq,Ord)
@@ -83,7 +86,7 @@ isFile (FilePath x) = show x |> Dir.doesFileExist |> shredIO
 dir::FolderPath -> [Text]
 dir (FolderPath x) 
     = x |> unpack |> Dir.listDirectory |> shredIO 
-        |> fmap (\y -> Text.splat([ x , fslash,  pack y ]))
+        |> fmap (\y -> Text.concat([ x , FSlash,  pack y ]))
 
 -- | Returns the files that are contained in a specified parent folder
 files::FolderPath -> [FilePath]    

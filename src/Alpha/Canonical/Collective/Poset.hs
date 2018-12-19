@@ -1,10 +1,19 @@
-module Alpha.Data.Poset
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+module Alpha.Canonical.Collective.Poset
 (
     Poset, poset
 )
 where
 import Alpha.Base
-import Alpha.Canonical
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Text.Formattable
+import Alpha.Canonical.Collective.Container
+import Alpha.Canonical.Collective.ItemSet
 import qualified Data.Set as Set
 
 -- Encloses (constructively) a partially ordered set

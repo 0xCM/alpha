@@ -1,18 +1,19 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Operators.Operative
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE PolyKinds #-}
+module Alpha.Canonical.Functions.Operators
 (    
     O1, O2, O3,
+    OpSpec(..),
     Operator(..),
-    Operative(..),
     Commutative(..), 
     Associative(..),
+    Identity(..),
 
     (<|),(|>), scompose, associator,associative, 
     endoply, cartesian, dual, endo, ifelse, left,right, 
@@ -22,7 +23,7 @@ module Alpha.Canonical.Operators.Operative
 ) where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Map as Map
@@ -43,20 +44,28 @@ type O2 a = a -> a -> a
 -- its homogenous 3-cartesian domain
 type O3 a = a -> a -> a -> a
 
--- | Defines arity-polymorphic families of operators
-data family Operator (n::Nat) f :: Type
+-- | Defines arity-polymorphic families of operator specifications
+data family OpSpec (n::Nat) f :: Type
+data instance OpSpec 1 (O1 a) = O1 a
+data instance OpSpec 2 (O2 a) = O2 a
+data instance OpSpec 3 (O3 a) = O3 a
 
--- | Defines capabilities for members of the 'Operator' family
-class Operative (n::Nat) f (a::Type) where
+-- | Defines evaluation and provisioning services for specified operators
+class Operator (n::Nat) f (a::Type) where
     type OpArgs n f a
-    operator::Operator n f
+    operator::OpSpec n f
     evaluate::OpArgs n f a -> a 
+    
 
 -- | Classifies commutative binary operators
-class (Operative 2 f a) => Commutative f a where
+class (Operator 2 f a) => Commutative f a where
 
 -- | Classifies associative binary operators
-class (Operative 2 f a) => Associative f a where
+class (Operator 2 f a) => Associative f a where
+
+-- | Associaties an identty element with an operator
+class (Operator 2 f a) => Identity f a where
+        identity::a
         
 -- | Characterizes a type over which function iterates may be computed
 class Iterable a where

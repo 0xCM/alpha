@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Successive
 (
     Increment(..), Incrementable(..),
@@ -6,7 +12,7 @@ module Alpha.Canonical.Algebra.Successive
 ) where
 import Alpha.Base hiding(div)
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Native
 
 import qualified Data.List as List

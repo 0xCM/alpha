@@ -1,19 +1,20 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Subtractive
-(
-    
+(    
     Subtractive(..), 
-    Subtracted(..), 
-    Bisubtractive(..)
+    Negatable(..),
     
 ) where
 import Alpha.Base hiding(div)
-import Alpha.Canonical.Operators
 import Alpha.Native
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Elementary
 
--- | Represents a family of types that support a notion of (potentially) heterogeneous 
--- subtraction where the instance type is the result type of applying a 
--- conforming subtraction operation
-type family Subtracted a b
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -31,10 +32,10 @@ newtype Subtraction a = Subtractive (O2 a)
 instance Newtype (Subtraction a)        
 type OpK f a = (f ~ Subtraction a, Subtractive a)
 
-data instance Operator 2 (Subtraction a) 
+data instance OpSpec 2 (Subtraction a) 
     = Subtraction (O2 a)
 
-instance OpK f a => Operative 2 f a where
+instance OpK f a => Operator 2 f a where
     type OpArgs 2 f a = (a,a)
 
     operator = Subtraction sub 
@@ -43,16 +44,29 @@ instance OpK f a => Operative 2 f a where
     evaluate (a1,a2) =  f a1 a2 where (Subtraction f) = operator 
     {-# INLINE evaluate #-}        
 
--- / Characterizes a pair of type that supports a notion of heterogenious subtraction
-class Bisubtractive a b where
-    -- | Calculates the difference between the first value and the second
-    bisub::a -> b -> Subtracted a b
 
-    -- | Infix synonym for 'hsub'        
-    (>-<)::a -> b -> Subtracted a b
-    (>-<) = bisub
-    infixl 6 >-<    
+-- | Characterizes types whose values are closed under 
+-- additive negation
+class Negatable a where
+    -- | Negates the operand    
+    negate::a -> a
 
+newtype Negation a = Negative (O1 a)    
+
+type OpN f a = (f ~ Negation a, Negatable a)
+    
+data instance OpSpec 1 (Negation a) 
+    = Negation (O1 a)
+
+instance OpN f a => Operator 1 f a where
+    type OpArgs 1 f a = a
+
+    operator = Negation negate
+    {-# INLINE operator #-}        
+
+    evaluate a = f a where
+            (Negation f) = operator 
+    {-# INLINE evaluate #-}        
     
 -- Subtractive
 -------------------------------------------------------------------------------
@@ -108,21 +122,77 @@ instance Subtractive CDouble where
     sub = sub'
     {-# INLINE sub #-}
 
--- type instance Subtracted Natural Natural = Natural
--- type instance Subtracted Integer Integer = Integer
--- type instance Subtracted Int Int = Int
--- type instance Subtracted Int8 Int8 = Int8
--- type instance Subtracted Int16 Int16 = Int16
--- type instance Subtracted Int32 Int32 = Int32
--- type instance Subtracted Int64 Int64 = Int64
--- type instance Subtracted Word Word = Word
--- type instance Subtracted Word8 Word8 = Word8
--- type instance Subtracted Word16 Word16 = Word16
--- type instance Subtracted Word32 Word32 = Word32
--- type instance Subtracted Word64 Word64 = Word64
--- type instance Subtracted (Ratio a) (Ratio a) = Ratio a
--- type instance Subtracted Float Float = Float
--- type instance Subtracted Double Double = Double
--- type instance Subtracted CFloat CFloat = CFloat
--- type instance Subtracted CDouble CDouble = CDouble
-    
+-- Negatable 
+-------------------------------------------------------------------------------
+instance Negatable Integer where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Int where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Int8 where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Int16 where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Int32 where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Int64 where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance (Integral a) => Negatable (Ratio a) where 
+    negate x = sub' 0 x
+    {-# INLINE negate #-}    
+instance Negatable Float where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable Double where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable CFloat where 
+    negate = negate'
+    {-# INLINE negate #-}
+instance Negatable CDouble where 
+    negate = negate'
+    {-# INLINE negate #-}
+
+
+-- Subtractive tuples
+-------------------------------------------------------------------------------
+type Subtractive2 a1 a2 = (Subtractive a1, Subtractive a2)
+type Subtractive3 a1 a2 a3 = (Subtractive2 a1 a2, Subtractive a3)
+type Subtractive4 a1 a2 a3 a4 = (Subtractive3 a1 a2 a3, Subtractive a4)
+type Subtractive5 a1 a2 a3 a4 a5 = (Subtractive4 a1 a2 a3 a4, Subtractive a5)
+
+instance Subtractive2 a1 a2 => Subtractive (Tuple2 a1 a2) where
+    sub (x1,x2) (y1,y2) = (x1 - y1, x2 - y2)
+
+instance Subtractive3 a1 a2 a3 => Subtractive (Tuple3 a1 a2 a3) where
+    sub  (x1,x2,x3) (y1,y2,y3) = (x1 - y1, x2 - y2,x3 - y3)
+
+instance Subtractive4 a1 a2 a3 a4 => Subtractive (Tuple4 a1 a2 a3 a4) where
+    sub  (x1,x2,x3,x4) (y1,y2,y3,y4) = (x1 - y1, x2 - y2,x3 - y3, x4 - y4)
+
+instance Subtractive5 a1 a2 a3 a4 a5 => Subtractive (Tuple5 a1 a2 a3 a4 a5) where
+    sub  (x1,x2,x3,x4,x5) (y1,y2,y3,y4,y5) = (x1 - y1, x2 - y2,x3 - y3, x4 - y4,x5 - y5)
+
+-- Negatable tuples
+-------------------------------------------------------------------------------
+type Negatable2 a1 a2 = (Negatable a1, Negatable a2)
+type Negatable3 a1 a2 a3 = (Negatable2 a1 a2, Negatable a3)
+type Negatable4 a1 a2 a3 a4 = (Negatable3 a1 a2 a3, Negatable a4)
+type Negatable5 a1 a2 a3 a4 a5 = (Negatable4 a1 a2 a3 a4, Negatable a5)
+
+instance Negatable2 a1 a2 => Negatable (Tuple2 a1 a2) where    
+    negate (a1,a2) = (negate a1, negate a2)
+
+instance Negatable3 a1 a2 a3 => Negatable (Tuple3 a1 a2 a3) where
+    negate (a1,a2,a3) = (negate a1, negate a2, negate a3)
+
+instance Negatable4 a1 a2 a3 a4 => Negatable (Tuple4 a1 a2 a3 a4) where
+    negate (a1,a2,a3,a4) = (negate a1, negate a2, negate a3, negate a4)
+
+instance Negatable5 a1 a2 a3 a4 a5  => Negatable (Tuple5 a1 a2 a3 a4 a5)  where
+    negate (a1,a2,a3,a4,a5) = (negate a1, negate a2, negate a3, negate a4, negate a5)                

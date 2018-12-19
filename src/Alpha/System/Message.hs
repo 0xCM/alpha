@@ -1,12 +1,12 @@
 -----------------------------------------------------------------------------
 -- | Operations and types related to application logging/messaging
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 
-module Alpha.Data.Message
+module Alpha.System.Message
 (
     Severity(..),
     Message(..),

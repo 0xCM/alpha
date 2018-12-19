@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines vectcor-related API surface
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------

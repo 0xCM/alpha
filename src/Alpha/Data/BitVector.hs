@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- | A type-level bitvector, derivative from Galois bv-sized and 
 -- parameterized-utils libraries; see LICENSE
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ import Numeric
 import Alpha.Types.Nats
 import Alpha.Types.Some
 import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod,rem)
-import Alpha.Text.Combinators
+import Alpha.Canonical.Text.Combinators
 import Alpha.Base
 import GHC.Real(mod)
 
@@ -381,8 +381,8 @@ instance ToBitVector Word32 32 where
 instance ToBitVector Word64 64 where
   bv x = bitvector (fromIntegral x)
 
-instance (KnownNat w1, KnownNat w2) => Appendable (BitVector w1) (BitVector w2)  where
-  append = bvConcat
+instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2)  where
+  concat = bvConcat
 
 instance KnownNat w => Length (BitVector w) where
   length  = convert . finiteBitSize  

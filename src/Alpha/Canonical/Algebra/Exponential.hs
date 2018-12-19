@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Exponential
 (
     Exponential(..), exponential,
@@ -8,7 +14,7 @@ module Alpha.Canonical.Algebra.Exponential
 ) where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Collective.Reductive
 import Alpha.Canonical.Algebra.Multiplicative
 import qualified Data.List as List

@@ -11,16 +11,14 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE PostfixOperators #-}
 
-module Alpha.Data.Row
+module Alpha.Canonical.Collective.Row
 (
     Row(..), Label(..)
 )
 where
 import Alpha.Base
-import Alpha.Canonical
 import GHC.Read
-import Data.Ix
-import Data.List((++),stripPrefix)
+import Data.List(stripPrefix)
 
 class RowExtend e l where
     type ExtendedRow e l
@@ -87,8 +85,8 @@ instance Show (Row '[]) where
 
 instance (Show e, Show (Row r)) => Show (Row(e ': r)) where
     show (x :++: l) = let 'R':'[':s = show l
-                        in "R[" ++ show x ++
-                                    (if s == "]" then s else "," ++ s)
+                        in "R[" <> show x <>
+                                    (if s == "]" then s else "," <> s)
 
 instance Read (Row '[]) where
     readsPrec _ str = case stripPrefix "R[]" str of

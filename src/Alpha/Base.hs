@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines the common API service for accessing base and 3rd-party libs
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------

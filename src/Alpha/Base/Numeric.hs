@@ -1,19 +1,17 @@
-{-# LANGUAGE NoStarIsType #-}
 -----------------------------------------------------------------------------
--- | Base Data.* modules
--- Copyright   :  (c) 0xCM, 2018
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE NoStarIsType #-}
 {-# LANGUAGE MagicHash #-}
-
 module Alpha.Base.Numeric
 (
     
     Natural,
     Integral, quot, quotRem, divMod, gcd,lcm,
-    Floating, pi, exp, log, sin, cos, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt,
-    double2Float, float2Double,
+    Floating, pi, exp, log, sin, cos, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt, double2Float, float2Double,
     Fractional, recip, fromRational, divf,
     Ratio, frac,
     Real,fromIntegral,

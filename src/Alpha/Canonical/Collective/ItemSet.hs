@@ -1,27 +1,32 @@
-{-# LANGUAGE OverloadedLists #-}
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE OverloadedLists #-}
+
 module Alpha.Canonical.Collective.ItemSet
 (
     ItemSet(..),Setwise(..),IsSet(..)
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Common
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Vacant
 import Alpha.Canonical.Collective.Container
+import Alpha.Canonical.Collective.Containers
+import Alpha.Canonical.Collective.Appendable
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Semiring
 import Alpha.Canonical.Algebra.Modular
+import Alpha.Canonical.Algebra.Hetero
 import Alpha.Canonical.Text
 import Alpha.Canonical.Text.Asci
+
 
 import qualified Data.List as List
 import qualified Data.Vector as Vector
@@ -29,10 +34,11 @@ import qualified Data.Sequence as Sequence
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as Text
+import qualified Data.MultiSet as Bag
 
 
 type instance Element (ItemSet a) = a
-type instance Collapsed (ItemSet (ItemSet a)) = ItemSet a        
+type instance Appended (ItemSet (ItemSet a)) = ItemSet a        
 type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
 
 
@@ -77,8 +83,8 @@ instance (Ord a) => Container (ItemSet a) where
     contain = fromList
     contents = toList
 
-instance (Ord a) => Collapsible (ItemSet (ItemSet a)) where
-    collapse = unions . toList
+instance (Ord a) => Appendable (ItemSet (ItemSet a)) where
+    append = unions . toList
 
 instance (Ord a) => FiniteContainer (ItemSet a) where        
 
@@ -141,3 +147,21 @@ instance (Ord a, Unital a, Multiplicative a) => Semiring (ItemSet a)
     
 instance  KnownNat n => Membership (Zn n) where    
     members s = residues s |> Set.fromList |> ItemSet
+
+instance (Eq a, Ord a) => Setwise [a] where
+    union = List.union
+    intersect = List.intersect
+    delta =  (List.\\)
+    subset proper candidate source  
+        = subset proper  (ItemSet $ Set.fromList candidate)  (ItemSet $ Set.fromList source)
+
+    
+instance (Ord a) => Setwise (Bag a) where
+    intersect = Bag.intersection
+    delta = Bag.difference
+    union = Bag.union        
+    subset proper candidate source 
+        = ifelse proper 
+            (Bag.isProperSubsetOf candidate source) 
+            (Bag.isSubsetOf candidate source)
+

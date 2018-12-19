@@ -1,7 +1,14 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Group
 (
     Group(..),
     AbelianGroup(..),
+    Invertible(..),
     commutator,
     MonoidalAlt, MonoidalProduct, MonoidalSum,
     altM, sumM, prodM
@@ -12,17 +19,19 @@ import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Reciprocative
-import Alpha.Canonical.Algebra.Negatable
 
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import qualified Data.Monoid as Monoid
 
 type MonoidalAlt f a = Monoid.Alt f a
 type MonoidalSum a = Monoid.Sum a
 type MonoidalProduct a = Monoid.Product a
     
-class (Monoid a, Invertible a) => Group a where    
+-- class (Monoid a, Invertible a) => Group a where    
+
+
+class (Multiplicative a, Unital a, Invertible a) => Group a where
 
 class Invertible a where
     invert::a -> a

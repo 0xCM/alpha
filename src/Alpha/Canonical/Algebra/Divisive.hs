@@ -1,19 +1,20 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Divisive
 (
     Divisive(..),
-    Quotient(..), 
-    Bidivisive(..),
 
 ) where
 import Alpha.Base hiding(div)
 import Alpha.Native
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import qualified Data.List as List
 
--- | Represents a family of types that support a notion of (potentially) heterogenous division
--- where a type instance is the type of the result of applying a conforming quotient operator
-type family Quotient a b     
 
 -- / Characterizes a type that supports a notion of division
 class Divisive a where
@@ -30,10 +31,10 @@ newtype Division a = Divisive (O2 a)
     
 type OpK f a = (f ~ Division a, Divisive a)    
 
-data instance Operator 2 (Division a) 
+data instance OpSpec 2 (Division a) 
     = Division (O2 a)
 
-instance OpK f a => Operative 2 f a where
+instance OpK f a => Operator 2 f a where
     type OpArgs 2 f a = (a,a)
 
     operator = Division div 
@@ -42,16 +43,6 @@ instance OpK f a => Operative 2 f a where
     evaluate (a1,a2) = f a1 a2 where (Division f) = operator 
     {-# INLINE evaluate #-}        
 
--- | Characterizes pairs of types that support a notion of division
-class Bidivisive a b where
-    -- | Divides the first value by the second        
-    bidiv::a -> b -> Quotient a b
-
-    -- | Infix synonym for 'hdiv'
-    (>/<)::a -> b -> Quotient a b
-    (>/<) = bidiv
-    {-# INLINE (>/<) #-}        
-    infixl 8 >/<
 
 instance Divisive Natural where 
     div = quot

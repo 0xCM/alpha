@@ -1,10 +1,14 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Collective.Vacant where
+module Alpha.Canonical.Collective.Vacant
+(
+    Vacant(..)
+)
+where
 
 import Alpha.Base
 import Alpha.Canonical.Common
@@ -15,6 +19,17 @@ import qualified Data.Map as Map
 import qualified Numeric.Interval as Interval
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
+
+-- / Characterizes a type for which a canonical and unique vacant/void/empty
+-- value exists
+class Vacant a where
+
+    -- | Exhibits the canonical empty value
+    empty::a
+
+    -- | Determines whether a given value is the canonical
+    -- 'empty' value
+    null::a -> Bool
         
 instance Vacant [a] where
     empty = []

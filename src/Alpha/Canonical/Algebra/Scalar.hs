@@ -1,4 +1,4 @@
-module Alpha.Canonical.Algebra.Scaled
+module Alpha.Canonical.Algebra.Scalar
 (    
     LeftScalar(..), RightScalar(..), Scalar(..),
     

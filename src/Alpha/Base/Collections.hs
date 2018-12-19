@@ -1,10 +1,10 @@
-{-# LANGUAGE NoStarIsType #-}
 -----------------------------------------------------------------------------
--- | Base Data.* modules
--- Copyright   :  (c) 0xCM, 2018
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE NoStarIsType #-}
 module Alpha.Base.Collections
 (
     HashSet, 
@@ -16,7 +16,7 @@ module Alpha.Base.Collections
     LazyMap,
     IsList(..),   
     Stream,
-    Ix,
+    Ix, 
     NonEmpty(..),
     Vector,
 
@@ -44,7 +44,6 @@ import Data.Monoid(Monoid)
 import Data.Foldable(Foldable)
 import Data.Data(Data)
 import Control.DeepSeq(NFData)
-import Control.Category((.))
 
 import qualified Data.Map.Lazy as LM
 import qualified Data.MultiSet as MS

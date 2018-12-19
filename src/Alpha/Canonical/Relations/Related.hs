@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Relations.Related
@@ -23,8 +29,8 @@ module Alpha.Canonical.Relations.Related
 ) where
 import Algebra.PartialOrd 
 import Alpha.Base
-import Alpha.Canonical.Element
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Elementary
+import Alpha.Canonical.Functions
 import qualified Numeric.Interval as Interval
 import qualified Prelude as P
 

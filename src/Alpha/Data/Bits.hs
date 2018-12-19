@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Bit-level types and operations
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ import qualified Data.Text as Text
 import Data.Bits hiding(bit)
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Text.Combinators
+import Alpha.Canonical.Text.Combinators
 import Alpha.Data.Bit
 import GHC.TypeLits
 
@@ -75,20 +75,20 @@ lobyte x = x .&. 0xFF |> fromIntegral
 hibyte :: Word16 -> Word8
 hibyte x  = (x .>>.8) .&. 0xFF |> fromIntegral
 
-instance Appendable Word8 Word8 where
-    append x y = bitsplat 8 x y
+instance Concatenable Word8 Word8 where
+    concat x y = bitsplat 8 x y
             
-instance Appendable Word16 Word16 where    
-    append x y = bitsplat 16 x y
+instance Concatenable Word16 Word16 where    
+    concat x y = bitsplat 16 x y
 
-instance Appendable Word32 Word32 where
-    append x y = bitsplat 32 x y
+instance Concatenable Word32 Word32 where
+    concat x y = bitsplat 32 x y
 
-instance Appendable Int8 Int8 where
-    append x y = bitsplat 8 x y
+instance Concatenable Int8 Int8 where
+    concat x y = bitsplat 8 x y
             
-instance Appendable Int16 Int16 where
-    append x y = bitsplat 16 x y
+instance Concatenable Int16 Int16 where
+    concat x y = bitsplat 16 x y
 
-instance Appendable Int32 Int32 where
-    append x y = bitsplat 32 x y
+instance Concatenable Int32 Int32 where
+    concat x y = bitsplat 32 x y

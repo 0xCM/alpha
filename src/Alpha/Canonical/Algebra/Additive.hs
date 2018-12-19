@@ -1,27 +1,27 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Algebra.Additive
 (
     Additive(..),
     Nullary(..),
-    Summed(..), 
-    Biadditive(..),  
     
 ) where
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Numeric.Interval as Interval
-
--- | Represents a family of types that support a notion of (potentially) heterogenous addition
--- where a type instance is the addition result type
-type family Summed a b
 
 -- | Characterizes a type that supports a notion of  addition      
 class Additive a where
@@ -34,14 +34,22 @@ class Additive a where
     {-# INLINE (+) #-}
     infixl 6 +
 
+class Nullary a where
+    -- | Specifies the unique element 0 such that 0 + a = a + 0 = a forall a
+    zero::a
+
+    -- Tests whether a value is equal to the canonical zero
+    isZero::(Eq a) => a -> Bool
+    isZero a = a == zero    
+    
 newtype Addition a = Additive (O2 a)
     
-type OpK f a = (f ~ Addition a, Additive a)    
+type OpK f a = (f ~ Addition a, Additive a, Nullary a)  
 
-data instance Operator 2 (Addition a) 
+data instance OpSpec 2 (Addition a) 
     = Addition (O2 a)    
 
-instance OpK f a => Operative 2 f a where
+instance OpK f a => Operator 2 f a where
     type OpArgs 2 f a = (a,a)
 
     operator = Addition add    
@@ -52,28 +60,8 @@ instance OpK f a => Operative 2 f a where
 
 instance OpK f a =>  Commutative f a
 instance OpK f a =>  Associative f a
-
-
-class Nullary a where
-    -- | Specifies the unique element 0 such that 0 + a = a + 0 = a forall a
-    zero::a
-
-    -- Tests whether a value is equal to the canonical zero
-    isZero::(Eq a) => a -> Bool
-    isZero a = a == zero    
-
--- | Characterizes pairs of types that support a notion addition and
--- such addition need not be commutative so, in general,
--- hadd a + b != b + a
-class Biadditive a b where
-    -- | Adds the first operand with the second
-    biadd::a -> b -> Summed a b
-
-    -- | Infix synonym for 'hadd'
-    (>+<)::a -> b -> Summed a b
-    (>+<) = biadd
-    {-# INLINE (>+<) #-}
-    infixl 6 >+<
+instance OpK f a => Identity f a where
+    identity = zero
 
         
 -- Additive numbers
@@ -146,13 +134,7 @@ instance Additive CDouble where
     add = add'
     {-# INLINE add #-}
 
-    
-type UniSum a = Summed a a
-type instance Summed (Tuple2 a1 a2) (Tuple2 a1 a2) = Tuple2 (UniSum a1) (UniSum a2)
-type instance Summed (Tuple3 a1 a2 a3) (Tuple3 a1 a2 a3) = Tuple3 (UniSum a1) (UniSum a2) (UniSum a3)
-type instance Summed (Tuple4 a1 a2 a3 a4) (Tuple4 a1 a2 a3 a4) = Tuple4 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4)
-type instance Summed (Tuple5 a1 a2 a3 a4 a5) (Tuple5 a1 a2 a3 a4 a5) = Tuple5 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4) (UniSum a5)
-    
+        
 -- Nullary numbers
 -------------------------------------------------------------------------------
 instance Nullary Natural where 

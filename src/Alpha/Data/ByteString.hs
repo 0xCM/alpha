@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | ByteString-related utilities
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ module Alpha.Data.ByteString
 )
 where
 import Alpha.Base
-import Alpha.Text.Combinators
+import Alpha.Canonical.Text.Combinators
 import Alpha.Canonical hiding(range)
 import Alpha.Data.Bits
 import System.Entropy
@@ -39,9 +39,12 @@ type instance Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
 type instance Element LZ.ByteString = Word8
 type instance Element EG.ByteString = Word8
 
+type instance IndexedElement Int LZ.ByteString = Word8
+type instance IndexedElement Int EG.ByteString = Word8
+
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
-bytes::(Indexed a Int) => Int -> Int -> a -> [Element a]
+bytes::(Indexed Int a) => Int -> Int -> a -> [IndexedElement Int a]
 bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
 
 segment::(Int,Int) -> EG.ByteString -> EG.ByteString
@@ -94,30 +97,30 @@ instance Packable [Word8] EG.ByteString where
     pack = EG.pack
     unpack = EG.unpack 
         
-instance Appendable EG.ByteString EG.ByteString where    
-    append = EG.append
+instance Concatenable EG.ByteString EG.ByteString where    
+    concat = EG.append
 
 instance Length EG.ByteString where
     length = convert . EG.length 
 
-instance Indexed EG.ByteString Int where 
+instance Indexed Int EG.ByteString where 
     at = EG.index
 
 instance Packable [Word8] LZ.ByteString where
     pack = LZ.pack
     unpack = LZ.unpack 
     
-instance Appendable LZ.ByteString LZ.ByteString where
-    append = LZ.append
+instance Concatenable LZ.ByteString LZ.ByteString where
+    concat = LZ.append
     
 instance Length LZ.ByteString where
     length = convert . LZ.length 
 
-instance Indexed LZ.ByteString Int where    
+instance Indexed Int LZ.ByteString where    
     at x n = LZ.index x (int64 n)
 
 instance Convertible EG.ByteString [Word8] where
-    convert source = source |> bytes 0 (length source - 1) 
+    convert source = source |> bytes 0 (length source - 1)
 
 instance Chunkable EG.ByteString where
     chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    

@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Numeric.Conversion
 (
     FromDouble(..), ToDouble(..),
@@ -15,7 +21,7 @@ module Alpha.Canonical.Numeric.Conversion
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Numeric.Class
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 
 import qualified Data.Ratio as DR

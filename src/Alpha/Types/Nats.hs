@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- | Support for type-level natural numbers, derivative from Galois bv-sized and 
 -- parameterized-utils libraries; see LICENSE
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ import Data.Proxy as Proxy
 import qualified GHC.Natural as TN
 import qualified GHC.TypeLits as TL
 import Alpha.Types.Some
-import Alpha.Types.Common
+
 
 newtype NatRepr (n::Nat) = NatRepr {
    natValue :: Integer

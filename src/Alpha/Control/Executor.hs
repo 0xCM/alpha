@@ -1,14 +1,8 @@
-{-# LANGUAGE DefaultSignatures #-}
-
 module Alpha.Control.Executor where
 
 import qualified Data.Text as Text
 import Alpha.Base
 import Alpha.Canonical
-import Alpha.Text
-
--- type family ErrorInfo (t :: Type) :: Type where
---     ErrorInfo (f a) = a
 
 newtype ResultInfo = ResultInfo Text
 

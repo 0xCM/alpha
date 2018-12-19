@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Reversible
 (    
     Reversible(..),
@@ -6,7 +12,7 @@ module Alpha.Canonical.Reversible
 ) where
 import Alpha.Native
 import Alpha.Base
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 
 import qualified Data.List as List  
 import qualified Data.Map as Map

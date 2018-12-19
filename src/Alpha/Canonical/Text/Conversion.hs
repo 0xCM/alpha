@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Text.Conversion
 (
     ToString(..),
@@ -5,7 +11,7 @@ module Alpha.Canonical.Text.Conversion
     ToLines(..)
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import qualified Data.Text as Text
 
 

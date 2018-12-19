@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE NoStarIsType #-}
@@ -108,7 +114,7 @@ natKinc::forall m. (KnownNat m ) => NatK (m + 1)
 natKinc = natK @m |> (>++<)
 
 instance forall k. KnownNat k => Formattable (NatK k) where
-    format (NatK k) = format k |> prepend (" (NatK " <> format (nat @k) <> ")") 
+    format (NatK k) = format k <> (" (NatK " <> format (nat @k) <> ")") 
 
 instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
@@ -128,7 +134,7 @@ instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where
     {-# INLINE span #-}
     
 instance forall m n. (KnownNatPair m n) => Partition (NatKSpan m n)  where        
-    points (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
+    breakpoints (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
     
 instance forall m. (KnownNat m) => Decrementable (NatK m) where    
     dec::NatK m -> Decrement (NatK m) 
@@ -165,15 +171,17 @@ instance forall m n. (KnownNatPair m n) =>  Bidivisive (NatK m) (NatK n) where
     bidiv (NatK m) (NatK n) = m * n |> NatK
     {-# INLINE bidiv #-}
 
-instance Nullary (NatK 0) where    
-    zero::NatK 0
-    zero = natK @0    
-    {-# INLINE zero #-}
 
-instance Unital (NatK 1) where    
-    one::NatK 1
-    one = natK @1    
-    {-# INLINE one #-}
+    
+-- instance Nullary (NatK 0) where    
+--     zero::NatK 0
+--     zero = natK @0    
+--     {-# INLINE zero #-}
+
+-- instance Unital (NatK 1) where    
+--     one::NatK 1
+--     one = natK @1    
+--     {-# INLINE one #-}
         
 -- instance forall m . (KnownNat m) => Powered (NatK m) where    
 --     pow (NatK m) n = (natural m) ^ (natural n) |> fromNatural |> NatK

@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Text.Formattable
 (
     Formattable(..),
@@ -13,10 +19,9 @@ module Alpha.Canonical.Text.Formattable
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
-import Alpha.Canonical.Relations.Tuples
-import Alpha.Canonical.Collective.Discrete
-
+import Alpha.Canonical.Common
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Text.Asci
 
 import qualified Data.Text as Text
@@ -107,9 +112,7 @@ prefix a b = Text.append b a
 instance Packable String Text where
     pack = Text.pack
     unpack = Text.unpack
-        
-            
-
+                
 instance (Formattable a) => Formattable [a] where
     format x = x |> (<$>) format |> Text.concat
 

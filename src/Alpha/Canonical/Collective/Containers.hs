@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
--- | Fundamental container-related constraints
--- Copyright   :  (c) 0xCM, 2018
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -17,14 +17,13 @@ module Alpha.Canonical.Collective.Containers
 where
 
 import Alpha.Base
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Common
 import Alpha.Canonical.Algebra
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.Discrete
 import Alpha.Canonical.Collective.Sequential
 
 import qualified Data.List as List
@@ -38,7 +37,7 @@ import qualified Data.Text as Text
 
 
 
-class (Sequential (Stream a), Weavable a (Stream a), Iterable (Stream a) ) => SequentialStream a where    
+class (Headed (Stream a), Weavable a (Stream a), Iterable (Stream a) ) => SequentialStream a where    
 
     -- Constructs a sream that emits the elements
     -- of a list, cyling over said elements indefinitely
@@ -63,18 +62,7 @@ exclude exclusions source = source |>  List.filter ( `List.notElem` exclusions)
 countDistinct::Bag a -> Int
 countDistinct = Bag.distinctSize
 
-
 testTree = tree (\x -> (x, [1..x])) 5
-
-
-instance Collapsible (Tree a) where
-    collapse = Tree.flatten
-        
-instance Collapsible [[a]] where
-    collapse = List.concat    
-    
-instance Collapsible [Text] where
-    collapse = Text.concat        
         
 instance Counted [a] where
     count = fromIntegral . List.length
@@ -91,10 +79,6 @@ instance SequentialStream (Stream s)  where
     cycle (x:xs) = Stream.cycle(x :| xs)
     blackbox f = Stream.iterate (\_ -> f ()) (f())        
     
-instance Container (Stream e) where
-    singleton x = Stream.cycle [x]
-    contain [x] = Stream.cycle [x]
-    contents s = Stream.takeWhile (\_ -> True) s
             
 instance (Ord a) =>  IsList (Bag a) where
     type Item (Bag a) = a
@@ -102,6 +86,11 @@ instance (Ord a) =>  IsList (Bag a) where
     fromList = bag
     
 instance (Ord a) => Container (Bag a)
+
+instance Container (Stream e) where
+    singleton x = Stream.cycle [x]
+    contain [x] = Stream.cycle [x]
+    contents s = Stream.takeWhile (\_ -> True) s
 
 instance (Eq a) => Container [a] where
     contain x = x
@@ -114,6 +103,7 @@ instance Container (Seq a) where
 instance Container (Vector a)
 
 instance (Ord k) => Container (Map k v)
+
 
 instance (Eq a) => Filterable (Stream a) where
     filter = Stream.filter

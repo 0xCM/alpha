@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -11,7 +11,7 @@ module Alpha.Canonical.Relations.Quantification
 ) where
 
 import Alpha.Base
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import qualified Data.List as List
 import qualified Data.Set as Set
 

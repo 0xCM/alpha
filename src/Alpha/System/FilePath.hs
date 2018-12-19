@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
--- | Defines file path vocabulary
--- Copyright   :  (c) 0xCM, 2018
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -18,11 +18,14 @@ module Alpha.System.FilePath
 )
 
 where
-import Alpha.Text
-import Alpha.Canonical
+import Alpha.Canonical.Text
+import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Collective
+import Alpha.Canonical.Algebra
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Text.Combinators(rightOfLast)
 import Alpha.Base
-
-
+import qualified Data.Text as Text
 
 -- | Represents some part of a path, i.e. a full path, a folder name,
 -- a relative path, etc.
@@ -118,12 +121,12 @@ extension x = FileExtension x
 
 
 getExtension':: Text -> Maybe FileExtension
-getExtension' x = case (x |> rightOfLast dot) of 
+getExtension' x = case (x |> rightOfLast Period) of 
         Just y -> extension y |> just
         _ -> none
 
 instance PathComponent DriveLetter where
-    path (DriveLetter x) = (format x ) <>  colon        
+    path (DriveLetter x) = (format x ) <>  Colon
 instance PathComponent FilePath where
     path (FilePath x) = x
 instance PathComponent FolderPath where
@@ -139,25 +142,25 @@ instance PathComponent RelativeFilePath where
 instance PathComponent RelativeFolderPath where
     path (RelativeFolderPath x) = x
 
-instance Appendable DriveLetter FolderName where
-    append x y = splat [path x, fslash, path y] |> folder
-instance Appendable DriveLetter RelativeFolderPath where
-    append x y = splat [path x, fslash, path y] |> folder
-instance Appendable DriveLetter FileName where
-    append x y = splat [path x, fslash, path y] |> file
-instance Appendable DriveLetter RelativeFilePath where
-    append x y = splat [path x, fslash, path y] |> file
-instance Appendable FolderPath FolderName where
-    append x y = splat [path x, fslash, path y] |> folder        
-instance Appendable FolderPath FileName where
-    append x y = splat [path x, fslash, path y] |> file
-instance Appendable FolderPath RelativeFolderPath where
-    append x y = splat [path x, fslash, path y] |> folder
-instance Appendable FolderPath RelativeFilePath where
-    append x y = splat [path x, fslash, path y] |> file            
-instance Appendable FileName FileExtension where
-    append x y = splat [path x, dot, path y] |> file
-instance Appendable FilePath FileExtension where
-    append x y = splat [path x, dot, path y] |> file    
-instance Appendable FileExtension FileExtension where
-    append x y = splat [path x, dot, path y] |> extension    
+instance Concatenable DriveLetter FolderName where
+    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance Concatenable DriveLetter RelativeFolderPath where
+    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance Concatenable DriveLetter FileName where
+    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance Concatenable DriveLetter RelativeFilePath where
+    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance Concatenable FolderPath FolderName where
+    concat x y = Text.concat [path x, FSlash, path y] |> folder        
+instance Concatenable FolderPath FileName where
+    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance Concatenable FolderPath RelativeFolderPath where
+    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance Concatenable FolderPath RelativeFilePath where
+    concat x y = Text.concat [path x, FSlash, path y] |> file            
+instance Concatenable FileName FileExtension where
+    concat x y = Text.concat [path x, Period, path y] |> file
+instance Concatenable FilePath FileExtension where
+    concat x y = Text.concat [path x, Period, path y] |> file    
+instance Concatenable FileExtension FileExtension where
+    concat x y = Text.concat [path x, Period, path y] |> extension    

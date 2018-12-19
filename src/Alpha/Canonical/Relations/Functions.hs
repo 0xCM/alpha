@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines predicate operators and types
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -17,7 +17,7 @@ module Alpha.Canonical.Relations.Functions
 import Alpha.Base
 import Alpha.Canonical.Relations.Related
 
-import Control.Category(Category(..))
+
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.List as List

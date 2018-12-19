@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines the functorial API surface provided by external libraries
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -19,7 +19,6 @@ module Alpha.Base.Functors
     Biapplicative, Bitraversable, (<<*>>), bipure, biliftA2, (*>>), (<<*), biliftA3, traverseBia, sequenceBia, traverseBiaWith,    
     Biapply,(<<$>>),(<<..>>), bilift2,bilift3,
     BindTrans, liftB,    
-    Category, (.),
     Comonad, (=>=), (=<=),(<<=), (=>>),
     Const, fconst,
     Contravariant, phantom, ($<), (>$<),  (>$$<),
@@ -29,7 +28,7 @@ module Alpha.Base.Functors
     Functor, fmap, (<$>), ($>), (<$),
     Functorial(..),
     Foldable, foldMap, fold, foldr, foldr', foldl, foldl', foldby, 
-    Identity, identity,
+    --Identity, identity,
     Monad, (>>=),
     Traversable, traverse, sequenceA,
     Product, product, -- Compatible with the notion of a categorical product

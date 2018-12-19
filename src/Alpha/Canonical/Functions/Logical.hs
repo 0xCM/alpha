@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Operators.Logical
+module Alpha.Canonical.Functions.Logical
 (    
     Disjunctive(..), 
     ExclusivelyDisjunct(..), 
@@ -15,13 +15,72 @@ module Alpha.Canonical.Operators.Logical
     Substitutive(..),
     Boolean(..),    
     Predicate(..), 
-    P1,P2,P3
+    P1,P2,P3,
+
+    type (==),
+    type (&&),
+    type (||),
+    type (:=>),
+    If, Not,
+    Disjunct(..), Conjunct(..), Implies(..)
 
 ) where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Element
-import Alpha.Canonical.Operators.Functions
+import Alpha.Canonical.Elementary
+import Alpha.Canonical.Functions.Common
+
+
+type True = 'True
+type False = 'False
+
+type family a == b :: Bool where
+    a == a = True
+    a == b = False    
+    
+infixl 1 ==
+
+data Disjunct a b = Disjunct (Either a b)
+data Conjunct a b = Conjunct (a,b)
+
+data Implies a b = Implies (a->b)
+
+type a :-> b = Implies a b    
+infixl 5 :->
+
+type family (a::Bool) || (b::Bool) :: Bool where
+    True || True = True
+    True || False = True
+    False || True = True
+    False || False = False
+
+infixl 2 ||
+
+type family (a::Bool) && (b::Bool) :: Bool where
+    True && True = True
+    True && False = False
+    False && True = False
+    False && False = False    
+
+infixl 3 &&    
+
+type family Not (a::Bool) :: Bool where    
+    Not True = False
+    Not False = True
+
+type family If (a::Bool) (b::k) (c::k) :: k where
+    If True b c = b
+    If False b c = c    
+
+type family a :=> b where
+    False :=> False = True
+    False :=> True = True
+    True :=> False = False
+    True :=> True = True
+
+infixl 5 :=>
+    
+
 
 -- | Characterizes a value that can be converted to a 'Bool'
 class Boolean a where
@@ -31,12 +90,10 @@ class Boolean a where
 -- | Characterizes a type's logical disjunction operator 
 class Disjunctive a where
     (||)::a -> a -> Bool
-    infixr 2 ||
 
 -- | Characterizes a type's logical conjunction operator 
 class Conjunctive a where
     (&&)::a -> a -> Bool    
-    infixr 3 &&
 
 
 -- | The modus ponens of propositional logic

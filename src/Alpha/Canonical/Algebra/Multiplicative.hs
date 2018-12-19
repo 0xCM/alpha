@@ -1,21 +1,22 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Multiplicative
 (
     Multiplicative(..),
     Factorable(..), Factored(..),
     Unital(..),
-    Multiplied(..), 
-    Bimultiplicative(..),    
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Operators
 import Alpha.Native
+import Alpha.Canonical.Functions
 
 type family Factored a = r | r -> a
 
--- | Represents a family of types that support a notion of (potentially) heterogenous multiplication
--- where a type instance is the multiplication result type
-type family Multiplied a b
 
 class Factorable (a::Type) where
     --- | Factors a supplied value into constituent parts
@@ -38,12 +39,12 @@ class Multiplicative a where
 
 newtype Multiplication a = Multiplicative (O2 a)
 
-type OpK f a = (f ~ Multiplication a, Multiplicative a)
+type OpK f a = (f ~ Multiplication a, Multiplicative a, Unital a)
 
-data instance Operator 2 (Multiplication a) 
+data instance OpSpec 2 (Multiplication a) 
     = Multiplication (O2 a)
 
-instance OpK f a => Operative 2 f a where
+instance OpK f a => Operator 2 f a where
     type OpArgs 2 f a = (a,a)
 
     operator = Multiplication mul
@@ -55,21 +56,13 @@ instance OpK f a => Operative 2 f a where
 
 instance OpK f a =>  Commutative f a
 instance OpK f a =>  Associative f a
-    
+instance OpK f a => Identity f a where
+    identity = one
+
 class Unital a where
     -- | Specifies the unique element 1 such that 1*a = a*1 = a forall a
     one::a
     
--- | Characterizes pairs of types that support a notion multiplication
-class Bimultiplicative a b where
-    -- | Multiplies the first operand by the second
-    bimul::a -> b -> Multiplied a b
-
-    -- | Infix synonym for 'hmul'
-    (>*<)::a -> b -> Multiplied a b
-    (>*<) = bimul
-    {-# INLINE (>*<) #-}    
-    infixl 7 >*<
 
 -- Unital
 -------------------------------------------------------------------------------

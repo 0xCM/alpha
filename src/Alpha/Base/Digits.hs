@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- | Provides digit manipulation operations
 -- Adapted from: https://bitbucket.org/sffubs/digits
--- Copyright   : Original author and Chris Moore(c) 0xCM, 2018
+-- Copyright   : Original author and Chris Moore(c) Chris Moore, 2018
 -- License     :  BSD/MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines a 2-dimensional tabular data structure
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -31,7 +31,8 @@ newtype DataTable m n a = DataTable (M.Matrix a)
     deriving (Eq, NFData, Functor, Semigroup, Monoid, Applicative, Foldable, Traversable, Num) 
     
 type instance Element (DataTable m n a) = a
-    
+type instance IndexedElement (Int,Int) (DataTable m n a) = a
+
 -- | Specifies the form of the matrix dimension type
 type TableDim = (Int, Int)
 
@@ -90,5 +91,5 @@ instance forall m n a. (KnownNat m, KnownNat n) => Dimensional (DataTable m n a)
 instance Show a => Formattable (DataTable m n a) where
     format = Text.pack . show
 
-instance forall m n a.KnownNatPair m n  => Indexed (DataTable m n a) (Int,Int) where
+instance forall m n a.KnownNatPair m n  => Indexed (Int,Int) (DataTable m n a) where
     at (DataTable m) (r,c) = M.getElem r c m

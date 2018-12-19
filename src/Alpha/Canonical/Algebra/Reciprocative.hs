@@ -5,7 +5,7 @@ module Alpha.Canonical.Algebra.Reciprocative
 ) where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Algebra.Divisive
 
 -- | Characterizes types whose values are closed under 

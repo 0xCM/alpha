@@ -14,7 +14,7 @@ module Alpha.Canonical.Structures
 where
 import Alpha.Base hiding (Semigroup, Monoid)
 
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 
 class Structure a where
     -- | Extracts the elements from a structure

@@ -1,9 +1,14 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE FlexibleInstances #-}
 
-module Alpha.Text.Combinators
+module Alpha.Canonical.Text.Combinators
 (    
-    dot, dots, space, colon, semi, comma, 
-    fslash, bslash, larrow, rarrow,
+    dots, dashes, spaces,
     splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,
     zpadL, padL,
@@ -16,11 +21,14 @@ module Alpha.Text.Combinators
  where
 
 import Alpha.Base hiding (div)
-import Alpha.Canonical
-import Alpha.Canonical.Text
-import Alpha.Canonical.Operators
-import Alpha.Text.Symbols
 import Alpha.Native
+import Alpha.Canonical.Text
+import Alpha.Canonical.Algebra
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Text.Symbols
 import Data.Aeson (FromJSON, ToJSON, decode, encode)
 import Data.Aeson.Encode.Pretty
 
@@ -30,6 +38,20 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import Numeric(showIntAtBase)
 
+repeat::Integral i => i -> Text -> Text
+repeat i t = replicate (fromIntegral i) t
+
+-- | Produces text containing a specified number of "." characters
+dots::Integral i => i -> Text
+dots i = repeat i Period
+
+-- | Produces text containing a specified number of "-" characters
+dashes::Integral i => i -> Text
+dashes i = repeat i Dash
+
+-- | Produces text containing a specified number of spaces
+spaces::Integral i => i -> Text
+spaces i = repeat i Space
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -132,8 +154,4 @@ bitstring n = showBasedInt 2 n |> zpadL width
 -- | Encodes an integral value as a base-2 Text
 bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitstringN w n = showBasedInt 2 n |> zpadL w
-
-instance Cloneable Int Text where
-    type Cloned Int Text = Text
-    clone = Text.replicate
 

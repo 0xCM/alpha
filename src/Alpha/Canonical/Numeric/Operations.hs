@@ -1,14 +1,19 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Numeric.Operations
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Common
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Subtractive
-import Alpha.Canonical.Algebra.Negatable
 
 import Alpha.Canonical.Numeric.Types
 

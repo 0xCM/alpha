@@ -1,17 +1,17 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Data.Interval
+module Alpha.Canonical.Algebra.Interval
 (
     interval
 )
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical
+import Alpha.Canonical.Algebra.Semiring
 
 
 interval::(Ord a, Semiring a) => a -> a -> Interval a

@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Partition
 (
     Span(..),    
@@ -8,8 +14,8 @@ module Alpha.Canonical.Algebra.Partition
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Element
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Elementary
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 import qualified Data.List as List
 import qualified Numeric.Interval as I
@@ -33,7 +39,7 @@ class (Ord a, Ord b) => Spanned a b where
     infixl 5 ...
 
 class Partition a where
-    points::a -> [Element a]
+    breakpoints::a -> [Element a]
         
 class Partitioner a where
     partition::Int -> [a] -> [[a]]
@@ -43,7 +49,7 @@ instance Partitioner a
 newtype IntegralSpan a = IntegralSpan [a]
 
 instance (Ord a, Integral a) => Partition (IntegralSpan a)  where
-    points (IntegralSpan l) = l
+    breakpoints (IntegralSpan l) = l
     
 instance (Ord a, Integral a) => Spanned (Min a) (Max a) where
     span (Min min) (Max max) = IntegralSpan [min .. max]

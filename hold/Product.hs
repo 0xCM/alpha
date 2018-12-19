@@ -20,7 +20,7 @@ module Alpha.Data.Product
 import Alpha.Base hiding(zero)
 import Alpha.Canonical hiding(Factorable)
 import Alpha.Text.Combinators
-import qualified Control.Category as C
+--import qualified Control.Category as C
 import qualified Data.Vector as V
 
 type family Factor (j::Nat) a where

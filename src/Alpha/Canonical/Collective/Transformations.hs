@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Abstractions inspired by list-like structure and operations
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -10,7 +10,7 @@ module Alpha.Canonical.Collective.Transformations
 ) where
 
 import Alpha.Base
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import qualified Data.List as List
 
 -- Characterizes a composition and pairing of heterogenous values

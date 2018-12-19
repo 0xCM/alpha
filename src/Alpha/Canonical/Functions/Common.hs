@@ -1,17 +1,20 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Operators.Functions
+module Alpha.Canonical.Functions.Common
 (    
     Func, UnaryFunc, CartesianFunc, BinaryFunc, TernaryFunc,    
-    Uncurried, Uncurriable, Curried, Curriable
+    Uncurried, Curried, 
+    Curriable(..), Uncurriable(..),
+    Computable(..),
+
 ) where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 
 -- A synonym for the canonical unary function type
 type Func a b = a -> b
@@ -78,3 +81,12 @@ instance Uncurriable (BinaryFunc a b c) where
     uncurry::BinaryFunc a b c -> Uncurried (BinaryFunc a b c)
     uncurry f p = f (fst p) (snd p)
 
+
+-- | Characterizes a deferred computation or a computation
+-- specification    
+class Computable a where
+    -- | The type of computed value
+    type Computed a
+
+    -- | Effects the computation
+    compute::a -> Computed a

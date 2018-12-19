@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Numeric.Class
 (
@@ -9,7 +15,7 @@ module Alpha.Canonical.Numeric.Class
 import Alpha.Base    
 import Alpha.Native
 import Alpha.Canonical.Common
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive

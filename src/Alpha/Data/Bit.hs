@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | 0 1
--- Copyright   :  (c) 0xCM, 2018 + Contributors per license
+-- Copyright   :  (c) Chris Moore, 2018 + Contributors per license
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -27,15 +27,13 @@ import qualified Data.List as List
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read)
 
-
 newtype Bit = Bit Flag
-    deriving (Eq, Ord, Generic, Data, Typeable, Read,
-        Disjunctive, Conjunctive, Invertive, Implication, ExclusivelyDisjunct, Substitutive, Propositional, 
-        JoinSemiLattice,MeetSemiLattice, Lattice
-        )
-
-
-
+    deriving (
+        Eq, Ord, Generic, Data, Typeable, Read, 
+        Disjunctive, Conjunctive, Invertive, 
+        Implication, ExclusivelyDisjunct, Substitutive, 
+        Propositional, JoinSemiLattice,MeetSemiLattice, 
+        Lattice)
 
 newtype BitString = BitString [Bit]   
     deriving (Eq, Ord, Generic, Data, Typeable, Read)
@@ -137,7 +135,7 @@ instance MeetSemiLattice Flag where
 instance Lattice Flag where    
             
 instance Formattable BitString where
-    format (BitString bits) =  format <$> bits |> collapse |> prefix n
+    format (BitString bits) =  format <$> bits |> append |> prefix n
         where n =  List.length bits |> format |> parenthetical |> spaced
 
 instance ToInteger BitString where

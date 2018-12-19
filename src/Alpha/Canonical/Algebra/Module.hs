@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Module
 (
     LeftModule(..), 
@@ -5,8 +11,8 @@ module Alpha.Canonical.Algebra.Module
         
 ) where
 import Alpha.Base 
-import Alpha.Canonical.Operators
-import Alpha.Canonical.Algebra.Scaled
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Algebra.Scalar
 import Alpha.Canonical.Algebra.Group
 import Alpha.Canonical.Algebra.Ring
 

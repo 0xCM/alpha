@@ -10,7 +10,7 @@ module Alpha.Canonical.Relations.BiComparison
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Related
 
 import qualified Numeric.Interval as Interval

@@ -5,10 +5,12 @@ module Alpha.System.Log
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical
-import Alpha.System.IO
+import Alpha.Canonical.Functions
+import Alpha.Canonical.Text
 import Alpha.Canonical.Text.Asci
-import Alpha.Data.Message
+import Alpha.System.IO
+import Alpha.System.Message
+
 import System.Console.ANSI
 import qualified System.Console.ANSI as ANSI
 import Prelude(putStrLn,putStr)

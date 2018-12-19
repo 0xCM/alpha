@@ -1,15 +1,12 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Collective.Mappable
 (
-    Mappable(..),
-    mapi,
-    
-
+    Mappable(..), mapi,
 ) where
 import Alpha.Base
 import Alpha.Canonical.Algebra.Subtractive

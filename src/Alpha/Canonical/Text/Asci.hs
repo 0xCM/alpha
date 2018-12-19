@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Operations and types related to the ASCI character set
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -18,9 +18,6 @@ pattern D6 = "6"::Text
 pattern D7 = "7"::Text
 pattern D8 = "8"::Text
 pattern D9 = "9"::Text
-
-asciD::[Text]
-asciD = [D0,D1,D2,D3,D4,D5,D6,D7,D8,D9]
 
 pattern Au = "A"::Text
 pattern Bu = "B"::Text
@@ -49,13 +46,6 @@ pattern Xu = "X"::Text
 pattern Yu = "Y"::Text
 pattern Zu = "Z"::Text
 
-asciU::[Text]
-asciU
-    = [Au, Bu, Cu, Du, Eu, Fu, Gu, Hu, Iu, 
-       Ju, Ku, Lu, Mu, Nu, Ou, Pu, Qu, Ru, 
-       Su, Tu, Uu, Vu, Wu, Xu, Yu, Zu]
-
-
 pattern Al = "a"::Text
 pattern Bl = "b"::Text
 pattern Cl = "c"::Text
@@ -82,38 +72,15 @@ pattern Wl = "w"::Text
 pattern Xl = "x"::Text
 pattern Yl = "y"::Text
 pattern Zl = "z"::Text
-
-asciL::[Text]
-asciL = [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
-        Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
-        Sl, Tl, Ul, Vl, Wl, Xl, Yl, Zl]
         
-
-
 pattern LBrace = "{"::Text
 pattern RBrace = "}"::Text
-
-braces::(Text,Text)
-braces = (LBrace, RBrace)
-
 pattern LBrack = "["::Text
 pattern RBrack = "]"::Text
-
-brackets::(Text,Text)
-brackets = (LBrack,RBrack)
-
 pattern BSlash = "\\"::Text
 pattern FSlash = "/"::Text
-
-slashes::(Text,Text)
-slashes = (BSlash,FSlash)
-
 pattern LParen = "("::Text
 pattern RParen = ")"::Text
-
-parens::(Text,Text)
-parens = (LParen,RParen)
-
 pattern Space = " "::Text
 pattern Tick = "`"::Text
 pattern Tilde = "~"::Text
@@ -138,5 +105,36 @@ pattern Less = "<"::Text
 pattern Greater = ">"::Text
 pattern Equal = "="::Text
 pattern Empty = ""::Text
+pattern Period = "."::Text
+-- | Produces "<-"
+pattern LArrow = "<-"::Text
+-- | Produces "->"
+pattern RArrow = "->"::Text
+
+asciL::[Text]
+asciL = [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
+        Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 
+        Sl, Tl, Ul, Vl, Wl, Xl, Yl, Zl]
+
+asciD::[Text]
+asciD = [D0,D1,D2,D3,D4,D5,D6,D7,D8,D9]
+
+asciU::[Text]
+asciU
+    = [Au, Bu, Cu, Du, Eu, Fu, Gu, Hu, Iu, 
+       Ju, Ku, Lu, Mu, Nu, Ou, Pu, Qu, Ru, 
+       Su, Tu, Uu, Vu, Wu, Xu, Yu, Zu]
+
+slashes::(Text,Text)
+slashes = (BSlash,FSlash)
+
+parens::(Text,Text)
+parens = (LParen,RParen)
+
+brackets::(Text,Text)
+brackets = (LBrack,RBrack)
+
+braces::(Text,Text)
+braces = (LBrace, RBrace)
 
 

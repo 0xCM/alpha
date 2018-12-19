@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE OverloadedLists #-}
@@ -18,13 +24,14 @@ module Alpha.Canonical.Algebra.Modular
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Text
-import Alpha.Canonical.Element
-import Alpha.Canonical.Operators
+import Alpha.Canonical.Elementary
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Divisive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
+import Alpha.Canonical.Algebra.Hetero
 import qualified Data.Vector as Vector
 
 import qualified Data.List as List

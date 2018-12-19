@@ -1,18 +1,18 @@
 -----------------------------------------------------------------------------
 -- | 
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Collective.Discrete
+module Alpha.Canonical.Elementary.Discrete
 (
     Discrete(..), Aggregate(..),
     Woven(..), Weavable(..),
-
     Assembly(..),    
 ) where
 
 import Alpha.Base
+
 
 import qualified Data.List as List
 import qualified Data.Text as Text
@@ -30,7 +30,7 @@ class Discrete a where
     type Individual a   
     
     -- Partition a discretizable structure into its canonical linear order
-    discretize::a -> [Individual a]
+    points::a -> [Individual a]
         
 class (Discrete a) =>  Aggregate a where
 
@@ -48,12 +48,12 @@ class Assembly a b | a -> b, b -> a where
 
 instance Discrete [a] where
     type Individual [a] = a
-    discretize = id    
+    points = id    
 
 instance Discrete Text where
     type Individual Text = Char
-    discretize = Text.unpack
-    
+    points = Text.unpack
+        
 instance Weavable Char Text where
     weave = Text.intersperse
             
@@ -66,4 +66,3 @@ instance Weavable g (Stream g) where
 instance Assembly [a] a where
     assemble = id
     disassemble = id
-    

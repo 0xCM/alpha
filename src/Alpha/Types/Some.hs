@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- | A type-level Some representation, derivative from Galois bv-sized and 
 -- parameterized-utils libraries; see LICENSE
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  Per accompanying LICENSE file
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- | Defines api surface of control-level constructs upon which alpha depends
--- Copyright   :  (c) 0xCM, 2018
+-- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
@@ -11,7 +11,7 @@ module Alpha.Base.Control
     forM,
 
     NFData(..), force, ($!!), deepseq,
-    Category,
+    Category(..),
     Comonad(..),
     liftW,     -- :: Comonad w => (a -> b) -> w a -> w b
     wfix,      -- :: Comonad w => w (w a -> a) -> a

@@ -5,11 +5,11 @@ module Alpha.Canonical.Algebra.Ring
 
 ) where
 import Alpha.Base
-import Alpha.Canonical.Element
+import Alpha.Canonical.Elementary
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Negatable
-import Alpha.Canonical.Algebra.Scaled
+import Alpha.Canonical.Algebra.Subtractive
+import Alpha.Canonical.Algebra.Scalar
 import Alpha.Canonical.Relations
 
 -- | A ring (with identity)
