@@ -5,6 +5,7 @@ module Alpha.Canonical.Algebra.Reciprocative
 ) where
 import Alpha.Base
 import Alpha.Native
+import Alpha.Canonical.Functions
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Algebra.Divisive
 
@@ -13,6 +14,7 @@ import Alpha.Canonical.Algebra.Divisive
 class Reciprocative a where
     reciprocal::a -> a
 
+
 -- Reciprocative 
 -------------------------------------------------------------------------------
 instance (Integral a) => Reciprocative (Ratio a) where
@@ -20,17 +22,17 @@ instance (Integral a) => Reciprocative (Ratio a) where
     {-# INLINE reciprocal #-}
 
 instance Reciprocative Float where 
-    reciprocal x = 1/x
+    reciprocal x =  (unwrap reciprocation) x
     {-# INLINE reciprocal #-}
 
 instance Reciprocative Double where 
-    reciprocal x = 1/x
+    reciprocal x =  (unwrap reciprocation) x
     {-# INLINE reciprocal #-}
 
 instance Reciprocative CFloat where 
-    reciprocal x = 1/x
+    reciprocal x =  (unwrap reciprocation) x
     {-# INLINE reciprocal #-}
 
 instance Reciprocative CDouble where 
-    reciprocal x = 1/x
+    reciprocal x =  (unwrap reciprocation) x
     {-# INLINE reciprocal #-}

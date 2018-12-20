@@ -27,23 +27,6 @@ class Divisive a where
     {-# INLINE (/) #-}
     infixl 8 /    
 
-newtype Division a = Divisive (O2 a)
-    
-type OpK f a = (f ~ Division a, Divisive a)    
-
-data instance OpSpec 2 (Division a) 
-    = Division (O2 a)
-
-instance OpK f a => Operator 2 f a where
-    type OpArgs 2 f a = (a,a)
-
-    operator = Division div 
-    {-# INLINE operator #-}        
-
-    evaluate (a1,a2) = f a1 a2 where (Division f) = operator 
-    {-# INLINE evaluate #-}        
-
-
 instance Divisive Natural where 
     div = quot
     {-# INLINE div #-}

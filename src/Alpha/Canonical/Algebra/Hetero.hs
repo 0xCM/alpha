@@ -8,7 +8,7 @@ module Alpha.Canonical.Algebra.Hetero
 (
     Summed(..), Biadditive(..),    
     Multiplied(..), Bimultiplicative(..),    
-    Quotient(..), Bidivisive(..), 
+    Divided(..), Bidivisive(..), 
     Negated(..), Binegatable(..),
     Subtracted(..), Bisubtractive(..)
 
@@ -31,7 +31,7 @@ type family Summed a b
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous division
 -- where a type instance is the type of the result of applying a conforming quotient operator
-type family Quotient a b     
+type family Divided a b     
 
 -- Defines a family of types that represent the result of applying a
 -- (potentially) heterogeneous negation operation
@@ -62,10 +62,10 @@ class Biadditive a b where
 -- | Characterizes pairs of types that support a notion of division
 class Bidivisive a b where
     -- | Divides the first value by the second        
-    bidiv::a -> b -> Quotient a b
+    bidiv::a -> b -> Divided a b
 
     -- | Infix synonym for 'hdiv'
-    (>/<)::a -> b -> Quotient a b
+    (>/<)::a -> b -> Divided a b
     (>/<) = bidiv
     {-# INLINE (>/<) #-}        
     infixl 8 >/<
@@ -96,7 +96,6 @@ class Bimultiplicative a b where
     (>*<) = bimul
     {-# INLINE (>*<) #-}    
     infixl 7 >*<
-
 
 type instance Negated Natural = Integer
 type instance Negated Word = Int

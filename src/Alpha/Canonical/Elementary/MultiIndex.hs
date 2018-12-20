@@ -6,14 +6,16 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE OverloadedLists #-}
 
 module Alpha.Canonical.Elementary.MultiIndex
 (
     MultiIndex(..),
     MultiIndexed(..),
     IndexRange(..),
+    IndexedTerm(..), 
     ixrange,
+    term,
+    nest
 )
 where
 import Alpha.Base
@@ -76,3 +78,9 @@ instance (OrdEnum a) => MultiIndexed 4 a where
 instance (OrdEnum a) => MultiIndexed 5 a where    
     multix (r1, r2, r3, r4, r5) = (ixrange r1, ixrange r2, ixrange r3, ixrange r4, ixrange r5)
     levels mix = list mix
+
+nest::(OrdEnum a) => IndexRange a -> IndexRange a -> [(a,a)]
+nest r1 r2 = do
+    a <- points r1
+    b <- points r2
+    return $ (a,b)

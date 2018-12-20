@@ -6,9 +6,9 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Group
 (
-    Group(..),
+    MultiplicativeGroup(..),
+    AdditiveGroup(..),
     AbelianGroup(..),
-    Invertible(..),
     commutator,
     MonoidalAlt, MonoidalProduct, MonoidalSum,
     altM, sumM, prodM
@@ -27,17 +27,14 @@ import qualified Data.Monoid as Monoid
 type MonoidalAlt f a = Monoid.Alt f a
 type MonoidalSum a = Monoid.Sum a
 type MonoidalProduct a = Monoid.Product a
-    
--- class (Monoid a, Invertible a) => Group a where    
 
 
-class (Multiplicative a, Unital a, Invertible a) => Group a where
+class (Multiplicative a, Unital a, Reciprocative a) => MultiplicativeGroup a where
 
-class Invertible a where
-    invert::a -> a
+class (Additive a, Nullary a, Negatable a) => AdditiveGroup a where    
 
 -- | A group for which the related commutator is always satisfied
-class (Semigroup a, Additive a, Negatable a) => AbelianGroup a where
+class (AdditiveGroup a) => AbelianGroup a where
 
 -- | Constructs a commutator for a binary operator
 -- See https://en.wikipedia.org/wiki/Commutator
@@ -56,3 +53,36 @@ sumM = Monoid.Sum
 
 prodM::Monoid a => a -> MonoidalProduct a
 prodM = Monoid.Product
+
+
+
+instance (Integral a) => MultiplicativeGroup (Ratio a) where
+instance MultiplicativeGroup Float where 
+instance MultiplicativeGroup Double where 
+instance MultiplicativeGroup CFloat where 
+instance MultiplicativeGroup CDouble where 
+
+instance AdditiveGroup Integer where 
+instance AdditiveGroup Int where 
+instance AdditiveGroup Int8 where 
+instance AdditiveGroup Int16 where 
+instance AdditiveGroup Int32 where 
+instance AdditiveGroup Int64 where     
+instance (Integral a) => AdditiveGroup (Ratio a) where 
+instance AdditiveGroup Float where 
+instance AdditiveGroup Double where 
+instance AdditiveGroup CFloat where 
+instance AdditiveGroup CDouble where 
+    
+instance AbelianGroup Integer where 
+instance AbelianGroup Int where 
+instance AbelianGroup Int8 where 
+instance AbelianGroup Int16 where 
+instance AbelianGroup Int32 where 
+instance AbelianGroup Int64 where     
+instance (Integral a) => AbelianGroup (Ratio a) where 
+instance AbelianGroup Float where 
+instance AbelianGroup Double where 
+instance AbelianGroup CFloat where 
+instance AbelianGroup CDouble where 
+        

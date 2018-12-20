@@ -72,7 +72,8 @@ pattern Wl = "w"::Text
 pattern Xl = "x"::Text
 pattern Yl = "y"::Text
 pattern Zl = "z"::Text
-        
+
+pattern Pipe = "|"::Text        
 pattern LBrace = "{"::Text
 pattern RBrace = "}"::Text
 pattern LBrack = "["::Text

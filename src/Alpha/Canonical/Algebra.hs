@@ -21,6 +21,7 @@ import Alpha.Canonical.Algebra.Partition as X
 import Alpha.Canonical.Algebra.Ring as X
 import Alpha.Canonical.Algebra.Reciprocative as X
 import Alpha.Canonical.Algebra.Scalar as X
+import Alpha.Canonical.Algebra.Series as X
 import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Successive as X
 import Alpha.Canonical.Algebra.Semiring as X

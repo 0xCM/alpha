@@ -47,7 +47,7 @@ type instance Element (NatKSpan m n) = Integer
 type instance Summed (NatK m) (NatK n) = NatK(m + n)
 type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
 type instance Subtracted (NatK m) (NatK n) = NatK(m - n)
-type instance Quotient (NatK m) (NatK n) = NatK (m / n)
+type instance Divided (NatK m) (NatK n) = NatK (m / n)
 type instance Modulo (NatK m) (NatK n) = NatK (m % n)
 type instance Decrement (NatK m) = NatK (m - 1)
 type instance Increment (NatK m) = NatK (m + 1)
@@ -167,26 +167,11 @@ instance forall m n. (KnownNatPair m n) =>  Bisubtractive (NatK m) (NatK n) wher
     {-# INLINE bisub #-}
 
 instance forall m n. (KnownNatPair m n) =>  Bidivisive (NatK m) (NatK n) where    
-    bidiv::NatK m -> NatK n -> Quotient (NatK m) (NatK n)
+    bidiv::NatK m -> NatK n -> Divided (NatK m) (NatK n)
     bidiv (NatK m) (NatK n) = m * n |> NatK
     {-# INLINE bidiv #-}
 
 
-    
--- instance Nullary (NatK 0) where    
---     zero::NatK 0
---     zero = natK @0    
---     {-# INLINE zero #-}
-
--- instance Unital (NatK 1) where    
---     one::NatK 1
---     one = natK @1    
---     {-# INLINE one #-}
-        
--- instance forall m . (KnownNat m) => Powered (NatK m) where    
---     pow (NatK m) n = (natural m) ^ (natural n) |> fromNatural |> NatK
---     {-# INLINE pow #-}
-    
 instance forall m n. (KnownNatPair m n) =>  BiLT (NatK m) (NatK n) where    
     lt (NatK m) (NatK n) = m < n 
     {-# INLINE lt #-}

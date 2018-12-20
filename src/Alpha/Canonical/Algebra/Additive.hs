@@ -34,6 +34,8 @@ class Additive a where
     {-# INLINE (+) #-}
     infixl 6 +
 
+
+
 class Nullary a where
     -- | Specifies the unique element 0 such that 0 + a = a + 0 = a forall a
     zero::a
@@ -42,32 +44,11 @@ class Nullary a where
     isZero::(Eq a) => a -> Bool
     isZero a = a == zero    
     
-newtype Addition a = Additive (O2 a)
-    
-type OpK f a = (f ~ Addition a, Additive a, Nullary a)  
 
-data instance OpSpec 2 (Addition a) 
-    = Addition (O2 a)    
-
-instance OpK f a => Operator 2 f a where
-    type OpArgs 2 f a = (a,a)
-
-    operator = Addition add    
-    {-# INLINE operator #-}        
-
-    evaluate (a1,a2) = f a1 a2 where (Addition f) = operator 
-    {-# INLINE evaluate #-}        
-
-instance OpK f a =>  Commutative f a
-instance OpK f a =>  Associative f a
-instance OpK f a => Identity f a where
-    identity = zero
-
-        
 -- Additive numbers
 -------------------------------------------------------------------------------
 instance Additive Natural where 
-    add = add'
+    add x y = evaluate addition (x,y)
     {-# INLINE add #-}
 
 instance Additive Integer where 

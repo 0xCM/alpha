@@ -15,7 +15,6 @@ import Alpha.Native
 import Alpha.Canonical.Functions
 import Alpha.Canonical.Elementary
 
-
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
@@ -27,46 +26,12 @@ class Subtractive a where
     {-# INLINE (-) #-}
     infixl 6 -    
 
-newtype Subtraction a = Subtractive (O2 a)
-    deriving(Generic)
-instance Newtype (Subtraction a)        
-type OpK f a = (f ~ Subtraction a, Subtractive a)
-
-data instance OpSpec 2 (Subtraction a) 
-    = Subtraction (O2 a)
-
-instance OpK f a => Operator 2 f a where
-    type OpArgs 2 f a = (a,a)
-
-    operator = Subtraction sub 
-    {-# INLINE operator #-}        
-
-    evaluate (a1,a2) =  f a1 a2 where (Subtraction f) = operator 
-    {-# INLINE evaluate #-}        
-
-
 -- | Characterizes types whose values are closed under 
 -- additive negation
 class Negatable a where
     -- | Negates the operand    
     negate::a -> a
 
-newtype Negation a = Negative (O1 a)    
-
-type OpN f a = (f ~ Negation a, Negatable a)
-    
-data instance OpSpec 1 (Negation a) 
-    = Negation (O1 a)
-
-instance OpN f a => Operator 1 f a where
-    type OpArgs 1 f a = a
-
-    operator = Negation negate
-    {-# INLINE operator #-}        
-
-    evaluate a = f a where
-            (Negation f) = operator 
-    {-# INLINE evaluate #-}        
     
 -- Subtractive
 -------------------------------------------------------------------------------

@@ -71,5 +71,3 @@ newtype LeftCoset a = LeftCoset [Element a]
 type instance Element (LeftCoset a) = a
 
 
--- leftCoset::(Group a) => Element a -> a -> LeftCoset a
--- leftCoset g h = LeftCoset $ (* g) <$> (elements h)

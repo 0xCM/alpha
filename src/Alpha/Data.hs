@@ -12,3 +12,4 @@ import Alpha.Data.BitVector as X
 import Alpha.Data.ByteString as X
 import Alpha.Data.Tabular as X
 import Alpha.Data.NatK as X
+import Alpha.Data.Permutation as X

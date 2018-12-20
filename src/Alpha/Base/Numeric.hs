@@ -11,7 +11,7 @@ module Alpha.Base.Numeric
     
     Natural,
     Integral, quot, quotRem, divMod, gcd,lcm,
-    Floating, pi, exp, log, sin, cos, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt, double2Float, float2Double,
+    Floating, pi, exp, log, sin, cos, tan, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt, double2Float, float2Double, diva,
     Fractional, recip, fromRational, divf,
     Ratio, frac,
     Real,fromIntegral,
@@ -24,10 +24,13 @@ module Alpha.Base.Numeric
     CDouble,CFloat,
     Interval, (+/-),width,
 
+    factorial, factorials    
+
 ) where
 import Data.Int(Int,Int8,Int16,Int32,Int64)
 import Data.Word(Word,Word8,Word16,Word32,Word64)
 import Data.Ratio(Ratio, (%))
+import GHC.Enum
 import GHC.Num(Num,Integer,fromInteger,signum,Natural)
 import GHC.Real(Fractional(..),RealFrac(..),Real, fromIntegral)
 import GHC.Real(Integral(..), gcd, lcm, rem, quot, mod,  divMod, quotRem,)
@@ -36,11 +39,24 @@ import GHC.Real(realToFrac)
 import GHC.Enum(Bounded(..))
 import Foreign.C(CDouble,CFloat)
 import Numeric.Interval(Interval, (+/-),width)
+import qualified Math.NumberTheory.Recurrencies.Linear as Arith
+import qualified Data.List as List
+
+factorials::(Num a, Enum a) => [a]
+factorials = Arith.factorial
+
+factorial::(Num a, Enum a,Integral a) => a -> a
+factorial a = List.last (List.take (fromIntegral a) factorials)
 
 -- | Infix alias for the base fractional division operator (/)
 divf::(Fractional a) => a -> a -> a
 divf = (/)
 {-# INLINE divf #-}
+
+diva::(Floating a) => a -> a -> a
+diva = (/)
+{-# INLINE diva #-}
+
 
 -- Defines a rational number as a fraction
 frac::(Integral n) => n -> n -> Ratio n
