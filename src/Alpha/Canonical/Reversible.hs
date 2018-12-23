@@ -12,7 +12,7 @@ module Alpha.Canonical.Reversible
 ) where
 import Alpha.Native
 import Alpha.Base
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
 
 import qualified Data.List as List  
 import qualified Data.Map as Map

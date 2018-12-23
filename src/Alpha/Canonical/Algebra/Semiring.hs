@@ -4,12 +4,18 @@ module Alpha.Canonical.Algebra.Semiring
     
 
 ) where
-import Alpha.Base    
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Multiplicative
+import Alpha.Canonical.Common    
+import Alpha.Canonical.Algebra.Monoidal
+import Alpha.Canonical.Algebra.Abelian
+import Alpha.Canonical.Algebra.Distributive
 
--- | Almost A ring; elements are not required though to have an additive inverse
-class (Additive a, Nullary a, Multiplicative a, Unital a) 
+-- | An additive monoid - via 'Abelian' with a multiplicative 
+-- monoid - via 'Monoidal' such that multiplication distributes 
+-- over addition - via 'Distributive'
+-- The most elementary algebraic structure that supports both
+-- addition and multiplication
+-- See https://en.wikipedia.org/wiki/Semiring
+class (Abelian a, Monoidal a, Distributive a) 
     => Semiring a where
 
 -- Semiring (+) (*)

@@ -63,14 +63,6 @@ instance forall m n a. (KnownNat m, KnownNat n) => Container (DataTable m n a) w
     contain = fromList
     contents = toList
 
--- mzero::forall m n a. (Additive a) => DataTable m n a
--- mzero = fromList $  (* zero) <$> [1..mn] where
---     mn = (nat @m) * (nat @n)
-
--- mone::forall n a. (Multiplicative a) => DataTable n n a
--- mone = fromList $ one <$> [1..mn] where
---     mn = (nat @n)*(nat @n)
-    
 instance forall m n a. (KnownNat m, KnownNat n, Additive a, Num a) => Additive (DataTable m n a) where
     add t1 t2 = List.zipWith add (toList t1) (toList t2) |> fromList
 

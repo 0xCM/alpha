@@ -21,10 +21,6 @@ module Alpha.System.IO
 )
 where
 
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Text
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Collective
 import Alpha.System.FilePath

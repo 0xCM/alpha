@@ -37,7 +37,7 @@ import Numeric
 import Alpha.Types.Nats
 import Alpha.Types.Some
 import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod,rem)
-import Alpha.Canonical.Text.Combinators
+--import Alpha.Canonical.Text.Combinators
 import Alpha.Base
 import GHC.Real(mod)
 
@@ -171,23 +171,23 @@ bvMul (BV wRepr x) (BV _ y) = BV wRepr (truncBits width (x * y))
 
 -- | Bitwise division (unsigned). Rounds to zero.
 bvQuotU :: BitVector w -> BitVector w -> BitVector w
-bvQuotU (BV wRepr x) (BV _ y) = BV wRepr (x `quot` y)
+bvQuotU (BV wRepr x) (BV _ y) = BV wRepr (x `quot'` y)
 
 -- | Bitwise division (signed). Rounds to zero (not negative infinity).
 bvQuotS :: BitVector w -> BitVector w -> BitVector w
-bvQuotS bv1@(BV wRepr _) bv2 = BV wRepr (truncBits width (x `quot` y))
+bvQuotS bv1@(BV wRepr _) bv2 = BV wRepr (truncBits width (x `quot'` y))
   where x = bvIntegerS bv1
         y = bvIntegerS bv2
         width = natValue wRepr
 
 -- | Bitwise remainder after division (unsigned), when rounded to zero.
 bvRemU :: BitVector w -> BitVector w -> BitVector w
-bvRemU (BV wRepr x) (BV _ y) = BV wRepr (x `rem` y)
+bvRemU (BV wRepr x) (BV _ y) = BV wRepr (x `rem'` y)
 
 -- | Bitwise remainder after  division (signed), when rounded to zero (not negative
 -- infinity).
 bvRemS :: BitVector w -> BitVector w -> BitVector w
-bvRemS bv1@(BV wRepr _) bv2 = BV wRepr (truncBits width (x `rem` y))
+bvRemS bv1@(BV wRepr _) bv2 = BV wRepr (truncBits width (x `rem'` y))
   where x = bvIntegerS bv1
         y = bvIntegerS bv2
         width = natValue wRepr
@@ -310,7 +310,7 @@ bvSextWithRepr repr bv = BV repr (truncBits width (bvIntegerS bv))
 type instance Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
 
 instance Formattable (BitVector w) where
-  format (BV w x ) = bitstringN (repVal w) x
+  format (BV w x ) = bitTextW (repVal w) x
 
 instance KnownNat w => Read (BitVector w) where
   readsPrec s =

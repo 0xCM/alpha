@@ -8,28 +8,13 @@
 
 module Alpha.Canonical.Collective.ItemSet
 (
-    ItemSet(..),Setwise(..),IsSet(..)
+    ItemSet(..), IsSet(..)
 ) where
-import Alpha.Base
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Relations
-import Alpha.Canonical.Collective.Vacant
+import Alpha.Canonical.Algebra
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.Containers
-import Alpha.Canonical.Collective.Appendable
-import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Semiring
-import Alpha.Canonical.Algebra.Modular
-import Alpha.Canonical.Algebra.Hetero
-import Alpha.Canonical.Text
 import Alpha.Canonical.Text.Asci
 
-
 import qualified Data.List as List
-import qualified Data.Vector as Vector
 import qualified Data.Sequence as Sequence
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -42,26 +27,10 @@ type instance Appended (ItemSet (ItemSet a)) = ItemSet a
 type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
 
 
-
 newtype ItemSet a = ItemSet (Set.Set a)
-    deriving(Eq,Generic,Ord,Monoid,Semigroup,Foldable,Data,NFData,Finite,JoinSemiLattice,MeetSemiLattice,Lattice)
+    deriving(Eq,Generic,Ord,Monoid,Semigroup,Foldable,Data,NFData,JoinSemiLattice,MeetSemiLattice,Lattice)
 instance Newtype (ItemSet a)
 
--- | Characterizes a structure that can exhibit a list of elements
-class Membership s where
-    members::s -> ItemSet (Element s)         
-instance Set (Membership a)    
-
--- | Characterizes types whose values can be treated as sets
-class (Container c) => Setwise c where
-    -- The union operator
-    union::c -> c -> c
-    -- The intersection operator
-    intersect::c -> c -> c
-    -- The set difference operator
-    delta::c -> c -> c
-    -- The set membership test operator
-    subset::Bool -> c -> c -> Bool
 
 class (Ord a) => IsSet a where
     set::a -> ItemSet (Item a)
@@ -86,7 +55,6 @@ instance (Ord a) => Container (ItemSet a) where
 instance (Ord a) => Appendable (ItemSet (ItemSet a)) where
     append = unions . toList
 
-instance (Ord a) => FiniteContainer (ItemSet a) where        
 
 instance (Ord a) => Vacant (ItemSet a) where
     empty = ItemSet Set.empty
@@ -96,14 +64,13 @@ instance (Ord a) => Setwise (ItemSet a) where
     union x y = wrap $ Set.union (unwrap x) (unwrap y)
     intersect x y = wrap $ Set.intersection (unwrap x) (unwrap y) 
     delta x y = wrap $ Set.difference (unwrap x) (unwrap y) 
-    subset proper candidate source 
+    isSubset proper candidate source 
         = ifelse proper 
             (Set.isProperSubsetOf c' s') 
             (Set.isSubsetOf c' s') 
         where
             (c', s') = (unwrap candidate, unwrap source)
-        
-        
+                
 instance (Formattable a, Ord a) => Formattable (ItemSet a) where
     format x =  LBrace <> separated  <> RBrace where
         items = format <$> (toList x)
@@ -142,26 +109,4 @@ instance (Ord a) =>  Additive (ItemSet a) where
 
 instance (Ord a) => Nullary (ItemSet a) where
     zero = []
-        
-instance (Ord a, Unital a, Multiplicative a) => Semiring (ItemSet a)
-    
-instance  KnownNat n => Membership (Zn n) where    
-    members s = residues s |> Set.fromList |> ItemSet
-
-instance (Eq a, Ord a) => Setwise [a] where
-    union = List.union
-    intersect = List.intersect
-    delta =  (List.\\)
-    subset proper candidate source  
-        = subset proper  (ItemSet $ Set.fromList candidate)  (ItemSet $ Set.fromList source)
-
-    
-instance (Ord a) => Setwise (Bag a) where
-    intersect = Bag.intersection
-    delta = Bag.difference
-    union = Bag.union        
-    subset proper candidate source 
-        = ifelse proper 
-            (Bag.isProperSubsetOf candidate source) 
-            (Bag.isSubsetOf candidate source)
 

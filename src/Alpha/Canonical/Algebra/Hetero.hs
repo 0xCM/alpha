@@ -13,11 +13,7 @@ module Alpha.Canonical.Algebra.Hetero
     Subtracted(..), Bisubtractive(..)
 
 ) where
-import Alpha.Base
-import Alpha.Native
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Elementary
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag

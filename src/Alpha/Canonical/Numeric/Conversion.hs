@@ -21,7 +21,6 @@ module Alpha.Canonical.Numeric.Conversion
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Numeric.Class
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 
 import qualified Data.Ratio as DR

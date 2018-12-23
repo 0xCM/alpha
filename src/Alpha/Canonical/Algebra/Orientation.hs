@@ -4,7 +4,6 @@ module Alpha.Canonical.Algebra.Orientation
     positive, negative, neutral, orientation
 )
 where
-import Alpha.Base
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 

@@ -13,9 +13,6 @@ module Alpha.Canonical.Algebra.Partition
     Partitioner(..)
 
 ) where
-import Alpha.Base
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 import qualified Data.List as List
 import qualified Numeric.Interval as I

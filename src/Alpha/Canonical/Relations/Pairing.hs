@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Pairing
 (
-    Paired(..), Pairing(..),
+    Paired(..), Pairing(..), Bipartite(..)
 ) where
 
 
@@ -31,4 +31,9 @@ class Pairing a b c where
 
     swap::(Pairing b a c) => Paired a b c -> Paired b a c
     swap x = pair (second x) (first x)
+    
+class Bipartite a where
+    type FirstPart a
+    type SecondPart a
+    bipartition::a -> (FirstPart a, SecondPart a)    
     

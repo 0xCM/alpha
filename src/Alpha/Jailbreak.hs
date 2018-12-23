@@ -11,7 +11,7 @@ module Alpha.Jailbreak
 where
 
 import Alpha.Base
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
 import System.IO.Unsafe
 import Control.Monad.Primitive
 

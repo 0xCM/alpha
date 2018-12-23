@@ -7,15 +7,13 @@
 module Alpha.Canonical.Algebra.Multiplicative
 (
     Multiplicative(..),
-    Factorable(..), Factored(..),
     Unital(..),
+    Multiplication(..), multiplication,
 
 ) where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
 
-type family Factored a = r | r -> a
+--type family Factored a = r | r -> a
 
 -- / Characterizes a type that supports a notion of *associative* multiplication    
 -- mul a b == mul b a
@@ -34,35 +32,34 @@ class Unital a where
     -- | Specifies the unique element 1 such that 1*a = a*1 = a forall a
     one::a
 
-class Factorable (a::Type) where
-    --- | Factors a supplied value into constituent parts
-    factor::a -> Factored a
-
-    unfactor::Factored a -> a
-        
--- newtype Multiplication a = Multiplicative (O2 a)
-
--- type OpK f a = (f ~ Multiplication a, Multiplicative a, Unital a)
-
--- data instance OpSpec 2 (Multiplication a) 
---     = Multiplication (O2 a)
-
--- instance OpK f a => Operator 2 f a where
---     type OpArgs 2 f a = (a,a)
-
---     operator = Multiplication mul
---     {-# INLINE operator #-}        
-
---     evaluate (a1,a2) = f a1 a2 where
---             (Multiplication f) = operator 
---     {-# INLINE evaluate #-}        
-
--- instance OpK f a =>  Commutative f a
--- instance OpK f a =>  Associative f a
--- instance OpK f a => Identity f a where
---     identity = one
     
+          
+-- | Represents a multiplication operator
+newtype Multiplication a = Multiplication (O2 a)    
+    deriving(Generic)
+instance Newtype (Multiplication a)
 
+-- | Produces the canonical multiplication operator
+multiplication::(Num a) => Multiplication a
+multiplication = Multiplication mul'
+
+instance (Num a) => Commutative (Multiplication a)
+instance (Num a) => Associative (Multiplication a)
+instance (Num a) => Identity (Multiplication a) where
+    identity = 1
+
+instance (Num a) => Operator (Multiplication a) where
+    type Operand (Multiplication a) = a
+
+    operator = multiplication
+    {-# INLINE operator #-}
+
+
+instance (Num a) => BinaryOperator (Multiplication a) where
+
+    evaluate (Multiplication f) (a1,a2) = f a1 a2
+    {-# INLINE evaluate #-}
+    
 -- Unital
 -------------------------------------------------------------------------------
 instance Unital Natural where 

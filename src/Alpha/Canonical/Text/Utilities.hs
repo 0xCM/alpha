@@ -6,13 +6,11 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE FlexibleInstances #-}
 
-module Alpha.Canonical.Text.Combinators
+module Alpha.Canonical.Text.Utilities
 (    
-    dots, dashes, spaces,
     splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,
     zpadL, padL,
-    hexstring,showBasedInt,bitstring,bitstringN,
     textlen, 
     suffixIfMissing, 
     prefixIfMissing, 
@@ -20,14 +18,8 @@ module Alpha.Canonical.Text.Combinators
 )
  where
 
-import Alpha.Base hiding (div)
-import Alpha.Native
-import Alpha.Canonical.Text
-import Alpha.Canonical.Algebra
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Relations
+import Alpha.Canonical.Common
 import Alpha.Canonical.Text.Asci
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Text.Symbols
 import Data.Aeson (FromJSON, ToJSON, decode, encode)
 import Data.Aeson.Encode.Pretty
@@ -38,20 +30,6 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import Numeric(showIntAtBase)
 
-repeat::Integral i => i -> Text -> Text
-repeat i t = replicate (fromIntegral i) t
-
--- | Produces text containing a specified number of "." characters
-dots::Integral i => i -> Text
-dots i = repeat i Period
-
--- | Produces text containing a specified number of "-" characters
-dashes::Integral i => i -> Text
-dashes i = repeat i Dash
-
--- | Produces text containing a specified number of spaces
-spaces::Integral i => i -> Text
-spaces i = repeat i Space
 
 -- | Determines whether text begins with a specified substring
 isPrefix::Text -> Text -> Bool
@@ -72,11 +50,11 @@ char = chr
 -- | Creates a left-padded string    
 padL :: Int -> Text -> Text -> Text
 padL n c s
-    | textlen s < n  = [padding, s] |> Text.concat
+    | lt' (textlen s) n  = [padding, s] |> Text.concat
     | otherwise     = s
     where 
         padding = Text.replicate len c    
-        len = sub n (textlen s)
+        len = sub' n (textlen s)
         
 -- | Creates a left-zero-padded string    
 zpadL :: (Integral n) => n -> Text -> Text
@@ -137,21 +115,4 @@ ltrim match subject =
         Just x -> x
         _ -> subject
 
--- | Encodes a finite integral value as a base-16 Text
-hexstring :: (Show n, Integral n, FiniteBits n) => n -> Text
-hexstring n = showBasedInt 16 n |> zpadL width
-    where width = 16 |> div (finiteBitSize n)
-
--- | Constructs a string representation for an integer 'n' based at 'b' 
-showBasedInt::(Integral n, Show n) => n -> n -> Text
-showBasedInt b n = showIntAtBase b intToDigit n "" |> Text.pack
-
--- | Encodes a finite integral value as a base-2 Text
-bitstring ::(Show n, Integral n, FiniteBits n) => n -> Text
-bitstring n = showBasedInt 2 n |> zpadL width
-    where width = finiteBitSize n
-
--- | Encodes an integral value as a base-2 Text
-bitstringN :: (Integral w, Integral n, Show n) => w -> n -> Text
-bitstringN w n = showBasedInt 2 n |> zpadL w
 

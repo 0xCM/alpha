@@ -5,7 +5,7 @@ module Alpha.System.Log
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Text
 import Alpha.Canonical.Text.Asci
 import Alpha.System.IO

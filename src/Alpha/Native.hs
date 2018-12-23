@@ -2,18 +2,18 @@ module Alpha.Native
 (
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
-    and',or',not'
+    and',or',not', lt', gt',quotRem', divMod', gcd',lcm', quot'
 
 ) where
 --import Alpha.Base
 import GHC.Num(Num, (+),(-),(*),negate,abs)
-import GHC.Real(div,(/),(^),(^^), mod, rem, Fractional,Integral, numerator, denominator, Real, realToFrac,toRational)
+import GHC.Real(div,(/),(^),(^^), mod, rem, quot, quotRem, divMod, lcm, gcd, Fractional,Integral, numerator, denominator, Real, realToFrac,toRational)
 import GHC.Float(Floating,(**))
 import GHC.Base(flip)
 import System.IO(IO,print)
 import GHC.Show(Show)
 import Data.Ix(Ix(..))
-import Data.Ord(Ord)
+import Data.Ord
 import Data.Maybe(fromJust)
 import Data.Ratio(Ratio(..),Rational)
 import Numeric.Interval(Interval, interval)
@@ -34,6 +34,12 @@ add' = (+)
 div'::(Integral a) => a -> a -> a
 div' = div
 {-# INLINE div' #-}
+
+lt'::(Ord a) => a -> a -> Bool
+lt' = (<)
+
+gt'::(Ord a) => a -> a -> Bool
+gt' = (>)
 
 
 negate'::(Num a) => a -> a
@@ -64,9 +70,29 @@ mod'::Integral a => a -> a -> a
 mod' = mod
 {-# INLINE mod' #-}
 
+quot'::(Integral a) => a -> a -> a
+quot' = quot
+{-# INLINE quot' #-}
+
+lcm'::(Integral a) => a -> a -> a
+lcm' = lcm
+{-# INLINE lcm' #-}
+
+gcd'::(Integral a) => a -> a -> a
+gcd' = gcd
+{-# INLINE gcd' #-}
+
 flip'::(a -> b -> c) -> b -> a -> c
 flip' = flip
 {-# INLINE flip' #-}
+
+quotRem'::(Integral a) => a -> a -> (a,a)
+quotRem' = quotRem
+{-# INLINE quotRem' #-}
+
+divMod'::(Integral a) => a -> a -> (a,a)
+divMod' = divMod
+{-# INLINE divMod' #-}
 
 -- | Renders a showable to standard out 
 out'::Show s => s -> IO()
@@ -128,3 +154,4 @@ xor' = xor
 bit'::(Bits a) => Int -> a
 bit' = bit
 {-# INLINE bit' #-}
+

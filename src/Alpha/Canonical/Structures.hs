@@ -1,6 +1,5 @@
 module Alpha.Canonical.Structures 
 (
-    Structure(..),
     Multiplicative(..),
     Unital(..),
     Invertible(..),
@@ -9,65 +8,68 @@ module Alpha.Canonical.Structures
     Semigroup(..),
     Monoid(..),
     Group(..),
+    DiscreteGroup(..),
+    Subgroup(..),
     Semiring(..),
 )
 where
-import Alpha.Base hiding (Semigroup, Monoid)
 
-import Alpha.Canonical.Elementary
+import Alpha.Canonical.Algebra hiding (Group,Multiplicative,Unital,Nullary,Additive,Semiring,Monoid,Semigroup)
+import qualified Alpha.Canonical.Algebra as A
+import qualified Data.Text as Text
+import qualified Data.List as List
+import qualified Data.Map as Map
 
-class Structure a where
-    -- | Extracts the elements from a structure
-    elements::a -> [Element a]
+import Alpha.Canonical.Text.Asci
 
-instance Set (Structure a)
+-- Characterizes a structure whose elements are invertible
+class Structure a => Invertible a where
+    -- | Computes the inverse of an Individual
+    invert::Individual a -> Individual a
 
-class Subset a where
-    -- | Extracts a subset of elements from a structure
-    subset::a -> [Element a]
-
-class Multiplicative a where
+-- | Characterizes structures for which element multiplication is defined
+class Structure a => Multiplicative a where
     -- | Defines a structure's multiplication operator
-    (*)::Element a -> Element a -> Element a
+    (*)::Individual a -> Individual a -> Individual a
 
-class Unital a where
+class Multiplicative a => Semigroup a where        
+
+class Semigroup a => Unital a where
     -- | Produces the multiplicative identity
-    one::Element a
+    one::Individual a
+
+class Unital a => Monoid a where    
+
     
-class Invertible a where
-    -- | Computes the multiplicative inverse of an element
-    invert::Element a -> Element a    
-        
-class Additive a where
+class Structure a => Additive a where
     -- | Defines a structure's addition operator
-    (+)::Element a -> Element a -> Element a
+    (+)::Individual a -> Individual a -> Individual a
 
-class Nullary s where
+class Additive a => Nullary a where
     -- | Produces the additive identity
-    zero::Element a
+    zero::Individual a
     
-class Negatable a where
-    -- | Computes the additive inverse of an element
-    negate::Element a -> Element a    
 
--- | Defines a semigroup for a specified 'Multiplicative'
-class (Structure a, Multiplicative a) => Semigroup a where
-    
--- | Defines a monoid over a specified 'Semigroup' and 'Unitial'
-class (Structure a, Multiplicative a, Unital a) => Monoid a where    
+class Nullary a  => Negatable a where
+    -- | Computes the additive inverse of an Individual
+    negate::Individual a -> Individual a    
+
 
 -- | Defines a group over a specified 'Monoid' and 'Invertible'
-class (Structure a, Multiplicative a, Unital a, Invertible a) => Group a where
+class (Invertible a) => Group a where
 
--- | Defines a subroup 
-class (Group a, Subset a) => Subgroup a where
-    subgroup::a -> [Element a]
-    subgroup = subset
+class (Discrete a, Group a) => DiscreteGroup a where
+
+class (Group a, Subset (Individual a) a) => Subgroup a where
+    
+-- class (Substructure a) => DiscreteSubgroup a where
+--     subgroup::a -> [Individual a]
+--     subgroup = members
 
 -- | Defines a semiring via the joined context
-class (Multiplicative a, Unital a, Additive a, Nullary a) => Semiring a where
+class (Unital a, Nullary a) => Semiring a where
 
-newtype LeftCoset a = LeftCoset [Element a]
+newtype LeftCoset a = LeftCoset [Individual a]
 type instance Element (LeftCoset a) = a
 
 

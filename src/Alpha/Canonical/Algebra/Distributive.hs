@@ -4,20 +4,29 @@ module Alpha.Canonical.Algebra.Distributive
     RightDistributive(..),
     Distributive(..)
 ) where
-import Alpha.Base
+import Alpha.Canonical.Common
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
 
+-- | Characterizes a type that supports both addition,
+-- via 'Additive', and multiplication, via 'Multiplicative', 
+-- such that multiplication left-distributes over addition
 class (Multiplicative a, Additive a) => LeftDistributive a where
     distL::a -> (a,a) -> a
     distL x (y1,y2) = x*y1 + x*y2
     {-# INLINE distL #-}
 
+-- | Characterizes a type that supports both addition,
+-- via 'Additive', and multiplication, via 'Multiplicative', 
+-- such that multiplication right-distributes over addition
 class (Multiplicative a, Additive a) => RightDistributive a where
     distR::(a,a) -> a -> a
     distR (x1,x2) y = x1*y + x2*y
     {-# INLINE distR #-}
 
+-- | Characterizes a type that supports both addition,
+-- via 'Additive', and multiplication, via 'Multiplicative', 
+-- such that multiplication is both left/right distributive
 class (LeftDistributive a, RightDistributive a) => Distributive a where
     dist::a -> (a,a) -> a
     dist = distL

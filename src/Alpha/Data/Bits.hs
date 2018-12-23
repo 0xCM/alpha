@@ -16,9 +16,7 @@ module Alpha.Data.Bits
 where
 import qualified Data.Text as Text
 import Data.Bits hiding(bit)
-import Alpha.Base
 import Alpha.Canonical
-import Alpha.Canonical.Text.Combinators
 import Alpha.Data.Bit
 import GHC.TypeLits
 

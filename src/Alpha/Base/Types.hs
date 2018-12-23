@@ -15,7 +15,7 @@ module Alpha.Base.Types
     Default(..),
 
     Proxy(..), proxy, 
-    KnownSymbol, symstr,
+    KnownSymbol, symstr,symtext,
     KnownNat,  nat, natg, 
     SomeNat, Nat, 
     SomeSymbol, someSymbolVal,
@@ -41,7 +41,8 @@ import GHC.Real(Integral,fromIntegral)
 import Data.String(String)
 import Data.Int(Int)
 import Data.Data(Data(..),)  
-
+import Data.Text(Text)
+import qualified Data.Text as Text
 
 
 -- | Retrieves the 'DataType' metadata for the type 'a'
@@ -68,6 +69,10 @@ proxy = Proxy
 -- | Produces a string for a symbol
 symstr :: forall s. KnownSymbol s => String
 symstr = symbolVal @s Proxy
+
+-- | Produces a text for a symbol
+symtext :: forall s. KnownSymbol s => Text
+symtext =  Text.pack (symbolVal @s Proxy)
 
 -- | Computes the 'Int' value corresponding to a type-level nat
 nat::forall m. KnownNat m => Int

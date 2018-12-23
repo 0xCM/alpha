@@ -14,7 +14,6 @@ import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Algebra.Exponential
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Numeric.Signage
 
     

@@ -12,10 +12,7 @@ module Alpha.Canonical.Algebra.Exponential
     
 
 ) where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Collective.Reductive
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Multiplicative
 import qualified Data.List as List
 

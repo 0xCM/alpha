@@ -7,13 +7,11 @@
 module Alpha.Canonical.Algebra.Subtractive
 (    
     Subtractive(..), 
-    Negatable(..),
+    Subtraction(..), subtraction,
     
 ) where
-import Alpha.Base hiding(div)
-import Alpha.Native
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Elementary
+import Alpha.Canonical.Relations
+
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
@@ -26,13 +24,28 @@ class Subtractive a where
     {-# INLINE (-) #-}
     infixl 6 -    
 
--- | Characterizes types whose values are closed under 
--- additive negation
-class Negatable a where
-    -- | Negates the operand    
-    negate::a -> a
 
     
+-- | Represents a subtraction operator
+newtype Subtraction a = Subtraction (O2 a)    
+    deriving(Generic)
+instance Newtype (Subtraction a)
+
+instance (Subtractive a) => Associative (Subtraction a)
+
+-- | Produces the canonical subtraction operator
+subtraction::(Subtractive a) => Subtraction a
+subtraction = Subtraction sub
+
+instance (Subtractive a) => Operator (Subtraction a) where
+    type Operand (Subtraction a) = a
+    operator = subtraction
+    {-# INLINE operator #-}
+
+instance (Subtractive a) => BinaryOperator (Subtraction a) where
+    evaluate (Subtraction f) (a1,a2) = f a1 a2
+    {-# INLINE evaluate #-}
+
 -- Subtractive
 -------------------------------------------------------------------------------
 instance Subtractive Natural where 
@@ -87,41 +100,6 @@ instance Subtractive CDouble where
     sub = sub'
     {-# INLINE sub #-}
 
--- Negatable 
--------------------------------------------------------------------------------
-instance Negatable Integer where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Int where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Int8 where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Int16 where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Int32 where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Int64 where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance (Integral a) => Negatable (Ratio a) where 
-    negate x = sub' 0 x
-    {-# INLINE negate #-}    
-instance Negatable Float where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable Double where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable CFloat where 
-    negate = negate'
-    {-# INLINE negate #-}
-instance Negatable CDouble where 
-    negate = negate'
-    {-# INLINE negate #-}
 
 
 -- Subtractive tuples
@@ -143,21 +121,3 @@ instance Subtractive4 a1 a2 a3 a4 => Subtractive (Tuple4 a1 a2 a3 a4) where
 instance Subtractive5 a1 a2 a3 a4 a5 => Subtractive (Tuple5 a1 a2 a3 a4 a5) where
     sub  (x1,x2,x3,x4,x5) (y1,y2,y3,y4,y5) = (x1 - y1, x2 - y2,x3 - y3, x4 - y4,x5 - y5)
 
--- Negatable tuples
--------------------------------------------------------------------------------
-type Negatable2 a1 a2 = (Negatable a1, Negatable a2)
-type Negatable3 a1 a2 a3 = (Negatable2 a1 a2, Negatable a3)
-type Negatable4 a1 a2 a3 a4 = (Negatable3 a1 a2 a3, Negatable a4)
-type Negatable5 a1 a2 a3 a4 a5 = (Negatable4 a1 a2 a3 a4, Negatable a5)
-
-instance Negatable2 a1 a2 => Negatable (Tuple2 a1 a2) where    
-    negate (a1,a2) = (negate a1, negate a2)
-
-instance Negatable3 a1 a2 a3 => Negatable (Tuple3 a1 a2 a3) where
-    negate (a1,a2,a3) = (negate a1, negate a2, negate a3)
-
-instance Negatable4 a1 a2 a3 a4 => Negatable (Tuple4 a1 a2 a3 a4) where
-    negate (a1,a2,a3,a4) = (negate a1, negate a2, negate a3, negate a4)
-
-instance Negatable5 a1 a2 a3 a4 a5  => Negatable (Tuple5 a1 a2 a3 a4 a5)  where
-    negate (a1,a2,a3,a4,a5) = (negate a1, negate a2, negate a3, negate a4, negate a5)                

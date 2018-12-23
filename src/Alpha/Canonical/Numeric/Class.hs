@@ -14,16 +14,7 @@ module Alpha.Canonical.Numeric.Class
 ) where
 import Alpha.Base    
 import Alpha.Native
-import Alpha.Canonical.Common
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Algebra.Subtractive
-import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Divisive
-import Alpha.Canonical.Algebra.Modular
-import Alpha.Canonical.Algebra.Semiring
-import Alpha.Canonical.Algebra.Exponential
-
+import Alpha.Canonical.Algebra
 import Alpha.Canonical.Numeric.Types
 import Alpha.Canonical.Numeric.Powers
 import Alpha.Canonical.Numeric.Operations
@@ -36,7 +27,7 @@ class (Ord a, Subtractive a, Semiring a, Multiplicative a, Additive a, Absolute 
     num = id
     {-# INLINE num #-}
 
-class (Numeric a, Integral a, Modular a) => IntegralNumeric a where
+class (Numeric a, Integral a, IntegralDomain a) => IntegralNumeric a where
 
 -- | Classifies unsigned integral numeric values    
 class (IntegralNumeric a, UnsignedIntegral a) => NaturalNumeric a where

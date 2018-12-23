@@ -9,8 +9,7 @@ module Alpha.Canonical.Algebra.Interval
     interval
 )
 where
-import Alpha.Base
-import Alpha.Native
+import Alpha.Canonical.Common
 import Alpha.Canonical.Algebra.Semiring
 
 

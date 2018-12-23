@@ -7,7 +7,6 @@ module Alpha.Data.Permutation
 
 )
 where
-import Alpha.Base
 import Alpha.Canonical
 import Alpha.Data.NatK
 import Alpha.Canonical.Text.Asci
@@ -33,6 +32,9 @@ type instance Cod (Permutation n) = Int
 type instance Element (Permutation n) = Int
 type instance IndexedElement Int (Permutation n) = Int
 
+instance Structure (Permutation n) where
+    type Individual (Permutation n) = Element (Permutation n)
+
 -- | Constructs a permutation of lenth n from an explicit list of correspondences
 perm::forall n. KnownNat n => [(Int,Int)] -> Permutation n
 perm = Permutation . Map.fromList
@@ -41,7 +43,7 @@ image::forall n. KnownNat n => Permutation n -> Int -> Int
 image = (!)
 
 preimage::forall n. KnownNat n =>Permutation n -> Int -> Int
-preimage (Permutation pm) i =  list pm |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
+preimage (Permutation pm) i =  members pm |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
 
 -- | Effects a transposition
 switch::forall n. KnownNat n => (Int,Int) -> Permutation n -> Permutation n
@@ -54,8 +56,8 @@ switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> perm
 
 instance Formattable (Permutation n) where
     format (Permutation perm) = rows where
-        row1 = perm |> list |> fmap (\(x,y) -> format x) |> weave Space |> enclose "|" "|"
-        row2 = perm |> list |> fmap (\(x,y) -> format y) |> weave Space |> enclose "|" "|"
+        row1 = perm |> members |> fmap (\(x,y) -> format x) |> weave Space |> enclose "|" "|"
+        row2 = perm |> members |> fmap (\(x,y) -> format y) |> weave Space |> enclose "|" "|"
         sep = Text.replicate 20 "-"
         rows = sep <> EOL <> row1 <> EOL <> row2
 
@@ -65,12 +67,26 @@ instance Show (Permutation n) where
 instance forall n a.KnownNat n =>  Indexed Int (Permutation n) where
     at (Permutation s ) i = s Map.! i
 
+newtype PermuMul n = PermuMul (O2 (Permutation n))
+    deriving(Generic)
+instance Newtype (PermuMul n)
+
+instance KnownNat n => Operator (PermuMul n) where
+    type Operand (PermuMul n) = Permutation n
+    operator = PermuMul permumul
+
+instance KnownNat n => BinaryOperator (PermuMul n) where
+    evaluate (PermuMul mul) (f,g) = mul f g
+
+permumul::KnownNat n => O2 (Permutation n)
+permumul g (Permutation f) = f |> Map.toList 
+                    |> fmap (\(i,j) -> (i, g ! j)) 
+                    |> Map.fromList 
+                    |> Permutation
+
 instance  KnownNat n => Multiplicative (Permutation n) where
-    mul g (Permutation f) = f |> Map.toList 
-                                |> fmap (\(i,j) -> (i, g ! j)) 
-                                |> Map.fromList 
-                                |> Permutation
-        
+    mul = permumul
+
 instance  KnownNat n => Semigroup (Permutation n) where
     g <> f = g * f
 

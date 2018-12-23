@@ -10,8 +10,7 @@ module Alpha.Canonical.Numeric.Types
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Common
-import Alpha.Canonical.Text.Formattable
+import Alpha.Canonical.Text
 import Alpha.Canonical.Algebra
 
 -- | A ratio sans sign

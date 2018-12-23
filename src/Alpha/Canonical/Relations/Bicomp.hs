@@ -1,4 +1,4 @@
-module Alpha.Canonical.Relations.BiComparison
+module Alpha.Canonical.Relations.Bicomp
 (        
     BiLT(..), 
     BiGT(..), 

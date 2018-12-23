@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Functions.Logical
+module Alpha.Canonical.Relations.Logical
 (    
     Disjunctive(..), 
     ExclusivelyDisjunct(..), 
@@ -12,7 +12,7 @@ module Alpha.Canonical.Functions.Logical
     Invertive(..), 
     Implication(..), 
     Propositional(..),
-    Substitutive(..),
+    Biconditional(..),
     Boolean(..),    
     Predicate(..), 
     P1,P2,P3,
@@ -28,7 +28,7 @@ module Alpha.Canonical.Functions.Logical
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Elementary
-import Alpha.Canonical.Functions.Common
+import Alpha.Canonical.Relations.Functions
 
 
 type True = 'True
@@ -80,8 +80,6 @@ type family a :=> b where
 
 infixl 5 :=>
     
-
-
 -- | Characterizes a value that can be converted to a 'Bool'
 class Boolean a where
     bool::a -> Bool    
@@ -102,7 +100,7 @@ class Implication a where
     implies::a -> a -> Bool
 
 
-class Substitutive a where
+class Biconditional a where
     iff::a -> a -> Bool
 
     (<->)::a -> a -> Bool
@@ -115,7 +113,7 @@ class Invertive a where
 class ExclusivelyDisjunct a where
     lxor::a -> a -> Bool    
     
-class (Disjunctive a, ExclusivelyDisjunct a, Conjunctive a, Invertive a, Implication a, Substitutive a) => Propositional a where
+class (Disjunctive a, ExclusivelyDisjunct a, Conjunctive a, Invertive a, Implication a, Biconditional a) => Propositional a where
 
 -- | Defines arity-polymorphic families of operators
 data family Predicate (n::Nat) f :: Type
@@ -176,7 +174,7 @@ instance ExclusivelyDisjunct Bool where
     lxor False False = False
     {-# INLINE lxor #-}
 
-instance Substitutive Bool where
+instance Biconditional Bool where
     iff True True = True
     iff True False = False
     iff False True = False

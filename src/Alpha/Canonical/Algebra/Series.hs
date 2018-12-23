@@ -5,9 +5,7 @@ module Alpha.Canonical.Algebra.Series
     series
 )
 where
-import Alpha.Base
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Semiring
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
@@ -25,13 +23,13 @@ data SeriesKind =
     deriving(Eq,Enum,Show)
 
 -- | Constructs a mathematical series
-series::(Integral i, Semiring t) => SeriesKind -> (i,i) -> Func i t -> Series i t
+series::(Integral i, Semiring t) => SeriesKind -> (i,i) -> (i->t) -> Series i t
 series SummationSeries i t = Series (SummationSeries, (+), IndexRange i, term t)
 series ProductSeries i t = Series (ProductSeries, (*), IndexRange i, term t)
 
 instance (Integral i, Semiring t)  => Computable (Series i t) where
     type Computed (Series i t) = t
     compute (Series (k, f, r, t)) = aggregation where
-        expansion = (unwrap t) <$> points r
+        expansion = (unwrap t) <$> members r
         identity = ifelse (k == SummationSeries) zero one
         aggregation = reduce identity f expansion        

@@ -10,12 +10,11 @@ module Alpha.Canonical.Algebra.Additive
 (
     Additive(..),
     Nullary(..),
-    
+    Summation(..),summation,
+    Addition(..), addition,
+
 ) where
-import Alpha.Base
-import Alpha.Native
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Functions
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
@@ -34,8 +33,7 @@ class Additive a where
     {-# INLINE (+) #-}
     infixl 6 +
 
-
-
+-- | Characterizes a type that supports the notion of additive identity
 class Nullary a where
     -- | Specifies the unique element 0 such that 0 + a = a + 0 = a forall a
     zero::a
@@ -44,6 +42,41 @@ class Nullary a where
     isZero::(Eq a) => a -> Bool
     isZero a = a == zero    
     
+-- | Represents an addition operator
+newtype Addition a = Addition (O2 a)    
+    deriving(Generic)
+instance Newtype (Addition a)
+
+-- | Represents a formal sum
+newtype Summation a = Summation [a]    
+
+-- | Produces the canonical addition operator
+-- addition::(Num a) => Addition a
+-- addition = Addition add'
+addition::(Additive a) => Addition a
+addition = Addition add
+
+-- | Constructs a summation
+summation::[a] -> Summation a
+summation = Summation
+
+instance (Additive a) => Commutative (Addition a)
+instance (Additive a) => Associative (Addition a)
+instance (Additive a, Nullary a) => Identity (Addition a) where
+    identity = zero
+    
+instance (Additive a) => Operator (Addition a) where
+    type Operand (Addition a) = a
+    operator = addition
+    {-# INLINE operator #-}
+
+instance (Additive a) => BinaryOperator (Addition a) where
+    evaluate (Addition f) (a1,a2) = f a1 a2
+    {-# INLINE evaluate #-}
+
+instance (Additive a, Nullary a) => Computable (Summation a) where
+    type Computed (Summation a) = a
+    compute (Summation items) = reduce zero (+) items
 
 -- Additive numbers
 -------------------------------------------------------------------------------
@@ -193,16 +226,22 @@ type Additive3 a1 a2 a3 = (Additive2 a1 a2, Additive a3)
 type Additive4 a1 a2 a3 a4 = (Additive3 a1 a2 a3, Additive a4)
 type Additive5 a1 a2 a3 a4 a5 = (Additive4 a1 a2 a3 a4, Additive a5)
 
-instance Additive2 a1 a2 => Additive (a1,a2) where
+instance Additive a1 => Additive (Tuple1 a1) where
+    add (Tuple1 x1) (Tuple1 y1) = Tuple1 (x1 + y1)
+
+instance Additive a1 => Additive (UniTuple1 a1) where
+    add (UniTuple1 x1) (UniTuple1 y1) = UniTuple1 (x1 + y1)
+    
+instance Additive2 a1 a2 => Additive (Tuple2 a1 a2) where
     add (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
 
-instance Additive3 a1 a2 a3 => Additive (a1,a2,a3) where
+instance Additive3 a1 a2 a3 => Additive (Tuple3 a1 a2 a3) where
     add (x1,x2,x3) (y1,y2,y3) = (x1 + y1, x2 + y2,x3 + y3)
 
-instance Additive4 a1 a2 a3 a4 => Additive (a1,a2,a3,a4) where
+instance Additive4 a1 a2 a3 a4 => Additive (Tuple4 a1 a2 a3 a4) where
     add (x1,x2,x3,x4) (y1,y2,y3,y4) = (x1 + y1, x2 + y2,x3 + y3, x4 + y4)
 
-instance Additive5 a1 a2 a3 a4 a5 => Additive (a1,a2,a3,a4,a5) where
+instance Additive5 a1 a2 a3 a4 a5 => Additive (Tuple5 a1 a2 a3 a4 a5) where
     add (x1,x2,x3,x4,x5) (y1,y2,y3,y4,y5) = (x1 + y1, x2 + y2,x3 + y3, x4 + y4,x5 + y5)
     
 -- Nullary tuples

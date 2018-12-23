@@ -8,9 +8,6 @@ module Alpha.Canonical.Numeric.Operations
 where
 import Alpha.Base
 import Alpha.Native
-import Alpha.Canonical.Functions
-import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Subtractive
@@ -162,27 +159,4 @@ instance Antecedent Int32 where
 
 instance Antecedent Int64 where
     prior n = ifelse (n == minBound) none (just (n - 1))
-
-instance InvariantSet Int where
-    invariants =  [minBound .. maxBound]                
-instance InvariantSet Word where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Word8 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Word16 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Word32 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Word64 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Int8 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Int16 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Int32 where
-    invariants =  [minBound .. maxBound]
-instance InvariantSet Int64 where
-    invariants =  [minBound .. maxBound]                                    
-instance InvariantSet Natural where
-    invariants =  [0 .. ]
 

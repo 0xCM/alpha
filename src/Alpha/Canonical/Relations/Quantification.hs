@@ -31,8 +31,10 @@ class Universal c where
 
 instance Universal [a] where
     all = List.all
+    
         
 instance Existential [a] where
     any = List.any
     
+
 

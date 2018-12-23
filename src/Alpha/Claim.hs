@@ -10,34 +10,46 @@ module Alpha.Claim
 (
   Evaluation(..),
   Claim(..),
+  Example(..),
   success, failure, succeeded, failed, 
   some, none, equal
 )
 where
 
-import Alpha.Base hiding (none,some,equal)
-import Alpha.Canonical.Text.Formattable
+--import Alpha.Base hiding (none,some,equal)
+import Alpha.Canonical.Common hiding (none,some,equal)
 import qualified Data.Text as Text
 
+-- | Defines an example identified by a symbol
+class (KnownSymbol s) => Example s  where
+  type Exemplar s
+  type Exemplar s = IO()
+  
+  example::Exemplar s
+  
+  name::String
+  name = symstr @s 
+
+
 -- | Specifies the result of evaluating a claim
-data Evaluation (a::Symbol) =
+data Evaluation a =
       Success
     | Failure
     deriving (Eq,Ord)
 
+
+-- | Defines a claim identified by a symbol
+class (KnownSymbol s) => Claim s where
+  claim::Evaluation s
+
 instance KnownSymbol s => Formattable (Evaluation s) where
   format (Success) =  format (symbol @s) <> " -> Success"
   format (Failure) =  format (symbol @s) <> " -> Failure"
-    
-
-instance KnownSymbol s => Show (Evaluation s) where
-  show = Text.unpack . format
-
-
--- | Relates a symbol to a claim
-class Claim (a::Symbol) where
-  claim::Evaluation a
       
+  
+instance KnownSymbol s => Show (Evaluation s) where
+  show = Text.unpack . format    
+
 -- | Constructs an 'Evaluation' with a value of 'Success'             
 success::KnownSymbol a => Evaluation a
 success = Success
@@ -73,4 +85,3 @@ equal::(KnownSymbol s, Eq a) => a -> a -> Evaluation s
 equal x y = case (x == y) of
              True -> Success
              _ -> Failure
-

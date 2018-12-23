@@ -10,7 +10,7 @@ module Alpha.Base.Numeric
 (
     
     Natural,
-    Integral, quot, quotRem, divMod, gcd,lcm,
+    Integral, 
     Floating, pi, exp, log, sin, cos, tan, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, sqrt, double2Float, float2Double, diva,
     Fractional, recip, fromRational, divf,
     Ratio, frac,
@@ -24,7 +24,7 @@ module Alpha.Base.Numeric
     CDouble,CFloat,
     Interval, (+/-),width,
 
-    factorial, factorials    
+    factorial, factorials, factorise
 
 ) where
 import Data.Int(Int,Int8,Int16,Int32,Int64)
@@ -41,6 +41,8 @@ import Foreign.C(CDouble,CFloat)
 import Numeric.Interval(Interval, (+/-),width)
 import qualified Math.NumberTheory.Recurrencies.Linear as Arith
 import qualified Data.List as List
+import Math.NumberTheory.Primes(factorise) 
+
 
 factorials::(Num a, Enum a) => [a]
 factorials = Arith.factorial
@@ -62,3 +64,5 @@ diva = (/)
 frac::(Integral n) => n -> n -> Ratio n
 frac m n =  m % n
 {-# INLINE frac #-}
+
+

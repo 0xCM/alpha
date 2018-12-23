@@ -10,7 +10,7 @@ module Alpha.Base.Functors
     ArrowLoop, loop,
     ArrowPlus, ArrowChoice, ArrowZero,
     Applicative, pure, (<*>),  (<**>), liftA2, (<*), (*>),
-    Alternative, empty, (<|>),
+    Alternative, (<|>),
     Apply, (<..>), (<.>), (.>), (<.), liftF2,  liftF3,
     Alt, optional,(<!>),some,many,
     Bind, (>>-), (-<<), (-<-), (->-),join,
@@ -42,7 +42,7 @@ import Control.Arrow(ArrowPlus, ArrowChoice, ArrowZero)
 import Control.Arrow((^>>), (<<^), (>>^), (^<<), (>>>), (<<<))
 import Control.Monad(Monad(..))
 import Control.Applicative(Applicative, pure, (<*>),  (<**>), liftA2, (<*), (*>))
-import Control.Applicative(Alternative, empty, (<|>))
+import Control.Applicative(Alternative, (<|>))
 import Control.Comonad(Comonad, extract, duplicate, extend, (=>=), (=<=),(<<=), (=>>))    
 import Data.Traversable(Traversable, traverse, sequenceA)
 import Data.Distributive(Distributive, distribute, collect, cotraverse)

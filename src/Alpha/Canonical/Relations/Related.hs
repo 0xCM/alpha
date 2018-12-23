@@ -30,7 +30,8 @@ module Alpha.Canonical.Relations.Related
 import Algebra.PartialOrd 
 import Alpha.Base
 import Alpha.Canonical.Elementary
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Relations.Logical
+import Alpha.Canonical.Relations.Operators
 import qualified Numeric.Interval as Interval
 import qualified Prelude as P
 

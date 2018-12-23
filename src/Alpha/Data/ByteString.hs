@@ -15,8 +15,6 @@ module Alpha.Data.ByteString
 
 )
 where
-import Alpha.Base
-import Alpha.Canonical.Text.Combinators
 import Alpha.Canonical hiding(range)
 import Alpha.Data.Bits
 import System.Entropy

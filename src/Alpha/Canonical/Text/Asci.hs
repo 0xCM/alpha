@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Text.Asci where
 
-import Alpha.Base
+import Alpha.Canonical.Common
 
 pattern D0 = "0"::Text
 pattern D1 = "1"::Text

@@ -10,10 +10,7 @@ module Alpha.Canonical.Algebra.Successive
     Decrement(..), Decrementable(..),
     
 ) where
-import Alpha.Base hiding(div)
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Functions
-import Alpha.Native
 
 import qualified Data.List as List
 

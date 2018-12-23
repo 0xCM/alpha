@@ -12,7 +12,7 @@ module Alpha.Data.NatK
 (
     NatK(..), NatKPair(..), NatKSpan(..),     
     KnownNatPair(..), KnownNatTriple(..), KnownNatQuad(..), 
-
+    nats,
     natKpair,  natKspan,
     natK, nat2, natK2, nat3, natK3, nat4, natK4,
     natKadd, natKsub, natKmod, natKdiv, natKmul, natKinc, natKdec
@@ -55,7 +55,7 @@ type instance Raised (NatK m) (NatK n) = NatK (m ^ n)
 type instance Infimum (NatKSpan m n) = NatK m
 type instance Supremum (NatKSpan m n) = NatK n
 type instance Span (NatK m) (NatK n) = NatKSpan m n
-type instance Factored (NatKPair m n) = (NatK m, NatK n)
+--type instance Factored (NatKPair m n) = (NatK m, NatK n)
 type instance Paired (NatK m) (NatK n) (NatKPair m n) = NatKPair m n
 
 -- | Computes the value-level representation of a type-level nat
@@ -110,8 +110,13 @@ natKmul =   natK @m >*< natK @n
 natKdec::forall m. (KnownNat m ) => NatK (m - 1)
 natKdec =  natK @m |> (>--<)
 
-natKinc::forall m. (KnownNat m ) => NatK (m + 1)
+natKinc::forall m. (KnownNat m) => NatK (m + 1)
 natKinc = natK @m |> (>++<)
+
+-- | Produces a list of lenth m of integral values of the form [0,...,m-1]
+nats::forall m i. (KnownNat m, Integral i) => [i]
+nats = [0 .. upper] where
+    upper = (nat @m) - 1 |> integral
 
 instance forall k. KnownNat k => Formattable (NatK k) where
     format (NatK k) = format k <> (" (NatK " <> format (nat @k) <> ")") 
@@ -124,9 +129,10 @@ instance forall m n. (KnownNatPair m n) =>  Pairing (NatK m) (NatK n) (NatKPair 
     first _ = natK @m
     second _ = natK @n
     
-instance forall m n. (KnownNatPair m n) =>  Factorable (NatKPair m n) where    
-    factor (NatKPair (m,n)) = (m,n)
-    unfactor (m,n) = NatKPair (m,n)
+-- instance forall m n. (KnownNatPair m n) =>  Factorable (NatKPair m n) where    
+--     type Factored (NatKPair m n) = (NatK m, NatK n)
+--     factor (NatKPair (m,n)) = (m,n)
+--     unfactor (m,n) = NatKPair (m,n)
         
 instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where    
     span::NatK m -> NatK n -> Span (NatK m) (NatK n)
@@ -170,7 +176,6 @@ instance forall m n. (KnownNatPair m n) =>  Bidivisive (NatK m) (NatK n) where
     bidiv::NatK m -> NatK n -> Divided (NatK m) (NatK n)
     bidiv (NatK m) (NatK n) = m * n |> NatK
     {-# INLINE bidiv #-}
-
 
 instance forall m n. (KnownNatPair m n) =>  BiLT (NatK m) (NatK n) where    
     lt (NatK m) (NatK n) = m < n 

@@ -15,11 +15,10 @@ module Alpha.Canonical.Numeric.Complex
 import Alpha.Base
 import Alpha.Native
 import Alpha.Canonical.Algebra
-import Alpha.Canonical.Text
 import Alpha.Canonical.Text.Asci
 
 newtype Complex a = Complex (a,a)
-    deriving(Eq,Additive, Subtractive)
+    deriving(Eq, Additive, Subtractive)
     
 complex::(a,a) -> Complex a
 complex (r,i) = Complex (r,i)

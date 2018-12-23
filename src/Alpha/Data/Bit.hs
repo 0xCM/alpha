@@ -11,14 +11,12 @@ module Alpha.Data.Bit
 (
     Bit(..),
     ToBit(..), 
-    ToBitString(..),
     Flag(..),
     on, isOn,
     off, isOff,
 )
 where
     
-import Alpha.Base
 import Alpha.Canonical
 import Data.Bits(Bits(..))
 import qualified Data.List as List
@@ -31,13 +29,10 @@ newtype Bit = Bit Flag
     deriving (
         Eq, Ord, Generic, Data, Typeable, Read, 
         Disjunctive, Conjunctive, Invertive, 
-        Implication, ExclusivelyDisjunct, Substitutive, 
+        Implication, ExclusivelyDisjunct, Biconditional, 
         Propositional, JoinSemiLattice,MeetSemiLattice, 
         Lattice)
 
-newtype BitString = BitString [Bit]   
-    deriving (Eq, Ord, Generic, Data, Typeable, Read)
-instance Newtype (BitString)
 
 type instance Unsigned Bit = Bit
 instance Unsignable Bit
@@ -45,8 +40,6 @@ instance Unsignable Bit
 class ToBit a where
     bit::a -> Bit    
 
-class ToBitString a where
-    bits::a -> BitString
         
 -- | Constructs a 'Bit' in the 'Off' state    
 off::Bit
@@ -72,15 +65,6 @@ bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr
 {-# INLINE bitref' #-}
 
-bitstring::(Integral a) => a -> BitString
-bitstring i = BitString $ bitstring' (quotRem i 2) []  where
-    bitstring' (n,d) r = seq c $
-        case n of
-        0 -> r'
-        _ -> bitstring' (quotRem n 2) r' 
-        where
-            c  = ifelse (d == 0) off on
-            r' = c : r            
 
 instance Disjunctive Flag where
     On || On = True
@@ -110,7 +94,7 @@ instance Implication Flag where
     implies Off Off = True
     {-# INLINE implies #-}
 
-instance Substitutive Flag where
+instance Biconditional Flag where
     iff On On = True
     iff On Off = False
     iff Off On = False
@@ -125,24 +109,15 @@ instance Invertive Flag where
 instance Propositional Flag    
 
 instance JoinSemiLattice Flag where
-        (\/) x y = ifelse (x || y) On Off
-        {-# INLINE (\/) #-}
+    (\/) x y = ifelse (x || y) On Off
+    {-# INLINE (\/) #-}
 
 instance MeetSemiLattice Flag where
-        (/\) x y = ifelse (x && y) On Off
-        {-# INLINE (/\) #-}
+    (/\) x y = ifelse (x && y) On Off
+    {-# INLINE (/\) #-}
 
 instance Lattice Flag where    
             
-instance Formattable BitString where
-    format (BitString bits) =  format <$> bits |> append |> prefix n
-        where n =  List.length bits |> format |> parenthetical |> spaced
-
-instance ToInteger BitString where
-    integer = undefined
-
-instance Show BitString where
-    show = string . format
 
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
@@ -178,6 +153,7 @@ instance Additive Bit where
     add (Bit Off) (Bit Off) = off
     {-# INLINE add #-}
 
+    
 instance Nullary Bit where    
     zero = off
     {-# INLINE zero #-}
@@ -187,7 +163,11 @@ instance Negatable Bit where
     negate (Bit Off) = on
     
     {-# INLINE negate #-}
-    
+
+instance Subtractive Bit where
+    sub x = negate . add x
+    {-# INLINE sub #-}
+        
 instance Semigroup Bit where
     (<>) = (+)
     {-# INLINE (<>) #-}    
@@ -196,11 +176,9 @@ instance Absolute Bit where
     abs = id
     {-# INLINE abs #-}
 
-
 instance Monoid Bit where 
     mempty = off
     {-# INLINE mempty #-}
-
 
 instance Boolean Bit where
     bool (Bit On) = True
@@ -285,53 +263,3 @@ instance Bits Bit where
 
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
-        
-
-instance ToBitString Int where
-    bits = bitstring
-    {-# INLINE bits #-}
-    
-instance ToBitString Int8 where
-    bits = bitstring
-    {-# INLINE bits #-}
-
-instance ToBitString Int16 where
-    bits = bitstring
-    {-# INLINE bits #-}
-
-instance ToBitString Int32 where
-    bits = bitstring
-    {-# INLINE bits #-}
-        
-instance ToBitString Int64 where
-    bits = bitstring
-    {-# INLINE bits #-}
-
-instance ToBitString Integer where
-    bits = bitstring
-    {-# INLINE bits #-}
-    
-instance ToBitString Word where
-    bits = bitstring
-    {-# INLINE bits #-}
-    
-instance ToBitString Word8 where
-    bits = bitstring
-    {-# INLINE bits #-}
-
-instance ToBitString Word16 where
-    bits = bitstring
-    {-# INLINE bits #-}
-
-instance ToBitString Word32 where
-    bits = bitstring
-    {-# INLINE bits #-}
-        
-instance ToBitString Word64 where
-    bits = bitstring
-    {-# INLINE bits #-}
-        
-instance ToBitString Natural where
-    bits = bitstring
-    {-# INLINE bits #-}
-        

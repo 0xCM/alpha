@@ -10,8 +10,7 @@ module Alpha.Canonical.Text.Conversion
     FromText(..),
     ToLines(..)
 ) where
-import Alpha.Base
-import Alpha.Canonical.Functions
+import Alpha.Canonical.Common
 import qualified Data.Text as Text
 
 

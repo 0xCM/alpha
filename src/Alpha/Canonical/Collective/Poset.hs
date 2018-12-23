@@ -9,9 +9,7 @@ module Alpha.Canonical.Collective.Poset
     Poset, poset
 )
 where
-import Alpha.Base
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Text.Formattable
 import Alpha.Canonical.Collective.Container
 import Alpha.Canonical.Collective.ItemSet
 import qualified Data.Set as Set

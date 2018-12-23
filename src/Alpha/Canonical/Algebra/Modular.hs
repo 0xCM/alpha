@@ -10,7 +10,6 @@
 
 module Alpha.Canonical.Algebra.Modular
 (
-    Modular(..), 
     Modulo(..), 
     Bimodular(..),
     Zn, BasedInt,
@@ -21,17 +20,14 @@ module Alpha.Canonical.Algebra.Modular
 
     (/%), (/%%)
 ) where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Text
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Functions
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Divisive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Hetero
+import Alpha.Canonical.Algebra.IntegralDomain
+
 import qualified Data.Vector as Vector
 
 import qualified Data.List as List
@@ -65,39 +61,6 @@ type instance Element (Zn n) = Residue n
 type instance Summed (Zn n) (Zn n) = Zn n
 type instance Summed (Residue n) (Residue n) = Residue n
 
-class (Nullary a, Eq a, Divisive a) => Modular a where
-    -- | Calculates the remainder of dividing the first operand by the second
-    rem::a -> a -> a
-
-    mod::a -> a -> a
-
-    -- | Infix synonym for 'rem'
-    (%)::a -> a -> a
-    (%) = rem
-    {-# INLINE (%) #-}
-    infix 8 %
-
-    -- | Infix synonym for 'mod'
-    (%%)::a -> a -> a
-    (%%) = mod
-    {-# INLINE (%%) #-}
-    infix 8 %%
-
-    
-    -- Determines whether m is evenly Divisive by n
-    divides::a -> a -> Bool
-    divides m n = m % n == zero
-    {-# INLINE divides #-}      
-
-    -- Calculates the points within the interval that are
-    -- Divisive by n
-    modpart::(Ix a) => (a, a) -> a -> [a]
-    modpart (min,max) n 
-        = range' (min, max) 
-        |> (<$>) (\j -> case divides j n of True -> j; _ -> zero)
-        |> List.filter (\j -> j /= zero)
-    {-# INLINE modpart #-}      
-
 
 class Bimodular a b where
     -- | Calculates the remainder of dividing the first operand by the second
@@ -110,12 +73,12 @@ class Bimodular a b where
     infix 8 >%<
     
 (/%)::(Integral n) => n -> n -> (n,n)
-(/%) = quotRem
+(/%) = quotRem'
 {-# INLINE (/%) #-}
 infixl 5 /%
 
 (/%%)::(Integral n) => n -> n -> (n,n)
-(/%%) = divMod
+(/%%) = divMod'
 {-# INLINE (/%%) #-}
 infixl 5 /%%
         
@@ -171,13 +134,13 @@ encode::(Integral i) => i -> Char
 encode i = encoding Vector.! (fromIntegral i)
 
 digits::forall b i. (KnownNat b, Integral i) => i -> Digits b
-digits i = Digits $ recurse (quotRem i b) []  
+digits i = Digits $ recurse (quotRem' i b) []  
     where
         b = natg @b
         recurse (n,d) r = seq c $
             case n of
             0 -> r'
-            _ -> recurse (quotRem n b) r' 
+            _ -> recurse (quotRem' n b) r' 
             where
                 c  = encode d
                 r' = c : r            
@@ -224,74 +187,3 @@ instance KnownNat n => Multiplicative (Residue n) where
 instance KnownNat n => Unital (Residue n) where        
     one = residue 1
 
-instance Modular Natural where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Integer where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Int where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'    
-    {-# INLINE mod #-}
-
-instance Modular Int8 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Int16 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Int32 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'    
-    {-# INLINE mod #-}
-
-instance Modular Int64 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Word where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Word8 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Word16 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Word32 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}
-
-instance Modular Word64 where 
-    rem = rem'
-    {-# INLINE rem #-}
-    mod = mod'
-    {-# INLINE mod #-}

@@ -8,14 +8,14 @@ module Alpha.Canonical.Algebra.Field
 
 )
 where
-import Alpha.Base
-import Alpha.Canonical
-    
+import Alpha.Canonical.Relations    
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Divisive
+import Alpha.Canonical.Algebra.Negatable
 import Alpha.Canonical.Algebra.Reciprocative
+import Alpha.Canonical.Algebra.Distributive
 
 -- | Specifies field addition constraint
 type FieldAdd a = (Additive a, Nullary a)

@@ -112,6 +112,7 @@ dependencies:
 - tagged
 - unordered-containers
 - vector
+- unicode-show
 
 # - adjunctions
 # - async

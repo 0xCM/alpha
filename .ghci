@@ -15,3 +15,6 @@
 :set -XDataKinds
 :set -XPolyKinds
 :load Alpha
+
+-- import qualified Text.Show.Unicode
+-- :set -interactive-print=Text.Show.Unicode.uprint
