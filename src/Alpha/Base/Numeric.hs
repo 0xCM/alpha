@@ -24,7 +24,7 @@ module Alpha.Base.Numeric
     CDouble,CFloat,
     Interval, (+/-),width,
 
-    factorial, factorials, factorise
+    factorial, factorials 
 
 ) where
 import Data.Int(Int,Int8,Int16,Int32,Int64)
@@ -41,7 +41,7 @@ import Foreign.C(CDouble,CFloat)
 import Numeric.Interval(Interval, (+/-),width)
 import qualified Math.NumberTheory.Recurrencies.Linear as Arith
 import qualified Data.List as List
-import Math.NumberTheory.Primes(factorise) 
+
 
 
 factorials::(Num a, Enum a) => [a]

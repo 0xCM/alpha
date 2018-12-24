@@ -11,14 +11,13 @@ import Alpha.Canonical.Collective.Container
 
 import qualified Data.Vector as Vector
 
-type instance Element (Vector a) = a
-instance (Eq a) => Structure (Vector a) where
-    type Individual (Vector a) = Element (Vector a)
+type instance Individual (Vector a) = a
+
 
 instance Container (Vector a)
 
-instance (Eq a) => Discrete (Vector a) where
-    members = Vector.toList                        
+instance (Eq a) => SetBuilder (Vector a) a where
+    set = Vector.toList                        
 
 instance Vacant (Vector a) where
     empty = Vector.empty

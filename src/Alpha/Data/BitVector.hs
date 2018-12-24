@@ -7,8 +7,6 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ConstraintKinds #-}
 
 module Alpha.Data.BitVector
 (
@@ -19,6 +17,7 @@ import Data.Bits
 import Data.Hashable
 import Data.Ix
 import Data.Functor
+import Data.Int
 import Data.Foldable
 import Data.Ord(compare)
 import Data.Kind(Type)
@@ -34,12 +33,27 @@ import Unsafe.Coerce
 import Text.Printf
 import Numeric
 
-import Alpha.Types.Nats
-import Alpha.Types.Some
 import Alpha.Canonical hiding(index, (+), (-), (*), abs, mod,rem)
---import Alpha.Canonical.Text.Combinators
 import Alpha.Base
 import GHC.Real(mod)
+import Prelude(($!))
+
+import qualified GHC.Natural as TN
+import qualified GHC.TypeLits as TL
+
+maxInt::Integer
+maxInt = integer (maxBound :: Int)
+
+knownNat :: forall n . KnownNat n => NatRepr n
+knownNat = NatRepr (natg @n)
+      
+-- | Return the value of the nat representation.
+repVal :: NatRepr n -> Int
+repVal (NatRepr i) | i < maxInt = fromInteger i
+                    | otherwise = error "Width is too large."
+
+addNat :: NatRepr m -> NatRepr n -> NatRepr (m+n)
+addNat (NatRepr m) (NatRepr n) = NatRepr (m+n)
 
 data BitVector (w :: Nat) :: Type where
   BV :: NatRepr w -> Integer -> BitVector w
@@ -386,3 +400,43 @@ instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2
 
 instance KnownNat w => Length (BitVector w) where
   length  = convert . finiteBitSize  
+
+newtype NatRepr (n::Nat) = NatRepr {
+    natValue :: Integer
+    } deriving (Hashable)
+ 
+ 
+instance Eq (NatRepr m) where
+    _ == _ = True
+
+instance TestEquality NatRepr where
+    testEquality (NatRepr m) (NatRepr n)
+        | m == n = Just (unsafeCoerce Refl)
+        | otherwise = Nothing
+
+instance (KnownNat n) => Reifiable n Integer where
+    reify = TL.natVal (Proxy::Proxy n)
+        
+
+data Some (f:: k -> *) = forall x . Some (f x)
+
+viewSome :: (forall tp . f tp -> r) -> Some f -> r
+viewSome f (Some x) = f x
+
+mapSome :: (forall tp . f tp -> g tp) -> Some f -> Some g
+mapSome f (Some x) = Some $! f x
+
+{-# INLINE traverseSome #-}
+-- | Modify the inner value.
+traverseSome :: Functor m
+                => (forall tp . f tp -> m (g tp))
+                -> Some f
+                -> m (Some g)
+traverseSome f (Some x) = Some `fmap` f x
+
+
+-- | Modify the inner value.
+traverseSome_ :: Functor m => (forall tp . f tp -> m ()) -> Some f -> m ()
+traverseSome_ f (Some x) = (\_ -> ()) `fmap` f x
+{-# INLINE traverseSome_ #-}    
+      

@@ -7,20 +7,18 @@ module Alpha.Canonical.Algebra.Ring
 
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Group as X
-import Alpha.Canonical.Algebra.Monoidal as X
 import Alpha.Canonical.Algebra.Distributive as X
-import Alpha.Canonical.Algebra.Multiplicative as X
-import Alpha.Canonical.Algebra.Abelian as X
-import Alpha.Canonical.Algebra.Additive as X
 import Alpha.Canonical.Algebra.Divisive as X
+import Alpha.Canonical.Algebra.Group as X
+import Alpha.Canonical.Algebra.Semiring as X
+import Alpha.Canonical.Algebra.Unsigned as X
 
 import qualified Data.List as List
 
 
 -- | A ring (with identity)
 -- See https://en.wikipedia.org/wiki/Ring_(mathematics)     
-class (AbelianGroup a, Monoidal a, Distributive a)
+class (AbelianGroup a, Monoidal a, Distributive a, Absolute a)
     => Ring a where
         
 -- | A ring in which the the mulplication operation is also commutative
@@ -29,6 +27,7 @@ class Ring a => CommutativeRing a where
 -- | A unital ring is a ring with a multiplicative identity element
 -- See Y2018MTLA   
 class (Unital a, Ring a) => UnitalRing a where
+
 
 
 instance Ring Integer    

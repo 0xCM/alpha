@@ -35,16 +35,16 @@ instance Newtype (IntegralDivision a)
 divisionI::(Integral a, Divisive a) => IntegralDivision a
 divisionI = IntegralDivision div
 
-instance (Integral a, Divisive a) => Operator (IntegralDivision a) where
-    type Operand (IntegralDivision a) = a
+instance (Integral a, Divisive a) => Operator 2 (IntegralDivision a) a where
 
-    operator = divisionI
+    operator = operation divisionI
     {-# INLINE operator #-}
 
-
-instance (Integral a, Divisive a) => BinaryOperator (IntegralDivision a) where
-    evaluate (IntegralDivision f) (a1,a2) = f a1 a2
+    evaluate (a1,a2) = f a1 a2 where (IntegralDivision f) = divisionI
     {-# INLINE evaluate #-}
+
+
+
 
 -- Floating Division
 -------------------------------------------------------------------------------
@@ -59,14 +59,12 @@ instance Newtype (FloatingDivision a)
 divisionF::(Divisive a, Floating a) => FloatingDivision a
 divisionF = FloatingDivision $ div
 
-instance (Divisive a, Floating a) => Operator (FloatingDivision a) where
-    type Operand (FloatingDivision a) = a
+instance (Divisive a, Floating a) => Operator 2 (FloatingDivision a) a where
 
-    operator = divisionF
+    operator = operation divisionF
     {-# INLINE operator #-}
 
-instance (Divisive a, Floating a) => BinaryOperator (FloatingDivision a) where
-    evaluate (FloatingDivision f) (a1,a2) = f a1 a2
+    evaluate (a1,a2) = f a1 a2 where (FloatingDivision f) = divisionF
     {-# INLINE evaluate #-}
 
 

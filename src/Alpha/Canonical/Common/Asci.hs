@@ -4,9 +4,8 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Text.Asci where
-
-import Alpha.Canonical.Common
+module Alpha.Canonical.Common.Asci where
+import Alpha.Base
 
 pattern D0 = "0"::Text
 pattern D1 = "1"::Text

@@ -6,46 +6,40 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Group
 (
+    module X,
     MultiplicativeGroup(..),
     AbelianGroup(..),
-    commutator,
+    commutator
+    
     
 ) where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Subtractive
-import Alpha.Canonical.Algebra.Negatable
-import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Reciprocative
-import Alpha.Canonical.Algebra.Abelian
-import Alpha.Canonical.Algebra.Monoidal
+import Alpha.Canonical.Algebra.Additive as X
+import Alpha.Canonical.Algebra.Subtractive as X
+import Alpha.Canonical.Algebra.Negatable as X
+import Alpha.Canonical.Algebra.Multiplicative as X
+import Alpha.Canonical.Algebra.Reciprocative as X
+import Alpha.Canonical.Algebra.Abelian as X
+import Alpha.Canonical.Algebra.Monoidal as X
 
 import Alpha.Canonical.Relations
 import qualified Data.Monoid as Monoid
 
--- | Characterizes a type 'a' whose individuals are invertible via 'f'
-class (Structure a, Inverter f) => Invertible a f where
-    inverter::a -> f
-    
-    
+        
 -- | A multiplicative group, not necessarily commutive
-class (Monoidal a, Reciprocative a, Structure a) => MultiplicativeGroup a where
+class (Monoidal a, Reciprocative a) => MultiplicativeGroup a where
     
 -- | An additive group, always commutative
-class (Abelian a, Negatable a, Structure a) => AbelianGroup a where   
-    
+class (Abelian a, Negatable a) => AbelianGroup a where   
 
 -- | Constructs a commutator for a binary operator
 -- See https://en.wikipedia.org/wiki/Commutator
-commutator::(Reciprocative a) => O2 a -> O2 a
-commutator o =  \x y ->  o (o (reciprocal x) (reciprocal y)) (o x y) where
-
-
-instance Eq a => Structure (MultiplicativeGroup a) where
-    type Individual (MultiplicativeGroup a) = a
+commutator::(Inverter f a, BinaryOperator g a) => g -> f -> O2 a
+commutator g f =  \x y ->  o (o (i x) (i y)) (o x y) where
+    o = o2 g
+    i = inverter f
     
-instance Eq a => Structure (AbelianGroup a) where
-    type Individual (AbelianGroup a) = a
+
 
 instance (Integral a) => MultiplicativeGroup (Ratio a) where
 instance MultiplicativeGroup Float where 

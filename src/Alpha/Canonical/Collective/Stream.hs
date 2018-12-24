@@ -25,11 +25,7 @@ class (Headed (Stream a), Weavable a (Stream a), Iterable (Stream a) ) => Sequen
     blackbox::(() -> a) -> Stream a
 
 
-type instance Element (Stream a) = a
-
-
-instance (Eq a) => Structure (Stream a) where
-    type Individual (Stream a) = Element (Stream a)
+type instance Individual (Stream a) = a
 
     
 instance IsList (Stream a) where

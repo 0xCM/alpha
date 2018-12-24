@@ -19,15 +19,15 @@ import qualified Data.Tree as Tree
 import qualified Data.Text as Text
 import qualified Data.Map as Map
 
-type instance Element (Map a b) = (a,b)
-instance (Eq a, Eq b) => Structure (Map a b) where
-    type Individual (Map a b) = Element (Map a b)
+type instance Individual (Map a b) = (a,b)
+
+    
 
 instance (Ord k) => Container (Map k v)
 
 instance (Formattable k, Formattable v) => Formattable (Map k v) where
     format m = format $ format  <$> (Map.toList m)    
 
-instance (Eq a, Eq b) => Discrete (Map a b) where
-    members = Map.toList
+instance (Eq a, Eq b) => SetBuilder (Map a b) (a,b) where
+    set = Map.toList
 

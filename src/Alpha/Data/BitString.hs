@@ -34,7 +34,8 @@ bitstring i = BitString $ bitstring' (quotRem i 2) []  where
 
 instance Formattable BitString where
     format (BitString bits) =  format <$> bits |> append |> prefix n
-        where n =  length bits |> format |> parenthetical |> spaced
+        where n =  ((length bits)::Int) |> format |> parenthetical |> spaced
+              
 
 instance ToInteger BitString where
     integer = undefined

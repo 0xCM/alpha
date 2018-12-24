@@ -3,11 +3,8 @@ module Alpha.System.Log
     applog
 )
 where
-import Alpha.Base
-import Alpha.Native
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Text
-import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Common.Asci
 import Alpha.System.IO
 import Alpha.System.Message
 

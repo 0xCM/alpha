@@ -1,5 +1,12 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-module Alpha.Data.Tensor
+
+module Alpha.Canonical.Algebra.Tensor
 (
     IndexComponent(..),
     ComponentSpec(..),
@@ -8,9 +15,9 @@ module Alpha.Data.Tensor
     
 )
 where
-import Alpha.Canonical
-import qualified Alpha.Canonical.Text.Asci as Asci
-import Alpha.Data.NatK
+import Alpha.Canonical.Relations
+import qualified Alpha.Canonical.Common.Asci as Asci
+
     
 type Indicial s n = (KnownSymbol s, KnownNat n)
 

@@ -1,13 +1,13 @@
-module Alpha.Control.Executor where
+module Alpha.Canonical.Common.Executor where
 
 import qualified Data.Text as Text
-import Alpha.Base
-import Alpha.Canonical
+import Alpha.Canonical.Common.Root
+
 
 newtype ResultInfo = ResultInfo Text
 
-success::Text -> Either l ResultInfo
-success x = Right(ResultInfo x)
+cmdresult::Text -> Either l ResultInfo
+cmdresult x = Right(ResultInfo x)
 
 class (Show c) => Executor c s f where
     type Command c
@@ -28,4 +28,4 @@ instance Executor Print Text Text where
     type Command Print = Print
 
     execute c = do
-        success (show c |> Text.pack)
+        cmdresult (show c |> Text.pack)

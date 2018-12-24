@@ -89,8 +89,8 @@ newtype PairFunc a b = PairFunc (Map a b)
 instance Newtype (PairFunc a b)
 
 
--- | Defines a family of types that specify function composition
--- Mor precisely, given a function g whose domain coincides with
+-- | Defines a family of types that specify heterogenous function composition
+-- More precisely, given a function g whose domain coincides with
 -- the codomain of a function f the 'Composition' type of g and f
 -- is the type of the function h:Dom f -> Cod g where h = g . f
 type family Composition g f

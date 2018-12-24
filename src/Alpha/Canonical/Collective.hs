@@ -15,4 +15,5 @@ import Alpha.Canonical.Collective.Vector as X
 import Alpha.Canonical.Collective.List as X
 import Alpha.Canonical.Collective.Stream as X
 import Alpha.Canonical.Collective.Seq as X
+import Alpha.Canonical.Collective.Table as X
 

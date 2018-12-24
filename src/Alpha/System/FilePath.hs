@@ -18,13 +18,9 @@ module Alpha.System.FilePath
 )
 
 where
-import Alpha.Canonical.Text
-import Alpha.Canonical.Text.Asci
-import Alpha.Canonical.Collective
-import Alpha.Canonical.Algebra
+import Alpha.Canonical.Common.Asci
+import Alpha.Canonical.Common.TextUtil(rightOfLast)
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Text.Utilities(rightOfLast)
-import Alpha.Base
 import qualified Data.Text as Text
 
 -- | Represents some part of a path, i.e. a full path, a folder name,

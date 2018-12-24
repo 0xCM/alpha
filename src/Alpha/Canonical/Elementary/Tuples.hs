@@ -19,9 +19,9 @@ module Alpha.Canonical.Elementary.Tuples
     
 ) where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Text
 import Alpha.Canonical.Elementary.Elements
 import Alpha.Canonical.Elementary.Indexing
+import Alpha.Canonical.Elementary.Sets
 
 newtype Tuple1 a1 = Tuple1 a1
     deriving (Eq,Ord)
@@ -31,6 +31,14 @@ type Tuple3 a1 a2 a3 = (a1,a2,a3)
 type Tuple4 a1 a2 a3 a4 = (a1,a2,a3,a4)
 type Tuple5 a1 a2 a3 a4 a5 = (a1,a2,a3,a4,a5)
 
+
+type instance Individual (UniTuple1 a) = a
+type instance  Individual (UniTuple2 a) = a
+type instance Individual (UniTuple3 a) = a
+type instance Individual (UniTuple4 a) = a
+type instance Individual (UniTuple5 a) = a
+
+
 newtype UniTuple1 a = UniTuple1 a
     deriving (Eq,Ord)
 
@@ -39,11 +47,6 @@ type UniTuple3 a = Tuple3 a a a
 type UniTuple4 a = Tuple4 a a a a
 type UniTuple5 a = Tuple5 a a a a a
 
-type instance Element (UniTuple1 a) = a
-type instance Element (UniTuple2 a) = a
-type instance Element (UniTuple3 a) = a
-type instance Element (UniTuple4 a) = a
-type instance Element (UniTuple5 a) = a
 
 type instance IndexedElement 1 (UniTuple1 a) = a
 type instance IndexedElement 1 (Tuple1 a1) = a1
@@ -115,42 +118,32 @@ instance Tupeler 5 (Tuple5 a1 a2 a3 a4 a5) where
     tuple (a1,a2,a3,a4,a5)  = (a1,a2,a3,a4,a5)
     {-# INLINE tuple #-}
 
-instance (Eq a) => Structure (UniTuple1 a) where
-    type Individual (UniTuple1 a) = a
-instance (Eq a) => Structure (UniTuple2 a) where
-    type Individual (UniTuple2 a) = a
-instance (Eq a) => Structure (UniTuple3 a) where
-    type Individual (UniTuple3 a) = a
-instance (Eq a) => Structure (UniTuple4 a) where
-    type Individual (UniTuple4 a) = a
-instance (Eq a) => Structure (UniTuple5 a) where
-    type Individual (UniTuple5 a) = a
-                
-instance (Eq a) => Discrete (UniTuple1 a) where
-    members (UniTuple1 a1) = [a1]
-instance (Eq a) => Discrete (UniTuple2 a) where
-    members (a1,a2) = [a1,a2]
-instance (Eq a) => Discrete (UniTuple3 a) where
-    members (a1,a2,a3) = [a1,a2,a3]
-instance (Eq a) => Discrete (UniTuple4 a) where
-    members (a1,a2,a3,a4) = [a1,a2,a3,a4]
-instance (Eq a) => Discrete (UniTuple5 a) where
-    members (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]
+
+instance (Eq a) => SetBuilder (UniTuple1 a) a where
+    set (UniTuple1 a1) = [a1]
+instance (Eq a) => SetBuilder (UniTuple2 a) a where
+    set (a1,a2) = [a1,a2]
+instance (Eq a) => SetBuilder (UniTuple3 a) a where
+    set (a1,a2,a3) = [a1,a2,a3]
+instance (Eq a) => SetBuilder (UniTuple4 a) a where
+    set (a1,a2,a3,a4) = [a1,a2,a3,a4]
+instance (Eq a) => SetBuilder (UniTuple5 a) a where
+    set (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]
                 
 
-instance (Eq a) => Vectored (UniTuple1 a) where
+instance (Eq a) => Vectored (UniTuple1 a) a where
     vector (UniTuple1 a1) = [a1]
         
-instance (Eq a) => Vectored (UniTuple2 a) where
+instance (Eq a) => Vectored (UniTuple2 a) a where
     vector (a1,a2) = [a1,a2]
 
-instance (Eq a) => Vectored (UniTuple3 a) where    
+instance (Eq a) => Vectored (UniTuple3 a) a where    
     vector (a1,a2,a3) = [a1,a2,a3]    
 
-instance (Eq a) => Vectored (UniTuple4 a) where
+instance (Eq a) => Vectored (UniTuple4 a) a where
     vector (a1,a2,a3,a4) = [a1,a2,a3,a4]    
 
-instance (Eq a) => Vectored (UniTuple5 a) where
+instance (Eq a) => Vectored (UniTuple5 a) a where
     vector (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]    
 
 instance (Eq a1) => NaturallyIndexed 1 (Tuple1 a1) where

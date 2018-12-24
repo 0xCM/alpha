@@ -21,10 +21,10 @@ module Alpha.System.IO
 )
 where
 
-import Alpha.Canonical.Algebra
 import Alpha.Canonical.Collective
 import Alpha.System.FilePath
-import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Algebra
+import Alpha.Canonical.Common.Asci
 
 import qualified Data.Text as Text
 import qualified Prelude as P

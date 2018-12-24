@@ -1,16 +1,26 @@
------------------------------------------------------------------------------
--- |
--- Copyright   :  (c) Chris Moore, 2018
--- License     :  MIT
--- Maintainer  :  0xCM00@gmail.com
------------------------------------------------------------------------------
-module Alpha.System.Cellular
-(
-    RefCell(..),
-    Cellular(..)
+module Alpha.Canonical.Common.State where
 
-) where
-import Alpha.Base
+import Data.STRef
+import Control.Monad(forever, (>>=))
+import Control.Monad.ST
+import Control.Concurrent(forkFinally)
+import System.IO
+import Network.Socket
+
+import Alpha.Canonical.Common.Root
+
+-- | Creates a mutable reference cell in the current state thread
+spack:: a -> ST s (STRef s a)    
+spack = newSTRef
+
+-- | Dereferences the cell to obtain a value
+sunpack::STRef s a -> ST s a
+sunpack = readSTRef
+
+-- | Replace the existing value with a new value
+replace::STRef s a -> a -> ST s ()
+replace = writeSTRef
+
 
 newtype RefCell a = RefCell (IORef a)
     deriving (Eq)

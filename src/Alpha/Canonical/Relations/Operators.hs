@@ -5,26 +5,24 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE PolyKinds #-}
-
 module Alpha.Canonical.Relations.Operators
 (    
     Operator(..), operation,
-    BinaryOperator(..), O1, O2, O3,
-    UnaryOperator(..), 
+    O1, O2, O3,
+    Compositer(..),
 
     Commutative(..), 
-    Associative(..),
-    Identity(..),
-    Inverter(..),
+    Associative(..), 
+    Identity(..), 
+    Inverter(..), 
+    BinaryOperator(..),
+    UnaryOperator(..),
 
     scompose, associator,associative, 
     endoply, cartesian, dual, endo, left,right, 
     reduce,
     Iterable(..),
-
     
-    StructureOperator(..)
     
 ) where
 import Alpha.Canonical.Elementary
@@ -36,7 +34,7 @@ import qualified Data.List as List
 import qualified Data.Text as Text
 
 -- | Synonym for unary operator vis-a-vis: 
--- A *ternary operator* is a total function closed over its domain
+-- A *unary operator* is a total function closed over its domain
 type O1 a = a -> a
 
 -- | Synonym for binary operator vis-a-vis: 
@@ -49,53 +47,61 @@ type O2 a = a -> a -> a
 -- its homogenous 3-cartesian domain
 type O3 a = a -> a -> a -> a
 
--- Characterizes an operator of arbitrary arity and domain
-class Operator f where
-    type Operand f
-    operator::f
+-- | Characterizes a type for which a binary operation is defined
+-- What Blythe calls an "internal law of composition"
+class Compositer a where
+    composite::O2 a
+
+    (~.~)::O2 a
+    (~.~) = composite
+
+-- | Characterizes an operator defined in a structured context
+class KnownNat n => Operator n f a where            
+    operator::Operation n f a
+    evaluate::UniTuple n a -> a
+        
+-- | Characterizes a type that can produce a unary operator
+class UnaryOperator f a where
+    o1::f -> O1 a    
+
+-- | Characterizes a type that can produce a unary inverter
+class UnaryOperator f a => Inverter f a where
+    inverter::f -> O1 a
     
+-- | Characterizes a type that can produce a binary operator
+class BinaryOperator f a where
+    o2::f -> O2 a
 
--- | An operation is an operator with known domain and arity
-newtype Operation n a f = Operation f
+-- | Characterizes a type that can produce a commutative binary operator
+class BinaryOperator f a => Commutative f a where
 
-type instance Dom (Operation n a f) = UniProduct n a
-type instance Cod (Operation n a f) = a
-type instance Arity (Operation n a f) = n
+-- | Characterizes a type that can produce an associative binary operator
+class BinaryOperator f a => Associative f a where
 
-class UnaryOperator (f::Type) where
-    ueval::f -> Operand f -> Operand f
-
--- | Defines evaluation and provisioning services for specified operators
-class (Operator f) => BinaryOperator (f::Type) where
-    evaluate::f -> (Operand f, Operand f) -> Operand f    
-
--- | Classifies commutative binary operators
-class (BinaryOperator f) => Commutative f where
-
--- | Classifies associative binary operators
-class (BinaryOperator f) => Associative f where
-
--- | Associaties an identity element with a binary operator
-class (BinaryOperator f) => Identity f where
-    identity::Operand f        
-
-class (UnaryOperator f) => Inverter f where
-    invert::Operand f -> Operand f    
-
-class (BinaryOperator f, Structure a, Operand f ~ Individual a) => StructureOperator f a where
-    operate::Individual a -> Individual a -> Individual a
-    operate x y = evaluate op (x,y) where
-        op = operator::f
+class Associative f a => Identity f a where
+    identity::a
     
-            
+-- | Characterizes a structure with a binary operation
+-- See https://en.wikipedia.org/wiki/Magma_(algebra)    
+class Compositer a => Magma a where    
+
 -- | Characterizes a type over which function iterates may be computed
 class Iterable a where
-    iterate :: O1 (Element a) -> (Element a) -> a
+    iterate :: O1 (Individual a) -> (Individual a) -> a
 
-    
-operation::forall n a f. (KnownNat n, Operator f) => f ->  Operation n a f
+
+-- | An operation is an operator with known domain and arity
+newtype Operation n f a = Operation f
+    deriving (Generic)
+instance Newtype f =>  Newtype (Operation n f a)
+
+type instance Dom (Operation n f a) = UniProduct n a
+type instance Cod (Operation n f a) = a
+type instance Arity (Operation n f a) = n
+
+operation::forall n f a. (KnownNat n, Operator n f a) => f -> Operation n f a
 operation = Operation
-    
+                
 -- Alias for semigroupoid composition operator
 scompose::(Semigroupoid c) => c j k -> c i j -> c i k
 scompose = o
@@ -144,8 +150,5 @@ reduce id op (a:b:tail) =  op (op a b)  (reduce id op tail)
 reduce id op (a:[]) = a
 reduce id op [] = id
 
-
 instance Iterable [a] where
     iterate = List.iterate            
-
-

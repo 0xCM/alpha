@@ -12,7 +12,6 @@ module Alpha.Canonical.Algebra.Action
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 
-
 class LeftAction k a where
     type LeftProduct k a
     type LeftProduct k a = a

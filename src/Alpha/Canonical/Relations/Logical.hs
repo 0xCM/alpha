@@ -26,7 +26,6 @@ module Alpha.Canonical.Relations.Logical
 
 ) where
 import Alpha.Base
-import Alpha.Native
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Functions
 

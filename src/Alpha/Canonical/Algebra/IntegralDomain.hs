@@ -1,12 +1,20 @@
+
 module Alpha.Canonical.Algebra.IntegralDomain
 (
     module X,
     IntegralDomain(..),
+    GcdDomain(..),
+    Ufd(..),
+    Pid(..),
+    Eud(..)
+    
 
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Ring as X
 import qualified Data.List as List
+import Math.NumberTheory.Primes(factorise) 
+import Math.NumberTheory.Euclidean(extendedGCD)
 
 -- | An integral domain is a commutative ring such such that
 -- for all elements a != 0 && b != 0, a*b != 0
@@ -42,13 +50,6 @@ class (Divisive a, CommutativeRing a) => IntegralDomain a where
     (%) = rem
     {-# INLINE (%) #-}
     infix 8 %
-
-    -- | Infix synonym for 'mod'
-    (%%)::a -> a -> a
-    default (%%)::(Integral a) => a -> a -> a
-    (%%) = mod
-    {-# INLINE (%%) #-}
-    infix 8 %%
     
     -- Determines whether m is evenly Divisive by n
     divides::a -> a -> Bool
@@ -80,11 +81,19 @@ class IntegralDomain a => GcdDomain a where
 newtype Factorization a = Factorization [(a,Int)]    
     deriving (Eq,Ord)
 
+-- | Characterizes a unique factorization domain    
 class (GcdDomain a) => Ufd a where
     factor::a -> Factorization a
     default factor::(Integral a) => a -> Factorization a        
     factor a = (\(n,p) -> (fromIntegral n,p)) <$> factors  |> Factorization where
         factors = factorise (fromIntegral a)
+
+-- | Characterizes a principal ideal domain        
+class Ufd a => Pid a where
+
+-- | Characterizes a Euclidean Domain    
+-- See https://en.wikipedia.org/wiki/Euclidean_domain
+class Pid a => Eud a  where
 
 instance IntegralDomain Integer
 instance IntegralDomain Int
@@ -125,3 +134,29 @@ instance Ufd Word16 where
 instance Ufd Word32 where 
 instance Ufd Word64 where             
 
+instance Pid Integer where
+instance Pid Int where
+instance Pid Int8 where
+instance Pid Int16
+instance Pid Int32
+instance Pid Int64
+instance Pid Natural where 
+instance Pid Word where 
+instance Pid Word8 where 
+instance Pid Word16 where 
+instance Pid Word32 where 
+instance Pid Word64 where             
+        
+instance Eud Integer where
+instance Eud Int where
+instance Eud Int8 where
+instance Eud Int16
+instance Eud Int32
+instance Eud Int64
+instance Eud Natural where 
+instance Eud Word where 
+instance Eud Word8 where 
+instance Eud Word16 where 
+instance Eud Word32 where 
+instance Eud Word64 where             
+        

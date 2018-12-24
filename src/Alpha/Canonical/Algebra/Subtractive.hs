@@ -12,7 +12,6 @@ module Alpha.Canonical.Algebra.Subtractive
 ) where
 import Alpha.Canonical.Relations
 
-
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
@@ -23,28 +22,21 @@ class Subtractive a where
     (-) = sub
     {-# INLINE (-) #-}
     infixl 6 -    
-
-
     
 -- | Represents a subtraction operator
 newtype Subtraction a = Subtraction (O2 a)    
     deriving(Generic)
 instance Newtype (Subtraction a)
 
-instance (Subtractive a) => Associative (Subtraction a)
-
 -- | Produces the canonical subtraction operator
 subtraction::(Subtractive a) => Subtraction a
 subtraction = Subtraction sub
 
-instance (Subtractive a) => Operator (Subtraction a) where
-    type Operand (Subtraction a) = a
-    operator = subtraction
-    {-# INLINE operator #-}
+instance Subtractive a => BinaryOperator (Subtraction a) a where
+    o2 = unwrap
 
-instance (Subtractive a) => BinaryOperator (Subtraction a) where
-    evaluate (Subtraction f) (a1,a2) = f a1 a2
-    {-# INLINE evaluate #-}
+instance (Subtractive a) => Associative (Subtraction a) a
+
 
 -- Subtractive
 -------------------------------------------------------------------------------

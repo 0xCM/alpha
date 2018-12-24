@@ -7,7 +7,8 @@
 module Alpha.Canonical.Collective.List
 (
     Reduced(..),
-    exclude
+    exclude,
+    Partitioner(..)
 
 )
 where
@@ -20,11 +21,16 @@ import qualified Data.Set as Set
 
 type family Reduced a
 type instance Reduced [a] = a
-instance Eq a => Set [a]
+type instance Individual [a] = a
+
+class Partitioner a where
+    partition::Int -> [a] -> [[a]]
+    partition width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
+
+instance Partitioner a    
 
 
-instance (Eq a) => Structure [a] where
-    type Individual [a] = Element [a]
+    
 
 class Reductive a where
     -- The reduction operator // takes a binary operator ⊕ on its left and a vector
@@ -65,9 +71,6 @@ instance Concatenable [a] [a] where
 
 instance Appendable [[a]] where
     append = List.concat    
-    
-instance Counted [a] where
-    count = fromIntegral . List.length
     
 instance (Eq a) => Filterable [a] where
     filter = List.filter
@@ -110,7 +113,7 @@ instance Mappable [a] a b where
     map = List.map
     
 instance Groupable [a] where
-    group = List.groupBy
+    groups = List.groupBy
 
     
 instance Zippable [a] [b] [c] where
@@ -120,7 +123,3 @@ instance Zippable [a] [b] [c] where
     type Zipper [a] [b] [c] = a -> b -> c
 
     zip = List.zipWith
-    
-    
-    
-    

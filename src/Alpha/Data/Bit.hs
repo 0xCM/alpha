@@ -17,7 +17,7 @@ module Alpha.Data.Bit
 )
 where
     
-import Alpha.Canonical
+import Alpha.Canonical.Algebra
 import Data.Bits(Bits(..))
 import qualified Data.List as List
 
@@ -116,8 +116,7 @@ instance MeetSemiLattice Flag where
     (/\) x y = ifelse (x && y) On Off
     {-# INLINE (/\) #-}
 
-instance Lattice Flag where    
-            
+instance Lattice Flag where                
 
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0

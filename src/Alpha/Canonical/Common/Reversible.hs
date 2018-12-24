@@ -4,16 +4,14 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Reversible
+module Alpha.Canonical.Common.Reversible
 (    
     Reversible(..),
     Flippable(..)
     
 ) where
-import Alpha.Native
-import Alpha.Base
-import Alpha.Canonical.Relations
-
+--import Alpha.Canonical.Relations
+import Alpha.Canonical.Common.Root
 import qualified Data.List as List  
 import qualified Data.Map as Map
 import qualified Data.Text as Text

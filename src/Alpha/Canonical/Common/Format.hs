@@ -5,9 +5,10 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Text.Format
+module Alpha.Canonical.Common.Format
 (
     Packable(..),
+    Formattable(..),
     enclose,
     parenthetical, 
     embrace,
@@ -25,20 +26,21 @@ module Alpha.Canonical.Text.Format
     bitTextW
 
 ) where
-import Alpha.Canonical.Common
-import Alpha.Canonical.Text.Asci
-import Alpha.Canonical.Text.Utilities(zpadL)
+import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Asci
+import Alpha.Canonical.Common.TextUtil(zpadL)
 import Numeric(showIntAtBase)
 import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.Map as Map
 
-type instance Concatenated Text Text = Text
-type instance Concatenated Text Char = Text
-type instance Concatenated Char Text = Text
-type instance Concatenated Char Char = Text
-    
-            
+-- | Converts a showable to text    
+text::(Show s) => s -> Text
+text = Text.pack . show
+
+-- | Characterizes a value that can be rendered in human-readable form
+class Formattable a where
+    format ::a -> Text            
 
 -- | Characterizes a pair of types for which transformations are defined 
 -- for respectively "packing"  and "unpacking" type values
@@ -47,6 +49,8 @@ class Packable a b where
     pack::a -> b
     -- Restores an a-value from a b-value
     unpack::b -> a    
+
+                
 
     
 enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
@@ -109,9 +113,6 @@ bitText n = showBasedInt 2 n |> zpadL width
 bitTextW :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitTextW w n = showBasedInt 2 n |> zpadL w
 
-instance Appendable [Text] where
-    append = Text.concat        
-
 instance Packable String Text where
     pack = Text.pack
     unpack = Text.unpack
@@ -119,15 +120,53 @@ instance Packable String Text where
 instance  (Formattable v, Faceted f v) => Formattable (FacetValue f  v) where
     format (FacetValue v) =  format v
     
-instance Concatenable Text Text where
-    concat = Text.append    
-        
-instance Concatenable Text Char where
-    concat t c  = Text.pack  [c] |> Text.append t 
+
+
+
+instance Formattable Text where
+    format s = s         
+instance Formattable Char where
+    format = Text.singleton 
+instance Formattable Natural where
+    format = text
+instance Formattable Int where
+    format = text
+instance Formattable Word where
+    format = text
+instance Formattable Integer where
+    format = text
+instance (Show a) => Formattable (Ratio a) where
+    format = text
+instance Formattable Word8 where
+    format = text
+instance Formattable Word16 where
+    format = text
+instance Formattable Word32 where
+    format = text
+instance Formattable Word64 where
+    format = text
+instance Formattable Int8 where
+    format = text
+instance Formattable Int16 where
+    format = text
+instance Formattable Int32 where
+    format = text
+instance Formattable Int64 where
+    format = text
+instance Formattable Double where
+    format = text
+instance Formattable Float where
+    format = text
+instance Formattable CDouble where
+    format = text
+instance Formattable CFloat where
+    format = text
+
+instance (Formattable a) => Formattable [a] where
+    format x = x |> (<$>) format |> Text.concat
     
-instance Concatenable Char Text where    
-    concat c t  = Text.append (Text.pack [c]) t
+instance Formattable Variance where
+    format (Covariant) = "*"
+    format (Contravariant) = "^"
     
-instance Concatenable Char Char where    
-    concat c1 c2  = Text.pack ([c1] List.++ [c2])
     

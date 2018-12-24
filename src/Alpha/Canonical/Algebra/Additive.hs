@@ -53,35 +53,28 @@ newtype Summation a = Summation [a]
 -- | Produces the canonical addition operator
 -- addition::(Num a) => Addition a
 -- addition = Addition add'
-addition::(Additive a) => Addition a
+addition::Additive a => Addition a
 addition = Addition add
 
 -- | Constructs a summation
 summation::[a] -> Summation a
 summation = Summation
 
-instance (Additive a) => Commutative (Addition a)
-instance (Additive a) => Associative (Addition a)
-instance (Additive a, Nullary a) => Identity (Addition a) where
+instance Additive a => Commutative (Addition a) a
+instance Additive a => Associative (Addition a) a
+instance Additive a => BinaryOperator (Addition a) a where
+    o2 = unwrap
+instance (Additive a, Nullary a) => Identity (Addition a) a where
     identity = zero
-    
-instance (Additive a) => Operator (Addition a) where
-    type Operand (Addition a) = a
-    operator = addition
-    {-# INLINE operator #-}
 
-instance (Additive a) => BinaryOperator (Addition a) where
-    evaluate (Addition f) (a1,a2) = f a1 a2
-    {-# INLINE evaluate #-}
-
-instance (Additive a, Nullary a) => Computable (Summation a) where
+instance (Nullary a, Additive a) => Computable (Summation a) where
     type Computed (Summation a) = a
     compute (Summation items) = reduce zero (+) items
 
 -- Additive numbers
 -------------------------------------------------------------------------------
 instance Additive Natural where 
-    add x y = evaluate addition (x,y)
+    add = add'
     {-# INLINE add #-}
 
 instance Additive Integer where 
@@ -221,27 +214,24 @@ instance Nullary CDouble where
 
 -- Additive tuples
 -------------------------------------------------------------------------------
-type Additive2 a1 a2 = (Additive a1, Additive a2)
-type Additive3 a1 a2 a3 = (Additive2 a1 a2, Additive a3)
-type Additive4 a1 a2 a3 a4 = (Additive3 a1 a2 a3, Additive a4)
-type Additive5 a1 a2 a3 a4 a5 = (Additive4 a1 a2 a3 a4, Additive a5)
+type instance Individual (Tuple1 a1) = Tuple1 a1
 
-instance Additive a1 => Additive (Tuple1 a1) where
+instance Additive a => Additive (Tuple1 a) where
     add (Tuple1 x1) (Tuple1 y1) = Tuple1 (x1 + y1)
 
 instance Additive a1 => Additive (UniTuple1 a1) where
     add (UniTuple1 x1) (UniTuple1 y1) = UniTuple1 (x1 + y1)
     
-instance Additive2 a1 a2 => Additive (Tuple2 a1 a2) where
+instance (Additive a1, Additive a2) => Additive (Tuple2 a1 a2) where
     add (x1,x2) (y1,y2) = (x1 + y1, x2 + y2)
 
-instance Additive3 a1 a2 a3 => Additive (Tuple3 a1 a2 a3) where
+instance (Additive a1, Additive a2, Additive a3) => Additive (Tuple3 a1 a2 a3) where
     add (x1,x2,x3) (y1,y2,y3) = (x1 + y1, x2 + y2,x3 + y3)
 
-instance Additive4 a1 a2 a3 a4 => Additive (Tuple4 a1 a2 a3 a4) where
+instance (Additive a1, Additive a2, Additive a3, Additive a4) => Additive (Tuple4 a1 a2 a3 a4) where
     add (x1,x2,x3,x4) (y1,y2,y3,y4) = (x1 + y1, x2 + y2,x3 + y3, x4 + y4)
 
-instance Additive5 a1 a2 a3 a4 a5 => Additive (Tuple5 a1 a2 a3 a4 a5) where
+instance (Additive a1, Additive a2, Additive a3, Additive a4, Additive a5) => Additive (Tuple5 a1 a2 a3 a4 a5) where
     add (x1,x2,x3,x4,x5) (y1,y2,y3,y4,y5) = (x1 + y1, x2 + y2,x3 + y3, x4 + y4,x5 + y5)
     
 -- Nullary tuples

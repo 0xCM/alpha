@@ -12,6 +12,5 @@ where
 
 import Alpha.System.FilePath as X
 import Alpha.System.IO as X
-import Alpha.System.Cellular as X
 import Alpha.System.Log as X
 import Alpha.System.Message as X

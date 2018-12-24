@@ -15,4 +15,5 @@ import Alpha.Base.Text as X
 import Alpha.Base.Types as X
 import Alpha.Base.Common as X
 import Alpha.Base.System as X
+import Alpha.Base.Alias as X
 

@@ -12,7 +12,7 @@ module Alpha.Canonical.Collective.ItemSet
 ) where
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Common.Asci
 
 import qualified Data.List as List
 import qualified Data.Sequence as Sequence
@@ -22,7 +22,7 @@ import qualified Data.Text as Text
 import qualified Data.MultiSet as Bag
 
 
-type instance Element (ItemSet a) = a
+type instance Individual (ItemSet a) = a
 type instance Appended (ItemSet (ItemSet a)) = ItemSet a        
 type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
 
@@ -33,12 +33,12 @@ instance Newtype (ItemSet a)
 
 
 class (Ord a) => IsSet a where
-    set::a -> ItemSet (Item a)
+    iset::a -> ItemSet (Item a)
         
 instance (Ord a)  => IsSet [a] where    
     -- Constructs an 'ItemSet' from a list
-    set::[a] -> ItemSet a
-    set = fromList
+    iset::[a] -> ItemSet a
+    iset = fromList
 
 unions::(Ord a) => [ItemSet a] -> ItemSet a
 unions sets = (unwrap <$> sets) |> Set.unions |> ItemSet
@@ -79,7 +79,7 @@ instance (Formattable a, Ord a) => Formattable (ItemSet a) where
 instance (Formattable a, Ord a) => Show (ItemSet a) where
     show = string . format
 
-instance Counted (ItemSet a) where
+instance Finite (ItemSet a) where
     count = fromIntegral . Set.size . unwrap
 
 instance (Ord a) => Filterable (ItemSet a) where

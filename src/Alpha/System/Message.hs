@@ -42,12 +42,12 @@ severity val
          | val == 3 -> Error
          | val >= 5 -> Fatal
       
-construct::Severity -> Text -> Maybe a -> Message a
-construct sev msg payload = Message sev msg payload
+define::Severity -> Text -> Maybe a -> Message a
+define sev msg payload = Message sev msg payload
 
 -- | Constructs a verbose message with an optional payload
 babble'::Text -> Maybe a -> Message a
-babble' msg payload = construct Trivia msg payload
+babble' msg payload = define Trivia msg payload
 
 -- | Constructs a verbose message
 babble::Text -> Message ()
@@ -55,7 +55,7 @@ babble msg = babble' msg none
 
 -- | Constructs an informative message with an optional payload
 inform'::Text -> Maybe a -> Message a
-inform' msg payload = construct Info msg payload
+inform' msg payload = define Info msg payload
 
 -- | Constructs an informative message
 inform::Text -> Message ()
@@ -63,7 +63,7 @@ inform msg = inform' msg none
 
 -- | Constructs an warning message with an optional payload
 warn'::Text -> Maybe a -> Message a
-warn' msg payload = construct Warn msg payload
+warn' msg payload = define Warn msg payload
 
 -- | Constructs an warning message
 warn::Text ->  Message ()
@@ -71,7 +71,7 @@ warn msg = warn' msg none
 
 -- | Constructs an error message with an optional payload
 oops'::Text -> Maybe a -> Message a
-oops' msg payload = construct Error msg payload
+oops' msg payload = define Error msg payload
 
 -- | Constructs an error message
 oops::Text -> Message ()
@@ -79,7 +79,7 @@ oops msg = oops' msg none
 
 -- | Constructs an fatal message with an optional payload
 doom'::Text -> Maybe a -> Message a
-doom' msg payload = construct Fatal msg payload
+doom' msg payload = define Fatal msg payload
 
 -- | Constructs an fatal message with an optional payload
 doom::Text -> Message ()

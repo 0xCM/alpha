@@ -9,6 +9,7 @@
 
 module Alpha.Base.Common
 (
+    Bits,
     FiniteBits(..),
     ByteString,    
     Hashable(..),
@@ -42,6 +43,11 @@ import Prelude(error,fst,snd)
 import Data.Int
 import Data.Word
 import Data.Bool
+import Data.Type.Equality as Equality
+import Data.Proxy as Proxy
+import qualified GHC.Natural as TN
+import qualified GHC.TypeLits as TL
+
 
     
 -- | Constructs a valued 'Maybe'

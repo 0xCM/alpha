@@ -1,4 +1,4 @@
-module Alpha.Native
+module Alpha.Base.Alias
 (
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',

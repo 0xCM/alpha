@@ -12,10 +12,7 @@ import Alpha.Canonical.Collective.Container
 import qualified Data.Sequence as Seq
 
 type instance Concatenated (Seq a) (Seq a) = Seq a   
-type instance Element (Seq a) = a
-
-instance (Eq a) => Structure (Seq a) where
-    type Individual (Seq a) = Element (Seq a)
+type instance Individual (Seq a) = a
 
 instance Concatenable (Seq a) (Seq a) where
     concat a b = a <> b

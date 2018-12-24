@@ -14,11 +14,11 @@ module Alpha.Data.Bits
     
 )
 where
+import Alpha.Canonical.Common
+import Alpha.Data.Bit
+    
 import qualified Data.Text as Text
 import Data.Bits hiding(bit)
-import Alpha.Canonical
-import Alpha.Data.Bit
-import GHC.TypeLits
 
 type instance Concatenated Word8 Word8 = Word16
 type instance Concatenated Word16 Word16 = Word32

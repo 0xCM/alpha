@@ -5,8 +5,7 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 
-module Alpha.Canonical.Text.Symbols where
-import Alpha.Canonical.Common
+module Alpha.Canonical.Common.Symbols where
 import Data.Text
 
 -- | Produces "⊛"

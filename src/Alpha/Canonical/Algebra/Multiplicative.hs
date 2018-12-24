@@ -4,6 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Algebra.Multiplicative
 (
     Multiplicative(..),
@@ -31,8 +32,6 @@ class Multiplicative a where
 class Unital a where
     -- | Specifies the unique element 1 such that 1*a = a*1 = a forall a
     one::a
-
-    
           
 -- | Represents a multiplication operator
 newtype Multiplication a = Multiplication (O2 a)    
@@ -40,26 +39,17 @@ newtype Multiplication a = Multiplication (O2 a)
 instance Newtype (Multiplication a)
 
 -- | Produces the canonical multiplication operator
-multiplication::(Num a) => Multiplication a
-multiplication = Multiplication mul'
+multiplication::Multiplicative a => Multiplication a
+multiplication = Multiplication mul
 
-instance (Num a) => Commutative (Multiplication a)
-instance (Num a) => Associative (Multiplication a)
-instance (Num a) => Identity (Multiplication a) where
-    identity = 1
+instance Multiplicative a => Commutative (Multiplication a) a
+instance Multiplicative a => Associative (Multiplication a) a
+instance (Multiplicative a, Unital a) => Identity (Multiplication a) a where
+     identity = one
+instance BinaryOperator (Multiplication a) a where
+    o2  = unwrap
 
-instance (Num a) => Operator (Multiplication a) where
-    type Operand (Multiplication a) = a
-
-    operator = multiplication
-    {-# INLINE operator #-}
-
-
-instance (Num a) => BinaryOperator (Multiplication a) where
-
-    evaluate (Multiplication f) (a1,a2) = f a1 a2
-    {-# INLINE evaluate #-}
-    
+        
 -- Unital
 -------------------------------------------------------------------------------
 instance Unital Natural where 

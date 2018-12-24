@@ -75,7 +75,7 @@ class (Container c) => Setwise c where
 -- the remainder
 class Headed a where
     -- | Retrives the first item in the sequence
-    head::a -> Element a
+    head::a -> Individual a
 
         -- | Skips the first item of the sequence and returns the remainder
     tail::a -> a
@@ -107,6 +107,7 @@ class Mappable c a b where
 -- | The elements of a tree are projected onto a list
 type instance Appended (Tree a) = [a]
 
+
 instance Eq a => Set (Tree a)
 
 
@@ -122,12 +123,12 @@ class (Headed a) => Sequential a  where
     take::(Integral n) => n -> a -> a
 
         -- | Returns elements until a supplied predicate is disatisfied
-    while::P1 (Element a) -> a -> a
+    while::P1 (Individual a) -> a -> a
     
     -- | Branches the source according to the outcome of a predicate:
     -- Elements that satisfy the predicate are branched right while the
     -- remainder are branched left
-    split::P1 (Element a) -> a -> (a, a)
+    split::P1 (Individual a) -> a -> (a, a)
 
     splitAt::(Integral n) => n -> a -> (a, a)
 
@@ -152,4 +153,4 @@ class Zippable a b c where
     zip::Zipper a b c -> LeftZip a b c -> RightZip a b c -> Zipped a b c
     
 class Groupable c where
-    group::(Element c -> Element c -> Bool) -> c -> [[Element c]]
+    groups::(Individual c -> Individual c -> Bool) -> c -> [[Individual c]]

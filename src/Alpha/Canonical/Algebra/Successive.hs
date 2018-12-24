@@ -11,7 +11,8 @@ module Alpha.Canonical.Algebra.Successive
     
 ) where
 import Alpha.Canonical.Relations
-
+import Alpha.Canonical.Algebra.Subtractive
+import Alpha.Canonical.Algebra.Additive
 import qualified Data.List as List
 
 -- | Represents a family of types that support some sort of incrementing operation where
@@ -190,3 +191,86 @@ instance Incrementable CFloat where
 instance Incrementable CDouble where
     inc = add' 1
     {-# INLINE inc #-}
+
+-- Successive
+-------------------------------------------------------------------------------
+instance Successive Integer where
+    next n = just (n + 1)
+
+instance Successive Natural where
+    next n = just (n + 1)
+    
+instance Integral n => Successive (Ratio n) where
+    next n = just (n + 1)
+        
+instance Successive Word where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word8 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word16 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word32 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Word64 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int8 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int16 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int32 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+
+instance Successive Int64 where
+    next n = ifelse (n == maxBound) none (just (n + 1))
+        
+-- Antecedent
+-------------------------------------------------------------------------------
+instance Antecedent Integer where
+    prior n = just (n - 1)
+
+instance Antecedent Natural where
+    prior n = ifelse (n > 0) (just(n - 1)) none
+    
+instance Integral n => Antecedent (Ratio n) where
+    prior n = ifelse (n > 0) (just(n - 1)) none
+        
+instance Antecedent Word where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Word8 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Word16 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Word32 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Word64 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Int where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Int8 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Int16 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Int32 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+
+instance Antecedent Int64 where
+    prior n = ifelse (n == minBound) none (just (n - 1))
+

@@ -20,14 +20,14 @@ import qualified Data.Set as Set
 -- regarding element containment
 class Existential c where
     -- Determines whether any element exists that satisfies a given predicate
-    any::(Element c -> Bool) -> c -> Bool
+    any::(Individual c -> Bool) -> c -> Bool
 
     -- Determines whether an exlement exists via an equality predicate
-    exists::(Eq (Element c)) => Element c -> c -> Bool
+    exists::(Eq (Individual c)) => Individual c -> c -> Bool
     exists = any . (==) 
     
 class Universal c where
-    all::(Element c -> Bool) -> c -> Bool
+    all::(Individual c -> Bool) -> c -> Bool
 
 instance Universal [a] where
     all = List.all

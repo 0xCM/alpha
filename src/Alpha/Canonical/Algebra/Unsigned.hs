@@ -1,5 +1,6 @@
-module Alpha.Canonical.Numeric.Types
+module Alpha.Canonical.Algebra.Unsigned
 (
+    module X,
     URatio, uratio,
     UFloat, ufloat,
     UDouble, udouble, 
@@ -8,10 +9,9 @@ module Alpha.Canonical.Numeric.Types
     Unsigned(..),
 )
 where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Text
-import Alpha.Canonical.Algebra
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Absolute as X
+import Alpha.Canonical.Algebra.Divisive as X
 
 -- | A ratio sans sign
 newtype URatio a = URatio (Ratio a)
@@ -93,3 +93,16 @@ instance Unsignable UFloat
 instance Unsignable UDouble
 instance Unsignable UCFloat
 instance Unsignable UCDouble
+
+instance Absolute UFloat where 
+    abs = id
+    {-# INLINE abs #-}
+instance Absolute UDouble where 
+    abs = id
+    {-# INLINE abs #-}    
+instance Absolute UCFloat where 
+    abs = id
+    {-# INLINE abs #-}
+instance Absolute UCDouble where 
+    abs = id
+    {-# INLINE abs #-}

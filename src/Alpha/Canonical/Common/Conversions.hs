@@ -4,8 +4,9 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Numeric.Conversion
+module Alpha.Canonical.Common.Conversions
 (
+    Convertible(..),
     FromDouble(..), ToDouble(..),
     FromInt(..), ToInt(..),
     ToWord(..), FromWord(..),
@@ -13,17 +14,41 @@ module Alpha.Canonical.Numeric.Conversion
     ToNatural(..), FromNatural(..),
     Doubly(..),
     ToIntegral(..),
+    FromText(..),
+    ToString(..),
+    ToLines(..),
+
     int8, int16, int32, int64,
     word8, word16, word32, word64,
     rational, fractional,
 
 ) where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Numeric.Class
-import Alpha.Canonical.Relations
-
+import Alpha.Canonical.Common.Root
+import qualified Data.Text as Text
+import qualified Data.List as List
+import qualified Data.Map as Map
 import qualified Data.Ratio as DR
+
+-- | Characterizes a value that can be converted to a list of 'Text' values
+class ToLines a where
+    -- | Converts an 'a' value to a list of 'Text' values
+    lines::a -> [Text]    
+
+-- | Characterizes a value that can be converted to a 'String'
+class ToString a where
+    -- | Convers an 'a' value to a 'String'
+    string::a -> String
+
+-- | Characterizes a value that can be materialized from 'Text'
+class FromText a where
+    -- | Materializes an 'a'-value from text
+    fromText::Text -> a
+
+-- | Codifies a (directed) conversion relationship between an input value and output value
+class Convertible a b where
+    -- | Requires that an 'a' value be converted to a 'b' value
+    convert::a -> b    
+
 
 -- | Characterizies a type whose values can be converted to/from 'Double' values    
 type Doubly a = (ToDouble a, FromDouble a)
@@ -566,4 +591,19 @@ instance ToNatural CDouble where
 
 instance (Integral a, Num b) => Convertible a b where
     convert = fromIntegral
+    
+instance ToString String where
+    string = id
+    
+instance ToString Text where
+    string x = Text.unpack x    
+
+instance ToString Char where
+    string x = [x]
+    
+instance ToLines Text where    
+    lines = Text.lines
+
+instance ToLines String where    
+    lines = Text.lines . Text.pack    
     

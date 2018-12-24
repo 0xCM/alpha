@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Numeric.Complex
+module Alpha.Canonical.Algebra.Complex
 (
     Complex(..),
     complex,
@@ -12,10 +12,13 @@ module Alpha.Canonical.Numeric.Complex
     im,
     conjugate
 ) where
-import Alpha.Base
-import Alpha.Native
-import Alpha.Canonical.Algebra
-import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Multiplicative
+import Alpha.Canonical.Algebra.Subtractive
+import Alpha.Canonical.Algebra.Additive
+import Alpha.Canonical.Algebra.Negatable
+
+import Alpha.Canonical.Common.Asci
 
 newtype Complex a = Complex (a,a)
     deriving(Eq, Additive, Subtractive)

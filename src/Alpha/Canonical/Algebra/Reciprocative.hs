@@ -22,22 +22,12 @@ instance Newtype (Reciprocation a)
 reciprocation::(Reciprocative a) => Reciprocation a
 reciprocation = Reciprocation reciprocal
 
-instance (Reciprocative a) => Operator (Reciprocation a) where
-    type Operand (Reciprocation a) = a
 
-    operator = reciprocation
-    {-# INLINE operator #-}
-
-instance (Reciprocative a) => Inverter (Reciprocation a) where
-    invert x = f x  where
-        (Reciprocation f) = operator
-    {-# INLINE invert #-}
+instance Reciprocative a => UnaryOperator (Reciprocation a) a where
+    o1 = unwrap
+instance Reciprocative a => Inverter (Reciprocation a) a where
+    inverter = o1
         
-instance (Reciprocative a) => UnaryOperator (Reciprocation a) where
-    ueval (Reciprocation f) a = f a
-    {-# INLINE ueval #-}
-
-    
 -- Reciprocative 
 -------------------------------------------------------------------------------
 instance (Integral a) => Reciprocative (Ratio a) where

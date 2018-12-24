@@ -30,6 +30,6 @@ series ProductSeries i t = Series (ProductSeries, (*), IndexRange i, term t)
 instance (Integral i, Semiring t)  => Computable (Series i t) where
     type Computed (Series i t) = t
     compute (Series (k, f, r, t)) = aggregation where
-        expansion = (unwrap t) <$> members r
+        expansion = (unwrap t) <$> set r
         identity = ifelse (k == SummationSeries) zero one
         aggregation = reduce identity f expansion        

@@ -10,22 +10,15 @@
 
 module Alpha.Canonical.Algebra.Modular
 (
+    Summed(..), 
     Modulo(..), 
-    Bimodular(..),
     Zn, BasedInt,
     Base(..),
     zN, modulus, residues,residue,
     based, base2, base10, base16,
     base, digits,
-
-    (/%), (/%%)
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Divisive
-import Alpha.Canonical.Algebra.Subtractive
-import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Hetero
 import Alpha.Canonical.Algebra.IntegralDomain
 
 import qualified Data.Vector as Vector
@@ -46,6 +39,10 @@ data BasedInt (b::Nat) i = BasedInt !i
 -- more generally, quotient groups and similar
 type family Modulo a b
 
+-- | Represents a family of types that support a notion of (potentially) heterogenous addition
+-- where a type instance is the addition result type
+type family Summed a b
+
 -- | Represents the ring of integers mod n
 data Zn (n::Nat) = Zn Integer
     deriving (Eq, Ord)
@@ -57,30 +54,10 @@ data Residue (n::Nat) = Residue (Zn n) Integer
 -- particular basis    
 newtype Digits b = Digits [Char]    
 
-type instance Element (Zn n) = Residue n
+type instance Individual (Zn n) = Residue n
+
 type instance Summed (Zn n) (Zn n) = Zn n
 type instance Summed (Residue n) (Residue n) = Residue n
-
-
-class Bimodular a b where
-    -- | Calculates the remainder of dividing the first operand by the second
-    bimod::a -> b -> Modulo a b
-
-    -- | Infix synonym for 'bimod'
-    (>%<)::a -> b -> Modulo a b
-    (>%<) = bimod
-    {-# INLINE (>%<) #-}
-    infix 8 >%<
-    
-(/%)::(Integral n) => n -> n -> (n,n)
-(/%) = quotRem'
-{-# INLINE (/%) #-}
-infixl 5 /%
-
-(/%%)::(Integral n) => n -> n -> (n,n)
-(/%%) = divMod'
-{-# INLINE (/%%) #-}
-infixl 5 /%%
         
 -- | Constructs an integer with a specified base
 based::forall (n::Nat) i. (Integral i) => i -> BasedInt n i
@@ -165,7 +142,6 @@ instance forall b. KnownNat b => Show (Digits b ) where
 
 instance  KnownNat n => Set (Zn n)
 
-
 instance KnownNat n => Show (Residue n) where
     show (Residue zN m) = (show m) <> " " <> (show zN)
 
@@ -186,4 +162,3 @@ instance KnownNat n => Multiplicative (Residue n) where
 
 instance KnownNat n => Unital (Residue n) where        
     one = residue 1
-

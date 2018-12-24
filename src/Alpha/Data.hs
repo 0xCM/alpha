@@ -11,8 +11,6 @@ import Alpha.Data.Bits as X
 import Alpha.Data.BitString as X
 import Alpha.Data.BitVector as X
 import Alpha.Data.ByteString as X
-import Alpha.Data.Tabular as X
-import Alpha.Data.NatK as X
 import Alpha.Data.Vector as X
 import Alpha.Data.Permutation as X
 import Alpha.Data.SymmetricGroup as X

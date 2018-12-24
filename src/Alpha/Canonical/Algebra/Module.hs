@@ -22,10 +22,12 @@ import Alpha.Canonical.Algebra.Multiplicative
 
 -- | A left module over a ring r
 -- See Y2018MTLA,
-class (Ring r, AbelianGroup m, LeftAction r m) 
-    => LeftModule r m where
+class (Ring r, AbelianGroup m, LeftAction r m) => LeftModule r m where
     
 -- | A right module over a ring r
-class (Ring r, AbelianGroup m, RightAction m r) 
-    => RightModule m r where
+class (Ring r, AbelianGroup m, RightAction m r) => RightModule m r where
     
+-- | A generating set G for a module M is the intersection of all 
+-- submodules of M that contain G that is itself a submodule of M
+-- Encoding this properly is an open question!
+class LeftModule r m => LeftGenerator r m where

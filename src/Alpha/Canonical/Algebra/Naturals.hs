@@ -8,7 +8,7 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE NoStarIsType #-}
 
-module Alpha.Data.NatK
+module Alpha.Canonical.Algebra.Naturals
 (
     NatK(..), NatKPair(..), NatKSpan(..),     
     KnownNatPair(..), KnownNatTriple(..), KnownNatQuad(..), 
@@ -19,8 +19,14 @@ module Alpha.Data.NatK
 ) where
 
 import Alpha.Base
-import Alpha.Canonical
-    
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Hetero
+import Alpha.Canonical.Algebra.Successive
+import Alpha.Canonical.Algebra.Partition
+import Alpha.Canonical.Algebra.Exponential
+import Alpha.Canonical.Algebra.Field
+
+
 -- Unifies type naturals and value-level integers
 newtype NatK k = NatK Integer    
     deriving (Eq,Ord)
@@ -42,8 +48,8 @@ type KnownNatTriple m n p = (KnownNatPair m n, KnownNat p)
 -- | Alias for a 4-tuple of 'KnownNat' constraints
 type KnownNatQuad m n p q = (KnownNatPair m n, KnownNatPair p q)
 
-type instance Element (NatKPair m n) = Integer
-type instance Element (NatKSpan m n) = Integer
+type instance Individual (NatKPair m n) = Integer
+type instance Individual (NatKSpan m n) = Integer
 type instance Summed (NatK m) (NatK n) = NatK(m + n)
 type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
 type instance Subtracted (NatK m) (NatK n) = NatK(m - n)

@@ -18,7 +18,6 @@ module Alpha.Canonical.Relations.Related
     Setoid(..),    
     PartialOrd(..),
     PartialOrder(..),
-    Convertible(..),
     Point(..), Pointed(..),
     Related, relate,
     Pairs(..),
@@ -40,6 +39,7 @@ type family Supremum a
 type family Extremum a
 
 type instance Extremum (Interval a) = a
+type instance Individual (Interval a) = a
 
 -- | Synonym for default comparison predicate
 type Comparer a = a -> a -> Bool
@@ -111,12 +111,12 @@ class (PartialOrd a, Relation a) =>  PartialOrder a where
 -- i.e., a is minimal in A if a <= x for all x in A
 class Minimal a where
     -- A minimal element 
-    minimum::a -> Element a
+    minimum::a -> Individual a
 
 -- | Characterizes a type for which a minimal element can be identified
 -- i.e., a is maximal in A if a >= x for all x in A
 class Maximal a where
-    maximum::a -> Element a
+    maximum::a -> Individual a
     
 -- / Characterizes types for which a greatest lower bound can
 -- be identified, with bounded intervals being the canonical
@@ -124,7 +124,7 @@ class Maximal a where
 -- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
 class Infimal a where
     -- / The greatest lower bound
-    infimum::a -> Extremum a
+    infimum::a -> Individual a
     
 -- / Characterizes types for which a least upper bound can
 -- be identified, with bounded intervals being the canonical
@@ -134,10 +134,6 @@ class Supremal a where
     -- / The least upper bound
     supremum::a -> Extremum a
             
--- | Codifies a (directed) conversion relationship between an input value and output value
-class Convertible a b where
-    -- | Requires that an 'a' value be converted to a 'b' value
-    convert::a -> b    
 
 class (Ord a) => LTEQ a where
     (<=)::Comparer a

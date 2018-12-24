@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE FlexibleInstances #-}
 
-module Alpha.Canonical.Text.Utilities
+module Alpha.Canonical.Common.TextUtil
 (    
     splat, isPrefix, isSuffix,
     leftOfFirst, rightOfLast,ltrim,
@@ -17,14 +17,12 @@ module Alpha.Canonical.Text.Utilities
     
 )
  where
-
-import Alpha.Canonical.Common
-import Alpha.Canonical.Text.Asci
-import Alpha.Canonical.Text.Symbols
+import Alpha.Base
+import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Asci
+import Alpha.Canonical.Common.Symbols
 import Data.Aeson (FromJSON, ToJSON, decode, encode)
 import Data.Aeson.Encode.Pretty
-
-import qualified Alpha.Canonical.Text.Asci as Asci
 
 import qualified Data.Text as Text
 import qualified Data.List as List

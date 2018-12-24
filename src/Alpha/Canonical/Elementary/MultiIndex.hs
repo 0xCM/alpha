@@ -23,10 +23,12 @@ import Alpha.Canonical.Common
 import Alpha.Canonical.Elementary.Elements
 import Alpha.Canonical.Elementary.Tuples
 import Alpha.Canonical.Elementary.Indexing
+import Alpha.Canonical.Elementary.Sets
 
 import qualified Data.List as List
 
-type instance Element (IndexRange a) = a
+
+type instance Individual (IndexRange a) = a
 
 -- | Defines the lower and upper bounds for a sequence of 'IndexedTerm' values
 newtype IndexRange i = IndexRange (i,i)
@@ -41,7 +43,7 @@ type family MultiIndex (i::Nat) a = r | r -> i a where
 
 -- | Characterizes a multi-level index    
 class  (KnownNat i) => MultiIndexed i a where
-    -- | Constructs a multilevel index
+    -- | sets a multilevel index
     multix::UniTuple i (UniTuple 2 a) -> MultiIndex i a
     levels::MultiIndex i a -> [IndexRange a]
         
@@ -50,11 +52,6 @@ newtype IndexedTerm i t = IndexedTerm (i -> t)
     deriving (Generic)
 instance Newtype (IndexedTerm i t)
 
-
-instance (Eq a) => Structure (IndexRange a) where
-    type Individual (IndexRange a) = (Element (IndexRange a))
-    
-        
 term::(Integral i) => (i -> t) -> IndexedTerm i t
 term = IndexedTerm
 
@@ -64,31 +61,33 @@ ixrange = IndexRange
 instance (OrdEnum a, Show a) => Show (IndexRange a) where
     show (IndexRange (a1,a2)) = "[" <> (show a1) <> "..." <> (show a2) <> "]"
 
-instance (OrdEnum a) => Discrete (IndexRange a) where    
-    members (IndexRange (i,j)) = [i..j]
+instance (Eq a, OrdEnum a) => Set (IndexRange a)
+
+instance (OrdEnum a) => SetBuilder (IndexRange a) a where    
+    set (IndexRange (i,j)) = [i..j]
 
 instance (OrdEnum a) => MultiIndexed 1 a where    
     multix (UniTuple1 r) =  UniTuple1 $ ixrange r
-    levels mix = members mix
+    levels mix = set mix
         
 instance (OrdEnum a) => MultiIndexed 2 a where    
     multix (r1, r2) = (ixrange r1 , ixrange r2)
-    levels mix = members mix
+    levels mix = set mix
                                    
 instance (OrdEnum a) => MultiIndexed 3 a where    
     multix (r1, r2, r3) = (ixrange r1, ixrange r2, ixrange r3)        
-    levels mix = members mix
+    levels mix = set mix
 
 instance (OrdEnum a) => MultiIndexed 4 a where    
     multix (r1, r2, r3,r4) = (ixrange r1, ixrange r2, ixrange r3, ixrange r4)
-    levels mix = members mix
+    levels mix = set mix
 
 instance (OrdEnum a) => MultiIndexed 5 a where    
     multix (r1, r2, r3, r4, r5) = (ixrange r1, ixrange r2, ixrange r3, ixrange r4, ixrange r5)
-    levels mix = members mix
+    levels mix = set mix
 
 nest::(OrdEnum a) => IndexRange a -> IndexRange a -> [(a, a)]
 nest r1 r2 = do
-    a <- members r1
-    b <- members r2
+    a <- set r1
+    b <- set r2
     return $ (a,b)

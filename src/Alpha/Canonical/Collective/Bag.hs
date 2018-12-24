@@ -13,9 +13,8 @@ import Alpha.Canonical.Collective.Container
 import qualified Data.MultiSet as Bag
 import qualified Data.List as List
 
-type instance Element (Bag a) = a
-instance Eq a => Structure (Bag a) where
-    type Individual (Bag a) = (Element (Bag a))
+type instance Individual (Bag a) = a
+
 
 
 -- Constructs a bag from a list    
@@ -31,7 +30,7 @@ instance Vacant (Bag a) where
     empty = Bag.empty
     null = Bag.null
 
-instance Counted (Bag e) where
+instance Finite (Bag e) where
     count = fromIntegral . Bag.size
     
 instance (Ord a) => Setwise (Bag a) where

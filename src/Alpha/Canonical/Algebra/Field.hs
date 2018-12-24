@@ -1,5 +1,6 @@
 module Alpha.Canonical.Algebra.Field
 (
+    module X,
     FieldAdd(..),
     FieldMul(..),
     FieldSub(..),
@@ -9,13 +10,8 @@ module Alpha.Canonical.Algebra.Field
 )
 where
 import Alpha.Canonical.Relations    
-import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Subtractive
-import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Divisive
-import Alpha.Canonical.Algebra.Negatable
-import Alpha.Canonical.Algebra.Reciprocative
-import Alpha.Canonical.Algebra.Distributive
+import Alpha.Canonical.Algebra.Ring as X
+import Alpha.Canonical.Algebra.IntegralDomain as X
 
 -- | Specifies field addition constraint
 type FieldAdd a = (Additive a, Nullary a)
@@ -32,6 +28,10 @@ type FieldDiv a = (Divisive a, Reciprocative a)
 -- | Specifies a field predicated on conforming division, multiplication, subtraction
 -- and division operations
 class (FieldAdd a, FieldSub a, FieldMul a, FieldDiv a, Distributive a) => Field a where
+
+-- class (Field a, Finite a, Discrete s a) => FiniteField s a where
+--      order::(Integral n) => a -> n
+--      order = length . members 
 
 -- The rationals
 instance (Integral a) => Field (Ratio a) where 

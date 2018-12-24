@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Alpha.Canonical.Algebra.Euclidean
+module Alpha.Canonical.Algebra.En
 (
     En(..),
 )
@@ -18,7 +18,8 @@ import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Module
 import Alpha.Canonical.Algebra.Group
-    -- | Represents Euclidean n-space
+
+-- | Represents Euclidean space for some n >= 1
 data family En (n::Nat) k 
 data instance En 1 k = E1 (UniTuple 1 k)
 data instance En 2 k = E2 (UniTuple 2 k) 
@@ -70,7 +71,4 @@ kdelta::forall i j k. (KnownNat i, Integral j, Integral k) => j -> k
 kdelta j = ifelse (i == j) 1 0 where i = natg @i
     
 -- | Euclidean n-space        
-instance (v ~ En n k, KnownNat n, AbelianGroup v,  Ring k, LeftAction k v) => LeftModule k v
-
-
-                        
+instance (v ~ En n k, KnownNat n, AbelianGroup v,  Ring k, LeftAction k v) => LeftModule k v                

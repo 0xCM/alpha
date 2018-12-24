@@ -31,11 +31,12 @@ import qualified Data.ByteString.Lazy as LZ
 import qualified Data.Ix as Ix
 import qualified Data.List as L
 
-
 type instance Concatenated EG.ByteString EG.ByteString = EG.ByteString
 type instance Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
-type instance Element LZ.ByteString = Word8
-type instance Element EG.ByteString = Word8
+
+
+type instance Individual LZ.ByteString = Word8
+type instance Individual EG.ByteString = Word8
 
 type instance IndexedElement Int LZ.ByteString = Word8
 type instance IndexedElement Int EG.ByteString = Word8
@@ -68,6 +69,13 @@ segments width total = intervals
         intervals = cutpoints |> fmap (\c -> (c - width, c - 1))
         segs = intervals |> fmap (\x -> segment x source)
 
+
+instance Length EG.ByteString where
+    length = convert . EG.length 
+
+instance Length LZ.ByteString where
+    length = convert . LZ.length 
+            
 instance Formattable EG.ByteString where
     format x = (bytes 0 (EG.length x) x) |> format
 
@@ -88,32 +96,19 @@ instance IsList LZ.ByteString where
     fromList = LZ.pack
     
 instance Container EG.ByteString
-
 instance Container LZ.ByteString
 
 instance Packable [Word8] EG.ByteString where
     pack = EG.pack
     unpack = EG.unpack 
-        
-instance Concatenable EG.ByteString EG.ByteString where    
-    concat = EG.append
-
-instance Length EG.ByteString where
-    length = convert . EG.length 
-
-instance Indexed Int EG.ByteString where 
-    at = EG.index
-
+            
 instance Packable [Word8] LZ.ByteString where
     pack = LZ.pack
     unpack = LZ.unpack 
-    
-instance Concatenable LZ.ByteString LZ.ByteString where
-    concat = LZ.append
-    
-instance Length LZ.ByteString where
-    length = convert . LZ.length 
 
+instance Indexed Int EG.ByteString where 
+    at = EG.index
+    
 instance Indexed Int LZ.ByteString where    
     at x n = LZ.index x (int64 n)
 
@@ -122,6 +117,12 @@ instance Convertible EG.ByteString [Word8] where
 
 instance Chunkable EG.ByteString where
     chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
+
+instance Concatenable EG.ByteString EG.ByteString where    
+    concat = EG.append
+        
+instance Concatenable LZ.ByteString LZ.ByteString where
+    concat = LZ.append
         
 -- | Converts json to formatted text    
 json :: ToJSON a => a -> Text

@@ -24,22 +24,17 @@ newtype Negation a = Negation (O1 a)
 instance Newtype (Negation a)
 
 -- | Produces the canonical negation operator
-negation::(Negatable a) => Negation a
+negation::Negatable a => Negation a
 negation = Negation negate
 
-instance (Negatable a) => Operator (Negation a) where
-    type Operand (Negation a) = a    
-    operator = negation
 
-instance (Negatable a) => UnaryOperator (Negation a) where
-    ueval (Negation f) a = f a
-    {-# INLINE ueval #-}
-
-instance (Negatable a) => Inverter (Negation a) where
-    invert x = f x  where
-        (Negation f) = operator
-    {-# INLINE invert #-}
+instance Negatable a => UnaryOperator (Negation a) a where
+    o1 = unwrap
     
+instance Negatable a => Inverter (Negation a) a where
+    inverter = o1
+
+
 -- Negatable 
 -------------------------------------------------------------------------------
 instance Negatable Integer where 

@@ -18,7 +18,7 @@ type MonoidalAlt f a = Monoid.Alt f a
 type MonoidalSum a = Monoid.Sum a
 type MonoidalProduct a = Monoid.Product a
 -- | A a multiplicative struture with an identity element    
-class (Unital a, Multiplicative a) => Monoidal a where
+class (Unital a, Multiplicative a, Eq a) => Monoidal a where
 
 -- Lifts the input into the Alt monoid
 -- Example:

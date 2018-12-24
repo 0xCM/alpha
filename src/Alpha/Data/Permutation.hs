@@ -7,9 +7,12 @@ module Alpha.Data.Permutation
 
 )
 where
-import Alpha.Canonical
-import Alpha.Data.NatK
-import Alpha.Canonical.Text.Asci
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Collective
+import Alpha.Canonical.Algebra.Multiplicative
+import Alpha.Canonical.Algebra.Partition
+import Alpha.Canonical.Common.Asci
+import Alpha.Canonical.Algebra.Naturals
 
 import qualified Data.Text as Text
 import Prelude(snd)
@@ -29,11 +32,12 @@ instance Newtype(Permutation n)
 
 type instance Dom (Permutation n) = Int
 type instance Cod (Permutation n) = Int
-type instance Element (Permutation n) = Int
 type instance IndexedElement Int (Permutation n) = Int
+type instance Individual (Permutation n) = Permutation n
 
-instance Structure (Permutation n) where
-    type Individual (Permutation n) = Element (Permutation n)
+
+mappings::forall n. KnownNat n => Permutation n -> [(Int,Int)] 
+mappings (Permutation p) = toList p
 
 -- | Constructs a permutation of lenth n from an explicit list of correspondences
 perm::forall n. KnownNat n => [(Int,Int)] -> Permutation n
@@ -43,7 +47,7 @@ image::forall n. KnownNat n => Permutation n -> Int -> Int
 image = (!)
 
 preimage::forall n. KnownNat n =>Permutation n -> Int -> Int
-preimage (Permutation pm) i =  members pm |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
+preimage (Permutation pm) i =  set pm |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
 
 -- | Effects a transposition
 switch::forall n. KnownNat n => (Int,Int) -> Permutation n -> Permutation n
@@ -54,14 +58,14 @@ switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> perm
                       else if r == j then (r, p ! i)   
                       else (r, s)
 
-instance Formattable (Permutation n) where
-    format (Permutation perm) = rows where
-        row1 = perm |> members |> fmap (\(x,y) -> format x) |> weave Space |> enclose "|" "|"
-        row2 = perm |> members |> fmap (\(x,y) -> format y) |> weave Space |> enclose "|" "|"
+instance KnownNat n => Formattable (Permutation n) where
+    format perm = rows where
+        row1 = perm |> mappings |> fmap (\(x,y) -> format x) |> weave Space |> enclose "|" "|"
+        row2 = perm |> mappings |> fmap (\(x,y) -> format y) |> weave Space |> enclose "|" "|"
         sep = Text.replicate 20 "-"
         rows = sep <> EOL <> row1 <> EOL <> row2
 
-instance Show (Permutation n) where
+instance KnownNat n => Show (Permutation n) where
     show = string . format
 
 instance forall n a.KnownNat n =>  Indexed Int (Permutation n) where
@@ -71,12 +75,13 @@ newtype PermuMul n = PermuMul (O2 (Permutation n))
     deriving(Generic)
 instance Newtype (PermuMul n)
 
-instance KnownNat n => Operator (PermuMul n) where
-    type Operand (PermuMul n) = Permutation n
-    operator = PermuMul permumul
+instance forall n. KnownNat n => Operator 2 (PermuMul n) (Permutation n)  where    
+    operator = operation $ PermuMul permumul
 
-instance KnownNat n => BinaryOperator (PermuMul n) where
-    evaluate (PermuMul mul) (f,g) = mul f g
+    evaluate (f,g) = permumul f g 
+    {-# INLINE evaluate #-}
+
+    
 
 permumul::KnownNat n => O2 (Permutation n)
 permumul g (Permutation f) = f |> Map.toList 
