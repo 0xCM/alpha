@@ -22,11 +22,6 @@ instance Newtype (Reciprocation a)
 reciprocation::(Reciprocative a) => Reciprocation a
 reciprocation = Reciprocation reciprocal
 
-
-instance Reciprocative a => UnaryOperator (Reciprocation a) a where
-    o1 = unwrap
-instance Reciprocative a => Inverter (Reciprocation a) a where
-    inverter = o1
         
 -- Reciprocative 
 -------------------------------------------------------------------------------

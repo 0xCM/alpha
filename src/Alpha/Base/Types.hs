@@ -11,7 +11,7 @@ module Alpha.Base.Types
     Data(..),Typeable(..), 
     Generic(..),
     Generic1(..),    
-    Type,
+    Type,TypeRep,DataType,
     Default(..),
 
     Proxy(..), proxy, 
@@ -20,6 +20,8 @@ module Alpha.Base.Types
     SomeNat, Nat, 
     SomeSymbol, someSymbolVal,
     datatype,typeof,
+    valtype,datavaltype,
+    typeOf, 
     
     type (+), type (-), type (*), Mod(..), type (%), Div(..), type (/), type (^),        
 )
@@ -53,6 +55,11 @@ datatype =   dataTypeOf (def @a)
 typeof:: forall a. (Typeable a, Default a) => TypeRep
 typeof = typeOf (def @a)
 
+valtype::Typeable a => a -> TypeRep
+valtype = typeOf 
+
+datavaltype::Data a => a -> DataType
+datavaltype = dataTypeOf
 
 -- Modulus infix operator synonm
 type (%) m n = Mod m n

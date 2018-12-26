@@ -5,6 +5,7 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Multiplicative
 (
     Multiplicative(..),
@@ -13,6 +14,7 @@ module Alpha.Canonical.Algebra.Multiplicative
 
 ) where
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Collective.ItemSet
 
 --type family Factored a = r | r -> a
 
@@ -42,14 +44,18 @@ instance Newtype (Multiplication a)
 multiplication::Multiplicative a => Multiplication a
 multiplication = Multiplication mul
 
-instance Multiplicative a => Commutative (Multiplication a) a
-instance Multiplicative a => Associative (Multiplication a) a
-instance (Multiplicative a, Unital a) => Identity (Multiplication a) a where
-     identity = one
+instance Commutative (Multiplication a) 
+instance Associative (Multiplication a) 
 instance BinaryOperator (Multiplication a) a where
     o2  = unwrap
 
         
+instance (Ord a, Unital a) =>  Unital (ItemSet a) where
+    one = [one]
+    
+instance (Ord a, Multiplicative a) =>  Multiplicative (ItemSet a) where
+    mul x y = intersect x y
+    
 -- Unital
 -------------------------------------------------------------------------------
 instance Unital Natural where 

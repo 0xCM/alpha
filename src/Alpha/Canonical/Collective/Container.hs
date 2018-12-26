@@ -73,12 +73,15 @@ class (Container c) => Setwise c where
 -- | Classifies a structure that can be partitioned into two sets:
 -- A singleton set containing the "first" element and another set containing
 -- the remainder
-class Headed a where
+class Headed (a::Type) where
+    type Tailed a
+    type Tailed a = a
+
     -- | Retrives the first item in the sequence
     head::a -> Individual a
 
-        -- | Skips the first item of the sequence and returns the remainder
-    tail::a -> a
+    -- | Skips the first item of the sequence and returns the remainder
+    tail::a -> Tailed a
 
 -- / Characterizes a type for which a canonical and unique vacant/void/empty
 -- value exists
@@ -106,9 +109,6 @@ class Mappable c a b where
     
 -- | The elements of a tree are projected onto a list
 type instance Appended (Tree a) = [a]
-
-
-instance Eq a => Set (Tree a)
 
 
 instance Appendable (Tree a) where

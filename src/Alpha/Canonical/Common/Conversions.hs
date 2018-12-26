@@ -17,6 +17,7 @@ module Alpha.Canonical.Common.Conversions
     FromText(..),
     ToString(..),
     ToLines(..),
+    Vectored(..),
 
     int8, int16, int32, int64,
     word8, word16, word32, word64,
@@ -28,6 +29,9 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Ratio as DR
+
+class Vectored s a where
+    vector::s -> Vector a
 
 -- | Characterizes a value that can be converted to a list of 'Text' values
 class ToLines a where
@@ -48,7 +52,6 @@ class FromText a where
 class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
     convert::a -> b    
-
 
 -- | Characterizies a type whose values can be converted to/from 'Double' values    
 type Doubly a = (ToDouble a, FromDouble a)

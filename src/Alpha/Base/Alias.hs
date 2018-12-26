@@ -1,17 +1,16 @@
 module Alpha.Base.Alias
 (
+    FiniteInt(..),
+    Bag(..),
+    LazyMap(..),
+    BaseSet(..),
+
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
     and',or',not', lt', gt',quotRem', divMod', gcd',lcm', quot'
 
 ) where
---import Alpha.Base
-import GHC.Num(Num, (+),(-),(*),negate,abs)
-import GHC.Real(div,(/),(^),(^^), mod, rem, quot, quotRem, divMod, lcm, gcd, Fractional,Integral, numerator, denominator, Real, realToFrac,toRational)
-import GHC.Float(Floating,(**))
-import GHC.Base(flip)
 import System.IO(IO,print)
-import GHC.Show(Show)
 import Data.Ix(Ix(..))
 import Data.Ord
 import Data.Maybe(fromJust)
@@ -21,7 +20,23 @@ import Data.Bool(Bool(..), (&&), (||), not)
 import Data.Set(Set)
 import Data.Bits(Bits(..), xor,bit)
 import Data.Int(Int)
+import GHC.Num(Num, (+),(-),(*),negate,abs)
+import GHC.Real(div,(/),(^),(^^), mod, rem, quot, quotRem, divMod, lcm, gcd, Fractional,Integral, numerator, denominator, Real, realToFrac,toRational)
+import GHC.Float(Floating,(**))
+import GHC.Base(flip)
+import GHC.Enum(Bounded(..))
+import GHC.Show(Show)
+import Data.Typeable(typeOf)
+
 import qualified Data.Set as Set
+import qualified Data.Map.Lazy as LM
+import qualified Data.MultiSet as MS
+
+type FiniteInt a = (Integral a, Bounded a)
+type Bag a = MS.MultiSet a
+type LazyMap k v = LM.Map k v
+type BaseSet a = Set a
+
 
 sub'::(Num a) => a -> a -> a
 sub' = (-)
@@ -40,7 +55,6 @@ lt' = (<)
 
 gt'::(Ord a) => a -> a -> Bool
 gt' = (>)
-
 
 negate'::(Num a) => a -> a
 negate' = negate

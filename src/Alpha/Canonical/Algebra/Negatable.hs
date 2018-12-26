@@ -28,13 +28,6 @@ negation::Negatable a => Negation a
 negation = Negation negate
 
 
-instance Negatable a => UnaryOperator (Negation a) a where
-    o1 = unwrap
-    
-instance Negatable a => Inverter (Negation a) a where
-    inverter = o1
-
-
 -- Negatable 
 -------------------------------------------------------------------------------
 instance Negatable Integer where 
@@ -96,6 +89,9 @@ type Negatable2 a1 a2 = (Negatable a1, Negatable a2)
 type Negatable3 a1 a2 a3 = (Negatable2 a1 a2, Negatable a3)
 type Negatable4 a1 a2 a3 a4 = (Negatable3 a1 a2 a3, Negatable a4)
 type Negatable5 a1 a2 a3 a4 a5 = (Negatable4 a1 a2 a3 a4, Negatable a5)
+
+instance Negatable a => Negatable (UniTuple1 a) where
+    negate (UniTuple1 x) = UniTuple1 (negate x)
 
 instance Negatable2 a1 a2 => Negatable (Tuple2 a1 a2) where    
     negate (a1,a2) = (negate a1, negate a2)

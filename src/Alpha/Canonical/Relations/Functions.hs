@@ -151,6 +151,8 @@ class Compositional g f where
 class Functional f where    
     func::Function f -> ((Dom f) -> (Cod f))
 
+    
+
 instance Functional (F0 a1 ) where
     func a = id
     

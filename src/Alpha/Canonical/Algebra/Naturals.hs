@@ -18,8 +18,8 @@ module Alpha.Canonical.Algebra.Naturals
     natKadd, natKsub, natKmod, natKdiv, natKmul, natKinc, natKdec
 ) where
 
-import Alpha.Base
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Common
 import Alpha.Canonical.Algebra.Hetero
 import Alpha.Canonical.Algebra.Successive
 import Alpha.Canonical.Algebra.Partition

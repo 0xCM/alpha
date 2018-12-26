@@ -35,7 +35,7 @@ subtraction = Subtraction sub
 instance Subtractive a => BinaryOperator (Subtraction a) a where
     o2 = unwrap
 
-instance (Subtractive a) => Associative (Subtraction a) a
+instance Associative (Subtraction a)
 
 
 -- Subtractive
@@ -100,6 +100,9 @@ type Subtractive2 a1 a2 = (Subtractive a1, Subtractive a2)
 type Subtractive3 a1 a2 a3 = (Subtractive2 a1 a2, Subtractive a3)
 type Subtractive4 a1 a2 a3 a4 = (Subtractive3 a1 a2 a3, Subtractive a4)
 type Subtractive5 a1 a2 a3 a4 a5 = (Subtractive4 a1 a2 a3 a4, Subtractive a5)
+
+instance Subtractive a => Subtractive (UniTuple1 a) where
+    sub (UniTuple1 x) (UniTuple1 y) = UniTuple1 (x - y)
 
 instance Subtractive2 a1 a2 => Subtractive (Tuple2 a1 a2) where
     sub (x1,x2) (y1,y2) = (x1 - y1, x2 - y2)

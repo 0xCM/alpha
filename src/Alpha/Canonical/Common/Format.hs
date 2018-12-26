@@ -51,7 +51,6 @@ class Packable a b where
     unpack::b -> a    
 
                 
-
     
 enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
 enclose left right content = Text.concat [format left, format content, format right]

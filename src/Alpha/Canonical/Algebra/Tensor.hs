@@ -32,8 +32,9 @@ newtype IndexComponent s n = IndexComponent Variance
 newtype ComponentSpec = ComponentSpec (Variance, Text, Word)
     deriving (Eq, Ord)
 
+
 -- | Defines a collection of index complexes as a unit that consists
--- of an ordered pair of contravariant and covaariant components    
+-- of an ordered pair of contravariant and covariant components    
 newtype IndexComplex = IndexComplex ([ComponentSpec],[ComponentSpec])
     deriving (Eq, Ord)
 

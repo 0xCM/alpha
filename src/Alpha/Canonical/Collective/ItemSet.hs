@@ -8,11 +8,13 @@
 
 module Alpha.Canonical.Collective.ItemSet
 (
+    module X,
     ItemSet(..), IsSet(..)
 ) where
-import Alpha.Canonical.Algebra
-import Alpha.Canonical.Collective.Container
+--import Alpha.Canonical.Algebra
+import Alpha.Canonical.Relations
 import Alpha.Canonical.Common.Asci
+import Alpha.Canonical.Collective.Container as X
 
 import qualified Data.List as List
 import qualified Data.Sequence as Sequence
@@ -21,27 +23,24 @@ import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.MultiSet as Bag
 
-
 type instance Individual (ItemSet a) = a
 type instance Appended (ItemSet (ItemSet a)) = ItemSet a        
-type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
-
 
 newtype ItemSet a = ItemSet (Set.Set a)
     deriving(Eq,Generic,Ord,Monoid,Semigroup,Foldable,Data,NFData,JoinSemiLattice,MeetSemiLattice,Lattice)
 instance Newtype (ItemSet a)
 
-
 class (Ord a) => IsSet a where
     iset::a -> ItemSet (Item a)
         
+
+unions::(Ord a) => [ItemSet a] -> ItemSet a
+unions sets = (unwrap <$> sets) |> Set.unions |> ItemSet
+
 instance (Ord a)  => IsSet [a] where    
     -- Constructs an 'ItemSet' from a list
     iset::[a] -> ItemSet a
     iset = fromList
-
-unions::(Ord a) => [ItemSet a] -> ItemSet a
-unions sets = (unwrap <$> sets) |> Set.unions |> ItemSet
 
 instance (Ord a) => IsList (ItemSet a) where
     type Item (ItemSet a) = a
@@ -54,7 +53,6 @@ instance (Ord a) => Container (ItemSet a) where
 
 instance (Ord a) => Appendable (ItemSet (ItemSet a)) where
     append = unions . toList
-
 
 instance (Ord a) => Vacant (ItemSet a) where
     empty = ItemSet Set.empty
@@ -79,13 +77,10 @@ instance (Formattable a, Ord a) => Formattable (ItemSet a) where
 instance (Formattable a, Ord a) => Show (ItemSet a) where
     show = string . format
 
-instance Finite (ItemSet a) where
-    count = fromIntegral . Set.size . unwrap
 
 instance (Ord a) => Filterable (ItemSet a) where
     filter p s = ItemSet $  Set.filter p  (unwrap s)
     
--- Algebraic aspects    
 instance Pairing (ItemSet a) (ItemSet b) (DisjointUnion (ItemSet a) (ItemSet b)) where
     pair a b = DisjointUnion (a, b)
     first (DisjointUnion (a,b)) = a
@@ -96,17 +91,4 @@ instance Universal (ItemSet a) where
         
 instance Existential (ItemSet a) where
     any pred s = unwrap s |> Set.toList |> List.any pred
-
-instance (Ord a, Unital a) =>  Unital (ItemSet a) where
-    one = [one]
-    
-instance (Ord a, Multiplicative a) =>  Multiplicative (ItemSet a) where
-    mul x y = intersect x y
-    
-instance (Ord a) =>  Additive (ItemSet a) where
-    add x y = union x y
-    {-# INLINE add #-}
-
-instance (Ord a) => Nullary (ItemSet a) where
-    zero = []
 

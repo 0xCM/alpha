@@ -30,8 +30,6 @@ instance Vacant (Bag a) where
     empty = Bag.empty
     null = Bag.null
 
-instance Finite (Bag e) where
-    count = fromIntegral . Bag.size
     
 instance (Ord a) => Setwise (Bag a) where
     intersect = Bag.intersection

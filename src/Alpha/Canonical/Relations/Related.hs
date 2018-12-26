@@ -99,7 +99,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
 
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
-class (Set a, Equivalence a) => Setoid a where
+class (Equivalence a) => Setoid a where
 
 class (PartialOrd a, Relation a) =>  PartialOrder a where
 

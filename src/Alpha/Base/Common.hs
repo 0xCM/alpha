@@ -10,6 +10,7 @@
 module Alpha.Base.Common
 (
     Bits,
+    Constraint(..),
     FiniteBits(..),
     ByteString,    
     Hashable(..),
@@ -37,6 +38,7 @@ import GHC.Natural(Natural(..))
 import GHC.Base(($),undefined, id, (.),seq,when)
 import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
 import GHC.Real(Integral(..))
+import GHC.Exts(Constraint(..))
 import Foreign.Storable(Storable,poke, peek, sizeOf, alignment)
 import Foreign.Ptr (Ptr, castPtr)
 import Prelude(error,fst,snd)

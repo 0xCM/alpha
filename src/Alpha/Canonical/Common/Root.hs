@@ -23,14 +23,15 @@ module Alpha.Canonical.Common.Root
     Classifiable(..),
     Specifiable(..),
     
-    firstValue, 
-    lastValue,
+    -- firstValue, 
+    -- lastValue,
     enumValues,
     typeSymbol,
     typeSymbols,
     facetVal,
     mapi,
     ifelse, 
+    clone,
 
     (<|),(|>), 
 
@@ -125,7 +126,7 @@ facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    
     
 
--- | Retrieves the first value of an enum
+
 firstValue::(Enum e) => e
 firstValue = toEnum 0
 
@@ -169,3 +170,5 @@ infixl 0 |>
 f <| x = f x
 infixr 0 <|
 
+clone::(Integral n) => n -> a -> [a]
+clone n a = List.replicate (fromIntegral n) a

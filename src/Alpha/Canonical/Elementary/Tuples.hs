@@ -19,9 +19,9 @@ module Alpha.Canonical.Elementary.Tuples
     
 ) where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Elements
 import Alpha.Canonical.Elementary.Indexing
 import Alpha.Canonical.Elementary.Sets
+import Alpha.Canonical.Elementary.Structure
 
 newtype Tuple1 a1 = Tuple1 a1
     deriving (Eq,Ord)
@@ -191,6 +191,8 @@ instance Formattable a => Formattable (Tuple1 a) where
 
 instance Formattable a => Formattable (UniTuple1 a) where
     format (UniTuple1 a) = format a
+instance Formattable a => Show (UniTuple1 a) where    
+    show = string . format
         
 instance Formattable a => Show (Tuple1 a) where    
     show = string . format

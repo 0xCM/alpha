@@ -7,9 +7,9 @@
 module Alpha.Canonical.Collective.List
 (
     Reduced(..),
+    Partitioner(..),
     exclude,
-    Partitioner(..)
-
+    nonempty
 )
 where
 
@@ -18,19 +18,19 @@ import Alpha.Canonical.Collective.Container
 
 import qualified Data.List as List
 import qualified Data.Set as Set
+import qualified Data.List.NonEmpty as NonEmpty
 
 type family Reduced a
 type instance Reduced [a] = a
+
 type instance Individual [a] = a
+type instance Individual (NonEmpty a) = a
 
 class Partitioner a where
     partition::Int -> [a] -> [[a]]
     partition width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
 
 instance Partitioner a    
-
-
-    
 
 class Reductive a where
     -- The reduction operator // takes a binary operator ⊕ on its left and a vector
@@ -50,6 +50,10 @@ class Reductive a where
     (\\)::O2 (Reduced a) -> a -> a
     (\\) = scan
     infixl 6 \\
+
+-- | Creates a nonempty collection
+nonempty::a -> [a] -> NonEmpty a
+nonempty = (:|)
 
 -- | Identical to List.inits except that the empty list is excluded from the result
 inits'::[a] -> [[a]]
@@ -123,3 +127,24 @@ instance Zippable [a] [b] [c] where
     type Zipper [a] [b] [c] = a -> b -> c
 
     zip = List.zipWith
+
+instance NonEmptySet (NonEmpty a) where
+    leading =  NonEmpty.head  
+
+instance Container (NonEmpty a)
+
+instance Mappable (NonEmpty a) a b where
+    type Mapped (NonEmpty a) a b = NonEmpty b
+    map = NonEmpty.map    
+    
+instance Weavable a (NonEmpty a) where
+    weave = NonEmpty.intersperse        
+
+instance Headed (NonEmpty a) where        
+    type Tailed (NonEmpty a) = [a]
+    head = NonEmpty.head
+    tail = NonEmpty.tail
+        
+instance Formattable a => Formattable (NonEmpty a) where
+    format ne = format (toList ne)
+

@@ -25,6 +25,7 @@ import Alpha.Canonical.Algebra.IntegralDomain as X
 import Alpha.Canonical.Algebra.Measurable as X
 import Alpha.Canonical.Algebra.Modular as X
 import Alpha.Canonical.Algebra.Module as X
+import Alpha.Canonical.Algebra.ModuleSets as X
 import Alpha.Canonical.Algebra.Multiplicative as X
 import Alpha.Canonical.Algebra.Monoidal as X
 import Alpha.Canonical.Algebra.Negatable as X
@@ -37,6 +38,7 @@ import Alpha.Canonical.Algebra.Reciprocative as X
 import Alpha.Canonical.Algebra.Series as X
 import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Successive as X
+import Alpha.Canonical.Algebra.Simplex as X
 import Alpha.Canonical.Algebra.Semiring as X
 import Alpha.Canonical.Algebra.Tensor as X
 import Alpha.Canonical.Algebra.VectorSpace as X

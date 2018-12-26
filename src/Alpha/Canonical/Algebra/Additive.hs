@@ -6,6 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Additive
 (
     Additive(..),
@@ -15,6 +16,8 @@ module Alpha.Canonical.Algebra.Additive
 
 ) where
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Common
+import Alpha.Canonical.Collective.ItemSet
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
@@ -50,6 +53,8 @@ instance Newtype (Addition a)
 -- | Represents a formal sum
 newtype Summation a = Summation [a]    
 
+type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
+
 -- | Produces the canonical addition operator
 -- addition::(Num a) => Addition a
 -- addition = Addition add'
@@ -60,17 +65,24 @@ addition = Addition add
 summation::[a] -> Summation a
 summation = Summation
 
-instance Additive a => Commutative (Addition a) a
-instance Additive a => Associative (Addition a) a
+instance Commutative (Addition a)
+instance Associative (Addition a)
 instance Additive a => BinaryOperator (Addition a) a where
     o2 = unwrap
-instance (Additive a, Nullary a) => Identity (Addition a) a where
-    identity = zero
 
 instance (Nullary a, Additive a) => Computable (Summation a) where
     type Computed (Summation a) = a
     compute (Summation items) = reduce zero (+) items
 
+    
+instance (Ord a) =>  Additive (ItemSet a) where
+    add x y = union x y
+    {-# INLINE add #-}
+
+instance (Ord a) => Nullary (ItemSet a) where
+    zero = []
+
+    
 -- Additive numbers
 -------------------------------------------------------------------------------
 instance Additive Natural where 
@@ -240,15 +252,20 @@ type Nullary2 a1 a2 = (Nullary a1, Nullary a2)
 type Nullary3 a1 a2 a3 = (Nullary2 a1 a2, Nullary a3)
 type Nullary4 a1 a2 a3 a4 = (Nullary3 a1 a2 a3, Nullary a4)
 type Nullary5 a1 a2 a3 a4 a5 = (Nullary4 a1 a2 a3 a4, Nullary a5)
+
+instance Nullary a=> Nullary (UniTuple1 a) where
+    zero = UniTuple1 (zero)
+instance Nullary a=> Nullary (Tuple1 a) where
+    zero = Tuple1 (zero)
     
-instance Nullary2 a1 a2 => Nullary (a1,a2) where
+instance Nullary2 a1 a2 => Nullary (Tuple2 a1 a2) where
     zero = (zero,zero)
 
-instance Nullary3 a1 a2 a3 => Nullary (a1,a2,a3) where
+instance Nullary3 a1 a2 a3 => Nullary (Tuple3 a1 a2 a3) where
     zero = (zero,zero,zero)
 
-instance Nullary4 a1 a2 a3 a4 => Nullary (a1,a2,a3,a4) where
+instance Nullary4 a1 a2 a3 a4 => Nullary (Tuple4 a1 a2 a3 a4) where
     zero = (zero,zero,zero,zero)
 
-instance Nullary5 a1 a2 a3 a4 a5 => Nullary (a1,a2,a3,a4,a5) where
+instance Nullary5 a1 a2 a3 a4 a5 => Nullary (Tuple5 a1 a2 a3 a4 a5) where
     zero = (zero,zero,zero,zero,zero)

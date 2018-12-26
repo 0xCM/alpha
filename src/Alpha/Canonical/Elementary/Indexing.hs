@@ -13,7 +13,8 @@ module Alpha.Canonical.Elementary.Indexing
 
 )
 where
-import Alpha.Base
+import Alpha.Canonical.Common
+
 
 
 import qualified Data.Map as Map

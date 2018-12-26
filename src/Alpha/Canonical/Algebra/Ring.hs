@@ -28,8 +28,6 @@ class Ring a => CommutativeRing a where
 -- See Y2018MTLA   
 class (Unital a, Ring a) => UnitalRing a where
 
-
-
 instance Ring Integer    
 instance Ring Int
 instance Ring Int8

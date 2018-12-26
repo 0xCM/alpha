@@ -60,25 +60,23 @@ class KnownNat n => Operator n f a where
     operator::Operation n f a
     evaluate::UniTuple n a -> a
         
--- | Characterizes a type that can produce a unary operator
-class UnaryOperator f a where
-    o1::f -> O1 a    
+class UnaryOperator a where
+    o1::O1 a    
 
--- | Characterizes a type that can produce a unary inverter
-class UnaryOperator f a => Inverter f a where
-    inverter::f -> O1 a
+class UnaryOperator a => Inverter a where
+    inverter::O1 a
+    inverter = o1
     
 -- | Characterizes a type that can produce a binary operator
 class BinaryOperator f a where
     o2::f -> O2 a
 
--- | Characterizes a type that can produce a commutative binary operator
-class BinaryOperator f a => Commutative f a where
+class Commutative a where
 
 -- | Characterizes a type that can produce an associative binary operator
-class BinaryOperator f a => Associative f a where
+class Associative a where
 
-class Associative f a => Identity f a where
+class Identity a where
     identity::a
     
 -- | Characterizes a structure with a binary operation

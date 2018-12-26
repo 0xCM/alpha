@@ -29,9 +29,6 @@ type FieldDiv a = (Divisive a, Reciprocative a)
 -- and division operations
 class (FieldAdd a, FieldSub a, FieldMul a, FieldDiv a, Distributive a) => Field a where
 
--- class (Field a, Finite a, Discrete s a) => FiniteField s a where
---      order::(Integral n) => a -> n
---      order = length . members 
 
 -- The rationals
 instance (Integral a) => Field (Ratio a) where 

@@ -46,7 +46,7 @@ instance forall n. KnownNat n => Formattable (SymmetricGroup n) where
 instance forall n. KnownNat n => Indexed Int (SymmetricGroup n) where
     at sg i = (set sg) List.!! i
 
-instance forall n. KnownNat n => Finite (SymmetricGroup n) where
+instance forall n. KnownNat n => FiniteSet (SymmetricGroup n) where
     count _ = factorial (nat @n) |> fromIntegral
             
 instance forall n. KnownNat n => Show (SymmetricGroup n) where

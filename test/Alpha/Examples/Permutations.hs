@@ -27,7 +27,6 @@ instance Example "p-3" where
 instance Example "p-4" where
     example = do
         let s4 = symgroup @4
-        print (count s4)
         let p2 = s4 ! 2
         print p2
         let p5 = s4 ! 5        

@@ -18,12 +18,11 @@ module Alpha.Canonical.Elementary.MultiIndex
     nest
 )
 where
-import Alpha.Base
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Elements
 import Alpha.Canonical.Elementary.Tuples
 import Alpha.Canonical.Elementary.Indexing
 import Alpha.Canonical.Elementary.Sets
+import Alpha.Canonical.Elementary.Structure
 
 import qualified Data.List as List
 
@@ -61,7 +60,7 @@ ixrange = IndexRange
 instance (OrdEnum a, Show a) => Show (IndexRange a) where
     show (IndexRange (a1,a2)) = "[" <> (show a1) <> "..." <> (show a2) <> "]"
 
-instance (Eq a, OrdEnum a) => Set (IndexRange a)
+--instance (Eq a, OrdEnum a) => Set (IndexRange a)
 
 instance (OrdEnum a) => SetBuilder (IndexRange a) a where    
     set (IndexRange (i,j)) = [i..j]

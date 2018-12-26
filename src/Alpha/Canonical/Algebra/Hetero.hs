@@ -6,17 +6,17 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Hetero
 (
-    module X,
     Biadditive(..),    
-    Multiplied(..), Bimultiplicative(..),    
-    Divided(..), Bidivisive(..), 
-    Negated(..), Binegatable(..),
-    Subtracted(..), Bisubtractive(..),
-    Bimodular(..),(/%), (/%%)
+    Bimultiplicative(..),    
+    Bidivisive(..), 
+    Binegatable(..),
+    Bisubtractive(..),
+    Bimodular(..),(/%), (/%%),
+
 
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Modular as X
+import Alpha.Canonical.Algebra.Common
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
@@ -25,22 +25,6 @@ import qualified Data.Map as Map
 import qualified Numeric.Interval as Interval
 
 
--- | Represents a family of types that support a notion of (potentially) heterogenous division
--- where a type instance is the type of the result of applying a conforming quotient operator
-type family Divided a b     
-
--- Defines a family of types that represent the result of applying a
--- (potentially) heterogeneous negation operation
-type family Negated a
-
--- | Represents a family of types that support a notion of (potentially) heterogeneous 
--- subtraction where the instance type is the result type of applying a 
--- conforming subtraction operation
-type family Subtracted a b
-
--- | Represents a family of types that support a notion of (potentially) heterogenous multiplication
--- where a type instance is the multiplication result type
-type family Multiplied a b
 
 -- | Characterizes pairs of types that support a notion addition and
 -- such addition need not be commutative so, in general,

@@ -10,8 +10,6 @@
 
 module Alpha.Canonical.Algebra.Modular
 (
-    Summed(..), 
-    Modulo(..), 
     Zn, BasedInt,
     Base(..),
     zN, modulus, residues,residue,
@@ -20,6 +18,7 @@ module Alpha.Canonical.Algebra.Modular
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.IntegralDomain
+import Alpha.Canonical.Algebra.Common
 
 import qualified Data.Vector as Vector
 
@@ -33,15 +32,6 @@ newtype Base b = Base Natural
 -- | Represents an integer with a particular base
 data BasedInt (b::Nat) i = BasedInt !i
 
--- Represents a family of type pairs that support a notion of the first 
--- type 'mod' the second type. Intended to represent to the result of the 
--- modulus operation on integers, a paritioning of a set by a subset or
--- more generally, quotient groups and similar
-type family Modulo a b
-
--- | Represents a family of types that support a notion of (potentially) heterogenous addition
--- where a type instance is the addition result type
-type family Summed a b
 
 -- | Represents the ring of integers mod n
 data Zn (n::Nat) = Zn Integer
@@ -139,8 +129,6 @@ instance forall b. KnownNat b => Formattable (Digits b ) where
 
 instance forall b. KnownNat b => Show (Digits b ) where
     show = string . format
-
-instance  KnownNat n => Set (Zn n)
 
 instance KnownNat n => Show (Residue n) where
     show (Residue zN m) = (show m) <> " " <> (show zN)
