@@ -4,14 +4,14 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Relations.Quantification
+module Alpha.Canonical.Elementary.Quantification
 (
     Universal(..),
     Existential(..)
 ) where
 
-import Alpha.Base
-import Alpha.Canonical.Elementary
+import Alpha.Canonical.Common
+import Alpha.Canonical.Elementary.Individual
 import qualified Data.List as List
 import qualified Data.Set as Set
 

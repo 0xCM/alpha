@@ -4,7 +4,6 @@ module Alpha.Canonical.Algebra.VectorSpace
 (
     VectorSpace(..),
     Dimension(..), 
-    Dimensional(..),        
     Normed(..),    
 
 ) where

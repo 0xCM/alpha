@@ -14,3 +14,5 @@ import Alpha.Data.ByteString as X
 import Alpha.Data.Vector as X
 import Alpha.Data.Permutation as X
 import Alpha.Data.SymmetricGroup as X
+import Alpha.Data.Simplex as X
+

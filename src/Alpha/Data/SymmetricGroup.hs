@@ -44,9 +44,9 @@ instance forall n. KnownNat n => Formattable (SymmetricGroup n) where
             items = sg |> fmap (\p -> format p) |> format
 
 instance forall n. KnownNat n => Indexed Int (SymmetricGroup n) where
-    at sg i = (set sg) List.!! i
+    at sg i = (unwrap sg) List.!! i
 
-instance forall n. KnownNat n => FiniteSet (SymmetricGroup n) where
+instance forall n. KnownNat n => Finite (SymmetricGroup n) where
     count _ = factorial (nat @n) |> fromIntegral
             
 instance forall n. KnownNat n => Show (SymmetricGroup n) where
@@ -64,8 +64,8 @@ instance forall n. KnownNat n => Multiplicative (SymmetricGroup n) where
     g * f  = g <> f
 
 
-instance forall n. KnownNat n  => SetBuilder (SymmetricGroup n) (Permutation n) where
-    set = unwrap 
+instance forall n. KnownNat n  => SetBuilder (SymmetricGroup n) where
+    set (SymmetricGroup p)  = fneSet $ (head p) :| tail p
 
 instance forall n. KnownNat n => Semigroup (SymmetricGroup n)    
     

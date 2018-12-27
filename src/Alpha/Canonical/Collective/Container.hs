@@ -9,11 +9,8 @@ module Alpha.Canonical.Collective.Container
 (
     Container(..),
     Filterable(..),
-    Setwise(..),
     Headed(..),
-    Vacant(..),
     Sequential(..),
-    Mappable(..),    
     Zippable(..), 
     Groupable(..),
     tree,
@@ -46,8 +43,7 @@ class (IsList c) => Container c where
     singleton::Item c -> c
     singleton e = contain [e]
 
-
-
+    
 -- | Characterizes a container holding elements that can be 
 -- filtered via a unary predicate    
 class (Container c) => Filterable c where
@@ -59,16 +55,6 @@ class (Container c) => Filterable c where
     single::P1 (Item c) -> c -> Item c
     single p c =  List.head $ contents $ filter p c  
 
--- | Characterizes types whose values can be treated as sets
-class (Container c) => Setwise c where
-    -- The union operator
-    union::c -> c -> c
-    -- The intersection operator
-    intersect::c -> c -> c
-    -- The set difference operator
-    delta::c -> c -> c
-    -- The set membership test operator
-    isSubset::Bool -> c -> c -> Bool
     
 -- | Classifies a structure that can be partitioned into two sets:
 -- A singleton set containing the "first" element and another set containing
@@ -83,29 +69,7 @@ class Headed (a::Type) where
     -- | Skips the first item of the sequence and returns the remainder
     tail::a -> Tailed a
 
--- / Characterizes a type for which a canonical and unique vacant/void/empty
--- value exists
-class Vacant a where
 
-    -- | Exhibits the canonical empty value
-    empty::a
-
-    -- | Determines whether a given value is the canonical
-    -- 'empty' value
-    null::a -> Bool
-
-instance (Eq a) => Vacant (Interval a) where
-    empty = Interval.empty
-    null = Interval.null
-
-instance Vacant (Map k v) where
-    empty = Map.empty
-    null = Map.null
-    
-
-class Mappable c a b where    
-    type Mapped c a b
-    map::(a -> b) -> c -> Mapped c a b
     
 -- | The elements of a tree are projected onto a list
 type instance Appended (Tree a) = [a]
@@ -154,3 +118,16 @@ class Zippable a b c where
     
 class Groupable c where
     groups::(Individual c -> Individual c -> Bool) -> c -> [[Individual c]]
+
+instance (Ord a) => Container (FiniteSet a) where
+    contain = fromList
+    contents = toList
+    
+instance (Ord a) => Filterable (FiniteSet a) where
+    filter p s = FiniteSet $  Set.filter p  (unwrap s)
+    
+instance Pairing (FiniteSet a) (FiniteSet b) (DisjointUnion (FiniteSet a) (FiniteSet b)) where
+    pair a b = DisjointUnion (a, b)
+    first (DisjointUnion (a,b)) = a
+    second (DisjointUnion (a,b)) = b
+            

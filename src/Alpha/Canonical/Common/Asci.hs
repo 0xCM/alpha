@@ -97,6 +97,7 @@ pattern Plus = "+"::Text
 pattern Und = "_"::Text
 pattern Eq = "="::Text
 pattern Dot = "."::Text
+pattern Dots = "..."::Text
 pattern Comma = ","::Text
 pattern Semi = ";"::Text
 pattern Colon = ":"::Text

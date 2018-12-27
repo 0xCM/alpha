@@ -44,11 +44,11 @@ instance KnownNat n => Vectored (VecN n a) a where
 
 instance forall n a. (KnownNat n, Eq a) => Componentized (VecN n a) where
     type Component (VecN n a) = a
-    components (VecN v) = set v
+    components (VecN v) = toList v
 
 instance forall n a. (Eq a,KnownNat n) => Componentized (VecNPair n a) where
     type Component (VecNPair n a) = (a,a)
-    components ((VecN v1),(VecN v2)) = Vector.zipWith (\x y -> (x,y)) v1 v2 |> set
+    components ((VecN v1),(VecN v2)) = Vector.zipWith (\x y -> (x,y)) v1 v2 |> toList
     
 instance forall n a. (KnownNat n, Formattable a, Eq a) => Formattable (VecN n a) where
     format v = v |> components |> tuplestring

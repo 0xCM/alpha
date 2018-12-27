@@ -47,22 +47,16 @@ setformat::(Formattable m) => [m] -> Text
 setformat s = enclose LBrace RBrace (format elements) where
     elements =  weave Comma (format <$> s)
 
--- instance DiscreteSubset (BasisSet r m)  l  where
---     subelements = unwrap
 instance (Formattable r, Formattable m) => Formattable (BasisSet r m) where
     format (BasisSet x) = setformat x
 instance (Formattable r, Formattable m) => Show (BasisSet r m) where
     show = string . format    
     
--- instance DiscreteSubset (SpanningSet r m)  l  where
---     subelements = unwrap
 instance (Formattable r, Formattable m) => Formattable (SpanningSet r m) where
     format (SpanningSet x) = setformat x
 instance (Formattable r, Formattable m) => Show (SpanningSet r m) where
     show = string . format
     
--- instance DiscreteSubset (IndependentSet r m)  l  where
---     subelements = unwrap
 instance (Formattable r, Formattable m) => Formattable (IndependentSet r m) where
     format (IndependentSet x) = setformat x    
 instance (Formattable r, Formattable m) => Show (IndependentSet r m) where

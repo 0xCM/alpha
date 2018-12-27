@@ -11,12 +11,11 @@ module Alpha.Canonical.Collective.Poset
 where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.ItemSet
 import qualified Data.Set as Set
 
 -- Encloses (constructively) a partially ordered set
-newtype Poset a = Poset (ItemSet a)
-    deriving(Formattable,Setwise)
+newtype Poset a = Poset (FiniteSet a)
+    deriving(Formattable, Intersectable, Unionizable)
 
 -- Constructs a partially ordered set from a list
 poset::(Ord a, PartialOrder a) => [a] -> Poset a

@@ -1,13 +1,15 @@
 module Alpha.Base.Alias
 (
     FiniteInt(..),
+    Set'(..),
     Bag(..),
     LazyMap(..),
-    BaseSet(..),
 
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
-    and',or',not', lt', gt',quotRem', divMod', gcd',lcm', quot'
+    and',or',not', lt', gt',quotRem', divMod', gcd',lcm', quot', set',
+
+    powerset',
 
 ) where
 import System.IO(IO,print)
@@ -17,7 +19,7 @@ import Data.Maybe(fromJust)
 import Data.Ratio(Ratio(..),Rational)
 import Numeric.Interval(Interval, interval)
 import Data.Bool(Bool(..), (&&), (||), not)
-import Data.Set(Set)
+import Data.Set(Set(..),powerSet)
 import Data.Bits(Bits(..), xor,bit)
 import Data.Int(Int)
 import GHC.Num(Num, (+),(-),(*),negate,abs)
@@ -35,7 +37,7 @@ import qualified Data.MultiSet as MS
 type FiniteInt a = (Integral a, Bounded a)
 type Bag a = MS.MultiSet a
 type LazyMap k v = LM.Map k v
-type BaseSet a = Set a
+type Set' a = Set a
 
 
 sub'::(Num a) => a -> a -> a
@@ -168,4 +170,11 @@ xor' = xor
 bit'::(Bits a) => Int -> a
 bit' = bit
 {-# INLINE bit' #-}
+
+set'::(Ord a) => [a] -> Set a
+set' = Set.fromList
+
+-- | Calculates a set's powerset, modulo the empty set
+powerset'::Set' a -> Set' (Set' a)
+powerset' s =  Set.filter  (\x -> not (Set.null x)) (powerSet s)
 

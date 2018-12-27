@@ -14,9 +14,6 @@ module Alpha.Canonical.Algebra.Multiplicative
 
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Collective.ItemSet
-
---type family Factored a = r | r -> a
 
 -- / Characterizes a type that supports a notion of *associative* multiplication    
 -- mul a b == mul b a
@@ -50,10 +47,10 @@ instance BinaryOperator (Multiplication a) a where
     o2  = unwrap
 
         
-instance (Ord a, Unital a) =>  Unital (ItemSet a) where
+instance (Ord a, Unital a) =>  Unital (FiniteSet a) where
     one = [one]
     
-instance (Ord a, Multiplicative a) =>  Multiplicative (ItemSet a) where
+instance (Ord a, Multiplicative a) =>  Multiplicative (FiniteSet a) where
     mul x y = intersect x y
     
 -- Unital

@@ -20,8 +20,7 @@ module Alpha.Canonical.Elementary.Tuples
 ) where
 import Alpha.Canonical.Common
 import Alpha.Canonical.Elementary.Indexing
-import Alpha.Canonical.Elementary.Sets
-import Alpha.Canonical.Elementary.Structure
+import Alpha.Canonical.Elementary.Set
 
 newtype Tuple1 a1 = Tuple1 a1
     deriving (Eq,Ord)
@@ -119,16 +118,16 @@ instance Tupeler 5 (Tuple5 a1 a2 a3 a4 a5) where
     {-# INLINE tuple #-}
 
 
-instance (Eq a) => SetBuilder (UniTuple1 a) a where
-    set (UniTuple1 a1) = [a1]
-instance (Eq a) => SetBuilder (UniTuple2 a) a where
-    set (a1,a2) = [a1,a2]
-instance (Eq a) => SetBuilder (UniTuple3 a) a where
-    set (a1,a2,a3) = [a1,a2,a3]
-instance (Eq a) => SetBuilder (UniTuple4 a) a where
-    set (a1,a2,a3,a4) = [a1,a2,a3,a4]
-instance (Eq a) => SetBuilder (UniTuple5 a) a where
-    set (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]
+instance (Ord a) => SetBuilder (UniTuple1 a) where
+    set (UniTuple1 a1) = finite [a1]
+instance (Ord a) => SetBuilder (UniTuple2 a) where
+    set (a1,a2) = finite [a1,a2]
+instance (Ord a) => SetBuilder (UniTuple3 a) where
+    set (a1,a2,a3) = finite [a1,a2,a3]
+instance (Ord a) => SetBuilder (UniTuple4 a) where
+    set (a1,a2,a3,a4) = finite [a1,a2,a3,a4]
+instance (Ord a) => SetBuilder (UniTuple5 a) where
+    set (a1,a2,a3,a4,a5) = finite [a1,a2,a3,a4,a5]
                 
 
 instance (Eq a) => Vectored (UniTuple1 a) a where

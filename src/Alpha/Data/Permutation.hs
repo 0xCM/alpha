@@ -47,7 +47,7 @@ image::forall n. KnownNat n => Permutation n -> Int -> Int
 image = (!)
 
 preimage::forall n. KnownNat n =>Permutation n -> Int -> Int
-preimage (Permutation pm) i =  set pm |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
+preimage (Permutation p) i =  toList p |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
 
 -- | Effects a transposition
 switch::forall n. KnownNat n => (Int,Int) -> Permutation n -> Permutation n

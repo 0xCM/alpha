@@ -17,7 +17,6 @@ module Alpha.Canonical.Algebra.Additive
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Common
-import Alpha.Canonical.Collective.ItemSet
 
 import qualified Data.Set as Set
 import qualified Data.MultiSet as Bag
@@ -53,7 +52,7 @@ instance Newtype (Addition a)
 -- | Represents a formal sum
 newtype Summation a = Summation [a]    
 
-type instance Summed (ItemSet a) (ItemSet a) = ItemSet a    
+type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a    
 
 -- | Produces the canonical addition operator
 -- addition::(Num a) => Addition a
@@ -75,11 +74,11 @@ instance (Nullary a, Additive a) => Computable (Summation a) where
     compute (Summation items) = reduce zero (+) items
 
     
-instance (Ord a) =>  Additive (ItemSet a) where
+instance (Ord a) =>  Additive (FiniteSet a) where
     add x y = union x y
     {-# INLINE add #-}
 
-instance (Ord a) => Nullary (ItemSet a) where
+instance (Ord a) => Nullary (FiniteSet a) where
     zero = []
 
     

@@ -10,14 +10,17 @@ import Alpha.Canonical.Elementary
 import Alpha.Canonical.Collective.Container
 
 import qualified Data.Vector as Vector
+import qualified Data.List as List
 
 type instance Individual (Vector a) = a
 
 
 instance Container (Vector a)
 
-instance (Eq a) => SetBuilder (Vector a) a where
-    set = Vector.toList                        
+instance (Ord a) => SetBuilder (Vector a) where
+    set v = fneSet nel  where
+        items = Vector.toList v 
+        nel = (List.head items) :| (List.tail items) 
 
 instance Vacant (Vector a) where
     empty = Vector.empty

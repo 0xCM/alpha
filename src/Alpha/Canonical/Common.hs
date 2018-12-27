@@ -14,4 +14,5 @@ import Alpha.Canonical.Common.Root as X
 import Alpha.Canonical.Common.Reversible as X
 import Alpha.Canonical.Common.Signage as X
 import Alpha.Canonical.Common.State as X
+import Alpha.Canonical.Common.Asci as X
 

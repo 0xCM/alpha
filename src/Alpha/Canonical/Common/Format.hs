@@ -16,7 +16,7 @@ module Alpha.Canonical.Common.Format
     dashes, 
     spaces,
     tuplestring,
-    spaced,
+    spaced, lspaced, rspaced,
     suffix,
     prefix,
     text,
@@ -34,9 +34,6 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.Map as Map
 
--- | Converts a showable to text    
-text::(Show s) => s -> Text
-text = Text.pack . show
 
 -- | Characterizes a value that can be rendered in human-readable form
 class Formattable a where
@@ -51,6 +48,9 @@ class Packable a b where
     unpack::b -> a    
 
                 
+-- | Converts a showable to text    
+text::String -> Text
+text = Text.pack 
     
 enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
 enclose left right content = Text.concat [format left, format content, format right]
@@ -72,6 +72,12 @@ tuplestring src =  Text.concat [LParen, content, RParen] where
 -- | Surrounds the input text within a space on each side
 spaced::Text -> Text
 spaced t = Space <> t <> Space
+
+lspaced::Text -> Text
+lspaced t = Space <> t
+
+rspaced::Text -> Text
+rspaced t = t <> Space
 
 suffix::Text -> Text -> Text
 suffix = Text.append
@@ -120,52 +126,48 @@ instance  (Formattable v, Faceted f v) => Formattable (FacetValue f  v) where
     format (FacetValue v) =  format v
     
 
-
-
 instance Formattable Text where
     format s = s         
 instance Formattable Char where
     format = Text.singleton 
 instance Formattable Natural where
-    format = text
+    format = Text.pack . show
 instance Formattable Int where
-    format = text
+    format = Text.pack . show
 instance Formattable Word where
-    format = text
+    format = Text.pack . show
 instance Formattable Integer where
-    format = text
+    format = Text.pack . show
 instance (Show a) => Formattable (Ratio a) where
-    format = text
+    format = Text.pack . show
 instance Formattable Word8 where
-    format = text
+    format = Text.pack . show
 instance Formattable Word16 where
-    format = text
+    format = Text.pack . show
 instance Formattable Word32 where
-    format = text
+    format = Text.pack . show
 instance Formattable Word64 where
-    format = text
+    format = Text.pack . show
 instance Formattable Int8 where
-    format = text
+    format = Text.pack . show
 instance Formattable Int16 where
-    format = text
+    format = Text.pack . show
 instance Formattable Int32 where
-    format = text
+    format = Text.pack . show
 instance Formattable Int64 where
-    format = text
+    format = Text.pack . show
 instance Formattable Double where
-    format = text
+    format = Text.pack . show
 instance Formattable Float where
-    format = text
+    format = Text.pack . show
 instance Formattable CDouble where
-    format = text
+    format = Text.pack . show
 instance Formattable CFloat where
-    format = text
+    format = Text.pack . show
 
 instance (Formattable a) => Formattable [a] where
     format x = x |> (<$>) format |> Text.concat
     
 instance Formattable Variance where
     format (Covariant) = "*"
-    format (Contravariant) = "^"
-    
-    
+    format (Contravariant) = "^"    

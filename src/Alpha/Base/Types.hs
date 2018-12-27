@@ -7,20 +7,28 @@
 -----------------------------------------------------------------------------
 module Alpha.Base.Types
 (
-    Coercible(..), Coercion(..),
-    Data(..),Typeable(..), 
+    Coercible(..), 
+    Coercion(..),
+    Data(..),
+    Typeable(..), 
     Generic(..),
     Generic1(..),    
-    Type,TypeRep,DataType,
+    Type,
     Default(..),
 
+    TypeRep, typerep, valtype,
+    TypeRepG, typerepg, 
+    TyCon,TyConInfo(..), tycon, 
+    DataType, datatype,
     Proxy(..), proxy, 
-    KnownSymbol, symstr,symtext,
-    KnownNat,  nat, natg, 
-    SomeNat, Nat, 
-    SomeSymbol, someSymbolVal,
-    datatype,typeof,
-    valtype,datavaltype,
+
+    SomeSymbol, KnownSymbol, symstr, symtext, someSymbolVal,
+    KnownNat, SomeNat, Nat, nat, natg, 
+    
+    
+    typeof,
+    
+    datavaltype,
     typeOf, 
     
     type (+), type (-), type (*), Mod(..), type (%), Div(..), type (/), type (^),        
@@ -32,7 +40,8 @@ import Data.Data(Data(..),DataType)
 import Data.Default(Default(..))
 import Data.Kind(Type)
 import Data.Proxy
-import Data.Typeable(Typeable(..),Proxy(..),TypeRep,typeOf)
+import Data.Typeable(Typeable(..),Proxy(..),TypeRep,typeOf,typeRep)
+import Type.Reflection(typeRepTyCon,someTypeRepTyCon, SomeTypeRep)
 import Data.Type.Coercion
 import Data.Default(Default(def))
 import GHC.Generics(Generic(..),Generic1(..))
@@ -44,16 +53,47 @@ import Data.String(String)
 import Data.Int(Int)
 import Data.Data(Data(..),)  
 import Data.Text(Text)
-import qualified Data.Text as Text
+import GHC.Show(Show)
 
+import qualified Data.Text as Text
+import qualified Type.Reflection as Reflect
+
+type TypeRepG a = Reflect.TypeRep a
+type TyCon = Reflect.TyCon
+
+-- | Describes a type constructor
+newtype TyConInfo 
+    = TyConInfo (
+        Text, -- ^ The package name
+        Text, -- ^ The module name
+        Text  -- ^ The constructor name
+        )
+    deriving (Data,Typeable,Generic)
+
+typerep::forall a. Typeable a => SomeTypeRep
+typerep = Reflect.someTypeRep (Proxy::Proxy a)
+
+typerepg::forall a. Typeable a => TypeRepG a
+typerepg = Reflect.typeRep @a
 
 -- | Retrieves the 'DataType' metadata for the type 'a'
-datatype:: forall a. (Data a, Default a) => DataType
+datatype::forall a. (Data a, Default a) => DataType
 datatype =   dataTypeOf (def @a)
 
 -- | Retrieves the 'TypeRep' metadata for the type 'a'
-typeof:: forall a. (Typeable a, Default a) => TypeRep
+typeof:: forall a. (Typeable a, Default a) => TypeRep 
 typeof = typeOf (def @a)
+
+tycon'::forall a. Typeable a => TyCon
+tycon' = someTypeRepTyCon (typerep @a)
+
+tycon::forall a. Typeable a => TyConInfo
+tycon = info where
+    c = tycon' @a
+    info = TyConInfo (
+        Text.pack (Reflect.tyConPackage c),
+        Text.pack (Reflect.tyConModule c),
+        Text.pack (Reflect.tyConName c))
 
 valtype::Typeable a => a -> TypeRep
 valtype = typeOf 
@@ -90,3 +130,4 @@ nat = fromIntegral (natVal (proxy @m))
 natg::forall m i. (KnownNat m, Integral i) => i
 natg = fromIntegral (natVal (proxy @m))
 {-# INLINE natg #-}
+

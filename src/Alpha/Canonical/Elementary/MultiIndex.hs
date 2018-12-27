@@ -6,6 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Alpha.Canonical.Elementary.MultiIndex
 (
@@ -15,14 +16,13 @@ module Alpha.Canonical.Elementary.MultiIndex
     IndexedTerm(..), 
     ixrange,
     term,
-    nest
+    
 )
 where
 import Alpha.Canonical.Common
 import Alpha.Canonical.Elementary.Tuples
 import Alpha.Canonical.Elementary.Indexing
-import Alpha.Canonical.Elementary.Sets
-import Alpha.Canonical.Elementary.Structure
+import Alpha.Canonical.Elementary.Set
 
 import qualified Data.List as List
 
@@ -41,10 +41,10 @@ type family MultiIndex (i::Nat) a = r | r -> i a where
     MultiIndex 5 a = UniTuple5 (IndexRange a)
 
 -- | Characterizes a multi-level index    
-class  (KnownNat i) => MultiIndexed i a where
+class  (KnownNat i, Ord a) => MultiIndexed i a where
     -- | sets a multilevel index
     multix::UniTuple i (UniTuple 2 a) -> MultiIndex i a
-    levels::MultiIndex i a -> [IndexRange a]
+    levels::MultiIndex i a -> Set(IndexRange a)
         
 -- | Represents a term t indexed by i
 newtype IndexedTerm i t = IndexedTerm (i -> t)
@@ -62,8 +62,11 @@ instance (OrdEnum a, Show a) => Show (IndexRange a) where
 
 --instance (Eq a, OrdEnum a) => Set (IndexRange a)
 
-instance (OrdEnum a) => SetBuilder (IndexRange a) a where    
-    set (IndexRange (i,j)) = [i..j]
+instance (OrdEnum a) => SetBuilder (IndexRange a) where    
+    set (IndexRange (i,j)) = CountedSet count  s  where
+        s = [i..j]
+        count = add' (fromIntegral (List.length s)) 1
+
 
 instance (OrdEnum a) => MultiIndexed 1 a where    
     multix (UniTuple1 r) =  UniTuple1 $ ixrange r
@@ -85,8 +88,8 @@ instance (OrdEnum a) => MultiIndexed 5 a where
     multix (r1, r2, r3, r4, r5) = (ixrange r1, ixrange r2, ixrange r3, ixrange r4, ixrange r5)
     levels mix = set mix
 
-nest::(OrdEnum a) => IndexRange a -> IndexRange a -> [(a, a)]
-nest r1 r2 = do
-    a <- set r1
-    b <- set r2
-    return $ (a,b)
+-- nest::(OrdEnum a) => IndexRange a -> IndexRange a -> [(a, a)]
+-- nest r1 r2 = do
+--     a <- set' r1
+--     b <- set' r2
+--     return $ (a,b)

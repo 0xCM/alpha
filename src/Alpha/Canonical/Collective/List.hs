@@ -78,11 +78,18 @@ instance Appendable [[a]] where
     
 instance (Eq a) => Filterable [a] where
     filter = List.filter
-        
-instance (Eq a, Ord a) => Setwise [a] where
+
+instance (Ord a) => Unionizable [a] where    
     union = List.union
+    unions lists = Set.fromList <$> lists |> Set.unions |> toList
+
+instance (Eq a, Ord a) => Intersectable [a] where    
     intersect = List.intersect
-    delta =  (List.\\)
+
+instance (Eq a, Ord a) => SetDifference [a] where        
+    diff =  (List.\\)
+    
+instance (Eq a, Ord a) => SetContainment [a] where        
     isSubset proper candidate source  
         = test (Set.fromList candidate) (Set.fromList source)
             where test = ifelse proper Set.isProperSubsetOf Set.isSubsetOf 
@@ -132,6 +139,9 @@ instance NonEmptySet (NonEmpty a) where
     leading =  NonEmpty.head  
 
 instance Container (NonEmpty a)
+
+instance Length (NonEmpty a) where
+    length = fromIntegral . NonEmpty.length
 
 instance Mappable (NonEmpty a) a b where
     type Mapped (NonEmpty a) a b = NonEmpty b

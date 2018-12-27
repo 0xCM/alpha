@@ -7,9 +7,11 @@ module Alpha.Canonical.Common.Signage
     SignedIntegral(..),
     Signable(..),
 
-    positive,negative,neutral
+    positive,negative,neutral,
+    integers,
 ) where
 import Alpha.Canonical.Common.Root
+import qualified Data.List as List
 
 -- | Defines the codomain of the sign function
 data Sign = Negative | Neutral | Positive
@@ -31,6 +33,11 @@ class (Unsignable i, Integral i) => UnsignedIntegral i where
 class Unsignable a where
 
 class (Bounded a, Integral a) => BoundedIntegral a where    
+
+-- | Enumerates bounded integral values
+integers::(BoundedIntegral n) => NonEmpty n
+integers = (List.head range) :| (List.tail range)
+    where range = [minBound .. maxBound]
 
 -- Produces a 'Sign' of positive polarity
 positive::Sign

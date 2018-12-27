@@ -26,10 +26,10 @@ import Alpha.Canonical.Algebra.Monoidal as X
 import Alpha.Canonical.Relations
 import qualified Data.Monoid as Monoid
 
-class (Structure (Group a) a, Compositer a, Inverter a, Identity a) => Group a where
+class (Compositer a, Inverter a, Identity a) => Group a where
         
 -- | A multiplicative group, not necessarily commutive
-class (Structure (MultiplicativeGroup a) a, Monoidal a, Reciprocative a) => MultiplicativeGroup a where
+class (Monoidal a, Reciprocative a) => MultiplicativeGroup a where
     
 -- | An additive group, always commutative
 class (Abelian a, Negatable a) => AbelianGroup a where   
@@ -48,47 +48,6 @@ instance MultiplicativeGroup Double where
 instance MultiplicativeGroup CFloat where 
 instance MultiplicativeGroup CDouble where 
 
-instance Integral a => Structure (MultiplicativeGroup (Ratio a)) (Ratio a)
-instance Structure (MultiplicativeGroup Float) Float
-instance Structure (MultiplicativeGroup Double) Double
-instance Structure (MultiplicativeGroup CFloat) CFloat
-instance Structure (MultiplicativeGroup CDouble) CDouble
-
-instance Integral a => DiscreteStructure (MultiplicativeGroup (Ratio a)) (Ratio a)
-
-
-instance Structure (AbelianGroup Integer) Integer
-instance Structure (AbelianGroup Int) Int
-instance Structure (AbelianGroup Int8) Int8
-instance Structure (AbelianGroup Int16) Int16
-instance Structure (AbelianGroup Int32) Int32
-instance Structure (AbelianGroup Int64) Int64    
-instance Structure (AbelianGroup Natural) Natural
-instance Structure (AbelianGroup Word) Word
-instance Structure (AbelianGroup Word8) Word8
-instance Structure (AbelianGroup Word16) Word16
-instance Structure (AbelianGroup Word32) Word32
-instance Structure (AbelianGroup Word64) Word64    
-instance (Integral a) => Structure (AbelianGroup (Ratio a) ) (Ratio a)
-instance Structure (AbelianGroup Float) Float 
-instance Structure (AbelianGroup Double) Double where 
-instance Structure (AbelianGroup CFloat) CFloat where 
-instance Structure (AbelianGroup CDouble) CDouble where         
-    
-instance DiscreteStructure (AbelianGroup Integer) Integer
-instance DiscreteStructure (AbelianGroup Int) Int
-instance DiscreteStructure (AbelianGroup Int8) Int8
-instance DiscreteStructure (AbelianGroup Int16) Int16
-instance DiscreteStructure (AbelianGroup Int32) Int32
-instance DiscreteStructure (AbelianGroup Int64) Int64    
-instance DiscreteStructure (AbelianGroup Natural) Natural
-instance DiscreteStructure (AbelianGroup Word) Word
-instance DiscreteStructure (AbelianGroup Word8) Word8
-instance DiscreteStructure (AbelianGroup Word16) Word16
-instance DiscreteStructure (AbelianGroup Word32) Word32
-instance DiscreteStructure (AbelianGroup Word64) Word64    
-instance (Integral a) => DiscreteStructure (AbelianGroup (Ratio a) ) (Ratio a)
-    
 instance AbelianGroup Integer where 
 instance AbelianGroup Int where 
 instance AbelianGroup Int8 where 

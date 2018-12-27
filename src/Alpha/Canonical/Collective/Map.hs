@@ -34,6 +34,6 @@ instance (Ord k) => Container (Map k v)
 instance (Formattable k, Formattable v) => Formattable (Map k v) where
     format m = format $ format  <$> (Map.toList m)    
 
-instance (Eq a, Eq b) => SetBuilder (Map a b) (a,b) where
-    set = Map.toList
+instance (Ord a, Ord b) => SetBuilder (Map a b) where
+    set = set . Map.toList
 

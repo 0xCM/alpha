@@ -12,6 +12,7 @@ import Alpha.Canonical.Elementary
 import Alpha.Canonical.Collective.Container
 import qualified Data.MultiSet as Bag
 import qualified Data.List as List
+import qualified Data.Set as Set
 
 type instance Individual (Bag a) = a
 
@@ -30,15 +31,22 @@ instance Vacant (Bag a) where
     empty = Bag.empty
     null = Bag.null
 
-    
-instance (Ord a) => Setwise (Bag a) where
-    intersect = Bag.intersection
-    delta = Bag.difference
+instance (Ord a) => Unionizable (Bag a) where    
     union = Bag.union        
+    unions bags = (Set.fromList <$> (toList <$> bags)) |> Set.unions |> toList |> bag
+        
+
+instance (Ord a) => Intersectable (Bag a) where    
+    intersect = Bag.intersection
+
+instance (Ord a) => SetContainment (Bag a) where
     isSubset proper candidate source 
         = ifelse proper 
             (Bag.isProperSubsetOf candidate source) 
             (Bag.isSubsetOf candidate source)
+    
+instance (Ord a) => SetDifference (Bag a) where
+    diff = Bag.difference
     
 instance (Ord a) =>  IsList (Bag a) where
     type Item (Bag a) = a

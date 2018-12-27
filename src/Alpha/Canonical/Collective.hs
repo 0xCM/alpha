@@ -7,7 +7,6 @@
 module Alpha.Canonical.Collective(module X) where
 import Alpha.Canonical.Collective.Container as X
 import Alpha.Canonical.Collective.Map as X
-import Alpha.Canonical.Collective.ItemSet as X
 import Alpha.Canonical.Collective.Bag as X
 import Alpha.Canonical.Collective.Poset as X
 import Alpha.Canonical.Collective.Row as X

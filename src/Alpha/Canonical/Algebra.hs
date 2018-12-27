@@ -38,7 +38,6 @@ import Alpha.Canonical.Algebra.Reciprocative as X
 import Alpha.Canonical.Algebra.Series as X
 import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Successive as X
-import Alpha.Canonical.Algebra.Simplex as X
 import Alpha.Canonical.Algebra.Semiring as X
 import Alpha.Canonical.Algebra.Tensor as X
 import Alpha.Canonical.Algebra.VectorSpace as X

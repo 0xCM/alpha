@@ -18,7 +18,7 @@ module Alpha.Canonical.Common.Conversions
     ToString(..),
     ToLines(..),
     Vectored(..),
-
+    list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
     rational, fractional,
@@ -97,6 +97,8 @@ class ToNatural d where
 class FromNatural a where
     fromNatural::Natural -> a
 
+list::(IsList a) => a -> [Item a]
+list = toList
 
 -- | Constructs a list of Int values from a list of Integral values
 ints::(ToInt n) => [n] -> [Int]

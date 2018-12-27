@@ -22,9 +22,9 @@ module Alpha.Canonical.Common.Root
     Chunkable(..),
     Classifiable(..),
     Specifiable(..),
-    
-    -- firstValue, 
-    -- lastValue,
+    Mappable(..),    
+    Finite(..),
+    Cardinality(..),
     enumValues,
     typeSymbol,
     typeSymbols,
@@ -39,7 +39,29 @@ module Alpha.Canonical.Common.Root
 import Alpha.Base as X
 import qualified Data.Text as Text
 import qualified Data.List as List
+import qualified Numeric.Interval as Interval
+import qualified Data.Map as Map
 
+-- | Specifies the cardinality of a set
+-- See https://en.wikipedia.org/wiki/Cardinality
+data Cardinality a =
+    -- | There are no elements
+    Zero
+    -- | There is exactly one element
+   | One
+   -- | Either no elements or one element
+   | ZeroOrOne
+   -- | A finite and known number of elements
+   | FiniteCount a
+   -- | A finite, but unknown, number of elements
+   | Finite
+   -- | A countably-infinite number of elements
+   | CountablyInfinite
+   -- | An uncountable number of elements
+   | Uncountable
+   -- | An unknown number of elements
+   | Uncounted
+   deriving (Generic, Data, Typeable)
 
 -- Synonym for combined Ord and Enum constraints
 type OrdEnum a = (Enum a, Ord a)    
@@ -63,13 +85,15 @@ class Componentized a where
 class Successive a where
     next::a -> Maybe a
 
-
 -- / Characterizes a type with which a strictly monotonic sequence 
 -- of descending values is associated
 class Antecedent a where    
     prior::a -> Maybe a
     
-
+class Mappable c a b where    
+    type Mapped c a b
+    map::(a -> b) -> c -> Mapped c a b
+    
 class Weavable g t where
     type Woven g t
     type Woven g t = t
@@ -77,6 +101,14 @@ class Weavable g t where
     -- Weaves a grain 'g' with a target 't' to produce a 'Woven g t' value
     weave::g -> t -> Woven g t        
 
+
+-- | Characterizes a type inhabited by a finite set of
+-- values and for which a count is determined
+class Finite a where
+    -- | Counts the number of items within the purview of the subject
+    count::(Integral n) => a -> n
+
+    
 instance Weavable Char Text where
     type Woven Char Text = Text
     weave = Text.intersperse
@@ -125,8 +157,6 @@ class Specifiable a where
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    
     
-
-
 firstValue::(Enum e) => e
 firstValue = toEnum 0
 

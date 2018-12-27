@@ -99,13 +99,22 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
 
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
-class (Equivalence a) => Setoid a where
+class Equivalence a => Setoid a where
 
-class (PartialOrd a, Relation a) =>  PartialOrder a where
+class PartialOrd a => PartialOrder a where
+    partial::Comparer a
+    partial = (<=)
+    {-# INLINE partial #-}
 
-    (~<=)::P2 a
-    (~<=) = leq
-    infix 4 ~<=
+    (<=)::Comparer a
+    (<=) = partial
+    infix 4 <=
+    {-# INLINE (<=) #-}    
+    
+    -- (~<=)::P2 a
+    -- (~<=) = leq
+    -- infix 4 ~<=
+        
 
 -- | Characterizes a type for which a minimal element can be identified
 -- i.e., a is minimal in A if a <= x for all x in A
@@ -135,11 +144,11 @@ class Supremal a where
     supremum::a -> Extremum a
             
 
-class (Ord a) => LTEQ a where
-    (<=)::Comparer a
-    (<=) a b= a P.<= b
-    infix 4 <=
-    {-# INLINE (<=) #-}
+class (Ord a, PartialOrder a) => LTEQ a where
+    -- (<=)::Comparer a
+    -- (<=) a b= a P.<= b
+    -- infix 4 <=
+    -- {-# INLINE (<=) #-}
 
     -- Computes the minimum of two values    
     min::a -> a -> a
