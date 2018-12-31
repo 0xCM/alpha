@@ -14,7 +14,7 @@ import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Container
 import qualified Data.Stream.Infinite as Stream
 
-class (Headed (Stream a), Weavable a (Stream a), Iterable (Stream a) ) => SequentialStream a where    
+class (Headed (Stream a), Weave a (Stream a), Iterable (Stream a) ) => SequentialStream a where    
 
     -- Constructs a sream that emits the elements
     -- of a list, cyling over said elements indefinitely
@@ -52,6 +52,6 @@ instance Headed (Stream a) where
 instance Iterable (Stream a) where
     iterate = Stream.iterate    
             
-instance Weavable g (Stream g) where
+instance Weave g (Stream g) where
     weave = Stream.intersperse
     

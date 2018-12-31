@@ -54,6 +54,22 @@ type Euclidean n k v = (v ~ En n k, KnownNat n, AbelianGroup v,  Ring k, LeftAct
 -- to the type v ~ En n k
 instance Euclidean n k v => LeftModule k v
 
+instance (Eq k) => Eq (En 1 k) where
+    (E1 x) == (E1 y) = x == y
+
+instance (Eq k) => Eq (En 2 k) where
+    (E2 x) == (E2 y) = x == y    
+
+instance (Eq k) => Eq (En 3 k) where
+    (E3 x) == (E3 y) = x == y    
+
+instance (Eq k) => Eq (En 4 k) where
+    (E4 x) == (E4 y) = x == y    
+
+instance (Eq k) => Eq (En 5 k) where
+    (E5 x) == (E5 y) = x == y        
+
+
 instance Formattable k => Formattable (En 1 k) where
     format (E1 x) = format x
 instance Formattable k => Formattable (En 2 k) where
@@ -131,18 +147,12 @@ instance (Ring k) => EuclideanVector 4 k where
     euvector (x1,x2,x3,x4) = E4 (x1,x2,x3,x4)
 instance (Ring k) => EuclideanVector 5 k where 
     euvector (x1,x2,x3,x4,x5) = E5 (x1,x2,x3,x4,x5)
-
-instance Abelian k => Abelian (En 1 k)
-instance Abelian k => Abelian (En 2 k)
-instance Abelian k => Abelian (En 3 k)
-instance Abelian k => Abelian (En 4 k)
-instance Abelian k => Abelian (En 5 k)
     
-instance AbelianGroup k => AbelianGroup (En 1 k)
-instance AbelianGroup k => AbelianGroup (En 2 k)
-instance AbelianGroup k => AbelianGroup (En 3 k)
-instance AbelianGroup k => AbelianGroup (En 4 k)
-instance AbelianGroup k => AbelianGroup (En 5 k)
+instance (AbelianGroup k) => AbelianGroup (En 1 k)
+instance (AbelianGroup k) => AbelianGroup (En 2 k)
+instance (AbelianGroup k) => AbelianGroup (En 3 k)
+instance (AbelianGroup k) => AbelianGroup (En 4 k)
+instance (AbelianGroup k) => AbelianGroup (En 5 k)
         
 instance (Ring k) => NatBasisElement 1 1 k where 
     en = E1 $ UniTuple1 one    

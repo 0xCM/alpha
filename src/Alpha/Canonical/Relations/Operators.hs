@@ -8,7 +8,6 @@
 module Alpha.Canonical.Relations.Operators
 (    
     Operator(..), operation,
-    O1, O2, O3,
     Compositer(..),
 
     Commutative(..), 
@@ -33,19 +32,6 @@ import qualified Data.Map as Map
 import qualified Data.List as List
 import qualified Data.Text as Text
 
--- | Synonym for unary operator vis-a-vis: 
--- A *unary operator* is a total function closed over its domain
-type O1 a = a -> a
-
--- | Synonym for binary operator vis-a-vis: 
--- A *binary operator* is a a total function closed over 
--- an homogenous 2-cartesian domain
-type O2 a = a -> a -> a
-
--- | Synonym for ternary operator vis-a-vis: 
--- A *ternary operator* is a total function closed over 
--- its homogenous 3-cartesian domain
-type O3 a = a -> a -> a -> a
 
 -- | Characterizes a type for which a binary operation is defined
 -- What Blythe calls an "internal law of composition"
@@ -59,7 +45,8 @@ class Compositer a where
 class KnownNat n => Operator n f a where            
     operator::Operation n f a
     evaluate::UniTuple n a -> a
-        
+
+-- | Characterizes a unary operator    
 class UnaryOperator a where
     o1::O1 a    
 
@@ -67,9 +54,9 @@ class UnaryOperator a => Inverter a where
     inverter::O1 a
     inverter = o1
     
--- | Characterizes a type that can produce a binary operator
-class BinaryOperator f a where
-    o2::f -> O2 a
+-- | Characterizes a binary operator
+class BinaryOperator a where
+    o2::O2 a
 
 class Commutative a where
 

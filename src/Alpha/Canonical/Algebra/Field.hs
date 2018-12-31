@@ -1,34 +1,28 @@
 module Alpha.Canonical.Algebra.Field
 (
     module X,
-    FieldAdd(..),
-    FieldMul(..),
-    FieldSub(..),
-    FieldDiv(..),
     Field(..),
 
 )
 where
 import Alpha.Canonical.Relations    
 import Alpha.Canonical.Algebra.Ring as X
-import Alpha.Canonical.Algebra.IntegralDomain as X
+import Alpha.Canonical.Algebra.IntDomain as X
 
--- | Specifies field addition constraint
-type FieldAdd a = (Additive a, Nullary a)
 
--- | Specifies field multiplication constraint
-type FieldMul a = (Multiplicative a, Unital a)
+-- | Characterizes a field as a commutative division ring
+class (Commutative a, DivisionRing a) => Field a where
 
--- | Specifies field subraction constraint
-type FieldSub a = (Subtractive a, Negatable a)
+-- | Characterizes a field with a finite number of elements
+-- See https://en.wikipedia.org/wiki/Finite_field
+class (Field a, Finite a) => FiniteField a where
 
--- | Specifies field division constraint
-type FieldDiv a = (Divisive a, Reciprocative a)
-
--- | Specifies a field predicated on conforming division, multiplication, subtraction
--- and division operations
-class (FieldAdd a, FieldSub a, FieldMul a, FieldDiv a, Distributive a) => Field a where
-
+instance (Integral a) => Commutative (Ratio a)
+instance Commutative Float
+instance Commutative Double
+instance Commutative CFloat
+instance Commutative CDouble
+    
 
 -- The rationals
 instance (Integral a) => Field (Ratio a) where 
@@ -37,6 +31,7 @@ instance (Integral a) => Field (Ratio a) where
 instance Field Float where 
 instance Field Double where 
 instance Field CFloat where 
-instance Field CDouble where 
+instance Field CDouble where
+
         
     

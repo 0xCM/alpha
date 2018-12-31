@@ -6,18 +6,17 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Successive
 (
-    Increment(..), Incrementable(..),
-    Decrement(..), Decrementable(..),
+    Incrementable(..), Increment(..),
+    Decrementable(..), Decrement(..),
+    Successive(..), Antecedent(..),
     
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Subtractive
 import Alpha.Canonical.Algebra.Additive
+import Alpha.Canonical.Algebra.Multiplicative
 import qualified Data.List as List
 
--- | Represents a family of types that support some sort of incrementing operation where
--- a type instance is the type of an incremented type. The canonical example
--- is a successor function in the context of type-level naturals
 type family Increment a 
 
 type instance Increment Int = Int
@@ -38,9 +37,6 @@ type instance Increment Double = Double
 type instance Increment CFloat = CFloat
 type instance Increment CDouble = CDouble
 
--- | Represents a family of types that support some sort of decrementing operation where
--- a type instance is the type of an incremented type. The canonical example
--- is a successor function in the context of type-level naturals
 type family Decrement a 
 
 type instance Decrement Int = Int
@@ -64,7 +60,10 @@ type instance Decrement CDouble = CDouble
 
 class Incrementable a where
     -- Increments the operand by one unit
-    inc::a -> Increment a 
+    inc::a -> Increment a
+    default inc::(a ~ Increment a,Additive a, Unital a) => a -> Increment a
+    inc a = a + one
+    {-# INLINE inc #-}
 
     -- | Infix synonym for 'inc'
     (>++<)::a -> Increment a
@@ -75,122 +74,67 @@ class Incrementable a where
 class Decrementable a where
     -- Decrements the operand by one unit
     dec::a -> Decrement a 
+    default dec::(a ~ Decrement a, Subtractive a, Unital a) => a -> Decrement a
+    dec a = a - one
+    {-# INLINE dec #-}
 
     -- | Infix synonym for 'inc'
-    (>--<)::a -> Decrement a
+    (>--<)::a -> Decrement a 
     (>--<) = dec
     {-# INLINE (>--<) #-}
     infix 2 >--<
 
+-- / Characterizes a type with which a strictly monotonic sequence 
+-- of ascending values is associated
+class Successive a where
+    next::a -> Maybe a
+
+-- / Characterizes a type with which a strictly monotonic sequence 
+-- of descending values is associated
+class Antecedent a where    
+    prior::a -> Maybe a
+
 
 -- Decrement class intsances
 -------------------------------------------------------------------------------
-instance Decrementable Int where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Int8 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Int16 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Int32 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Int64 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Word where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Word8 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Word16 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Word32 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Word64 where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Natural where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Integer where
-    dec = sub' 1
-    {-# INLINE dec #-}            
-instance (Integral a, Ord a) => Decrementable (Ratio a) where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Float where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable Double where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable CFloat where
-    dec = sub' 1
-    {-# INLINE dec #-}
-instance Decrementable CDouble where
-    dec = sub' 1
-    {-# INLINE dec #-}
+instance Decrementable Int
+instance Decrementable Int8
+instance Decrementable Int16
+instance Decrementable Int32
+instance Decrementable Int64
+instance Decrementable Word
+instance Decrementable Word8
+instance Decrementable Word16
+instance Decrementable Word32
+instance Decrementable Word64
+instance Decrementable Natural
+instance Decrementable Integer
+instance (Integral a, Ord a) => Decrementable (Ratio a)
+instance Decrementable Float
+instance Decrementable Double
+instance Decrementable CFloat
+instance Decrementable CDouble
         
 
 -- Incrementable class intsances
 -------------------------------------------------------------------------------
-instance Incrementable Int where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Int8 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Int16 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Int32 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Int64 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Word where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Word8 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Word16 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Word32 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Word64 where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Natural where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Integer where
-    inc = add' 1
-    {-# INLINE inc #-}            
-instance (Integral a, Ord a) => Incrementable (Ratio a) where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Float where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable Double where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable CFloat where
-    inc = add' 1
-    {-# INLINE inc #-}
-instance Incrementable CDouble where
-    inc = add' 1
-    {-# INLINE inc #-}
+instance Incrementable Int
+instance Incrementable Int8
+instance Incrementable Int16
+instance Incrementable Int32
+instance Incrementable Int64
+instance Incrementable Word
+instance Incrementable Word8
+instance Incrementable Word16
+instance Incrementable Word32
+instance Incrementable Word64
+instance Incrementable Natural
+instance Incrementable Integer
+instance (Integral a, Ord a) => Incrementable (Ratio a)
+instance Incrementable Float
+instance Incrementable Double
+instance Incrementable CFloat
+instance Incrementable CDouble
 
 -- Successive
 -------------------------------------------------------------------------------

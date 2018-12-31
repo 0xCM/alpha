@@ -8,7 +8,7 @@
 module Alpha.Data.ByteString
 (
     bytes,
-    segment, 
+    segmentBS, 
     segments,
     bytestring,
     json,    
@@ -31,6 +31,8 @@ import qualified Data.ByteString.Lazy as LZ
 import qualified Data.Ix as Ix
 import qualified Data.List as L
 
+
+
 type instance Concatenated EG.ByteString EG.ByteString = EG.ByteString
 type instance Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
 
@@ -46,8 +48,8 @@ type instance IndexedElement Int EG.ByteString = Word8
 bytes::(Indexed Int a) => Int -> Int -> a -> [IndexedElement Int a]
 bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
 
-segment::(Int,Int) -> EG.ByteString -> EG.ByteString
-segment (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
+segmentBS::(Int,Int) -> EG.ByteString -> EG.ByteString
+segmentBS (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
 
 -- Constructs a bytestring from a list of words
 bytestring::[Word8] -> EG.ByteString
@@ -67,7 +69,7 @@ segments width total = intervals
                                     False -> 0)
                   |> L.filter (\i -> i /= 0)
         intervals = cutpoints |> fmap (\c -> (c - width, c - 1))
-        segs = intervals |> fmap (\x -> segment x source)
+        segs = intervals |> fmap (\x -> segmentBS x source)
 
 
 instance Length EG.ByteString where

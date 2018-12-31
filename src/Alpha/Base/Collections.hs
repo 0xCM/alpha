@@ -8,7 +8,8 @@
 module Alpha.Base.Collections
 (
     HashSet, 
-    HashMap, 
+    StrictHashMap, LazyHashMap,
+    StrictMap, LazyMap,    
     Tree, Forest,
     Seq, 
     Map, 
@@ -20,7 +21,6 @@ module Alpha.Base.Collections
 )
 where
 import Data.HashSet(HashSet)
-import Data.HashMap.Strict(HashMap)
 import Data.Map.Strict(Map)
 import Data.Tree(Tree,Forest)
 import Data.Set(Set)
@@ -39,11 +39,24 @@ import Data.Monoid(Monoid)
 import Data.Foldable(Foldable)
 import Data.Data(Data)
 import Control.DeepSeq(NFData)
-
-import qualified Data.Map.Strict as Map
-import qualified Data.Set as Set
-
 import Alpha.Base.Newtype
+
+import qualified Data.Map.Strict as SM
+import qualified Data.Map as LM
+import qualified Data.Set as Set
+import qualified Data.HashMap.Lazy as LHM
+import qualified Data.HashMap.Strict as SHM
+
+type LazyHashMap = LHM.HashMap
+type StrictHashMap = SHM.HashMap
+
+type StrictMap = SM.Map
+type LazyMap = LM.Map
+
+
+
+
+
 
 
 

@@ -7,14 +7,10 @@
 module Alpha.Canonical.Common.Root
 (
     module X,
-    Dimension(..),
     Dimensional(..),
-    Successive(..),
-    Antecedent(..),
-    Weavable(..),
+    Weave(..),
     Variance(..),
     Variant(..),
-    OrdEnum(..),
     Componentized(..),
     Faceted(..),
     FacetValue(..), 
@@ -23,8 +19,6 @@ module Alpha.Canonical.Common.Root
     Classifiable(..),
     Specifiable(..),
     Mappable(..),    
-    Finite(..),
-    Cardinality(..),
     enumValues,
     typeSymbol,
     typeSymbols,
@@ -42,78 +36,36 @@ import qualified Data.List as List
 import qualified Numeric.Interval as Interval
 import qualified Data.Map as Map
 
--- | Specifies the cardinality of a set
--- See https://en.wikipedia.org/wiki/Cardinality
-data Cardinality a =
-    -- | There are no elements
-    Zero
-    -- | There is exactly one element
-   | One
-   -- | Either no elements or one element
-   | ZeroOrOne
-   -- | A finite and known number of elements
-   | FiniteCount a
-   -- | A finite, but unknown, number of elements
-   | Finite
-   -- | A countably-infinite number of elements
-   | CountablyInfinite
-   -- | An uncountable number of elements
-   | Uncountable
-   -- | An unknown number of elements
-   | Uncounted
-   deriving (Generic, Data, Typeable)
-
--- Synonym for combined Ord and Enum constraints
-type OrdEnum a = (Enum a, Ord a)    
-
     
-type family Dimension a
-
 -- Characterizes a type for which a notion of dimensionality 
 -- can be defined, e.g., an array, matrix or more generally a tensor
 class Dimensional a where
+    type Dimension a
     dimension::a -> Dimension a
-    
 
 -- / Characterizes a type from which a sequence of components can be extracted
 class Componentized a where
     type Component a
     components::a -> [Component a]    
     
--- / Characterizes a type with which a strictly monotonic sequence 
--- of ascending values is associated
-class Successive a where
-    next::a -> Maybe a
-
--- / Characterizes a type with which a strictly monotonic sequence 
--- of descending values is associated
-class Antecedent a where    
-    prior::a -> Maybe a
+    
     
 class Mappable c a b where    
     type Mapped c a b
     map::(a -> b) -> c -> Mapped c a b
     
-class Weavable g t where
+class Weave g t where
     type Woven g t
     type Woven g t = t
 
     -- Weaves a grain 'g' with a target 't' to produce a 'Woven g t' value
     weave::g -> t -> Woven g t        
-
-
--- | Characterizes a type inhabited by a finite set of
--- values and for which a count is determined
-class Finite a where
-    -- | Counts the number of items within the purview of the subject
-    count::(Integral n) => a -> n
-
     
-instance Weavable Char Text where
+instance Weave Char Text where
     type Woven Char Text = Text
     weave = Text.intersperse
             
-instance Weavable g [g] where
+instance Weave g [g] where
     weave = List.intersperse        
 
 -- | Specifies whether a construct is covariant or contravariant    
@@ -153,7 +105,6 @@ class Specifiable a where
     type Specified a
     specify::a -> Specified a
             
-
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    
     

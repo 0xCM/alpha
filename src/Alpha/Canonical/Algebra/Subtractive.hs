@@ -8,14 +8,24 @@ module Alpha.Canonical.Algebra.Subtractive
 (    
     Subtractive(..), 
     Subtraction(..), subtraction,
+    Subtracted(..), 
+    Bisubtractive(..),
     
 ) where
 import Alpha.Canonical.Relations
+
+-- | Represents a family of types that support a notion of (potentially) heterogeneous 
+-- subtraction where the instance type is the result type of applying a 
+-- conforming subtraction operation
+type family Subtracted a b
+
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where
     -- | Subracts the second value from the first
     sub::O2 a
+    sub = (-)
+    {-# INLINE sub #-}
 
     -- | Infix synonym for 'sub'    
     (-)::O2 a
@@ -23,6 +33,16 @@ class Subtractive a where
     {-# INLINE (-) #-}
     infixl 6 -    
     
+-- / Characterizes a pair of type that supports a notion of heterogenious subtraction
+class Bisubtractive a b where
+    -- | Calculates the difference between the first value and the second
+    bisub::a -> b -> Subtracted a b
+
+    -- | Infix synonym for 'hsub'        
+    (>-<)::a -> b -> Subtracted a b
+    (>-<) = bisub
+    infixl 6 >-<    
+
 -- | Represents a subtraction operator
 newtype Subtraction a = Subtraction (O2 a)    
     deriving(Generic)
@@ -32,8 +52,6 @@ instance Newtype (Subtraction a)
 subtraction::(Subtractive a) => Subtraction a
 subtraction = Subtraction sub
 
-instance Subtractive a => BinaryOperator (Subtraction a) a where
-    o2 = unwrap
 
 instance Associative (Subtraction a)
 

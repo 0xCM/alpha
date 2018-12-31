@@ -171,9 +171,6 @@ instance Semigroup Bit where
     (<>) = (+)
     {-# INLINE (<>) #-}    
 
-instance Absolute Bit where 
-    abs = id
-    {-# INLINE abs #-}
 
 instance Monoid Bit where 
     mempty = off

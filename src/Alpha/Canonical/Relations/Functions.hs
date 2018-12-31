@@ -11,6 +11,7 @@ module Alpha.Canonical.Relations.Functions
     Dom(..),
     Cod(..),
     Arity(..),
+    Mor(..),
     Composition(..), 
     Compositional(..), 
     Function(..),
@@ -20,37 +21,40 @@ module Alpha.Canonical.Relations.Functions
     Computable(..),    
 ) where
 import Alpha.Base
+import Alpha.Canonical.Elementary
 
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.List as List
 
-newtype F0 a = F0 a
-    deriving (Generic)
-instance Newtype (F0 a)
 
-newtype F1 a1 a2 = F1 (a1 -> a2)
+newtype Func0 a = Func0 (F0 a)
     deriving (Generic)
-instance Newtype (F1 a1 a2)
+instance Newtype (Func0 a)
 
--- | Function representative that saturates with 2 heterogenous arguments
--- that aligns with the follwing definition
--- A **binary function** is a function that accepts two arguments and
--- produces a value. Note that a binary function cannot be cartesian
--- nor conversely.
-newtype F2 a1 a2 a3 = F2 (a1 -> a2 -> a3)
+newtype Func1 a1 a2 = Func1 (F1 a1 a2) 
     deriving (Generic)
-instance Newtype (F2 a1 a2 a3)
+instance Newtype (Func1 a1 a2)
 
-newtype F3 a1 a2 a3 a4 = F3 (a1 -> a2 -> a3 -> a4)
-newtype F4 a1 a2 a3 a4 a5 = F4 (a1 -> a2 -> a3 -> a4 -> a5)
+newtype Func2 a1 a2 a3 = Func2 (F2 a1 a2 a3)
+    deriving (Generic)
+instance Newtype (Func2 a1 a2 a3)
+
+newtype Func3 a1 a2 a3 a4 = Func3 (F3 a1 a2 a3 a4)
+    deriving (Generic)
+instance Newtype (Func3 a1 a2 a3 a4)
+
+newtype Func4 a1 a2 a3 a4 a5 = Func4 (F4 a1 a2 a3 a4 a5)
+    deriving (Generic)
+instance Newtype (Func4 a1 a2 a3 a4 a5)
+
 
 type family Func (n::Nat) a = r | r -> n where
-    Func 0 a = F0 a
-    Func 1 (a1,a2) = F1 a1 a2
-    Func 2 (a1,a2,a3) = F2 a1 a2 a3
-    Func 3 (a1,a2,a3,a4) = F3 a1 a2 a3 a4
-    Func 4 (a1,a2,a3,a4,a5) = F4 a1 a2 a3 a4 a5
+    Func 0 a = Func0 a
+    Func 1 (a1,a2) = Func1 a1 a2
+    Func 2 (a1,a2,a3) = Func2 a1 a2 a3
+    Func 3 (a1,a2,a3,a4) = Func3 a1 a2 a3 a4
+    Func 4 (a1,a2,a3,a4,a5) = Func4 a1 a2 a3 a4 a5
 
 -- | Synonym for function that saturates with 1 cartesian argument
 -- that aligns with the following definiion:
@@ -101,38 +105,43 @@ type instance Composition (Map b c) (Map a b) = Map a c
 type family Dom f 
 type instance Dom (a -> b) = a
 type instance Dom (Map a b) = a
-type instance Dom (F0 a) = a
-type instance Dom (F1 a1 a2) = a1
-type instance Dom (F2 a1 a2 a3) = (a1,a2)
-type instance Dom (F3 a1 a2 a3 a4) = (a1,a2,a3)
-type instance Dom (F4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4)
+type instance Dom (Func0 a) = a
+type instance Dom (Func1 a1 a2) = a1
+type instance Dom (Func2 a1 a2 a3) = (a1,a2)
+type instance Dom (Func3 a1 a2 a3 a4) = (a1,a2,a3)
+type instance Dom (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4)
 
--- Defines a family of types that specify function codomains
+-- Defines a family of types that specify function *codomains*,\
+-- i. e. identified sets that cover the respective function images
 type family Cod f     
 type instance Cod (a -> b) = b
 type instance Cod (Map a b) = b
-type instance Cod (F0 a) = a
-type instance Cod (F1 a1 a2) = a2
-type instance Cod (F2 a1 a2 a3) = a3
-type instance Cod (F3 a1 a2 a3 a4) = a4
-type instance Cod (F4 a1 a2 a3 a4 a5) = a5
+type instance Cod (Func0 a) = a
+type instance Cod (Func1 a1 a2) = a2
+type instance Cod (Func2 a1 a2 a3) = a3
+type instance Cod (Func3 a1 a2 a3 a4) = a4
+type instance Cod (Func4 a1 a2 a3 a4 a5) = a5
 
+-- Defines a family of structure-preserving functions (for groups, modules, etc)
+-- that ultimately yield the functor abstraction in the context of a category
+type family Mor f
 
 type family Function f      
 type instance Function (a -> b) = a -> b
 type instance Function (Map a b)  = Map a b
-type instance Function (F0 a) = a
-type instance Function (F1 a1 a2) = a1 -> a2
-type instance Function (F2 a1 a2 a3) = (a1,a2) -> a3
-type instance Function (F3 a1 a2 a3 a4) = (a1,a2,a3) -> a4
-type instance Function (F4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4) -> a5
+type instance Function (Func0 a) = a
+type instance Function (Func1 a1 a2) = a1 -> a2
+type instance Function (Func2 a1 a2 a3) = (a1,a2) -> a3
+type instance Function (Func3 a1 a2 a3 a4) = (a1,a2,a3) -> a4
+type instance Function (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4) -> a5
 
 type family Arity f = (r::Nat) 
-type instance Arity (F0 a) = 0
-type instance Arity (F1 a1 a2) = 1
-type instance Arity (F2 a1 a2 a3) = 2
-type instance Arity (F3 a1 a2 a3 a4) = 3
-type instance Arity (F4 a1 a2 a3 a4 a5) = 4
+type instance Arity (Func0 a) = 0
+type instance Arity (Func1 a1 a2) = 1
+type instance Arity (Func2 a1 a2 a3) = 2
+type instance Arity (Func3 a1 a2 a3 a4) = 3
+type instance Arity (Func4 a1 a2 a3 a4 a5) = 4
+
 
 -- | Characterizes a deferred computation or a computation
 -- specification    
@@ -150,22 +159,21 @@ class Compositional g f where
 
 class Functional f where    
     func::Function f -> ((Dom f) -> (Cod f))
-
     
 
-instance Functional (F0 a1 ) where
+instance Functional (Func0 a1 ) where
     func a = id
     
-instance Functional (F1 a1 a2) where
+instance Functional (Func1 a1 a2) where
     func f = f
     
-instance Functional (F2 a1 a2 a3) where
+instance Functional (Func2 a1 a2 a3) where
     func f = f
 
-instance Functional (F3 a1 a2 a3 a4) where
+instance Functional (Func3 a1 a2 a3 a4) where
     func f = f
 
-instance Functional (F4 a1 a2 a3 a4 a5) where
+instance Functional (Func4 a1 a2 a3 a4 a5) where
     func f = f        
 
 instance forall f a b. (Ord a, a ~ Dom f, b ~ Cod f, f ~ Map a b) => Functional (Map a b) where    
@@ -186,8 +194,8 @@ instance (Ord a, Ord b) => Compositional (Map b c) (Map a b) where
         mh = Map.fromList z
         func' m =  (Map.!) m
     
-instance Category F1 where
-    id = F1(\x -> x)
+instance Category Func1 where
+    id = Func1(\x -> x)
     g . f = wrap $ (unwrap g) . (unwrap f)
 
 instance Curriable (CartesianFunc a b c) where

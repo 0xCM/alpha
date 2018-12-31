@@ -4,7 +4,6 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE BangPatterns #-}
 module Alpha.Canonical.Algebra.Numeric
 (
@@ -37,12 +36,30 @@ class (Floating a) => ApproximatelyPowered a where
     {-# INLINE (**) #-}
     infixr 8 **
 
+type NumericContext a = (Ord a, Subtractive a, Semiring a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Powered a)    
 
-class (Ord a, Subtractive a, Semiring a, Multiplicative a, Additive a, Absolute a, Divisive a, Num a, Real a, Powered a) 
-    => Numeric a where
+class NumericContext a => Numeric a where
     num::a -> a
     num = id
     {-# INLINE num #-}
+
+newtype Number a = Number a
+    deriving (Eq,Ord)
+        
+        
+deriving instance Num a  => Num (Number a)
+deriving instance Subtractive a  => Subtractive (Number a)
+deriving instance Additive a  => Additive (Number a)
+deriving instance Nullary a  => Nullary (Number a)
+deriving instance Multiplicative a  => Multiplicative (Number a)
+deriving instance Unital a  => Unital (Number a)
+deriving instance Divisive a  => Divisive (Number a)
+deriving instance Real a  => Real (Number a)
+deriving instance Powered a  => Powered (Number a)
+deriving instance LeftDistributive a  => LeftDistributive (Number a)
+deriving instance RightDistributive a  => RightDistributive (Number a)
+deriving instance Semiring a  => Semiring (Number a)
+deriving instance Numeric a => Numeric (Number a)
 
 class (Numeric a, Integral a, IntegralDomain a) => IntegralNumeric a where
 
@@ -59,7 +76,7 @@ class (IntegralNumeric a) => Rational a where
 egcd::(Eud a, Num a) => a -> a -> (a,a,a)
 egcd a b = (d, x * signum a, y * signum b) 
     where
-    (d, x, y) = eGCD 0 1 1 0 (abs a) (abs b)
+    (d, x, y) = eGCD 0 1 1 0 (abs' a) (abs' b)
     eGCD !n1 o1 !n2 o2 r s
         | s == 0    = (r, o1, o2)
         | otherwise = case r `quotRem` s of
@@ -97,7 +114,8 @@ instance IntegralNumeric Word8
 instance IntegralNumeric Word16
 instance IntegralNumeric Word32
 instance IntegralNumeric Word64
-    
+
+
 instance NaturalNumeric Word
 instance NaturalNumeric Word8
 instance NaturalNumeric Word16
@@ -105,9 +123,9 @@ instance NaturalNumeric Word32
 instance NaturalNumeric Word64
 instance NaturalNumeric Natural
     
-instance (IntegralNumeric a) => Rational a  where
-    numerator = numerator'
-    denominator = denominator'
+-- instance (IntegralNumeric a) => Rational a  where
+--     numerator = numerator'
+--     denominator = denominator'
 
 
 instance (Show b, Show p) => Show (Exponential b p) where

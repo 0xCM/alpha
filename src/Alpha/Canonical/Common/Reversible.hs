@@ -12,6 +12,7 @@ module Alpha.Canonical.Common.Reversible
 ) where
 --import Alpha.Canonical.Relations
 import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Types
 import qualified Data.List as List  
 import qualified Data.Map as Map
 import qualified Data.Text as Text

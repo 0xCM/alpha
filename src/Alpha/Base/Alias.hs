@@ -3,7 +3,6 @@ module Alpha.Base.Alias
     FiniteInt(..),
     Set'(..),
     Bag(..),
-    LazyMap(..),
 
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
@@ -36,7 +35,6 @@ import qualified Data.MultiSet as MS
 
 type FiniteInt a = (Integral a, Bounded a)
 type Bag a = MS.MultiSet a
-type LazyMap k v = LM.Map k v
 type Set' a = Set a
 
 

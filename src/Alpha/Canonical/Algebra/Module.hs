@@ -6,10 +6,13 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Algebra.Module
 (
     LeftModule(..), 
     RightModule(..),
+    Module(..),
+    Bimodule(..),
     Basis(..),
     FiniteBasis(..),
     SpanningSet(..),
@@ -33,12 +36,18 @@ class (Ring r, AbelianGroup m, LeftAction r m) => LeftModule r m where
 -- | A right module over a ring r
 class (Ring r, AbelianGroup m, RightAction m r) => RightModule m r where
     
-        
+-- | Represents a bimodule where both left and right rings are the same
+-- See https://en.wikipedia.org/wiki/Bimodule   
+class (LeftModule r m, RightModule m r) => Module r m where
+
+-- | Represents a bimodule where left and right rings potentially differ
+-- See https://en.wikipedia.org/wiki/Bimodule   
+class (LeftModule r m, RightModule m s) => Bimodule r m s where
+    
 -- | Characterizes a module basis    
 class (LeftModule r m, s ~ BasisSet r m) => Basis r m s where
     basis::s -> BasisSet r m
-    
-        
+            
 -- | Characterizes a finite module basis 
 class (KnownNat n, Basis r m s) => FiniteBasis n r m s where
     dim::(Integral i) => BasisSet r m -> i
@@ -49,11 +58,17 @@ class (KnownNat n, Basis r m s) => FiniteBasis n r m s where
 -- See https://en.wikipedia.org/wiki/Free_module    
 class (LeftModule r m, Basis r m s) => FreeModule r m s where
 
-data Module r m  
 
-data ChainComplex  =   ChainComplex (forall r m. LeftModule r m => [(Integer, Module r m)])
+data ChainComplex = ChainComplex (forall r m. LeftModule r m => [(Integer, m)])
 
 
 -- | Captures the invariant that every Abelian group is a module over the
 -- ring of integers
 instance (AbelianGroup m, LeftAction Integer m) => LeftModule Integer m
+
+newtype ModuleHom a b  = ModuleHom (a -> b)
+    deriving(Generic)
+instance Newtype(ModuleHom a b)
+
+instance Functor (ModuleHom a)  where
+    fmap f (ModuleHom h) = undefined

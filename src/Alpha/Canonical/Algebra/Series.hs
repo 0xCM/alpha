@@ -27,10 +27,10 @@ series::(Integral i, Semiring t) => SeriesKind -> (i,i) -> (i->t) -> Series i t
 series SummationSeries i t = Series (SummationSeries, (+), IndexRange i, term t)
 series ProductSeries i t = Series (ProductSeries, (*), IndexRange i, term t)
 
-instance (Integral i, Semiring t, Ord t)  => Computable (Series i t) where
-    type Computed (Series i t) = t
-    compute (Series (k, f, r, t)) = aggregation where
+-- instance (Integral i, Semiring t, Ord t)  => Computable (Series i t) where
+--     type Computed (Series i t) = t
+--     compute (Series (k, f, r, t)) = aggregation where
     
-        expansion = (unwrap t) <$> toList  (set r)
-        identity = ifelse (k == SummationSeries) zero one
-        aggregation = reduce identity f (toList expansion)
+--         expansion = (unwrap t) <$> toList  (setspec r)
+--         identity = ifelse (k == SummationSeries) zero one
+--         aggregation = reduce identity f (toList expansion)

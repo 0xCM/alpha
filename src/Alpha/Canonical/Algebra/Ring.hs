@@ -4,6 +4,7 @@ module Alpha.Canonical.Algebra.Ring
     Ring(..),
     CommutativeRing(..),
     UnitalRing(..),
+    DivisionRing(..),
 
 ) where
 import Alpha.Canonical.Relations
@@ -15,18 +16,19 @@ import Alpha.Canonical.Algebra.Unsigned as X
 
 import qualified Data.List as List
 
-
 -- | A ring (with identity)
 -- See https://en.wikipedia.org/wiki/Ring_(mathematics)     
-class (AbelianGroup a, Monoidal a, Distributive a, Absolute a)
-    => Ring a where
-        
+class (AbelianGroup a, Monoidal a, Distributive a) => Ring a where
+                
 -- | A ring in which the the mulplication operation is also commutative
 class Ring a => CommutativeRing a where
 
 -- | A unital ring is a ring with a multiplicative identity element
--- See Y2018MTLA   
 class (Unital a, Ring a) => UnitalRing a where
+
+-- | A unital ring in which every nonzero element ahs a multiplicative inverse
+-- See https://en.wikipedia.org/wiki/Division_ring    
+class (UnitalRing a, Reciprocative a, Divisive a) => DivisionRing a where
 
 instance Ring Integer    
 instance Ring Int
@@ -41,8 +43,29 @@ instance Ring Word8 where
 instance Ring Word16 where 
 instance Ring Word32 where 
 instance Ring Word64 where             
-    
+instance Ring Float where 
+instance Ring Double where 
+instance Ring CFloat where 
+instance Ring CDouble where                         
 
+instance UnitalRing Integer    
+instance UnitalRing Int
+instance UnitalRing Int8
+instance UnitalRing Int16
+instance UnitalRing Int32
+instance UnitalRing Int64
+instance (Integral a) => UnitalRing (Ratio a)
+instance UnitalRing Natural where 
+instance UnitalRing Word where 
+instance UnitalRing Word8 where 
+instance UnitalRing Word16 where 
+instance UnitalRing Word32 where 
+instance UnitalRing Word64 where             
+instance UnitalRing Float where 
+instance UnitalRing Double where 
+instance UnitalRing CFloat where 
+instance UnitalRing CDouble where                         
+        
 instance CommutativeRing Integer    
 instance CommutativeRing Int
 instance CommutativeRing Int8
@@ -56,4 +79,14 @@ instance CommutativeRing Word8 where
 instance CommutativeRing Word16 where 
 instance CommutativeRing Word32 where 
 instance CommutativeRing Word64 where             
+instance CommutativeRing Float where 
+instance CommutativeRing Double where 
+instance CommutativeRing CFloat where 
+instance CommutativeRing CDouble where                         
+            
+instance (Integral a) => DivisionRing (Ratio a)
+instance DivisionRing Float where 
+instance DivisionRing Double where 
+instance DivisionRing CFloat where 
+instance DivisionRing CDouble where                         
     

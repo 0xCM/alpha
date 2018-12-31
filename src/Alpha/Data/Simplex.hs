@@ -21,8 +21,8 @@ newtype Simplex a = Simplex (Natural, NonEmpty a)
 
 newtype SimplicalComplex e = SimplicalComplex ([e], [Simplex e])
 
-type instance Dimension (Simplex e) = Natural
 instance Dimensional (Simplex e) where
+    type Dimension (Simplex e) = Natural
     dimension (Simplex (q,_)) = integral q
 
 -- | Extracts the simplexes form the complex of dimension 'q'    

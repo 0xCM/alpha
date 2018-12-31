@@ -17,10 +17,10 @@ data Coset a
     = LeftCoset a [a] [a]
     | RightCoset a [a] [a]
 
-leftCoset::(BinaryOperator f a) => f -> a -> [a] -> Coset a
+leftCoset::(a -> a -> a) -> a -> [a] -> Coset a
 leftCoset f h g = (*) <$> g |> LeftCoset h g
-    where (*) = (o2 f) h
+    where (*) = (\x -> f h x)
 
-rightCoset::(BinaryOperator f a) => f -> [a] -> a -> Coset a
+rightCoset::(a -> a -> a) -> [a] -> a -> Coset a
 rightCoset f g h = (*) <$> g |> RightCoset h g
-    where (*) = (\x -> (o2 f) x h)
+    where (*) = (\x -> f x h)

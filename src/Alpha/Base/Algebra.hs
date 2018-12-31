@@ -16,7 +16,7 @@ module Alpha.Base.Algebra
     Semigroup(..), Min(..), Max(..), First(..), Last(..),
     Groupoid(..),
     Semigroupoid(..), 
-    TotalOrder, Ord, Ordering,
+    Ord, Ordering,
     Functor(..),
     Eq(..), (!=),
     Bounded(..), Enum(..),
@@ -38,7 +38,7 @@ import GHC.Enum(Bounded(..),Enum(..))
 import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
 import Algebra.Lattice(Lattice(..))   
 
-type TotalOrder a = Ord a
+
 
 
 (!=)::(Eq a) => a -> a -> Bool

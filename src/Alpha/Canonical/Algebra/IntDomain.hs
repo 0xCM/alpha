@@ -1,12 +1,14 @@
-
-module Alpha.Canonical.Algebra.IntegralDomain
+module Alpha.Canonical.Algebra.IntDomain
 (
     module X,
     IntegralDomain(..),
+    IntDomain(..),
     GcdDomain(..),
     Ufd(..),
     Pid(..),
-    Eud(..)
+    Eud(..),
+    Residue(..),
+    Zn, zN, even,odd
     
 
 ) where
@@ -16,6 +18,23 @@ import qualified Data.List as List
 import Math.NumberTheory.Primes(factorise) 
 import Math.NumberTheory.Euclidean(extendedGCD)
 
+data Residue (n::Nat) i = Residue i
+    deriving (Eq, Ord)
+
+-- | Represents the ring of integers mod n
+data Zn (n::Nat) i = Zn [Residue n i]
+    deriving (Eq, Ord)
+
+type instance Individual (Zn n i) = Residue n i 
+type instance Individual (Residue n i) = Residue n i 
+type instance Summed (Zn n i) (Zn n i) = Zn n i
+type instance Summed (Residue n i) (Residue n i) = Residue n i
+    
+type IntDomain i = (Integral i, IntegralDomain i)
+
+-- residue::forall n i. (KnownNat n, IntDomain i) => i -> Residue n i
+-- residue i = Residue (i % (natg @ n))
+    
 -- | An integral domain is a commutative ring such such that
 -- for all elements a != 0 && b != 0, a*b != 0
 class (Divisive a, CommutativeRing a) => IntegralDomain a where
@@ -51,6 +70,10 @@ class (Divisive a, CommutativeRing a) => IntegralDomain a where
     {-# INLINE (%) #-}
     infix 8 %
     
+    residue::forall n .KnownNat n => a -> Residue n a
+    default residue::forall n. (KnownNat n, Integral a) => a -> Residue n a
+    residue i = Residue (i % (natg @ n))
+
     -- Determines whether m is evenly Divisive by n
     divides::a -> a -> Bool
     default divides::(Integral a) => a -> a -> Bool
@@ -66,6 +89,18 @@ class (Divisive a, CommutativeRing a) => IntegralDomain a where
         |> (<$>) (\j -> case divides j n of True -> j; _ -> zero)
         |> List.filter (\j -> j /= zero)
     {-# INLINE modpart #-}      
+
+even::(IntegralDomain i) => i -> Bool
+even i = i % (one + one) == zero
+
+odd::(IntegralDomain i) => i -> Bool
+odd = not . even
+
+-- | The canonical least residues modulo n
+-- See https://en.wikipedia.org/wiki/Modular_arithmetic
+zN::forall n i. (KnownNat n, IntDomain i) => Zn n i 
+zN = Zn $ residue <$> [0..(n-1)] 
+    where n = natg @n
 
 class IntegralDomain a => GcdDomain a where
     gcd :: a -> a -> a
@@ -94,6 +129,7 @@ class Ufd a => Pid a where
 -- | Characterizes a Euclidean Domain    
 -- See https://en.wikipedia.org/wiki/Euclidean_domain
 class Pid a => Eud a  where
+
 
 instance IntegralDomain Integer
 instance IntegralDomain Int
@@ -159,4 +195,44 @@ instance Eud Word8 where
 instance Eud Word16 where 
 instance Eud Word32 where 
 instance Eud Word64 where             
-        
+            
+instance forall n i. (KnownNat n, Show i) => Show (Zn n i) where
+    show _ = "Z/" <> nn where
+        nn = show $ nat @n
+
+instance forall n i. (KnownNat n, Show i) => Show (Residue n i) where
+    show (Residue m) = (show m) <> " Z/" <> show (natg @n)
+
+instance forall n i. (KnownNat n, IntDomain i) => Additive (Residue n i) where
+    add (Residue a) (Residue b) 
+        = residue( (a + b) % ( natg @n) )
+
+instance forall n i. (KnownNat n, IntDomain i) => Nullary (Residue n i) where        
+    zero = residue zero
+
+instance forall n i.  (KnownNat n, IntDomain i) => Subtractive (Residue n i) where
+    sub (Residue a) (Residue b) 
+        = residue( (a - b) % (natg @n) )
+
+instance forall n i. (KnownNat n, IntDomain i) => Negatable (Residue n i) where
+    negate r = zero - r
+                
+instance forall n i. (KnownNat n, IntDomain i) => Multiplicative (Residue n i) where
+    mul (Residue a) (Residue b) 
+        = residue( (a * b) % (natg @n) )    
+                        
+instance forall n i. (KnownNat n, IntDomain i) => Unital (Residue n i) where        
+    one = residue one
+
+instance forall n i. (KnownNat n, IntDomain i) => Finite (Zn n i) where        
+    individuals (Zn x) = x
+    
+instance (KnownNat n, IntDomain i) => Finite (Residue n i) where
+    individuals _ = individuals $ zN @n    
+
+instance (KnownNat n, IntDomain i) => AbelianGroup (Residue n i)        
+instance (KnownNat n, IntDomain i) => FiniteAbelianGroup (Residue n i)        
+instance (KnownNat n, IntDomain i) => LeftDistributive (Residue n i)
+instance (KnownNat n, IntDomain i) => RightDistributive (Residue n i)
+instance (KnownNat n, IntDomain i) => Ring (Residue n i)    
+    

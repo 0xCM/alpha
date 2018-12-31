@@ -27,7 +27,9 @@ type instance IndexedElement (Int,Int) (DataTable m n a) = a
 -- | Specifies the form of the matrix dimension type
 type TableDim = (Int, Int)
 
-type instance Dimension (DataTable m n a) = TableDim
+instance forall m n a. (KnownNat m, KnownNat n) => Dimensional (DataTable m n a) where
+    type instance Dimension (DataTable m n a) = TableDim
+    dimension _ = (nat @m, nat @n)
 
 table'::forall m n a. [[a]] -> DataTable m n a
 table' elements = DataTable $ M.fromLists elements
@@ -48,7 +50,7 @@ instance forall m n a.(KnownNat m, KnownNat n) =>  IsList (DataTable m n a) wher
     fromList elements = p |> table'
         where 
             width = fromIntegral $ nat @n
-            p = partition width elements 
+            p = segment width elements 
 
 instance forall m n a. (KnownNat m, KnownNat n) => Container (DataTable m n a) where
     contain = fromList

@@ -1,12 +1,6 @@
 module Alpha.Canonical.Structures 
 (
-    Multiplicative(..),
-    Unital(..),
-    Additive(..),
-    Nullary(..),
-    Semigroup(..),
-    Monoid(..),
-    Semiring(..),
+
 )
 where
 
@@ -20,35 +14,33 @@ import Alpha.Canonical.Common.Asci
 
 
 -- | Characterizes structures for which element multiplication is defined
-class Multiplicative a where
+class SMultiplicative a where
     -- | Defines a structure's multiplication operator
-    (*)::Individual a -> Individual a -> Individual a
+    smul::Individual a -> Individual a -> Individual a
 
-class Multiplicative a => Semigroup a where        
+class SMultiplicative a => SSemigroup a where        
 
-class Semigroup a => Unital a where
+class SSemigroup a => SUnital a where
     -- | Produces the multiplicative identity
-    one::Individual a
+    sone::Individual a
 
-class Unital a => Monoid a where    
+class SUnital a => SMonoid a where    
     
-class Additive a where
+class SAdditive a where
     -- | Defines a structure's addition operator
-    (+)::Individual a -> Individual a -> Individual a
+    sadd::Individual a -> Individual a -> Individual a
 
-class Additive a => Nullary a where
+class SAdditive a => SNullary a where
     -- | Produces the additive identity
-    zero::Individual a    
+    szero::Individual a    
 
-class Nullary a  => Negatable a where
+class SNullary a  => SNegatable a where
     -- | Computes the additive inverse of an Individual
-    negate::Individual a -> Individual a    
+    snegate::Individual a -> Individual a    
 
 
 -- | Defines a semiring via the joined context
-class (Unital a, Nullary a) => Semiring a where
-
-
+class (SUnital a, SNullary a) => SSemiring a where
 
 
 

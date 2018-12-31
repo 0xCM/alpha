@@ -7,16 +7,32 @@
 module Alpha.Canonical.Algebra.Negatable
 (    
     Negatable(..),
-    Negation(..), negation,    
+    Negation(..), 
+    Negated(..),
+    Binegatable(..),
+
+    alternate
 ) where
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Collective
 import Alpha.Canonical.Algebra.Subtractive
+import qualified Data.List as List
+
+-- Defines a family of types that represent the result of applying a
+-- (potentially) heterogeneous negation operation
+type family Negated a
+
 
 -- | Characterizes types whose values are closed under 
 -- additive negation
 class Subtractive a => Negatable a where
     -- | Negates the operand    
     negate::a -> a
+
+-- / Characterizes types for which unary negation is defined
+class Binegatable a where
+    -- | Negates the operand    
+    binegate::a -> Negated a
 
 -- | Represents a negation operator
 newtype Negation a = Negation (O1 a)    
@@ -27,6 +43,24 @@ instance Newtype (Negation a)
 negation::Negatable a => Negation a
 negation = Negation negate
 
+-- | Accepts a list of negatable things, creates
+-- a new list by negating each element in the
+-- input list and returns the admixture vis-a-vis
+-- 'intermix'
+alternate::(Negatable a) => [a] -> [a]
+alternate x = intermix x (negate <$> x)
+         
+type instance Negated Natural = Integer
+type instance Negated Word = Int
+type instance Negated Word8 = Int8
+type instance Negated Word16 = Int16
+type instance Negated Word32 = Int32
+type instance Negated Word64 = Int64
+
+instance SetBuilder Integer Integer where
+    set x = f x |> Infinite where
+        g x = List.union (negate <$> [1..20]) [0..20]
+        f x = g x |>infinite
 
 -- Negatable 
 -------------------------------------------------------------------------------

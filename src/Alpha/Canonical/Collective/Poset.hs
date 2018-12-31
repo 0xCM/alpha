@@ -18,14 +18,14 @@ newtype Poset a = Poset (FiniteSet a)
     deriving(Formattable, Intersectable, Unionizable)
 
 -- Constructs a partially ordered set from a list
-poset::(Ord a, PartialOrder a) => [a] -> Poset a
+poset::(OrdPartialOrd a) => [a] -> Poset a
 poset = Poset . fromList
 
-instance (Ord a, PartialOrder a) =>  IsList (Poset a) where
+instance (OrdPartialOrd a) =>  IsList (Poset a) where
     type Item (Poset a) = a
     toList (Poset s) = toList s    
     fromList = poset
 
-instance (Eq a, Ord a, PartialOrder a) => Container (Poset a) where
+instance (OrdPartialOrd a) => Container (Poset a) where
     contain x = poset x  
     contents (Poset s) = toList s

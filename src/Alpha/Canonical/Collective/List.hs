@@ -7,9 +7,10 @@
 module Alpha.Canonical.Collective.List
 (
     Reduced(..),
-    Partitioner(..),
+    Segmenter(..),
     exclude,
-    nonempty
+    nonempty,
+    intermix
 )
 where
 
@@ -26,11 +27,11 @@ type instance Reduced [a] = a
 type instance Individual [a] = a
 type instance Individual (NonEmpty a) = a
 
-class Partitioner a where
-    partition::Int -> [a] -> [[a]]
-    partition width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
+class Segmenter a where
+    segment::Int -> [a] -> [[a]]
+    segment width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
 
-instance Partitioner a    
+instance Segmenter a    
 
 class Reductive a where
     -- The reduction operator // takes a binary operator ⊕ on its left and a vector
@@ -98,9 +99,6 @@ instance Vacant [a] where
     empty = []
     null = List.null
             
-instance (Eq a) => Headed [a] where
-    head = List.head
-    tail = List.tail            
 
 instance (Monoid a) => Reductive [a] where
 
@@ -112,13 +110,21 @@ instance (Monoid a) => Reductive [a] where
     scan::O2 a -> [a] -> [a]
     scan op x = (reduce op) <$> (inits x)                
 
-instance (Eq a) => Sequential [a] where
-    take i src = fromList $ List.take (fromIntegral i) src
+instance Headed [a] where
+    head = List.head
+    tail = List.tail            
+    
+instance Predicative [a] where
+    while = List.takeWhile    
     split = List.partition
+    
+instance Paged [a] where
+    take i src = fromList $ List.take (fromIntegral i) src
     splitAt = List.genericSplitAt
     skip n s = List.drop (fromIntegral n) s
-    while = List.takeWhile    
-    
+
+instance Sequential [a]    
+
 instance Mappable [a] a b where
     type Mapped [a] a b = [b]
     map = List.map
@@ -147,7 +153,7 @@ instance Mappable (NonEmpty a) a b where
     type Mapped (NonEmpty a) a b = NonEmpty b
     map = NonEmpty.map    
     
-instance Weavable a (NonEmpty a) where
+instance Weave a (NonEmpty a) where
     weave = NonEmpty.intersperse        
 
 instance Headed (NonEmpty a) where        
@@ -157,4 +163,17 @@ instance Headed (NonEmpty a) where
         
 instance Formattable a => Formattable (NonEmpty a) where
     format ne = format (toList ne)
+
+intermix::[a] -> [a] -> [a]
+intermix x y = join <| do
+    i <- [0 .. n]
+    [[x List.!! i, y List.!! i] ] where
+        len = min (length x) (length y)  
+        n = sub' len 1  
+    
+
+
+    
+
+
 

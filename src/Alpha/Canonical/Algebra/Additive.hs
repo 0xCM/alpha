@@ -11,8 +11,10 @@ module Alpha.Canonical.Algebra.Additive
 (
     Additive(..),
     Nullary(..),
-    Summation(..),summation,
-    Addition(..), addition,
+    MultiSum(..),
+    Summed(..),
+    Biadditive(..),
+    nsum,multisum,
 
 ) where
 import Alpha.Canonical.Relations
@@ -24,35 +26,61 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Numeric.Interval as Interval
 
+-- | Represents a family of types that support a notion of (potentially) heterogenous addition
+-- where a type instance is the addition result type
+type family Summed a b
+type UniSum a = Summed a a
+type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a    
+
+-- | Represents an addition operator
+newtype Addition a = Addition (O2 a)    
+    deriving(Generic)
+instance Newtype (Addition a)
+
+-- | Represents a formal sum of an arbitrary
+-- number of elements
+newtype MultiSum a = MultiSum [a]    
+
+
 -- | Characterizes a type that supports a notion of  addition      
 class Additive a where
+
     -- | Adds the first operand with the second
     add::O2 a
-        
+    add = (+)
+    {-# INLINE add #-}
+
     -- | Infix synonym for 'add'    
     (+)::O2 a
     (+) = add
     {-# INLINE (+) #-}
     infixl 6 +
 
+-- | Characterizes pairs of types that support a notion addition and
+-- such addition need not be commutative so, in general,
+-- hadd a + b != b + a
+class Biadditive a b where
+    -- | Adds the first operand with the second
+    biadd::a -> b -> Summed a b
+
+    -- | Infix synonym for 'hadd'
+    (>+<)::a -> b -> Summed a b
+    (>+<) = biadd
+    {-# INLINE (>+<) #-}
+    infixl 6 >+<
+
 -- | Characterizes a type that supports the notion of additive identity
 class Nullary a where
     -- | Specifies the unique element 0 such that 0 + a = a + 0 = a forall a
     zero::a
-
-    -- Tests whether a value is equal to the canonical zero
-    isZero::(Eq a) => a -> Bool
-    isZero a = a == zero    
     
--- | Represents an addition operator
-newtype Addition a = Addition (O2 a)    
-    deriving(Generic)
-instance Newtype (Addition a)
+-- | Constructs a summation
+multisum::[a] -> MultiSum a
+multisum = MultiSum
 
--- | Represents a formal sum
-newtype Summation a = Summation [a]    
+nsum::(Integral n, Nullary a, Additive a) => n -> a -> a
+nsum n a = reduce zero (+) (clone n a)
 
-type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a    
 
 -- | Produces the canonical addition operator
 -- addition::(Num a) => Addition a
@@ -60,19 +88,12 @@ type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a
 addition::Additive a => Addition a
 addition = Addition add
 
--- | Constructs a summation
-summation::[a] -> Summation a
-summation = Summation
+instance (Nullary a, Additive a) => Computable (MultiSum a) where
+    type Computed (MultiSum a) = a
+    compute (MultiSum items) = reduce zero (+) items
 
 instance Commutative (Addition a)
 instance Associative (Addition a)
-instance Additive a => BinaryOperator (Addition a) a where
-    o2 = unwrap
-
-instance (Nullary a, Additive a) => Computable (Summation a) where
-    type Computed (Summation a) = a
-    compute (Summation items) = reduce zero (+) items
-
     
 instance (Ord a) =>  Additive (FiniteSet a) where
     add x y = union x y
@@ -81,6 +102,8 @@ instance (Ord a) =>  Additive (FiniteSet a) where
 instance (Ord a) => Nullary (FiniteSet a) where
     zero = []
 
+instance SetBuilder Natural Natural where
+    set _ = infinite [zero..] |> Infinite
     
 -- Additive numbers
 -------------------------------------------------------------------------------
@@ -268,3 +291,9 @@ instance Nullary4 a1 a2 a3 a4 => Nullary (Tuple4 a1 a2 a3 a4) where
 
 instance Nullary5 a1 a2 a3 a4 a5 => Nullary (Tuple5 a1 a2 a3 a4 a5) where
     zero = (zero,zero,zero,zero,zero)
+
+type instance Summed (Tuple2 a1 a2) (Tuple2 a1 a2) = Tuple2 (UniSum a1) (UniSum a2)
+type instance Summed (Tuple3 a1 a2 a3) (Tuple3 a1 a2 a3) = Tuple3 (UniSum a1) (UniSum a2) (UniSum a3)
+type instance Summed (Tuple4 a1 a2 a3 a4) (Tuple4 a1 a2 a3 a4) = Tuple4 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4)
+type instance Summed (Tuple5 a1 a2 a3 a4 a5) (Tuple5 a1 a2 a3 a4 a5) = Tuple5 (UniSum a1) (UniSum a2) (UniSum a3) (UniSum a4) (UniSum a5)
+    

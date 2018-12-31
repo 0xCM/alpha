@@ -10,7 +10,6 @@ module Alpha.Canonical.Collective.Container
     Container(..),
     Filterable(..),
     Headed(..),
-    Sequential(..),
     Zippable(..), 
     Groupable(..),
     tree,
@@ -56,20 +55,6 @@ class (Container c) => Filterable c where
     single p c =  List.head $ contents $ filter p c  
 
     
--- | Classifies a structure that can be partitioned into two sets:
--- A singleton set containing the "first" element and another set containing
--- the remainder
-class Headed (a::Type) where
-    type Tailed a
-    type Tailed a = a
-
-    -- | Retrives the first item in the sequence
-    head::a -> Individual a
-
-    -- | Skips the first item of the sequence and returns the remainder
-    tail::a -> Tailed a
-
-
     
 -- | The elements of a tree are projected onto a list
 type instance Appended (Tree a) = [a]
@@ -81,23 +66,6 @@ instance Appendable (Tree a) where
 tree::(b -> (a, [b])) -> b-> Tree a
 tree = Tree.unfoldTree
                 
-class (Headed a) => Sequential a  where 
-
-    -- | Takes a n items from the front if they exist, othwise takes all
-    take::(Integral n) => n -> a -> a
-
-        -- | Returns elements until a supplied predicate is disatisfied
-    while::P1 (Individual a) -> a -> a
-    
-    -- | Branches the source according to the outcome of a predicate:
-    -- Elements that satisfy the predicate are branched right while the
-    -- remainder are branched left
-    split::P1 (Individual a) -> a -> (a, a)
-
-    splitAt::(Integral n) => n -> a -> (a, a)
-
-    -- | Skips the first n elements and yields the remainder, if any
-    skip::Integral n => n -> a -> a
     
 -- Characterizes a composition and pairing of heterogenous values
 class Zippable a b c where

@@ -17,10 +17,10 @@ type instance Individual (Vector a) = a
 
 instance Container (Vector a)
 
-instance (Ord a) => SetBuilder (Vector a) where
-    set v = fneSet nel  where
-        items = Vector.toList v 
-        nel = (List.head items) :| (List.tail items) 
+-- instance (Ord a) => SetSpecBuilder (Vector a) where
+--     setspec v = fneSet nel  where
+--         items = Vector.toList v 
+--         nel = (List.head items) :| (List.tail items) 
 
 instance Vacant (Vector a) where
     empty = Vector.empty

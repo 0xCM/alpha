@@ -1,3 +1,4 @@
+{-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Algebra.Distributive
 (
     LeftDistributive(..),
@@ -32,6 +33,9 @@ class (LeftDistributive a, RightDistributive a) => Distributive a where
     dist = distL
     {-# INLINE dist #-}
 
+-- | Encodes the invariant that left + right distributivity = distributivity    
+instance (LeftDistributive a, RightDistributive a) => Distributive a   
+ 
 instance LeftDistributive Natural
 instance LeftDistributive Integer
 instance LeftDistributive Int where 
@@ -68,21 +72,3 @@ instance RightDistributive Double where
 instance RightDistributive CFloat where 
 instance RightDistributive CDouble where 
 
-instance Distributive Natural
-instance Distributive Integer
-instance Distributive Int where 
-instance Distributive Int8 where 
-instance Distributive Int16 where 
-instance Distributive Int32 where 
-instance Distributive Int64 where 
-instance Distributive Word where 
-instance Distributive Word8 where 
-instance Distributive Word16 where 
-instance Distributive Word32 where 
-instance Distributive Word64 where 
-instance (Integral a) => Distributive (Ratio a) where 
-instance Distributive Float where 
-instance Distributive Double where 
-instance Distributive CFloat where 
-instance Distributive CDouble where 
-    

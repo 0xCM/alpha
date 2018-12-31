@@ -10,7 +10,6 @@ module Alpha.Canonical.Algebra.Unsigned
 )
 where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Absolute as X
 import Alpha.Canonical.Algebra.Divisive as X
 
 -- | A ratio sans sign
@@ -94,15 +93,3 @@ instance Unsignable UDouble
 instance Unsignable UCFloat
 instance Unsignable UCDouble
 
-instance Absolute UFloat where 
-    abs = id
-    {-# INLINE abs #-}
-instance Absolute UDouble where 
-    abs = id
-    {-# INLINE abs #-}    
-instance Absolute UCFloat where 
-    abs = id
-    {-# INLINE abs #-}
-instance Absolute UCDouble where 
-    abs = id
-    {-# INLINE abs #-}

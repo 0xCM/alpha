@@ -10,7 +10,9 @@ module Alpha.Canonical.Algebra.Group
     module X,
     MultiplicativeGroup(..),
     AbelianGroup(..),
-    commutator
+    FiniteAbelianGroup(..),
+    commutator,
+    abs
     
     
 ) where
@@ -20,7 +22,6 @@ import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Negatable as X
 import Alpha.Canonical.Algebra.Multiplicative as X
 import Alpha.Canonical.Algebra.Reciprocative as X
-import Alpha.Canonical.Algebra.Abelian as X
 import Alpha.Canonical.Algebra.Monoidal as X
 
 import Alpha.Canonical.Relations
@@ -32,15 +33,18 @@ class (Compositer a, Inverter a, Identity a) => Group a where
 class (Monoidal a, Reciprocative a) => MultiplicativeGroup a where
     
 -- | An additive group, always commutative
-class (Abelian a, Negatable a) => AbelianGroup a where   
+class (Eq a, Nullary a, Additive a, Negatable a) => AbelianGroup a where  
+ 
+class (AbelianGroup a, Finite a) => FiniteAbelianGroup a where
 
 -- | Constructs a commutator for a binary operator
 -- See https://en.wikipedia.org/wiki/Commutator
-commutator::forall g a . (Inverter a, BinaryOperator g a) => g -> O2 a
-commutator g  =  \x y ->  o (o (i x) (i y)) (o x y) where
-    o = o2 g
+commutator::forall g a . (Inverter a) => O2 a -> O2 a
+commutator o  =  \x y ->  o (o (i x) (i y)) (o x y) where
     i = inverter @a
-    
+ 
+abs::(Nullary a, Ord a, Negatable a) => a -> a
+abs a = ifelse (a >= zero) a (negate a)
     
 instance Integral a => MultiplicativeGroup (Ratio a) where
 instance MultiplicativeGroup Float where 
@@ -65,6 +69,7 @@ instance AbelianGroup Float where
 instance AbelianGroup Double where 
 instance AbelianGroup CFloat where 
 instance AbelianGroup CDouble where                         
+        
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)
 type AG3 a1 a2 a3 = (AG2 a1 a2, AbelianGroup a3)

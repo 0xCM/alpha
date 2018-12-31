@@ -17,8 +17,7 @@ type instance Individual (Seq a) = a
 instance Concatenable (Seq a) (Seq a) where
     concat a b = a <> b
 
-
-instance (Eq a) => Headed (Seq a) where    
+instance Headed (Seq a) where    
     head s = Seq.index s 0
     tail s = snd $ Seq.splitAt 1 s
     
@@ -28,15 +27,18 @@ instance Container (Seq a) where
     
 instance Filterable (Seq a) where
     filter = Seq.filter
-        
-instance (Eq a) => Sequential (Seq a) where    
-    take n s = Seq.take (fromIntegral n) s
+
+instance Predicative (Seq a)  where
     split = Seq.partition    
+    while = Seq.takeWhileL 
+
+instance  Paged (Seq a) where    
+    take n s = Seq.take (fromIntegral n) s
     skip n s = Seq.drop (fromIntegral n) s
     splitAt i s = Seq.splitAt (fromIntegral i) s
-    while = Seq.takeWhileL 
     
 instance Mappable (Seq a) a b where
     type Mapped (Seq a) a b = Seq b
     map = fmap
                         
+instance Sequential (Seq a)    

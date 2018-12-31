@@ -19,10 +19,16 @@ module Alpha.Canonical.Algebra.Naturals
 ) where
 
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Additive
+import Alpha.Canonical.Algebra.Divisive
+import Alpha.Canonical.Algebra.Modular
+import Alpha.Canonical.Algebra.Subtractive
+import Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Algebra.Common
 import Alpha.Canonical.Algebra.Hetero
 import Alpha.Canonical.Algebra.Successive
-import Alpha.Canonical.Algebra.Partition
+import Alpha.Canonical.Algebra.Span
+
 import Alpha.Canonical.Algebra.Exponential
 import Alpha.Canonical.Algebra.Field
 
@@ -145,8 +151,8 @@ instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where
     span (NatK m) (NatK n) = NatKSpan $ NatKPair $ (natK @m, natK @n)
     {-# INLINE span #-}
     
-instance forall m n. (KnownNatPair m n) => Partition (NatKSpan m n)  where        
-    breakpoints (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
+instance forall m n. (KnownNatPair m n) => Membership (NatKSpan m n)  where        
+    members (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
     
 instance forall m. (KnownNat m) => Decrementable (NatK m) where    
     dec::NatK m -> Decrement (NatK m) 

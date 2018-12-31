@@ -5,31 +5,20 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-module Alpha.Data.Vector
+module Alpha.Data.VecN
 (
     VecN(..),
-    ScalarProduct(..),
     vecN
 )
 where
-import Alpha.Canonical.Relations
-import Alpha.Canonical.Collective.Vector
-import Alpha.Canonical.Algebra.Ring
-import Alpha.Canonical.Algebra.Naturals
+import Alpha.Canonical
 
 import qualified Data.Vector as Vector
 import qualified Data.List as List
 
-class ScalarProduct v where
-
-    type Dotted v
-    dot::v -> v -> Dotted v
-
-    (.*.)::v -> v -> Dotted v
-    (.*.) = dot
 
 newtype VecN n a = VecN (Vector a)
-    deriving (Eq,Ord,Generic)
+    deriving (Eq,Ord,Generic,Functor,Data,Typeable,Applicative,Foldable,Traversable,Monad,IsList)
 instance Newtype (VecN n a)    
 
 type instance Individual (VecN n a) = a
@@ -56,10 +45,31 @@ instance forall n a. (KnownNat n, Formattable a, Eq a) => Formattable (VecN n a)
 instance forall n a. (KnownNat n, Formattable a, Eq a) => Show (VecN n a) where    
     show = string . format
 
-instance forall k n. (KnownNat n, Ring k) => ScalarProduct (VecN n k) where
-    type Dotted (VecN n k) = k
-    dot (VecN v1) (VecN v2) = result where
-        result = f <$> nats @n |> reduce zero (+)
+combine::forall n a. (Eq a,KnownNat n) => O2 a -> VecNPair n a -> VecN n a    
+combine f v = vecN @n ((\(x,y) -> f x y) <$> components v)
 
-        f::Int -> k
-        f i = (v1 ! i) * (v2 ! i)         
+instance forall n a. (KnownNat n, Additive a, Eq a) => Additive (VecN n a) where
+    v1 + v2 = combine (+) (v1,v2)
+
+instance forall n a. (KnownNat n, Negatable a, Eq a) => Negatable (VecN n a) where
+    negate v = negate <$> v 
+    
+instance forall n a. (KnownNat n, Subtractive a, Eq a) => Subtractive (VecN n a) where
+    v1 - v2 = combine (-) (v1,v2)
+
+instance forall n a. (KnownNat n, Multiplicative a, Eq a) => Multiplicative (VecN n a) where
+    v1 * v2 = combine (*) (v1,v2)
+        
+instance forall n a. (KnownNat n, Nullary a, Eq a) => Nullary (VecN n a) where
+    zero = clone (nat @n) zero |> vecN @n
+
+instance forall n a. (KnownNat n, Unital a, Eq a) => Unital (VecN n a) where
+    one =  clone (nat @n) one |> vecN @n 
+
+    
+-- instance forall k n. (KnownNat n, VectorSpace k) => InnerProductSpace (VecN n k) where
+--     dot (VecN v1) (VecN v2) = result where
+--         result = f <$> nats @n |> reduce zero (+)
+
+--         f::Int -> k
+--         f i = (v1 ! i) * (v2 ! i)         

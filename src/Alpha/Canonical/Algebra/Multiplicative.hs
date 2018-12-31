@@ -4,16 +4,31 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Multiplicative
 (
     Multiplicative(..),
     Unital(..),
-    Multiplication(..), multiplication,
+    Bimultiplicative(..),    
+    Multiplied(..),
+    MultiProduct(..),
+    multiproduct,
 
 ) where
 import Alpha.Canonical.Relations
+
+-- | Represents a family of types that support a notion of (potentially) heterogenous multiplication
+-- where a type instance is the multiplication result type
+type family Multiplied a b
+
+-- | Represents a formal product of an arbitrary
+-- number of elements
+newtype MultiProduct a = MultiProduct [a]    
+
+-- | Represents a multiplication operator
+newtype Multiplication a = Multiplication (O2 a)    
+    deriving(Generic)
+instance Newtype (Multiplication a)
 
 -- / Characterizes a type that supports a notion of *associative* multiplication    
 -- mul a b == mul b a
@@ -21,31 +36,44 @@ class Multiplicative a where
 
     -- | Multiplies the first operand by the second
     mul::O2 a
-    
+    mul = (*)
+    {-# INLINE mul #-}
+
     -- | Infix synonym for 'mul'
     (*)::O2 a
     (*) = mul
     {-# INLINE (*) #-}
     infixl 7 *
 
+-- | Characterizes pairs of types that support a notion multiplication
+class Bimultiplicative a b where
+    -- | Multiplies the first operand by the second
+    bimul::a -> b -> Multiplied a b
+
+    -- | Infix synonym for 'hmul'
+    (>*<)::a -> b -> Multiplied a b
+    (>*<) = bimul
+    {-# INLINE (>*<) #-}    
+    infixl 7 >*<
+
 class Unital a where
     -- | Specifies the unique element 1 such that 1*a = a*1 = a forall a
     one::a
           
--- | Represents a multiplication operator
-newtype Multiplication a = Multiplication (O2 a)    
-    deriving(Generic)
-instance Newtype (Multiplication a)
-
 -- | Produces the canonical multiplication operator
 multiplication::Multiplicative a => Multiplication a
 multiplication = Multiplication mul
 
+-- | Constructs a summation
+multiproduct::[a] -> MultiProduct a
+multiproduct = MultiProduct
+
+instance (Unital a, Multiplicative a) => Computable (MultiProduct a) where
+    type Computed (MultiProduct a) = a
+    compute (MultiProduct items) = reduce one (*) items
+
 instance Commutative (Multiplication a) 
 instance Associative (Multiplication a) 
-instance BinaryOperator (Multiplication a) a where
-    o2  = unwrap
-
         
 instance (Ord a, Unital a) =>  Unital (FiniteSet a) where
     one = [one]
@@ -141,7 +169,7 @@ instance Unital4 a1 a2 a3 a4 => Unital (a1,a2,a3,a4) where
 
 instance Unital5 a1 a2 a3 a4 a5 => Unital (a1,a2,a3,a4,a5) where
     one = (one,one,one,one,one)
-                    
+    
 -- Multiplicative
 -------------------------------------------------------------------------------
 instance Multiplicative Natural where 

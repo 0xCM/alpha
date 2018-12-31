@@ -15,7 +15,6 @@ module Alpha.Canonical.Relations.Logical
     Biconditional(..),
     Boolean(..),    
     Predicate(..), 
-    P1,P2,P3,
 
     type (==),
     type (&&),
@@ -55,6 +54,7 @@ type family (a::Bool) || (b::Bool) :: Bool where
 
 infixl 2 ||
 
+
 type family (a::Bool) && (b::Bool) :: Bool where
     True && True = True
     True && False = False
@@ -83,6 +83,7 @@ infixl 5 :=>
 class Boolean a where
     bool::a -> Bool    
 
+    
 
 -- | Characterizes a type's logical disjunction operator 
 class Disjunctive a where
@@ -128,14 +129,6 @@ class Questionable (n::Nat) f (a::Type) where
     -- | Evaluates the predicate
     answer::QuestionArgs n f a -> Bool 
 
--- | Synonym for predicate that saturates with 1 argument
-type P1 a = a -> Bool
-
--- | Synonym for predicate that saturates with 2 (homogenous) arguments
-type P2 a = a -> a -> Bool
-
--- | Synonym for predicate that saturates with 3 (homogenous) arguments
-type P3 a = a -> a -> a -> Bool
 
 data instance Predicate 1 (P1 a) 
     = UnaryPredicate (P1 a)    

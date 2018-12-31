@@ -1,4 +1,3 @@
-{-# LANGUAGE UndecidableInstances #-}
 -----------------------------------------------------------------------------
 -- |
 -- Copyright   :  (c) Chris Moore, 2018
@@ -29,6 +28,7 @@ module Alpha.Canonical.Common.Format
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Asci
 import Alpha.Canonical.Common.TextUtil(zpadL)
+import Alpha.Canonical.Common.Synonyms
 import Numeric(showIntAtBase)
 import qualified Data.Text as Text
 import qualified Data.List as List
@@ -55,9 +55,9 @@ text = Text.pack
 enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
 enclose left right content = Text.concat [format left, format content, format right]
 
--- | Fences content between left and right braces
-embrace::(Formattable a) => a -> Text
-embrace content = enclose LBrace RBrace content 
+-- | Formats a list of values and ensconces the result between left and right braces
+embrace::(Formattable a) => [a] -> Text
+embrace items = format <$> items |> List.intersperse Comma |> Text.concat |> enclose LBrace RBrace
 
 -- | Fences content between left and right parenthesis
 parenthetical::(Formattable a) => a -> Text
@@ -171,3 +171,25 @@ instance (Formattable a) => Formattable [a] where
 instance Formattable Variance where
     format (Covariant) = "*"
     format (Contravariant) = "^"    
+
+type Formattable2 a1 a2 = (Formattable a1, Formattable a2)
+type Formattable3 a1 a2 a3 = (Formattable2 a1 a2, Formattable a3)
+type Formattable4 a1 a2 a3 a4 = (Formattable3 a1 a2 a3, Formattable a4)
+type Formattable5 a1 a2 a3 a4 a5 = (Formattable4 a1 a2 a3 a4, Formattable a5)
+    
+instance (Formattable2 a1 a2) => Formattable (Tuple2 a1 a2) where
+    format (a1,a2)
+        = tuplestring [format a1, format a2]
+        
+instance (Formattable3 a1 a2 a3) => Formattable (Tuple3 a1 a2 a3) where
+    format (a1,a2,a3)
+        = tuplestring [format a1, format a2, format a3]
+
+instance (Formattable4 a1 a2 a3 a4) => Formattable (Tuple4 a1 a2 a3 a4) where
+    format (a1,a2,a3,a4) 
+        = tuplestring [format a1, format a2, format a3, format a4]
+
+instance (Formattable5 a1 a2 a3 a4 a5) => Formattable (Tuple5 a1 a2 a3 a4 a5) where
+    format (a1,a2,a3,a4,a5) 
+        = tuplestring [format a1, format a2, format a3, format a4, format a5]    
+    

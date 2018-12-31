@@ -9,11 +9,16 @@ module Alpha.Canonical.Algebra.Divisive
     Divisive(..),
     IntegralDivision(..), divisionI,
     FloatingDivision(..), divisionF,
+    Divided(..),     
+    Bidivisive(..)
 
 ) where
 import Alpha.Canonical.Relations
 import qualified Data.List as List
 
+-- | Represents a family of types that support a notion of (potentially) heterogenous division
+-- where a type instance is the type of the result of applying a conforming quotient operator
+type family Divided a b     
 
 -- / Characterizes a type that supports a notion of division
 class Divisive a where
@@ -25,6 +30,17 @@ class Divisive a where
     (/) = div
     {-# INLINE (/) #-}
     infixl 8 /    
+
+-- | Characterizes pairs of types that support a notion of division
+class Bidivisive a b where
+    -- | Divides the first value by the second        
+    bidiv::a -> b -> Divided a b
+
+    -- | Infix synonym for 'hdiv'
+    (>/<)::a -> b -> Divided a b
+    (>/<) = bidiv
+    {-# INLINE (>/<) #-}        
+    infixl 8 >/<
 
 -- | Represents a Euclidean division operator
 newtype IntegralDivision a = IntegralDivision (O2 a)    

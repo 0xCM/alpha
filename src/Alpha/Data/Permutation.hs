@@ -3,14 +3,16 @@ module Alpha.Data.Permutation
 (
     Permutation(..),
     perm,
-    switch
+    switch,
+    symgroup
 
 )
 where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Partition
+import Alpha.Canonical.Algebra.Invertible
+import Alpha.Canonical.Algebra.Span
 import Alpha.Canonical.Common.Asci
 import Alpha.Canonical.Algebra.Naturals
 
@@ -35,7 +37,28 @@ type instance Cod (Permutation n) = Int
 type instance IndexedElement Int (Permutation n) = Int
 type instance Individual (Permutation n) = Permutation n
 
+type SymmetricGroup n = [Permutation n]
+--type instance IndexedElement Int (SymmetricGroup n) = Permutation n
+--type instance Individual (SymmetricGroup n) = Permutation n
 
+-- instance forall n. KnownNat n => Indexed Int (SymmetricGroup n) where
+--     at sg i = sg List.!! i
+
+
+-- Constructs the symmetric group of degree n        
+symgroup::forall n. KnownNat n => SymmetricGroup n
+symgroup = sg where
+    symbols = [1..nat @n]
+    perms = List.permutations symbols
+    sg = perms |> fmap (\perm ->  (List.zip symbols perm) ) 
+               |> fmap (\perm -> Map.fromList perm) 
+               |> fmap Permutation
+
+formatperms::forall n. KnownNat n => SymmetricGroup n -> Text
+formatperms sg = [Su, n, Colon, EOL, perms] |> Text.concat  where        
+    n = format (nat @n) 
+    perms = sg |> fmap (\p -> format p) |> format
+       
 mappings::forall n. KnownNat n => Permutation n -> [(Int,Int)] 
 mappings (Permutation p) = toList p
 
@@ -58,6 +81,12 @@ switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> perm
                       else if r == j then (r, p ! i)   
                       else (r, s)
 
+permumul::KnownNat n => O2 (Permutation n)
+permumul g (Permutation f) = f |> Map.toList 
+                    |> fmap (\(i,j) -> (i, g ! j)) 
+                    |> Map.fromList 
+                    |> Permutation
+                      
 instance KnownNat n => Formattable (Permutation n) where
     format perm = rows where
         row1 = perm |> mappings |> fmap (\(x,y) -> format x) |> weave Space |> enclose "|" "|"
@@ -80,15 +109,7 @@ instance forall n. KnownNat n => Operator 2 (PermuMul n) (Permutation n)  where
 
     evaluate (f,g) = permumul f g 
     {-# INLINE evaluate #-}
-
     
-
-permumul::KnownNat n => O2 (Permutation n)
-permumul g (Permutation f) = f |> Map.toList 
-                    |> fmap (\(i,j) -> (i, g ! j)) 
-                    |> Map.fromList 
-                    |> Permutation
-
 instance  KnownNat n => Multiplicative (Permutation n) where
     mul = permumul
 
@@ -108,12 +129,12 @@ instance forall n. KnownNat n =>  Unital (Permutation n) where
             where        
                 s = natKspan @1 @n
                 d = domain @n
-                pt = int <$> breakpoints s 
+                pt = int <$> members s 
                 z =  Map.fromList (List.zip pt range)
 
                 
--- instance (forall n a. KnownNat n) => Invertible (Permutation n) where
---     invert (Permutation p) = Permutation $ flip p    
+instance forall n.  KnownNat n => Invertible (Permutation n) where
+    invert (Permutation p) = Permutation $ flip p    
 
 instance forall n. KnownNat n => Monoid (Permutation n) where
     mempty = one

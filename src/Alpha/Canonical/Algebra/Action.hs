@@ -11,7 +11,6 @@ module Alpha.Canonical.Algebra.Action
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
-import Alpha.Canonical.Algebra.Abelian
 
 class LeftAction k a where
     -- | Effects a left action by k on a
@@ -23,7 +22,7 @@ class LeftAction k a where
     (*.) = leftmul
     infixl 5 *.
 
-instance Abelian a => LeftAction Integer a where
+instance (Additive a, Nullary a) => LeftAction Integer a where
     leftmul = nsum
     
 class RightAction a k where
@@ -36,7 +35,7 @@ class RightAction a k where
     (.*) = rightmul
     infixl 5 .*
 
-instance Abelian a => RightAction a Integer where
+instance (Additive a, Nullary a) => RightAction a Integer where
 
     rightmul a k = nsum k a
     
@@ -47,16 +46,16 @@ newtype LeftSum k a = LeftSum [(k,a)]
 newtype RightSum a k = RightSum [(a,k)]
 
 instance (LeftAction k a) => Computable (LeftSum k a) where
-    type Computed (LeftSum k a) = Summation a
+    type Computed (LeftSum k a) = MultiSum a
     
-    compute (LeftSum pairs) = scale <$> pairs |> summation where
+    compute (LeftSum pairs) = scale <$> pairs |> multisum where
         scale::(k,a) -> a
         scale (k,a) = k *. a
 
 instance (RightAction a k) => Computable (RightSum a k) where
-    type Computed (RightSum a k) = Summation a
+    type Computed (RightSum a k) = MultiSum a
     
-    compute (RightSum pairs) = scale <$> pairs |> summation   where
+    compute (RightSum pairs) = scale <$> pairs |> multisum   where
         scale::(a,k) -> a
         scale (a,k) = a .* k
                 

@@ -33,6 +33,7 @@ module Alpha.Base.Functors
     Traversable, traverse, sequenceA,
     Product, product, -- Compatible with the notion of a categorical product
     Sum, lsum, rsum, -- Compatible with the notion of a categorical coproduct    
+    Eq1(..), Eq2(..), Ord1(..), Ord2(..), Show1(..), Show2(..), Read1(..),Read2(..),
 )
 where
 import Control.Category
@@ -58,6 +59,7 @@ import Data.Functor.Identity
 import Data.Functor.Contravariant(Contravariant, Op(..), phantom, ($<), (>$<),  (>$$<))
 import Data.Functor.Product(Product(..))
 import Data.Functor.Sum 
+import Data.Functor.Classes(Eq1(..),Ord1(..),Show1(..),Read1(..),Eq2(..),Ord2(..),Show2(..),Read2(..))
 import Data.Bifunctor(Bifunctor, bimap)
 import Data.Bifunctor.Apply(Biapply, (<<$>>),(<<..>>),bilift2,bilift3, (<<.>>), (<<.),(.>>))
 import Data.Bifoldable(Bifoldable,bisum)
