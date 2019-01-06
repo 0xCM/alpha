@@ -34,7 +34,6 @@ instance IsList (Stream a) where
     fromList [x] = Stream.cycle [x]
 
 instance Container (Stream a) where
-    singleton x = Stream.cycle [x]
     contain [x] = Stream.cycle [x]
     contents s = Stream.takeWhile (\_ -> True) s
     
@@ -42,8 +41,8 @@ instance SequentialStream (Stream s)  where
     cycle (x:xs) = Stream.cycle(x :| xs)
     blackbox f = Stream.iterate (\_ -> f ()) (f())        
 
-instance (Eq a) => Filterable (Stream a) where
-    filter = Stream.filter
+instance Singletary (Stream a) where
+    singleton x = Stream.cycle [x]
         
 instance Headed (Stream a) where        
     head s = s Stream.!! 0

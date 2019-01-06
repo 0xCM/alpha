@@ -12,7 +12,6 @@ module Alpha.Canonical.Algebra.Cosets
 ) where
 import Alpha.Canonical.Relations
 
-
 data Coset a
     = LeftCoset a [a] [a]
     | RightCoset a [a] [a]

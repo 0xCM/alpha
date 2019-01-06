@@ -8,7 +8,6 @@ module Alpha.Canonical.Common.Signage
     Signable(..),
 
     positive,negative,neutral,
-    integers,
 ) where
 import Alpha.Canonical.Common.Root
 import qualified Data.List as List
@@ -35,9 +34,9 @@ class Unsignable a where
 class (Bounded a, Integral a) => BoundedIntegral a where    
 
 -- | Enumerates bounded integral values
-integers::(BoundedIntegral n) => NonEmpty n
-integers = (List.head range) :| (List.tail range)
-    where range = [minBound .. maxBound]
+-- integers::(BoundedIntegral n) => NonEmpty n
+-- integers = (List.head range) :| (List.tail range)
+--     where range = [minBound .. maxBound]
 
 -- Produces a 'Sign' of positive polarity
 positive::Sign

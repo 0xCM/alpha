@@ -10,7 +10,7 @@ module Alpha.Data.Bits
 (
     toggled, bitcount, 
     (.^.), (.~.), (.<<.), (.>>.), (.?.),
-    lobyte,hibyte
+    lobyte,hibyte,bitsplat
     
 )
 where
@@ -20,16 +20,6 @@ import Alpha.Data.Bit
 import qualified Data.Text as Text
 import Data.Bits hiding(bit)
 
-type instance Concatenated Word8 Word8 = Word16
-type instance Concatenated Word16 Word16 = Word32
-type instance Concatenated Word32 Word32 = Word64
-type instance Concatenated Int8 Int8 = Int16
-type instance Concatenated Int16 Int16 = Int32
-type instance Concatenated Int32 Int32 = Int64
-type instance Concatenated Int64 Int64 = Integer
-type instance Concatenated Word64 Word64 = Natural
-type instance Concatenated Integer Integer = Integer
-type instance Concatenated Natural Natural = Natural
 
 toggled :: Bits a => a -> Int -> Bit
 toggled n i = testBit n i |> bit
@@ -73,20 +63,31 @@ lobyte x = x .&. 0xFF |> fromIntegral
 hibyte :: Word16 -> Word8
 hibyte x  = (x .>>.8) .&. 0xFF |> fromIntegral
 
+-- type Concatenated Int64 Int64 = Integer
+-- type Concatenated Word64 Word64 = Natural
+-- type Concatenated Integer Integer = Integer
+-- type Concatenated Natural Natural = Natural
+
 instance Concatenable Word8 Word8 where
+    type Concatenated Word8 Word8 = Word16
     concat x y = bitsplat 8 x y
             
 instance Concatenable Word16 Word16 where    
+    type Concatenated Word16 Word16 = Word32
     concat x y = bitsplat 16 x y
 
 instance Concatenable Word32 Word32 where
+    type Concatenated Word32 Word32 = Word64
     concat x y = bitsplat 32 x y
 
 instance Concatenable Int8 Int8 where
+    type Concatenated Int8 Int8 = Int16
     concat x y = bitsplat 8 x y
             
 instance Concatenable Int16 Int16 where
+    type Concatenated Int16 Int16 = Int32
     concat x y = bitsplat 16 x y
 
 instance Concatenable Int32 Int32 where
+    type Concatenated Int32 Int32 = Int64
     concat x y = bitsplat 32 x y

@@ -36,8 +36,8 @@ class (Ord a, Ord b) => Spanned a b where
 
 
 
-instance (Ord a, Integral a) => Membership (IntegralSpan a)  where
-    members (IntegralSpan l) = l
+instance (Ord a, Integral a) => Associated (IntegralSpan a)  where
+    associates (IntegralSpan l) = l
     
 instance (Ord a, Integral a) => Spanned (Min a) (Max a) where
     span (Min min) (Max max) = IntegralSpan [min .. max]

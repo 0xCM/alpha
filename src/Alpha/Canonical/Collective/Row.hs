@@ -13,7 +13,7 @@
 
 module Alpha.Canonical.Collective.Row
 (
-    Row(..), Label(..)
+    Row(..), RowLabel(..)
 )
 where
 import Alpha.Base
@@ -25,13 +25,13 @@ class RowExtend e l where
     (.*.) :: e -> l -> ExtendedRow e l  
     infixr 2 .*.
   
-data Label l = Label
+data RowLabel l = RowLabel
 
-instance forall s. KnownSymbol s => Show (Label s) where
+instance forall s. KnownSymbol s => Show (RowLabel s) where
     show _ = symstr @s
 
-instance RowExtend (Label x) (Proxy ('[] :: [Type])) where
-    type ExtendedRow (Label x) (Proxy ('[] :: [Type])) = Proxy '[x]
+instance RowExtend (RowLabel x) (Proxy ('[] :: [Type])) where
+    type ExtendedRow (RowLabel x) (Proxy ('[] :: [Type])) = Proxy '[x]
     (.*.) _ _ = Proxy
 
 -- Abstract row representative

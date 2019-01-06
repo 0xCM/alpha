@@ -21,7 +21,8 @@ module Alpha.Canonical.Common.Conversions
     list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
-    rational, fractional,
+    rational, fractional, integers
+    
 
 ) where
 import Alpha.Canonical.Common.Root
@@ -108,9 +109,9 @@ ints src = int <$> src
 words::(ToWord n) => [n] -> [Word]
 words src = word <$> src
 
--- | Constructs a list of Integer values from a list of Integral values
-integers::(ToInteger n) => [n] -> [Integer]
-integers src = integer <$> src
+-- | constructs a list of all integers within bounds
+integers::(Bounded i, Integral i) => [i]    
+integers = [minBound .. maxBound]
 
 -- | Constructs a 'Int8' from an integral value
 int8::(Integral n) => n -> Int8

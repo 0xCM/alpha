@@ -5,10 +5,7 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE OverloadedLists #-}
-module Alpha.Canonical.Collective.Map
-(
-    associate
-) where
+module Alpha.Canonical.Collective.Map where
 
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Collective.Container
@@ -25,15 +22,12 @@ import qualified Data.Map as Map
 type instance Individual (Map a b) = (a,b)
 
     
--- | Produces an associative array for a list of key-value pairs
-associate::(Ord k) => [(k,v)] -> Map k v
-associate = Map.fromList
+
 
 instance (Ord k) => Container (Map k v)
 
 instance (Formattable k, Formattable v) => Formattable (Map k v) where
     format m = format $ format  <$> (Map.toList m)    
 
--- instance (Ord a, Ord b) => SetSpecBuilder (Map a b) where
---     setspec = setspec . Map.toList
-
+instance Ord k => Singletary (Map k v) where
+    singleton (k,v) = contain [(k,v)]

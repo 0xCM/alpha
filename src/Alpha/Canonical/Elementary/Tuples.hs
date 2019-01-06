@@ -9,24 +9,15 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Elementary.Tuples
 (    
-    Tuple(..), Tupeler(..), 
-    UniTuple(..), UniTupler(..),
-
-    
-    UniProduct(..)
-    
+    Tuple(..), 
+    Tupeler(..), 
+    UniTuple(..), 
+    UniTupler(..),    
 ) where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Indexed
 import Alpha.Canonical.Elementary.Set
+import Alpha.Canonical.Elementary.Indexed
     
-
-type family UniProduct (n::Nat) a = r | r -> n where 
-    UniProduct 1 a = UniTuple1 a
-    UniProduct 2 a = UniTuple2 a
-    UniProduct 3 a = UniTuple3 a
-    UniProduct 4 a = UniTuple4 a
-    UniProduct 5 a = UniTuple5 a
         
 -- Characterizes types from which tuples can be constructed    
 class KnownNat n =>  Tupeler n a where
@@ -58,9 +49,6 @@ instance Tupeler 5 (Tuple5 a1 a2 a3 a4 a5) where
     tuple (a1,a2,a3,a4,a5)  = (a1,a2,a3,a4,a5)
     {-# INLINE tuple #-}
 
-
-                
-
 instance (Eq a) => Vectored (UniTuple1 a) a where
     vector (UniTuple1 a1) = [a1]
         
@@ -76,8 +64,6 @@ instance (Eq a) => Vectored (UniTuple4 a) a where
 instance (Eq a) => Vectored (UniTuple5 a) a where
     vector (a1,a2,a3,a4,a5) = [a1,a2,a3,a4,a5]    
 
-
-
 instance Formattable a => Formattable (Tuple1 a) where
     format (Tuple1 a) = format a
 
@@ -90,3 +76,55 @@ instance Formattable a => Show (UniTuple1 a) where
 instance Formattable a => Show (Tuple1 a) where    
     show = string . format
 
+type instance IndexedElement 1 (UniTuple1 a) = a
+type instance IndexedElement 1 (Tuple1 a1) = a1
+type instance IndexedElement 1 (Tuple2 a1 a2) = a1
+type instance IndexedElement 2 (Tuple2 a1 a2) = a2
+type instance IndexedElement 1 (Tuple3 a1 a2 a3) = a1
+type instance IndexedElement 2 (Tuple3 a1 a2 a3) = a2
+type instance IndexedElement 3 (Tuple3 a1 a2 a3) = a3
+type instance IndexedElement 1 (Tuple4 a1 a2 a3 a4) = a1
+type instance IndexedElement 2 (Tuple4 a1 a2 a3 a4) = a2
+type instance IndexedElement 3 (Tuple4 a1 a2 a3 a4) = a3
+type instance IndexedElement 4 (Tuple4 a1 a2 a3 a4) = a4
+type instance IndexedElement 1 (Tuple5 a1 a2 a3 a4 a5) = a1
+type instance IndexedElement 2 (Tuple5 a1 a2 a3 a4 a5) = a2
+type instance IndexedElement 3 (Tuple5 a1 a2 a3 a4 a5) = a3
+type instance IndexedElement 4 (Tuple5 a1 a2 a3 a4 a5) = a4
+type instance IndexedElement 5 (Tuple5 a1 a2 a3 a4 a5) = a5
+
+instance (Eq a1) => NaturallyIndexed 1 (Tuple1 a1) where
+    natix (Tuple1 a1) = a1    
+    
+instance (Eq a1, Eq a2) =>  NaturallyIndexed 1 (Tuple2 a1 a2) where
+    natix (a1,_) = a1
+instance (Eq a1, Eq a2)  => NaturallyIndexed 2 (Tuple2 a1 a2) where
+    natix (_,a2) = a2    
+
+instance (Eq a1, Eq a2, Eq a3)  =>  NaturallyIndexed 1 (Tuple3 a1 a2 a3) where
+    natix (a1,_,_) = a1
+instance (Eq a1, Eq a2, Eq a3)  =>  NaturallyIndexed 2 (Tuple3 a1 a2 a3) where
+    natix (_,a2,_) = a2        
+instance (Eq a1, Eq a2, Eq a3)  =>  NaturallyIndexed 3 (Tuple3 a1 a2 a3) where
+    natix (_,_,a3) = a3            
+
+instance (Eq a1, Eq a2, Eq a3, Eq a4)  =>  NaturallyIndexed 1 (Tuple4 a1 a2 a3 a4) where
+    natix (a1,_,_,_) = a1
+instance (Eq a1, Eq a2, Eq a3, Eq a4)  =>   NaturallyIndexed 2 (Tuple4 a1 a2 a3 a4) where
+    natix (_,a2,_,_) = a2        
+instance (Eq a1, Eq a2, Eq a3, Eq a4)  =>  NaturallyIndexed 3 (Tuple4 a1 a2 a3 a4) where
+    natix (_,_,a3,_) = a3                
+instance (Eq a1, Eq a2, Eq a3, Eq a4)  =>  NaturallyIndexed 4 (Tuple4 a1 a2 a3 a4) where
+    natix (_,_,_,a4) = a4                    
+
+instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5)  => NaturallyIndexed 1 (Tuple5 a1 a2 a3 a4 a5) where
+    natix (a1,_,_,_,_) = a1
+instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 2 (Tuple5 a1 a2 a3 a4 a5) where
+    natix (_,a2,_,_,_) = a2        
+instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 3 (Tuple5 a1 a2 a3 a4 a5) where
+    natix (_,_,a3,_,_) = a3                
+instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 4 (Tuple5 a1 a2 a3 a4 a5) where
+    natix (_,_,_,a4,_) = a4                        
+instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 5 (Tuple5 a1 a2 a3 a4 a5) where
+    natix (_,_,_,_,a5) = a5                            
+    

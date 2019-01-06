@@ -16,8 +16,7 @@ module Alpha.Data.Bit
     off, isOff,
 )
 where
-    
-import Alpha.Canonical.Algebra
+import Alpha.Canonical.Structures
 import Data.Bits(Bits(..))
 import qualified Data.List as List
 

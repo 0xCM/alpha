@@ -16,7 +16,6 @@ module Alpha.Canonical.Algebra.Based
     
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.IntDomain
 import Alpha.Canonical.Algebra.Common
 
 import qualified Data.Vector as Vector
@@ -35,7 +34,7 @@ data BasedInt (b::Nat) i = BasedInt !i
 newtype Digits b = Digits [Char]    
 
 -- | Constructs an integer with a specified base
-based::forall (n::Nat) i. (IntegralDomain i) => i -> BasedInt n i
+based::forall (n::Nat) i. (Integral i) => i -> BasedInt n i
 based i = BasedInt i
 
 -- | Constructs a base-2 integer

@@ -10,13 +10,14 @@ module Alpha.Base.Algebra
     Arg, ArgMin, ArgMax,
     Bool(..),
     --(&&), (||), not, 
-    otherwise,
+    otherwise, 
     Monoid(..),
     Dual(..), Endo(..), All(..), Any(..),
     Semigroup(..), Min(..), Max(..), First(..), Last(..),
     Groupoid(..),
     Semigroupoid(..), 
-    Ord, Ordering,
+    Ord,compare, 
+    Ordering,
     Functor(..),
     Eq(..), (!=),
     Bounded(..), Enum(..),
@@ -31,7 +32,7 @@ import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Functor(Functor(..))
 import Data.Groupoid(Groupoid(..))
 import Data.Semigroup(Semigroup(..), Min(..), Max(..), First(..), Last(..),(<>), sconcat,Arg,ArgMin,ArgMax)
-import Data.Ord(Ord,Ordering)    
+import Data.Ord(Ord(..),Ordering)    
 import Data.Semigroupoid(Semigroupoid(..))
 import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl')
 import GHC.Enum(Bounded(..),Enum(..))

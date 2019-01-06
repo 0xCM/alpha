@@ -75,10 +75,10 @@ instance (Unital a, Multiplicative a) => Computable (MultiProduct a) where
 instance Commutative (Multiplication a) 
 instance Associative (Multiplication a) 
         
-instance (Ord a, Unital a) =>  Unital (FiniteSet a) where
+instance (Ord a, Unital a) =>  Unital (Set a) where
     one = [one]
     
-instance (Ord a, Multiplicative a) =>  Multiplicative (FiniteSet a) where
+instance (Ord a, Multiplicative a) =>  Multiplicative (Set a) where
     mul x y = intersect x y
     
 -- Unital

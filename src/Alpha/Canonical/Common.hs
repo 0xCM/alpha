@@ -17,5 +17,7 @@ import Alpha.Canonical.Common.Signage as X
 import Alpha.Canonical.Common.State as X
 import Alpha.Canonical.Common.Synonyms as X
 import Alpha.Canonical.Common.Types as X
+import Alpha.Canonical.Common.Individual as X
+import Alpha.Canonical.Common.Tuples as X
 
 

@@ -13,21 +13,20 @@ module Alpha.Canonical.Elementary.Sequential
 
 ) where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Individual
 
 -- | Classifies a structure that can be partitioned into two sets:
 -- A singleton set containing the "first" element and another set containing
 -- the remainder
-class Headed (a::Type) where
-    type Tailed a
-    type Tailed a = a
+class Headed a where
+    type Remaining a
+    type Remaining a = a
 
     -- | Retrives the first item in the sequence
     head::a -> Individual a
 
     -- | Skips the first item of the sequence and returns the remainder
-    tail::a -> Tailed a
-    
+    tail::a -> Remaining a
+        
 class Predicative a where
     -- | Returns elements until a supplied predicate is disatisfied
     while::P1(Individual a) -> a -> a

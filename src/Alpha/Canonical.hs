@@ -10,6 +10,7 @@ import Alpha.Canonical.Common as X
 import Alpha.Canonical.Collective as X
 import Alpha.Canonical.Elementary as X 
 import Alpha.Canonical.Relations as X 
+import Alpha.Canonical.Structures as X 
 
 
 

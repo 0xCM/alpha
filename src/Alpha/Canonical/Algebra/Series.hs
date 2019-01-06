@@ -6,7 +6,6 @@ module Alpha.Canonical.Algebra.Series
 )
 where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Semiring
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
 
@@ -23,14 +22,14 @@ data SeriesKind =
     deriving(Eq,Enum,Show)
 
 -- | Constructs a mathematical series
-series::(Integral i, Semiring t) => SeriesKind -> (i,i) -> (i->t) -> Series i t
-series SummationSeries i t = Series (SummationSeries, (+), IndexRange i, term t)
-series ProductSeries i t = Series (ProductSeries, (*), IndexRange i, term t)
+series::(Integral i, Additive t, Multiplicative t) => SeriesKind -> (i,i) -> IndexedTerm i t -> Series i t
+series SummationSeries (min,max) f = Series (SummationSeries, (+), IndexRange (min, max), f)
+series ProductSeries (min,max) f = Series (ProductSeries, (*), IndexRange (min,max), f)
 
--- instance (Integral i, Semiring t, Ord t)  => Computable (Series i t) where
+-- instance (Integral i, Additive t, Multiplicative t, Ord t)  => Computable (Series i t) where
 --     type Computed (Series i t) = t
 --     compute (Series (k, f, r, t)) = aggregation where
     
---         expansion = (unwrap t) <$> toList  (setspec r)
+--         expansion = (unwrap t) <$> toList  (set r)
 --         identity = ifelse (k == SummationSeries) zero one
 --         aggregation = reduce identity f (toList expansion)

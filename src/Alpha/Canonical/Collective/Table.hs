@@ -1,6 +1,6 @@
 module Alpha.Canonical.Collective.Table
 (
-    Tabular(..),
+    Tabled(..),
     DataTable(..),
 ) where
 import Alpha.Canonical.Relations
@@ -9,7 +9,7 @@ import Alpha.Canonical.Collective.List
 import qualified Data.Matrix as M
 
 -- | Characterizes a rectangular array of data
-class Tabular a where
+class Tabled a where
     -- The data target
     type Table a
     -- The data source
@@ -34,7 +34,7 @@ instance forall m n a. (KnownNat m, KnownNat n) => Dimensional (DataTable m n a)
 table'::forall m n a. [[a]] -> DataTable m n a
 table' elements = DataTable $ M.fromLists elements
     
-instance Tabular (DataTable m n a) where
+instance Tabled (DataTable m n a) where
     type Table (DataTable m n a) = DataTable m n a
     type TableSource (DataTable m n a) = [[a]]
     table = table'

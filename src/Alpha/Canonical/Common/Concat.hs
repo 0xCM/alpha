@@ -1,6 +1,5 @@
 module Alpha.Canonical.Common.Concat
 (
-    Concatenated(..),
     Concatenable(..), 
     Appended(..), 
     Appendable(..),
@@ -14,16 +13,12 @@ import qualified Data.ByteString as EG
 import qualified Data.ByteString.Lazy as LZ
 
 
-type family Concatenated a b
-type instance Concatenated [a] [a] = [a]
-type instance Concatenated Text Text = Text
-type instance Concatenated Text Char = Text
-type instance Concatenated Char Text = Text
-type instance Concatenated Char Char = Text
 
 
 -- | Characterizes a pair whose terms can be related via an append operation
 class Concatenable a b where
+    type Concatenated a b
+
     concat::a -> b -> Concatenated a b
 
     (++)::a -> b -> Concatenated a b
@@ -46,21 +41,27 @@ type instance Appended [a] = a
 class Appendable a where
     append::a -> Appended a
 
-
-instance Appendable [Text] where
+    
+instance Concatenable [a] [a] where
+    type Concatenated [a] [a] = [a]    
+    concat = (List.++)
+            
+instance Appendable [Text] where    
     append = Text.concat        
     
 instance Concatenable Text Text where
+    type Concatenated Text Text = Text
     concat = Text.append    
         
 instance Concatenable Text Char where
+    type Concatenated Text Char = Text
     concat t c  = Text.pack  [c] |> Text.append t 
     
 instance Concatenable Char Text where    
+    type Concatenated Char Text = Text
     concat c t  = Text.append (Text.pack [c]) t
     
 instance Concatenable Char Char where    
+    type Concatenated Char Char = Text
     concat c1 c2  = Text.pack ([c1] List.++ [c2])
-    
-        
-    
+            

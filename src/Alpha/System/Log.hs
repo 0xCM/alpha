@@ -15,7 +15,7 @@ import Prelude(putStrLn,putStr)
 log'::Message a -> IO()
 log' (Message severity text _) = do
     setSGR [SetColor Foreground intensity color]
-    text |> enclose prefix suffix |> string |> putStrLn
+    text |> fence prefix suffix |> string |> putStrLn
     setSGR [Reset]
     where (intensity, color, prefix, suffix) 
                 = case severity of

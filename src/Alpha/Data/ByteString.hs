@@ -33,8 +33,6 @@ import qualified Data.List as L
 
 
 
-type instance Concatenated EG.ByteString EG.ByteString = EG.ByteString
-type instance Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
 
 
 type instance Individual LZ.ByteString = Word8
@@ -120,10 +118,13 @@ instance Convertible EG.ByteString [Word8] where
 instance Chunkable EG.ByteString where
     chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
 
+        
 instance Concatenable EG.ByteString EG.ByteString where    
+    type Concatenated EG.ByteString EG.ByteString = EG.ByteString
     concat = EG.append
         
 instance Concatenable LZ.ByteString LZ.ByteString where
+    type Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
     concat = LZ.append
         
 -- | Converts json to formatted text    

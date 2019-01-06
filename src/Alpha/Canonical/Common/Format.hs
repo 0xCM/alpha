@@ -6,16 +6,18 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Common.Format
 (
-    Packable(..),
-    Formattable(..),
-    enclose,
+    Formattable2, Formattable3, Formattable4, Formattable5,
+    fence,
     parenthetical, 
     embrace,
     dots, 
     dashes, 
+    arrow,
     spaces,
     tuplestring,
-    spaced, lspaced, rspaced,
+    spaced, 
+    lspaced, 
+    rspaced,
     suffix,
     prefix,
     text,
@@ -35,33 +37,21 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 
 
--- | Characterizes a value that can be rendered in human-readable form
-class Formattable a where
-    format ::a -> Text            
-
--- | Characterizes a pair of types for which transformations are defined 
--- for respectively "packing"  and "unpacking" type values
-class Packable a b where
-    -- Encodes an a-value to a b-value
-    pack::a -> b
-    -- Restores an a-value from a b-value
-    unpack::b -> a    
-
                 
 -- | Converts a showable to text    
 text::String -> Text
 text = Text.pack 
     
-enclose::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
-enclose left right content = Text.concat [format left, format content, format right]
+fence::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
+fence left right content = Text.concat [format left, format content, format right]
 
 -- | Formats a list of values and ensconces the result between left and right braces
 embrace::(Formattable a) => [a] -> Text
-embrace items = format <$> items |> List.intersperse Comma |> Text.concat |> enclose LBrace RBrace
+embrace items = format <$> items |> List.intersperse Comma |> Text.concat |> fence LBrace RBrace
 
 -- | Fences content between left and right parenthesis
 parenthetical::(Formattable a) => a -> Text
-parenthetical content = enclose LParen RParen content 
+parenthetical content = fence LParen RParen content 
         
 -- Formats a list of formattable items as a tuple
 tuplestring::(Formattable a) => [a] -> Text
@@ -95,6 +85,9 @@ dots i = repeat i Period
 -- | Produces text containing a specified number of "-" characters
 dashes::Integral i => i -> Text
 dashes i = repeat i Dash
+
+arrow::Integral i => i -> Text
+arrow i = dashes i <> Greater
 
 -- | Produces text containing a specified number of spaces
 spaces::Integral i => i -> Text

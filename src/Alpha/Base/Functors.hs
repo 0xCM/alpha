@@ -15,8 +15,8 @@ module Alpha.Base.Functors
     Alt, optional,(<!>),some,many,
     Bind, (>>-), (-<<), (-<-), (->-),join,
     Bifunctor, bimap, (<<.>>), (.>>), (<<.),
-    Bifoldable, bisum,    
-    Biapplicative, Bitraversable, (<<*>>), bipure, biliftA2, (*>>), (<<*), biliftA3, traverseBia, sequenceBia, traverseBiaWith,    
+    Bifoldable, bisum, bifoldMap,   
+    Biapplicative, Bitraversable, (<<*>>), bipure, biliftA2, (*>>), (<<*), biliftA3, traverseBia, sequenceBia, traverseBiaWith, bitraverse,    
     Biapply,(<<$>>),(<<..>>), bilift2,bilift3,
     BindTrans, liftB,    
     Comonad, (=>=), (=<=),(<<=), (=>>),
@@ -31,8 +31,8 @@ module Alpha.Base.Functors
     --Identity, identity,
     Monad, (>>=),
     Traversable, traverse, sequenceA,
-    Product, product, -- Compatible with the notion of a categorical product
-    Sum, lsum, rsum, -- Compatible with the notion of a categorical coproduct    
+    --Product, product, -- Compatible with the notion of a categorical product
+    --Sum, lsum, rsum, -- Compatible with the notion of a categorical coproduct    
     Eq1(..), Eq2(..), Ord1(..), Ord2(..), Show1(..), Show2(..), Read1(..),Read2(..),
 )
 where
@@ -62,8 +62,8 @@ import Data.Functor.Sum
 import Data.Functor.Classes(Eq1(..),Ord1(..),Show1(..),Read1(..),Eq2(..),Ord2(..),Show2(..),Read2(..))
 import Data.Bifunctor(Bifunctor, bimap)
 import Data.Bifunctor.Apply(Biapply, (<<$>>),(<<..>>),bilift2,bilift3, (<<.>>), (<<.),(.>>))
-import Data.Bifoldable(Bifoldable,bisum)
-import Data.Bitraversable(Bitraversable)
+import Data.Bifoldable(Bifoldable,bisum,bifoldMap)
+import Data.Bitraversable(Bitraversable,bitraverse)
 import Data.Biapplicative(Biapplicative, (<<*>>), bipure, biliftA2, (*>>), (<<*),biliftA3,traverseBia, sequenceBia, traverseBiaWith)
 import Data.Monoid(Monoid)
 

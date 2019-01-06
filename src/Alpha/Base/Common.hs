@@ -23,7 +23,6 @@ module Alpha.Base.Common
     Ptr, Storable, poke, peek, sizeOf, alignment, castPtr,     
     when,
     seq,
-    
 )
 where
 

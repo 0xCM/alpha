@@ -27,25 +27,28 @@ countDistinct = Bag.distinctSize
 
 instance (Ord a) => Container (Bag a)
     
-instance Vacant (Bag a) where
+instance Vacuous (Bag a) where
     empty = Bag.empty
     null = Bag.null
 
 instance (Ord a) => Unionizable (Bag a) where    
     union = Bag.union        
-    unions bags = (Set.fromList <$> (toList <$> bags)) |> Set.unions |> toList |> bag
+    --unions bags = (Set.fromList <$> (toList <$> bags)) |> Set.unions |> toList |> bag
         
 
 instance (Ord a) => Intersectable (Bag a) where    
     intersect = Bag.intersection
+    
+instance (Ord a) => Singletary (Bag a) where
+    singleton a = bag [a]
 
-instance (Ord a) => SetContainment (Bag a) where
+instance (Ord a) => Containment (Bag a) where
     isSubset proper candidate source 
         = ifelse proper 
             (Bag.isProperSubsetOf candidate source) 
             (Bag.isSubsetOf candidate source)
     
-instance (Ord a) => SetDifference (Bag a) where
+instance (Ord a) => Differential (Bag a) where
     diff = Bag.difference
     
 instance (Ord a) =>  IsList (Bag a) where

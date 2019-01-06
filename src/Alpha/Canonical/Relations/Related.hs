@@ -18,12 +18,27 @@ module Alpha.Canonical.Relations.Related
     Equivalence(..),
     Setoid(..),    
     PartialOrd(..),
-    OrdPartialOrd(..),
-    Point(..), Pointed(..),
+    TotalOrd(..),
+    PartialOrder(..),
+    TotalOrder(..),
+    OrdNum(..),
+    Point(..), 
+    Pointed(..),
     Pairs(..),
-    Minimal(..), Maximal(..),  Infimal(..), Supremal(..),
-    Infimum(..), Supremum(..), Extremum(..),
-    Comparer(..), LT(..), GT(..), LTEQ(..), GTEQ(..), Comparable(..),   
+    Minimal(..), 
+    Maximal(..),  
+    Infimal(..), 
+    Supremal(..),
+    Infimum(..), 
+    Supremum(..), 
+    Extremum(..),
+    Comparer(..), 
+    LT(..), 
+    GT(..), 
+    LTEQ(..), 
+    GTEQ(..), 
+    Comparable(..),   
+    Quotient(..)
 
 ) where
 import Algebra.PartialOrd 
@@ -39,6 +54,8 @@ import qualified Data.List as List
 type family Infimum a
 type family Supremum a    
 type family Extremum a
+type family Quotient a
+
 
 type instance Extremum (Interval a) = a
 type instance Individual (Interval a) = a
@@ -46,10 +63,13 @@ type instance Individual (Interval a) = a
 -- | Synonym for default comparison predicate
 type Comparer a = a -> a -> Bool
 
--- | Defines a singleton value    
-newtype Point a = Point a
-    deriving(Generic,Show)
-instance Newtype (Point a)
+-- -- | Defines a singleton value    
+-- newtype Point a = Point a
+--     deriving(Generic,Show)
+-- instance Newtype (Point a)
+
+-- | Specifies the type of a point relative to a set/space
+type family Point d
 
 -- | Defines a collection of ordered pairs    
 newtype Pairs a b = Pairs [(a,b)]
@@ -185,14 +205,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
     
 newtype Partition a = Partition (Map a [a] )
 
-
-
-
-class (PartialOrd a, Ord a) => OrdPartialOrd a where
-    (<=)::Comparer a
-    infix 4 <=
-       
-    
+        
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
 class Equivalence a => Setoid a where
@@ -225,15 +238,20 @@ class Supremal a where
     -- / The least upper bound
     supremum::a -> Extremum a
             
+class (Ord a) => LTEQ a where  
+    (<=)::Comparer a
+    (<=) = (P.<=)
+    infix 4 <=
+    {-# INLINE (<=) #-}
 
-class (OrdPartialOrd a) => LTEQ a where    -- Computes the minimum of two values    
     min::a -> a -> a
     min x y = ifelse (x <= y) x y
-    {-# INLINE min #-}
+    {-# INLINE min #-}    
 
 class (Ord a) => LT a where
     (<)::Comparer a
     (<) a b = a P.< b
+
     infix 4 <    
     {-# INLINE (<) #-}
 
@@ -258,19 +276,23 @@ class (GTEQ a, GT a, LTEQ a, LT a) => Comparable a where
     between::P3 a
     between x a b = x >= a || x <= b
     {-# INLINE between #-}
-    
+
+-- Defines a constraint that requires satisfaction of 
+-- both 'Ord' and 'Comparable' constraints
+type TotalOrd a = (Ord a, Comparable a)
+
+-- Defines a constraint that requires satisfaction of 
+-- both 'TotalOrd' and 'Num' constraints
+type OrdNum a = (TotalOrd a, Num a)   
+
 -- Classifies a type that has a distinguished value    
 class Pointed a where
-    point::a -> Point a
-    point = Point
+    point::a -> Point a    
 
--- relate::r -> (a,b) -> Related r a b
--- relate  = Related
-
-instance (Ord a, Semigroup a) => Minimal [a] where
+instance (Ord a) => Minimal [a] where
     minimum (x:xs) = Min <$> (x :| xs) |> sconcat |> getMin
 
-instance (Ord a, Semigroup a) => Maximal [a] where
+instance (Ord a) => Maximal [a] where
     maximum (x:xs) = Max <$> (x :| xs) |> sconcat |> getMax
         
 instance Infimal (Interval a) where
@@ -278,3 +300,174 @@ instance Infimal (Interval a) where
 
 instance Supremal (Interval a) where
     supremum = Interval.sup            
+
+-- PartialOrd instances
+-------------------------------------------------------------------------------
+instance PartialOrd Natural where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Integer where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Int where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Int8 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Int16 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Int32 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Int64 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Word where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Word8 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Word16 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Word32 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Word64 where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance (Integral a, Ord a) => PartialOrd (Ratio a) where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Float where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd Double where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd CFloat where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+instance PartialOrd CDouble where
+    leq a b = a P.<= b
+    {-# INLINE leq #-}
+
+-- LTEQ instances
+-------------------------------------------------------------------------------
+instance LTEQ Natural
+instance LTEQ Integer
+instance LTEQ Int
+instance LTEQ Int8
+instance LTEQ Int16
+instance LTEQ Int32
+instance LTEQ Int64
+instance LTEQ Word
+instance LTEQ Word8
+instance LTEQ Word16
+instance LTEQ Word32
+instance LTEQ Word64
+instance (Integral a, Ord a) => LTEQ (Ratio a)
+instance LTEQ Float
+instance LTEQ Double
+instance LTEQ CFloat
+instance LTEQ CDouble
+
+-- GTEQ instances
+-------------------------------------------------------------------------------
+instance GTEQ Natural
+instance GTEQ Integer
+instance GTEQ Int
+instance GTEQ Int8
+instance GTEQ Int16
+instance GTEQ Int32
+instance GTEQ Int64
+instance GTEQ Word
+instance GTEQ Word8
+instance GTEQ Word16
+instance GTEQ Word32
+instance GTEQ Word64
+instance (Integral a, Ord a) => GTEQ (Ratio a)
+instance GTEQ Float
+instance GTEQ Double
+instance GTEQ CFloat
+instance GTEQ CDouble
+
+-- LT instances
+-------------------------------------------------------------------------------
+instance LT Natural
+instance LT Integer
+instance LT Int
+instance LT Int8
+instance LT Int16
+instance LT Int32
+instance LT Int64
+instance LT Word
+instance LT Word8
+instance LT Word16
+instance LT Word32
+instance LT Word64
+instance (Integral a, Ord a) => LT (Ratio a)
+instance LT Float
+instance LT Double
+instance LT CFloat
+instance LT CDouble
+
+-- GT instances
+-------------------------------------------------------------------------------
+instance GT Natural
+instance GT Integer
+instance GT Int
+instance GT Int8
+instance GT Int16
+instance GT Int32
+instance GT Int64
+instance GT Word
+instance GT Word8
+instance GT Word16
+instance GT Word32
+instance GT Word64
+instance (Integral a, Ord a) => GT (Ratio a)
+instance GT Float
+instance GT Double
+instance GT CFloat
+instance GT CDouble
+
+-- Comparable instances
+-------------------------------------------------------------------------------
+instance Comparable Natural
+instance Comparable Integer
+instance Comparable Int
+instance Comparable Int8
+instance Comparable Int16
+instance Comparable Int32
+instance Comparable Int64
+instance Comparable Word
+instance Comparable Word8
+instance Comparable Word16
+instance Comparable Word32
+instance Comparable Word64
+instance (Integral a, Ord a) => Comparable (Ratio a)
+instance Comparable Float
+instance Comparable Double
+instance Comparable CFloat
+instance Comparable CDouble
+

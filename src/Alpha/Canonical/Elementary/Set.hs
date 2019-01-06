@@ -8,295 +8,238 @@
 module Alpha.Canonical.Elementary.Set
 (
     module X,
-    SetSpec(..),
     SetBuilder(..),
-    Subset(..),
-    DiscreteSubset(..),
-    NonEmptySet(..),
-    Cardinality(..),   
+    Subset(..),    
     Set(..),
-
-    subset',
-    emptyset, setrep, discrep, indiscrete, 
+    FneSet(..),
+    emptyset, 
+    finiteSet,
+    fneset,
 
 )
 where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.SetConstraints as X
-import Alpha.Canonical.Elementary.FiniteSet as X
-import Alpha.Canonical.Elementary.Individual as X
-import Alpha.Canonical.Elementary.InfiniteSet as X
+import Alpha.Canonical.Elementary.Common
+import Alpha.Canonical.Elementary.Queries as X
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.List as List
 import qualified Data.Text as Text
 import qualified Data.Sequence as Sequence
-
-
--- data SetRep a =
---     DiscreteSet
-     
--- | Specifies the cardinality of a set and partitions the universe
--- of sets under consideration
--- See https://en.wikipedia.org/wiki/Cardinality
-data Cardinality a =
-    -- | There are no elements
-    Zero
-    -- | There is exactly one element
-   | Singleton
-   -- | A finite number of elements of count 2 or greater
-   | Counted
-   -- | A countably-infinite number of elements
-   | Countable
-   -- | An uncountable number of elements
-   | Uncountable
-   -- | An unknown number of elements
-   | Uncounted
-   deriving (Generic, Data, Typeable, Enum)
-
--- | Specifies whether a set is discrete
-data SetDiscretion a =
-      Discreete
-    | Indiscrete
-
--- | Specifies whether a set is empty
-data SetHabitation a =
-      Inhabited
-    | Uninhabited    
-
-data SetProduction a =
-      Constructible
-    | Unconstructible  
+import qualified Numeric.Interval as Interval
+         
+data Construcability a =
+      Constructive
+    | Unconstructive
 
 data SetDescription a 
-    = SetDescription (Cardinality a, SetDiscretion a, SetHabitation a, SetProduction a)
+    = SetDescription (Cardinality a, Discretion a, Habitation a, Construcability a)
 
 data Set a
-    = Finite (FiniteSet a) 
-    | Infinite (InfiniteSet a)
+    = EmptySet
+    | FiniteSet (Set' a) 
+    | InfiniteSet
     deriving(Generic, Data, Typeable, Eq, Ord)
-
-data SetSpec a 
-    = UnconsRep
-    -- | Identifies a representative for a discrete and countable set
-    | DiscreteRep
-    -- | Identifies the empty set
-    | EmptyRep
-    -- | Identifies a set that is non-discretizable and non-countable
-    | IndiscreteRep   
-    -- | Identifies a representative for which an explict set can be constructed
-    | ConsRep     
-        -- | Specifies a set with explicit content
-    | UncountedSet [a]
-      -- | Specifies a set with explicit finite content, if nonempty
-    | CountedSet Int (FiniteSet a)
-      -- | Specifies a set with explicit nonempty content
-    | NeSet (NonEmpty a)
-     -- | Specifies a finite non-empty set
-    | FneSet (FiniteSet a)    
-        deriving(Generic, Data, Typeable, Eq, Ord)
      
+
 type instance Individual (Set a) = a
-type instance Individual (SetSpec a) = a
 
-
-
-
--- | Constructs a representative for the empty set relative to the parameter 'a'
-setrep::SetSpec a
-setrep = UnconsRep
-
--- | Constructs the default set representative
-emptyset::SetSpec a
-emptyset = EmptyRep
-
--- | Constructs a finite, nonempty set
-fneSet::(Ord a) => NonEmpty a -> SetSpec a
-fneSet (a :| items) = FneSet $ fromList (a:items)
-
--- | Constructs a representative for a discrete set
-discrep::(Discrete a) => SetSpec a
-discrep = DiscreteRep
-
--- | Constructs a representative for a non-discretizable set
-indiscrete::SetSpec a
-indiscrete = IndiscreteRep
-
--- | Constructs an explicit finite set if source is nonempty, otherwise 
--- returns the empty set
--- finiteSpec::(Ord a) => [a] -> SetSpec a
--- finiteSpec items = 
---     if (List.null items) 
---         then EmptyRep 
---         else CountedSet 
---             (List.length items) 
---             (FiniteSet (fromList items))
-
-
-countedset::(Ord a) => FiniteSet a -> SetSpec a
-countedset (FiniteSet s) = 
-    if Set.null s 
-        then EmptyRep 
-        else CountedSet (Set.size s) (FiniteSet s) 
-
-neSet::(Ord a) => NonEmpty a -> SetSpec a
-neSet (a :| items) = NeSet $ fromList (a:items)
-
-isFneSet::SetSpec a -> Bool
-isFneSet (FneSet _) = True
-isFneSet _ = False
-
-powerset::Ord a => FiniteSet a -> FiniteSet(FiniteSet a)
-powerset (FiniteSet src) = Set.map FiniteSet (powerset' src) |> FiniteSet 
-
-            
-subset'::forall a b. Subset a b => SetSpec a
-subset' = subset @a (UnconsRep @b)
-
--- | Characterizes a discrete set    
-class Discrete a where
-    elements::SetSpec a -> [Individual a]    
-
--- | Classifies a type whose values can be interpreted as a 
--- subset of another type's values
 class Subset a b where
-    subset::SetSpec b -> SetSpec a
-    
--- | Classifies a type for which a discrete set of values can be interpreted as a 
--- subset of another type's values
-class (Subset a b, Discrete a) => DiscreteSubset a b where
-    subelements::SetSpec b -> [Individual a]
-    subelements b = elements (subset @a b)
-    
-class SetSpecBuilder s where
-    -- | Extracts the elements from a structure
-    setspec::s ->  [Individual s] --SetSpec (Individual s)
-    
+    subset::Set b -> Set a
+
 class (a ~ Individual b) =>  SetBuilder b a where
     set::b -> Set a
 
-instance Default (SetSpec a) where
-    def = EmptyRep
+instance (Ord a) => SetBuilder [a] a where
+    set src = ifelse (List.null src) EmptySet (FiniteSet (fromList src))
+
+-- | Represents a finite set that contains at least one element
+newtype FneSet a = FneSet (Set' a)    
+    deriving (Eq,Ord,Generic)
+
+instance Newtype(FneSet a)    
+
+type instance Individual (FneSet a) = a
+    
+-- | Constructs a representative for the empty set relative to the parameter 'a'
+emptyset::Set a
+emptyset = EmptySet
+
+finiteSet::(Ord a) => [a] -> Set a
+finiteSet = FiniteSet . fromList
+
+powerset::Ord a => Set a -> Set(Set a)
+powerset (FiniteSet src) = Set.map FiniteSet (powerset' src) |> FiniteSet
+powerset _ = EmptySet
+
+fneset::(Ord a) => NonEmpty a -> FneSet a
+fneset (a :| xs) = FneSet (Set.fromList(a : xs))
+
+formatset::(Formattable m) => [m] -> Text  
+formatset s = fence LBrace RBrace (format elements) where
+    elements =  weave Comma (format <$> s)
+
+instance Ord a => IsList (Set a) where
+    type Item (Set a) = a
+    toList (FiniteSet s) = toList s
+    toList _ = []
+
+    fromList ([]) = EmptySet
+    fromList (xs) = FiniteSet (fromList xs)
+
+instance Ord a => Associated (Set a) where
+    associates (FiniteSet s) = toList s
+    associates (_) = []
+    
+instance Ord a => Discrete (Set a) where
+    individuals = associates
+
+instance Ord a => Finite (Set a) where
+    count = fromIntegral . List.length . associates
         
--- instance Ord a => SetSpecBuilder [a] where
---     setspec items = 
---         if (List.null items) 
---         then EmptyRep 
---         else CountedSet count fs where
---             count = (fromIntegral $ List.length items)
---             fs = fromList items |> FiniteSet
+instance (Ord a) => Unionizable (Set a) where
+    union (FiniteSet x) (FiniteSet y )  =  FiniteSet $ Set.union x y    
+    union EmptySet EmptySet = EmptySet
+    union  (FiniteSet x) (EmptySet) = FiniteSet x
+    union (EmptySet)  (FiniteSet y) = FiniteSet y
+    union InfiniteSet  _ = undefined
+    union _  InfiniteSet = undefined
+    
+instance Universal (Set a) where
+    all pred (FiniteSet s) = s |> Set.toList |> List.all pred
+    all pred (EmptySet) = True
+    all pred (InfiniteSet) = undefined
+    
+instance Existential (Set a) where
+    any pred (FiniteSet s) = s |> Set.toList |> List.any pred
+    any pred (EmptySet) = False    
+    any pred (InfiniteSet) = undefined
+
+instance Ord a => Containment (Set a) where
+    isSubset proper (FiniteSet candidate) (FiniteSet source) 
+        = ifelse proper  
+            (Set.isProperSubsetOf c' s')  
+            (Set.isSubsetOf c' s')  where (c', s') = (candidate, source)
+    isSubset proper (EmptySet) _ = True
+    isSubset proper _ EmptySet = False
+    isSubset proper (InfiniteSet) _ = undefined
+
+instance Ord a => Differential (Set a) where
+    diff (FiniteSet x) (FiniteSet y) = FiniteSet $ Set.difference x y
+    
+instance Ord a => Intersectable (Set a) where
+    intersect (FiniteSet x) (FiniteSet y) = FiniteSet $ Set.intersection x y 
     
 instance Formattable TyConInfo where
-    format (TyConInfo (_,mod,ctor)) = mod <> enclose LParen RParen ctor 
+    format (TyConInfo (_,mod,ctor)) = mod <> fence LParen RParen ctor 
 
 instance Show TyConInfo where
     show = string . format
 
 instance (Formattable a, Ord a) => Formattable (Set a) where
-    format (Finite l) = format l
-    format (Infinite l) = format l
+    format  EmptySet =  LBrace <> RBrace
+    format  InfiniteSet =  LBrace <> RBrace
+    format (FiniteSet l) = formatset (toList l) where
+
+        
+instance (Ord a, Ord b) => Mappable(Set a) a b where
+    type Mapped (Set a) a b = Set b
+    map f (FiniteSet s) = FiniteSet $ Set.map f s
+    map f (EmptySet) = EmptySet
+    map f (InfiniteSet) = InfiniteSet
 
 instance (Formattable a, Ord a) => Show (Set a) where
     show = Text.unpack . format
-    
-instance forall a. (Formattable a, Typeable a, Ord a) => Formattable (SetSpec a) where
-    format x = fmt x where
-        tyName = typerep @a |> show |> Text.pack            
-        fmtU s = (List.take 10 s) |> (<$>) format |> List.intersperse Comma |> append |> enclose LBrace RBrace
 
-        fmtC::Int -> [a] -> Text
-        fmtC n s = format <$> s |> List.intersperse  Comma |> append |> enclose LBrace RBrace
-    
-        fmt (UnconsRep) =  rspaced tyName <> format (tycon @(UnconsRep::SetSpec a)) 
-        fmt (DiscreteRep) = rspaced tyName <> format (tycon @(DiscreteRep::SetSpec a)) 
-        fmt (EmptyRep) = rspaced tyName <>  format (tycon @(EmptyRep::SetSpec a)) 
-        fmt (IndiscreteRep) = rspaced tyName <> format (tycon @(IndiscreteRep::SetSpec a)) 
-        fmt (UncountedSet s) = fmtU s
-        fmt (CountedSet n s) = fmtC n (list s)
-        fmt (NeSet s) = (fmtU $ list s)
-        fmt (FneSet (FiniteSet s)) = fmtC (length s) (list s)
-                        
-    
-instance (Formattable a,Typeable a, Ord a) => Show (SetSpec a) where
-    show = Text.unpack . format 
+instance Ord a => Vacuous (Set a) where
+    empty = EmptySet
+    null (EmptySet) = True
+    null _ = False
         
--- instance Ord a => IsList (SetSpec a) where
---     type Item (SetSpec a) = a
---     toList (UnconsRep) = []
---     toList (DiscreteRep) = []
---     toList (EmptyRep) = []
---     toList (IndiscreteRep) = []
---     toList (UncountedSet items) = toList items
---     toList (CountedSet _ items) = toList items
---     toList (NeSet items) = toList items
---     toList (FneSet items) = toList items
-
---     fromList [] = EmptyRep
---     fromList x = setspec x 
-
-instance (Ord a) => Membership (SetSpec a) where
-    -- | Identifies a representative for which an explict set can be constructed
-    --members (ConsRep) =  members (construct::Set a)
-    members (UncountedSet s) = s
-    members (CountedSet _ (FiniteSet s)) = toList s
-    members (NeSet s) = toList s
-    members (FneSet s) = toList s  
-    members(_) = []
-
--- instance (Ord a) =>  Unionizable (SetSpec a) where
---     union a b = setspec $ List.union (toList a) (toList b)    
-
---     unions::[SetSpec a] -> SetSpec a
---     unions sets = undefined --(unwrap <$> sets) |> Set.unions |> FiniteSet
-        
-instance Subset Int8 Int16 where
-    subset _ = setrep 
-instance Subset Int16 Int32 where
-    subset _ = setrep 
-instance Subset Int32 Int64 where
-    subset _ = setrep 
-instance Subset Int64 Integer where
-    subset _ = setrep 
-instance Subset Word8 Word16 where
-    subset _ = setrep 
-instance Subset Word16 Word32 where
-    subset _ = setrep 
-instance Subset Word32 Word64 where
-    subset _ = setrep 
-instance Subset Word64 Natural where
-    subset _ = setrep 
-instance Subset Natural Integer where
-    subset _ = setrep 
-
 instance (Ord a) => SetBuilder (UniTuple1 a) a where
-    set (UniTuple1 a1) = finite [a1] |> Finite
+    set (UniTuple1 a1) = fromList [a1] 
 instance (Ord a) => SetBuilder (UniTuple2 a) a where
-    set (a1,a2) = finite [a1,a2] |> Finite
+    set (a1,a2) = fromList [a1,a2]
 instance (Ord a) => SetBuilder (UniTuple3 a) a where
-    set (a1,a2,a3) = finite [a1,a2,a3] |> Finite
+    set (a1,a2,a3) = fromList [a1,a2,a3]
 instance (Ord a) => SetBuilder (UniTuple4 a) a  where
-    set (a1,a2,a3,a4) = finite [a1,a2,a3,a4]  |> Finite
+    set (a1,a2,a3,a4) = fromList [a1,a2,a3,a4]
 instance (Ord a) => SetBuilder (UniTuple5 a) a where
-    set (a1,a2,a3,a4,a5) = finite [a1,a2,a3,a4,a5] |> Finite
-
-integers'::(Bounded i, Integral i) => [i]    
-integers' = [minBound .. maxBound]
+    set (a1,a2,a3,a4,a5) = fromList [a1,a2,a3,a4,a5] 
 
 instance SetBuilder Int8 Int8 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Int16 Int16 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Int32 Int32 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Int64 Int64 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Word8 Word8 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Word16 Word16 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Word32 Word32 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
 instance SetBuilder Word64 Word64 where
-    set _ = finite integers' |> Finite
+    set _ = set integers
+
+instance (Ord a) => Queryable (Set a) where
+    filter p (FiniteSet s) = s |> toList |> List.filter p
+    filter p _ = []        
+
+instance Universal (FneSet a) where
+    all pred (FneSet s) = s |> Set.toList |> List.all pred
     
+instance Existential (FneSet a) where
+    any pred (FneSet s) = s |> Set.toList |> List.any pred
+        
+instance Ord a => IsList (FneSet a) where
+    type Item (FneSet a) = a
+    toList (FneSet s) = toList s
+
+    fromList ([]) = error "no"
+    fromList (xs) = FneSet (fromList xs)
+
+instance Ord a => Associated (FneSet a) where
+    associates (FneSet s) = toList s
+
+instance Ord a => Discrete (FneSet a) where
+    individuals = associates        
+
+instance Ord a => Finite (FneSet a)
+    
+    
+instance (Ord a) => Unionizable (FneSet a) where
+    union (FneSet x) (FneSet y )  =  FneSet $ Set.union x y  
+    unions = undefined
+    
+
+instance Ord a => Differential (FneSet a) where
+    diff (FneSet x) (FneSet y) = FneSet $ Set.difference x y
+    
+instance Ord a => Intersectable (FneSet a) where
+    intersect (FneSet x) (FneSet y) = FneSet $ Set.intersection x y 
+                
+instance Ord a => Containment (FneSet a) where
+    isSubset proper (FneSet candidate) (FneSet source) 
+        = ifelse proper  
+            (Set.isProperSubsetOf c' s')  
+            (Set.isSubsetOf c' s')  
+                where (c', s') = (candidate, source)
+    
+instance (Ord a) => Queryable (FneSet a) where
+    filter p (FneSet s) = s |> toList |> List.filter p
+
+instance (Ord a, Ord b) => Mappable(FneSet a) a b where
+    type Mapped (FneSet a) a b = FneSet b
+    map f (FneSet s) = FneSet $ Set.map f s
+        
+instance (Formattable a, Ord a) => Formattable (FneSet a) where
+    format (FneSet l) = formatset (toList l) where
+
+instance (Formattable a, Ord a) => Show (FneSet a) where
+    show = Text.unpack . format
+    
+

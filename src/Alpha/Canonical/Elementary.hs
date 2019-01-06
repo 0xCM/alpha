@@ -6,13 +6,14 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Elementary(module X) where
 import Alpha.Canonical.Common as X
-import Alpha.Canonical.Elementary.FiniteSet as X
 import Alpha.Canonical.Elementary.Indexed as X
-import Alpha.Canonical.Elementary.Individual as X
-import Alpha.Canonical.Elementary.InfiniteSet as X
-import Alpha.Canonical.Elementary.Quantification as X
+import Alpha.Canonical.Elementary.MultiIndex as X
+import Alpha.Canonical.Elementary.IndexedTerm as X
+import Alpha.Canonical.Elementary.Queries as X
 import Alpha.Canonical.Elementary.Set as X
-import Alpha.Canonical.Elementary.SetConstraints as X
+import Alpha.Canonical.Elementary.Sets as X
 import Alpha.Canonical.Elementary.Tuples as X
 import Alpha.Canonical.Elementary.Sequential as X
+import Alpha.Canonical.Elementary.Common as X
+
 

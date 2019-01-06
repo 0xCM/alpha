@@ -11,14 +11,22 @@ module Alpha.Canonical.Common.Root
     Weave(..),
     Variance(..),
     Variant(..),
-    Componentized(..),
     Faceted(..),
     FacetValue(..), 
     Reifiable(..),
     Chunkable(..),
     Classifiable(..),
     Specifiable(..),
-    Mappable(..),    
+    Mappable(..),  
+    Sourced(..),
+    Targeted(..),  
+    Connective(..),
+    Packable(..),
+    Formattable(..),
+    Labeled(..),
+    Cardinality(..),   
+    Discretion(..),
+    Habitation(..),
     enumValues,
     typeSymbol,
     typeSymbols,
@@ -26,30 +34,70 @@ module Alpha.Canonical.Common.Root
     mapi,
     ifelse, 
     clone,
-
+    reduce,
+    associate, 
+    associated,
     (<|),(|>), 
 
 ) where
 import Alpha.Base as X
+import Alpha.Canonical.Common.Synonyms
 import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Numeric.Interval as Interval
 import qualified Data.Map as Map
-
     
--- Characterizes a type for which a notion of dimensionality 
+
+
+-- | Characterizes a value that can be rendered in human-readable form
+class Formattable a where
+    format ::a -> Text            
+
+-- | Characterizes a pair of types for which transformations are defined 
+-- for respectively "packing"  and "unpacking" type values
+class Packable a b where
+    -- Encodes an a-value to a b-value
+    pack::a -> b
+    -- Restores an a-value from a b-value
+    unpack::b -> a    
+
+
+-- | Characterizes a type for which a notion of dimensionality 
 -- can be defined, e.g., an array, matrix or more generally a tensor
 class Dimensional a where
     type Dimension a
     dimension::a -> Dimension a
 
--- / Characterizes a type from which a sequence of components can be extracted
-class Componentized a where
-    type Component a
-    components::a -> [Component a]    
+-- | Characterizes a type with which defines an intrinsic label
+class Labeled a where
+    type Label a    
+
+    -- | Write a label to a value
+    label::Label a -> a -> a
+
+    -- | Read a label from a value
+    getLabel::a -> Label a
     
-    
-    
+        
+-- | Characterizes a type with which an origin/initial object is related
+class Sourced a where
+    type Source a
+    source::a -> Source a
+
+-- | Characterizes a type with which a destination/final object is related
+class Targeted a where
+    type Target a
+    target::a -> Target a
+        
+-- } Characterizes a type that controls the reification of a directed relationship    
+-- from a source to a target
+class (Sourced a, Targeted b) => Connective a b where 
+    -- | The reification type
+    type Connection a b
+
+    -- | Establishes a connection from a source to a target
+    connect::a -> b -> Connection s t        
+
 class Mappable c a b where    
     type Mapped c a b
     map::(a -> b) -> c -> Mapped c a b
@@ -67,6 +115,35 @@ instance Weave Char Text where
             
 instance Weave g [g] where
     weave = List.intersperse        
+
+-- | Specifies the cardinality of a set and partitions the universe
+-- of sets under consideration
+-- See https://en.wikipedia.org/wiki/Cardinality
+data Cardinality a =
+    -- | There are no elements
+    Zero
+    -- | There is exactly one element
+   | Singleton
+   -- | A finite number of elements of count 2 or greater
+   | Counted
+   -- | A countably-infinite number of elements
+   | Countable
+   -- | An uncountable number of elements
+   | Uncountable
+   -- | An unknown number of elements
+   | Uncounted
+   deriving (Generic, Data, Typeable, Enum)
+
+-- | Specifies whether a type/value is discrete
+data Discretion a =
+      Discrete
+    | Indiscrete
+
+-- | Specifies whether a type/value is empty
+data Habitation a =
+      Inhabited
+    | Uninhabited    
+
 
 -- | Specifies whether a construct is covariant or contravariant    
 data Variance = Contravariant | Covariant
@@ -98,7 +175,6 @@ class Reifiable (a::k) r where
 -- that can be separated into groups of possibly different sizes
 class Chunkable a where
     chunk::Int -> a -> [a]
-
 
 -- | Captures the specification pattern
 class Specifiable a where
@@ -151,5 +227,19 @@ infixl 0 |>
 f <| x = f x
 infixr 0 <|
 
+reduce::a -> O2 a -> [a] -> a
+reduce id op (a:b:tail) =  op (op a b)  (reduce id op tail)
+reduce id op (a:[]) = a
+reduce id op [] = id
+
+
 clone::(Integral n) => n -> a -> [a]
 clone n a = List.replicate (fromIntegral n) a
+
+-- | Produces an associative array for a list of key-value pairs
+associate::Ord k => [(k,v)] -> Map k v
+associate = Map.fromList
+
+-- | Extracts the indexed values from a map
+associated::Ord k => Map k v -> [v]
+associated m = snd <$> (toList m)

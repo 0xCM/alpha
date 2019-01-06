@@ -14,7 +14,6 @@ module Alpha.Canonical.Algebra.Modular
 
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.IntDomain
 import Alpha.Canonical.Algebra.Common
 
 import qualified Data.Vector as Vector

@@ -10,8 +10,8 @@ module Alpha.Canonical.Relations.Functions
 (
     Dom(..),
     Cod(..),
+    Img(..),
     Arity(..),
-    Mor(..),
     Composition(..), 
     Compositional(..), 
     Function(..),
@@ -26,7 +26,6 @@ import Alpha.Canonical.Elementary
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe
 import qualified Data.List as List
-
 
 newtype Func0 a = Func0 (F0 a)
     deriving (Generic)
@@ -47,7 +46,6 @@ instance Newtype (Func3 a1 a2 a3 a4)
 newtype Func4 a1 a2 a3 a4 a5 = Func4 (F4 a1 a2 a3 a4 a5)
     deriving (Generic)
 instance Newtype (Func4 a1 a2 a3 a4 a5)
-
 
 type family Func (n::Nat) a = r | r -> n where
     Func 0 a = Func0 a
@@ -112,7 +110,8 @@ type instance Dom (Func3 a1 a2 a3 a4) = (a1,a2,a3)
 type instance Dom (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4)
 
 -- Defines a family of types that specify function *codomains*,\
--- i. e. identified sets that cover the respective function images
+-- i. e. identified sets that cover, but are not necessarily equal
+-- to, thes function images
 type family Cod f     
 type instance Cod (a -> b) = b
 type instance Cod (Map a b) = b
@@ -122,9 +121,11 @@ type instance Cod (Func2 a1 a2 a3) = a3
 type instance Cod (Func3 a1 a2 a3 a4) = a4
 type instance Cod (Func4 a1 a2 a3 a4 a5) = a5
 
--- Defines a family of structure-preserving functions (for groups, modules, etc)
--- that ultimately yield the functor abstraction in the context of a category
-type family Mor f
+-- | Represents the image of a function which is the same type as
+-- a codomain but may not represent the same set of values. When
+-- the codomain and image are indeed equal as sets then the
+-- function is a surjection
+type Img f = Cod f
 
 type family Function f      
 type instance Function (a -> b) = a -> b

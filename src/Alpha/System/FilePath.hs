@@ -71,17 +71,6 @@ newtype RelativeFilePath = RelativeFilePath Text
 newtype RelativeFolderPath = RelativeFolderPath Text
     deriving(Eq, Ord, Show, Generic, Data, Typeable, Formattable, Length)
 
-type instance Concatenated DriveLetter FolderName = FolderPath
-type instance Concatenated DriveLetter RelativeFolderPath = FolderPath
-type instance Concatenated DriveLetter FileName = FilePath 
-type instance Concatenated DriveLetter RelativeFilePath = FilePath 
-type instance Concatenated FolderPath FolderName = FolderPath
-type instance Concatenated FolderPath FileName = FilePath
-type instance Concatenated FolderPath RelativeFolderPath = FolderPath
-type instance Concatenated FolderPath RelativeFilePath = FilePath
-type instance Concatenated FileName FileExtension = FilePath
-type instance Concatenated FilePath FileExtension = FilePath
-type instance Concatenated FileExtension FileExtension = FileExtension
 
 -- | Constructs a 'DriveLetter'    
 drive::DriveChar -> DriveLetter
@@ -115,12 +104,11 @@ fileName x  = FileName x
 extension::Text -> FileExtension
 extension x = FileExtension x
 
-
 getExtension':: Text -> Maybe FileExtension
 getExtension' x = case (x |> rightOfLast Period) of 
         Just y -> extension y |> just
         _ -> none
-
+        
 instance PathComponent DriveLetter where
     path (DriveLetter x) = (format x ) <>  Colon
 instance PathComponent FilePath where
@@ -137,26 +125,47 @@ instance PathComponent RelativeFilePath where
     path (RelativeFilePath x) = x
 instance PathComponent RelativeFolderPath where
     path (RelativeFolderPath x) = x
-
+    
 instance Concatenable DriveLetter FolderName where
+    type Concatenated DriveLetter FolderName = FolderPath
     concat x y = Text.concat [path x, FSlash, path y] |> folder
+
 instance Concatenable DriveLetter RelativeFolderPath where
+    type Concatenated DriveLetter RelativeFolderPath = FolderPath
     concat x y = Text.concat [path x, FSlash, path y] |> folder
+
 instance Concatenable DriveLetter FileName where
+    type Concatenated DriveLetter FileName = FilePath 
     concat x y = Text.concat [path x, FSlash, path y] |> file
+
 instance Concatenable DriveLetter RelativeFilePath where
+    type Concatenated DriveLetter RelativeFilePath = FilePath 
     concat x y = Text.concat [path x, FSlash, path y] |> file
+
 instance Concatenable FolderPath FolderName where
+    type Concatenated FolderPath FolderName = FolderPath
     concat x y = Text.concat [path x, FSlash, path y] |> folder        
+
 instance Concatenable FolderPath FileName where
+    type Concatenated FolderPath FileName = FilePath
     concat x y = Text.concat [path x, FSlash, path y] |> file
+
 instance Concatenable FolderPath RelativeFolderPath where
+    type Concatenated FolderPath RelativeFolderPath = FolderPath
     concat x y = Text.concat [path x, FSlash, path y] |> folder
+
 instance Concatenable FolderPath RelativeFilePath where
+    type Concatenated FolderPath RelativeFilePath = FilePath
     concat x y = Text.concat [path x, FSlash, path y] |> file            
+
 instance Concatenable FileName FileExtension where
+    type Concatenated FileName FileExtension = FilePath
     concat x y = Text.concat [path x, Period, path y] |> file
+    
 instance Concatenable FilePath FileExtension where
+    type Concatenated FilePath FileExtension = FilePath
     concat x y = Text.concat [path x, Period, path y] |> file    
+
 instance Concatenable FileExtension FileExtension where
+    type Concatenated FileExtension FileExtension = FileExtension
     concat x y = Text.concat [path x, Period, path y] |> extension    

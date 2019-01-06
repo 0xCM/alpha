@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.132
+version:             0.0.133
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -22,6 +22,7 @@ default-extensions:
   DeriveFoldable
   DeriveGeneric
   DeriveTraversable
+  DerivingVia
   DuplicateRecordFields
   FunctionalDependencies
   FlexibleInstances

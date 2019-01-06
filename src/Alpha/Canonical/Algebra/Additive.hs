@@ -30,7 +30,7 @@ import qualified Numeric.Interval as Interval
 -- where a type instance is the addition result type
 type family Summed a b
 type UniSum a = Summed a a
-type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a    
+type instance Summed (Set a) (Set a) = Set a    
 
 -- | Represents an addition operator
 newtype Addition a = Addition (O2 a)    
@@ -95,15 +95,13 @@ instance (Nullary a, Additive a) => Computable (MultiSum a) where
 instance Commutative (Addition a)
 instance Associative (Addition a)
     
-instance (Ord a) =>  Additive (FiniteSet a) where
+instance (Ord a) =>  Additive (Set a) where
     add x y = union x y
     {-# INLINE add #-}
 
-instance (Ord a) => Nullary (FiniteSet a) where
-    zero = []
+instance (Ord a) => Nullary (Set a) where
+    zero = EmptySet
 
-instance SetBuilder Natural Natural where
-    set _ = infinite [zero..] |> Infinite
     
 -- Additive numbers
 -------------------------------------------------------------------------------

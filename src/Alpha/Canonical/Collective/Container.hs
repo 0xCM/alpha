@@ -8,8 +8,6 @@
 module Alpha.Canonical.Collective.Container
 (
     Container(..),
-    Filterable(..),
-    Headed(..),
     Zippable(..), 
     Groupable(..),
     tree,
@@ -38,23 +36,6 @@ class (IsList c) => Container c where
     contents::c -> [Item c]
     contents = toList
 
-    -- | Constructs a container with exactly one element
-    singleton::Item c -> c
-    singleton e = contain [e]
-
-    
--- | Characterizes a container holding elements that can be 
--- filtered via a unary predicate    
-class (Container c) => Filterable c where
-
-    -- | Excludes elements that don't satisfy a predicate
-    filter::P1 (Item c) -> c -> c
-
-    -- | Selects a single element that satisfies a predicate
-    single::P1 (Item c) -> c -> Item c
-    single p c =  List.head $ contents $ filter p c  
-
-    
     
 -- | The elements of a tree are projected onto a list
 type instance Appended (Tree a) = [a]
@@ -87,15 +68,14 @@ class Zippable a b c where
 class Groupable c where
     groups::(Individual c -> Individual c -> Bool) -> c -> [[Individual c]]
 
-instance (Ord a) => Container (FiniteSet a) where
+instance (Ord a) => Container (Set a) where
     contain = fromList
     contents = toList
     
-instance (Ord a) => Filterable (FiniteSet a) where
-    filter p s = FiniteSet $  Set.filter p  (unwrap s)
+--instance (Ord a) => Filterable (Set a)
     
-instance Pairing (FiniteSet a) (FiniteSet b) (DisjointUnion (FiniteSet a) (FiniteSet b)) where
-    pair a b = DisjointUnion (a, b)
-    first (DisjointUnion (a,b)) = a
+instance Triple (Set a) (Set b) (DisjointUnion (Set a) (Set b)) where
+    third a b = DisjointUnion (a, b)
     second (DisjointUnion (a,b)) = b
+    first (DisjointUnion (a,b)) = a
             

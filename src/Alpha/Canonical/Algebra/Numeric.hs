@@ -9,15 +9,16 @@ module Alpha.Canonical.Algebra.Numeric
 (
     module X,
     Numeric(..),
-    IntegralNumeric(..),
-    NaturalNumeric(..),
-    Rational(..),
     IntegrallyPowered(..),
     ApproximatelyPowered(..),
-    egcd,
+    Number(..), number,
 ) where
-import Alpha.Canonical.Common
-import Alpha.Canonical.Algebra.Field as X
+import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Subtractive as X
+import Alpha.Canonical.Algebra.Multiplicative as X
+import Alpha.Canonical.Algebra.Additive as X
+import Alpha.Canonical.Algebra.Divisive as X
+import Alpha.Canonical.Algebra.Distributive as X
 import Alpha.Canonical.Algebra.Exponential as X
 
 class (Fractional a) => IntegrallyPowered a where
@@ -36,7 +37,7 @@ class (Floating a) => ApproximatelyPowered a where
     {-# INLINE (**) #-}
     infixr 8 **
 
-type NumericContext a = (Ord a, Subtractive a, Semiring a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Powered a)    
+type NumericContext a = (Ord a, Subtractive a, Distributive a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Powered a)    
 
 class NumericContext a => Numeric a where
     num::a -> a
@@ -46,7 +47,9 @@ class NumericContext a => Numeric a where
 newtype Number a = Number a
     deriving (Eq,Ord)
         
-        
+number::(Numeric a) => a -> Number a
+number = Number
+
 deriving instance Num a  => Num (Number a)
 deriving instance Subtractive a  => Subtractive (Number a)
 deriving instance Additive a  => Additive (Number a)
@@ -58,30 +61,13 @@ deriving instance Real a  => Real (Number a)
 deriving instance Powered a  => Powered (Number a)
 deriving instance LeftDistributive a  => LeftDistributive (Number a)
 deriving instance RightDistributive a  => RightDistributive (Number a)
-deriving instance Semiring a  => Semiring (Number a)
 deriving instance Numeric a => Numeric (Number a)
-
-class (Numeric a, Integral a, IntegralDomain a) => IntegralNumeric a where
-
--- | Classifies unsigned integral numeric values    
-class (IntegralNumeric a, UnsignedIntegral a) => NaturalNumeric a where
-
-class (IntegralNumeric a) => Rational a where
-    numerator::Ratio a -> a
-    denominator::Ratio a -> a
-
--- | Extended gcd function in a Euclidean domain
--- Implementation taken from arithmoi
--- egcd a b = (s,t,d) where d = gcd(a,b) = sa + tb
-egcd::(Eud a, Num a) => a -> a -> (a,a,a)
-egcd a b = (d, x * signum a, y * signum b) 
-    where
-    (d, x, y) = eGCD 0 1 1 0 (abs' a) (abs' b)
-    eGCD !n1 o1 !n2 o2 r s
-        | s == 0    = (r, o1, o2)
-        | otherwise = case r `quotRem` s of
-                        (q, t) -> eGCD (o1 - q*n1) n1 (o2 - q*n2) n2 s t
-    
+deriving instance PartialOrd a => PartialOrd (Number a)   
+deriving instance LT a => LT (Number a)    
+deriving instance GT a => GT (Number a)    
+deriving instance LTEQ a => LTEQ (Number a)    
+deriving instance GTEQ a => GTEQ (Number a)    
+deriving instance Comparable a => Comparable (Number a)    
 
 instance Numeric Natural
 instance Numeric Integer
@@ -101,31 +87,6 @@ instance Numeric Double
 instance Numeric CFloat
 instance Numeric CDouble
 
-
-instance IntegralNumeric Natural
-instance IntegralNumeric Integer
-instance IntegralNumeric Int
-instance IntegralNumeric Int8
-instance IntegralNumeric Int16
-instance IntegralNumeric Int32
-instance IntegralNumeric Int64
-instance IntegralNumeric Word
-instance IntegralNumeric Word8
-instance IntegralNumeric Word16
-instance IntegralNumeric Word32
-instance IntegralNumeric Word64
-
-
-instance NaturalNumeric Word
-instance NaturalNumeric Word8
-instance NaturalNumeric Word16
-instance NaturalNumeric Word32
-instance NaturalNumeric Word64
-instance NaturalNumeric Natural
-    
--- instance (IntegralNumeric a) => Rational a  where
---     numerator = numerator'
---     denominator = denominator'
 
 
 instance (Show b, Show p) => Show (Exponential b p) where

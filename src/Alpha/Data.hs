@@ -11,8 +11,10 @@ import Alpha.Data.Bits as X
 import Alpha.Data.BitString as X
 import Alpha.Data.BitVector as X
 import Alpha.Data.ByteString as X
-import Alpha.Data.VecN as X
-import Alpha.Data.Permutation as X
-import Alpha.Data.Simplex as X
-import Alpha.Data.Polynomial as X
+import Alpha.Data.Gate as X
+import Alpha.Data.Grammar as X
+import Alpha.Data.PetriNet as X
+import Alpha.Data.Matrix as X
+
+
 

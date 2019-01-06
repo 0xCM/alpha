@@ -57,10 +57,6 @@ type instance Negated Word16 = Int16
 type instance Negated Word32 = Int32
 type instance Negated Word64 = Int64
 
-instance SetBuilder Integer Integer where
-    set x = f x |> Infinite where
-        g x = List.union (negate <$> [1..20]) [0..20]
-        f x = g x |>infinite
 
 -- Negatable 
 -------------------------------------------------------------------------------

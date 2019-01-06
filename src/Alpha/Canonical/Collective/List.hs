@@ -10,7 +10,8 @@ module Alpha.Canonical.Collective.List
     Segmenter(..),
     exclude,
     nonempty,
-    intermix
+    intermix,
+    List.intersperse
 )
 where
 
@@ -71,31 +72,26 @@ instance (Eq a) => Container [a] where
     contain x = x
     contents = id
 
-instance Concatenable [a] [a] where
-    concat = (List.++)
 
 instance Appendable [[a]] where
     append = List.concat    
     
-instance (Eq a) => Filterable [a] where
-    filter = List.filter
-
 instance (Ord a) => Unionizable [a] where    
     union = List.union
-    unions lists = Set.fromList <$> lists |> Set.unions |> toList
+    --unions lists = Set.fromList <$> lists |> Set.unions |> toList
 
 instance (Eq a, Ord a) => Intersectable [a] where    
     intersect = List.intersect
 
-instance (Eq a, Ord a) => SetDifference [a] where        
+instance (Eq a, Ord a) => Differential [a] where        
     diff =  (List.\\)
     
-instance (Eq a, Ord a) => SetContainment [a] where        
+instance (Eq a, Ord a) => Containment [a] where        
     isSubset proper candidate source  
         = test (Set.fromList candidate) (Set.fromList source)
             where test = ifelse proper Set.isProperSubsetOf Set.isSubsetOf 
     
-instance Vacant [a] where
+instance Vacuous [a] where
     empty = []
     null = List.null
             
@@ -141,8 +137,6 @@ instance Zippable [a] [b] [c] where
 
     zip = List.zipWith
 
-instance NonEmptySet (NonEmpty a) where
-    leading =  NonEmpty.head  
 
 instance Container (NonEmpty a)
 
@@ -157,7 +151,7 @@ instance Weave a (NonEmpty a) where
     weave = NonEmpty.intersperse        
 
 instance Headed (NonEmpty a) where        
-    type Tailed (NonEmpty a) = [a]
+    type Remaining (NonEmpty a) = [a]
     head = NonEmpty.head
     tail = NonEmpty.tail
         

@@ -321,7 +321,7 @@ bvSextWithRepr :: NatRepr w'
 bvSextWithRepr repr bv = BV repr (truncBits width (bvIntegerS bv))
   where width = natValue repr
 
-type instance Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
+
 
 instance Formattable (BitVector w) where
   format (BV w x ) = bitTextW (repVal w) x
@@ -396,6 +396,7 @@ instance ToBitVector Word64 64 where
   bv x = bitvector (fromIntegral x)
 
 instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2)  where
+  type Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
   concat = bvConcat
 
 instance KnownNat w => Length (BitVector w) where
