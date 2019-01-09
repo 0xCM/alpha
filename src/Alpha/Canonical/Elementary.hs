@@ -6,10 +6,8 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Elementary(module X) where
 import Alpha.Canonical.Common as X
-import Alpha.Canonical.Elementary.Indexed as X
-import Alpha.Canonical.Elementary.MultiIndex as X
+import Alpha.Canonical.Elementary.IndexComplex as X
 import Alpha.Canonical.Elementary.IndexedTerm as X
-import Alpha.Canonical.Elementary.Queries as X
 import Alpha.Canonical.Elementary.Set as X
 import Alpha.Canonical.Elementary.Sets as X
 import Alpha.Canonical.Elementary.Tuples as X

@@ -21,7 +21,8 @@ module Alpha.Canonical.Common.Conversions
     list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
-    rational, fractional, integers
+    rational, fractional, integers,
+    enumerate
     
 
 ) where
@@ -112,6 +113,10 @@ words src = word <$> src
 -- | constructs a list of all integers within bounds
 integers::(Bounded i, Integral i) => [i]    
 integers = [minBound .. maxBound]
+
+-- | constructs a list of all potential 'i' -values
+enumerate::(Bounded i, Enum i) => [i]
+enumerate = [minBound .. maxBound]
 
 -- | Constructs a 'Int8' from an integral value
 int8::(Integral n) => n -> Int8

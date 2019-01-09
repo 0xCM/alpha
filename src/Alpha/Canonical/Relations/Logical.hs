@@ -21,12 +21,22 @@ module Alpha.Canonical.Relations.Logical
     type (||),
     type (:=>),
     If, Not,
-    Disjunct(..), Conjunct(..), Implies(..)
+    Disjunct(..), Conjunct(..), Implies(..),
+
+    Segmenter(..),
+
 
 ) where
 import Alpha.Base
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Functions
+import qualified Data.List as List
+
+class Segmenter a where
+    segment::Int -> [a] -> [[a]]
+    segment width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
+
+instance Segmenter a    
 
 
 type True = 'True

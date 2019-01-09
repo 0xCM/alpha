@@ -7,6 +7,7 @@
 module Alpha.Canonical.Common.Root
 (
     module X,
+    Descriptor(..),
     Dimensional(..),
     Weave(..),
     Variance(..),
@@ -25,6 +26,7 @@ module Alpha.Canonical.Common.Root
     Formattable(..),
     Labeled(..),
     Cardinality(..),   
+    Cardinal(..),
     Discretion(..),
     Habitation(..),
     enumValues,
@@ -44,10 +46,15 @@ import Alpha.Base as X
 import Alpha.Canonical.Common.Synonyms
 import qualified Data.Text as Text
 import qualified Data.List as List
+import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Stream.Infinite as Stream
 import qualified Numeric.Interval as Interval
 import qualified Data.Map as Map
-    
 
+
+-- Characterizes a type with wich a description may be associated
+class Descriptor a b where
+    describe::a -> b
 
 -- | Characterizes a value that can be rendered in human-readable form
 class Formattable a where
@@ -69,14 +76,13 @@ class Dimensional a where
     dimension::a -> Dimension a
 
 -- | Characterizes a type with which defines an intrinsic label
-class Labeled a where
-    type Label a    
-
+class Labeled a l where
+    
     -- | Write a label to a value
-    label::Label a -> a -> a
+    label::l -> a -> a
 
     -- | Read a label from a value
-    getLabel::a -> Label a
+    getLabel::a -> l
     
         
 -- | Characterizes a type with which an origin/initial object is related
@@ -91,12 +97,15 @@ class Targeted a where
         
 -- } Characterizes a type that controls the reification of a directed relationship    
 -- from a source to a target
-class (Sourced a, Targeted b) => Connective a b where 
+class Connective p s t where 
     -- | The reification type
-    type Connection a b
+    type Connection p s t
+
 
     -- | Establishes a connection from a source to a target
-    connect::a -> b -> Connection s t        
+    -- and bundles said connection with properties/attributes
+    -- that further characterize the association
+    connect::p -> s -> t -> Connection p s t        
 
 class Mappable c a b where    
     type Mapped c a b
@@ -109,35 +118,33 @@ class Weave g t where
     -- Weaves a grain 'g' with a target 't' to produce a 'Woven g t' value
     weave::g -> t -> Woven g t        
     
-instance Weave Char Text where
-    type Woven Char Text = Text
-    weave = Text.intersperse
-            
-instance Weave g [g] where
-    weave = List.intersperse        
+    
+-- | Classifies a type to which a cardinality may be assigned    
+class Cardinal a where
+
+    -- | Determines the cardinality of 'a'
+    cardinality::a -> Cardinality
 
 -- | Specifies the cardinality of a set and partitions the universe
 -- of sets under consideration
 -- See https://en.wikipedia.org/wiki/Cardinality
-data Cardinality a =
+data Cardinality =
     -- | There are no elements
     Zero
-    -- | There is exactly one element
-   | Singleton
-   -- | A finite number of elements of count 2 or greater
-   | Counted
+   -- | A finite, nonzero number of elements
+   | Finite
    -- | A countably-infinite number of elements
-   | Countable
-   -- | An uncountable number of elements
-   | Uncountable
+   | Infinite
    -- | An unknown number of elements
    | Uncounted
-   deriving (Generic, Data, Typeable, Enum)
+   deriving (Eq, Ord, Generic, Data, Typeable, Enum)
+
 
 -- | Specifies whether a type/value is discrete
 data Discretion a =
       Discrete
     | Indiscrete
+    deriving (Eq, Ord, Generic, Data, Typeable, Enum)
 
 -- | Specifies whether a type/value is empty
 data Habitation a =
@@ -164,7 +171,7 @@ instance Faceted "length" Int where
 -- Captures the assertion that values of a type a can be categorized by
 -- values of an enumerable type c
 class (Enum c) => Classifiable a c where
-    classify::(a -> c) -> [a] -> [(c,a)]
+    classification::(a -> c) -> [a] -> [(c,a)]
     
 -- Characterizes a family of singleton types 'a' for which the type's single inhabitant
 -- is reifiable
@@ -243,3 +250,37 @@ associate = Map.fromList
 -- | Extracts the indexed values from a map
 associated::Ord k => Map k v -> [v]
 associated m = snd <$> (toList m)
+
+-- Mappable instances
+-------------------------------------------------------------------------------
+instance Mappable (Seq a) a b where
+    type Mapped (Seq a) a b = Seq b
+    map = fmap
+
+instance Mappable [a] a b where
+    type Mapped [a] a b = [b]
+    map = fmap
+
+instance Mappable (NonEmpty a) a b where
+    type Mapped (NonEmpty a) a b = NonEmpty b
+    map = NonEmpty.map    
+        
+-- Weavable instances    
+-------------------------------------------------------------------------------
+
+instance Weave Char Text where
+    type Woven Char Text = Text
+    weave = Text.intersperse
+            
+instance Weave g [g] where
+    weave = List.intersperse        
+
+instance Weave g (Stream g) where
+    weave = Stream.intersperse
+
+instance Weave a (NonEmpty a) where
+    weave = NonEmpty.intersperse        
+    
+    
+
+    

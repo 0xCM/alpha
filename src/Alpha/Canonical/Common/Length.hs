@@ -10,6 +10,8 @@ import qualified Data.Set as Set
 import qualified Data.List as List
 import qualified Data.ByteString as EG
 import qualified Data.ByteString.Lazy as LZ
+import qualified Data.List.NonEmpty as NonEmpty
+
 
 class Length a where    
     length::(Integral n) => a -> n
@@ -25,4 +27,7 @@ instance Length Char where
 
 instance Ord a => Length (Set' a) where
     length  =  integral . Set.size  
+    
+instance Length (NonEmpty a) where
+    length = fromIntegral . NonEmpty.length
     

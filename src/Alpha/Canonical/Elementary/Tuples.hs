@@ -9,14 +9,15 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Elementary.Tuples
 (    
+    module X,
     Tuple(..), 
     Tupeler(..), 
     UniTuple(..), 
     UniTupler(..),    
 ) where
-import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Set
-import Alpha.Canonical.Elementary.Indexed
+import Alpha.Canonical.Elementary.Common as X
+import Alpha.Canonical.Elementary.Set as X
+
     
         
 -- Characterizes types from which tuples can be constructed    
@@ -127,4 +128,15 @@ instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 4 (Tuple5 a1 a2
     natix (_,_,_,a4,_) = a4                        
 instance (Eq a1, Eq a2, Eq a3, Eq a4, Eq a5) => NaturallyIndexed 5 (Tuple5 a1 a2 a3 a4 a5) where
     natix (_,_,_,_,a5) = a5                            
+    
+instance (Ord a) => SetBuilder (UniTuple1 a) a where
+    set (UniTuple1 a1) = fromList [a1] 
+instance (Ord a) => SetBuilder (UniTuple2 a) a where
+    set (a1,a2) = fromList [a1,a2]
+instance (Ord a) => SetBuilder (UniTuple3 a) a where
+    set (a1,a2,a3) = fromList [a1,a2,a3]
+instance (Ord a) => SetBuilder (UniTuple4 a) a  where
+    set (a1,a2,a3,a4) = fromList [a1,a2,a3,a4]
+instance (Ord a) => SetBuilder (UniTuple5 a) a where
+    set (a1,a2,a3,a4,a5) = fromList [a1,a2,a3,a4,a5] 
     

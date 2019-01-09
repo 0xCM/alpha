@@ -5,7 +5,7 @@ module Alpha.Canonical.Collective.Table
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.List
+import Alpha.Canonical.Collective.Reduction
 import qualified Data.Matrix as M
 
 -- | Characterizes a rectangular array of data

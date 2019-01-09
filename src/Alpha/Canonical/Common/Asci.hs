@@ -108,10 +108,12 @@ pattern Equal = "="::Text
 pattern Empty = ""::Text
 pattern Period = "."::Text
 -- | Produces "<-"
-pattern LArrow = "<-"::Text
+pattern LArrow = "<--"::Text
 -- | Produces "->"
-pattern RArrow = "->"::Text
+pattern RArrow = "-->"::Text
 
+pattern RMap = ":-->"::Text
+pattern LMap = "<--:"::Text
 asciL::[Text]
 asciL = [Al, Bl, Cl, Dl, El, Fl, Gl, Hl, Il, 
         Jl, Kl, Ll, Ml, Nl, Ol, Pl, Ql, Rl, 

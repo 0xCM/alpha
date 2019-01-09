@@ -24,7 +24,6 @@ newtype SigmaAlgebra a = SigmaAlgebra (Subsets a)
 -- See Y2013PTCC
 newtype SetAlgebra a = SetAlgebra (Subsets a)
 
-
 -- | A ring over a set A is a collection of subsets of
 -- A that contains the empty set and is closed with respect
 -- to set difference and finite union

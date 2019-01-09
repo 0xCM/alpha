@@ -22,7 +22,7 @@ import qualified Data.List as List
 
 -- | Taken from bool8
 data {-# CTYPE "HsBool" #-} Flag = On | Off
-    deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read)
+    deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read,Bounded)
 
 newtype Bit = Bit Flag
     deriving (
@@ -34,6 +34,9 @@ newtype Bit = Bit Flag
 
 
 type instance Unsigned Bit = Bit
+type instance Individual Bit = Bit
+type instance Individual Flag = Flag
+
 instance Unsignable Bit
 
 class ToBit a where
@@ -117,6 +120,10 @@ instance MeetSemiLattice Flag where
 
 instance Lattice Flag where                
 
+instance Universe Flag where
+    inhabitants = FiniteSet (fromList enumerate)
+    
+
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
     {-# INLINE int #-}
@@ -170,7 +177,6 @@ instance Semigroup Bit where
     (<>) = (+)
     {-# INLINE (<>) #-}    
 
-
 instance Monoid Bit where 
     mempty = off
     {-# INLINE mempty #-}
@@ -198,13 +204,12 @@ instance Show Flag where
     show Off = "0"
 
 instance Show Bit where
-    show (Bit Off) = "0"
-    show _ = "1"
+    show = string . format
 
 instance Bounded Bit where
     minBound = off
     maxBound = on
-
+    
 instance Enum Bit where
     fromEnum (Bit b) = fromEnum b
     {-# INLINE fromEnum #-}
@@ -212,6 +217,9 @@ instance Enum Bit where
     toEnum = Bit . toEnum
     {-# INLINE toEnum #-}
 
+instance Universe Bit where
+    inhabitants = FiniteSet (fromList enumerate)
+    
 instance Storable Bit where
     sizeOf _ = 1
     alignment _ = 1

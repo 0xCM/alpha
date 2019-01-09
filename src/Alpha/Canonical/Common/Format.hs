@@ -15,6 +15,7 @@ module Alpha.Canonical.Common.Format
     arrow,
     spaces,
     tuplestring,
+    setstring,
     spaced, 
     lspaced, 
     rspaced,
@@ -32,9 +33,11 @@ import Alpha.Canonical.Common.Asci
 import Alpha.Canonical.Common.TextUtil(zpadL)
 import Alpha.Canonical.Common.Synonyms
 import Numeric(showIntAtBase)
+
 import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.Map as Map
+import qualified Data.MultiSet as Bag
 
 
                 
@@ -59,6 +62,11 @@ tuplestring src =  Text.concat [LParen, content, RParen] where
     content = Text.concat (format <$> (List.intersperse Comma flist)) where
           flist = format <$> src 
 
+-- Formats a list of formattable items as a set
+setstring::(Formattable a) => [a] -> Text  
+setstring s = fence LBrace RBrace (format elements) where
+    elements =  weave Comma (format <$> s)
+          
 -- | Surrounds the input text within a space on each side
 spaced::Text -> Text
 spaced t = Space <> t <> Space
@@ -185,4 +193,13 @@ instance (Formattable4 a1 a2 a3 a4) => Formattable (Tuple4 a1 a2 a3 a4) where
 instance (Formattable5 a1 a2 a3 a4 a5) => Formattable (Tuple5 a1 a2 a3 a4 a5) where
     format (a1,a2,a3,a4,a5) 
         = tuplestring [format a1, format a2, format a3, format a4, format a5]    
+    
+instance (Formattable k, Formattable v) => Formattable (Map k v) where
+    format m = format $ format  <$> (Map.toList m)    
+        
+instance Formattable TyConInfo where
+    format (TyConInfo (_,mod,ctor)) = mod <> fence LParen RParen ctor 
+
+instance Show TyConInfo where
+    show = Text.unpack . format
     

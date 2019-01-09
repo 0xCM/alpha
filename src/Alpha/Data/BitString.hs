@@ -5,7 +5,6 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingVia #-}
 
 module Alpha.Data.BitString
 (

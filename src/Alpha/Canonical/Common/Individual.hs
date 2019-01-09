@@ -5,14 +5,29 @@ module Alpha.Canonical.Common.Individual
     Discrete(..),
     Finite(..),
     Componentized(..),
+    Universal(..),
+    Existential(..),
+    Constructive(..),
+    Construction(..)
 
 )
 where
 import Alpha.Canonical.Common.Root
 import qualified Data.List as List
+import qualified Data.MultiSet as Bag
+import qualified Data.List as List
+import qualified Data.Set as Set
 
+-- | Relates the type of a part/singleton to the type of a whole
 type family Individual a
+
 type instance Individual [a] = a
+type instance Individual (Bag a) = a
+type instance Individual (Map a b) = (a,b)
+type instance Individual (Stream a) = a
+type instance Individual (NonEmpty a) = a
+type instance Individual (Seq a) = a
+type instance Individual (Vector a) = a
 type instance Individual Integer = Integer
 type instance Individual Int = Int
 type instance Individual Int8 = Int8
@@ -26,13 +41,14 @@ type instance Individual Word8 = Word8
 type instance Individual Word16 = Word16
 type instance Individual Word32 = Word32
 type instance Individual Word64 = Word64
-    
+type instance Individual Bool = Bool
+
 -- | Characterizes a type that is comprised of individuals or
 -- can be discretized as such
 class Discrete a where
     individuals::a -> [Individual a]
 
--- | Characterizes a type inhabited by a finite set of
+-- | Characterizes types inhabited by a finite set of
 -- values and for which a count is determined
 class (Discrete a) => Finite a where
     -- | Counts the number of items within the purview of the subject
@@ -42,7 +58,6 @@ class (Discrete a) => Finite a where
 -- | Characterizes a type that defines an association among a 
 -- collection of individuals
 class Associated a where
-
     -- | Specifies the members that participate in the association
     associates::a -> [Individual a]    
 
@@ -52,3 +67,34 @@ class Componentized a where
     -- | Extracts the components that are owned by the whole
     components::a -> [Individual a]    
 
+-- | Characterizes types for which existential questions may posed
+-- regarding element containment
+class Existential a where    
+    -- Determines whether any element exists that satisfies a given predicate
+    any::(Individual a -> Bool) -> a -> Bool
+
+    -- Determines whether an exlement exists via an equality predicate
+    exists::(Eq (Individual a)) => Individual a -> a -> Bool
+    exists = any . (==) 
+
+class Universal c where
+    all::(Individual c -> Bool) -> c -> Bool
+    
+-- | Characterizes types from which an 'Individual' may be constructed    
+class Constructive a where
+    construct::a -> Individual a
+
+-- | Provides concrete evidence of an existential    
+newtype Construction a = Construction (Individual a)
+
+type instance Individual (Construction a) = Individual a
+    
+instance Constructive (Construction a) where
+    construct (Construction x) = x
+            
+instance Universal [a] where
+    all = List.all
+    
+            
+instance Existential [a] where
+    any = List.any

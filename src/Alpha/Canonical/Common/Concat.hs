@@ -11,7 +11,7 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.ByteString as EG
 import qualified Data.ByteString.Lazy as LZ
-
+import qualified Data.Tree as Tree
 
 
 
@@ -30,22 +30,27 @@ class Concatenable a b where
 -- non-nested sequence of elements. An instance need not be
 -- Element-invariant
 type family Appended a
-
--- | A list of element lists is appended to produce a list of elements
 type instance Appended [[a]] = [a]
-
--- | A list of elements is appended to produce a single element
 type instance Appended [a] = a
+type instance Appended (Tree a) = [a]
 
 -- Classifies a type that can be transformed into an 'Appended' value
 class Appendable a where
     append::a -> Appended a
+
+
+
+instance Appendable (Tree a) where
+    append = Tree.flatten
 
     
 instance Concatenable [a] [a] where
     type Concatenated [a] [a] = [a]    
     concat = (List.++)
             
+instance Appendable [[a]] where
+    append = List.concat    
+    
 instance Appendable [Text] where    
     append = Text.concat        
     
@@ -65,3 +70,6 @@ instance Concatenable Char Char where
     type Concatenated Char Char = Text
     concat c1 c2  = Text.pack ([c1] List.++ [c2])
             
+instance Concatenable (Seq a) (Seq a) where
+    type Concatenated (Seq a) (Seq a) = Seq a   
+    concat a b = a <> b

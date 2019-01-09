@@ -38,7 +38,7 @@ instance forall m n a. (KnownNat m, KnownNat n) => Tabular (Matrix m n a) where
     cols m =   transpose (rows m)
 
 instance forall m n a. (KnownNat m, KnownNat n, Formattable a) => Formattable (Matrix m n a) where    
-    format m =  format <$> (\row -> (spaced . format) <$> row ) <$> rows m |> intersperse EOL |> append
+    format m =  format <$> (\row -> (spaced . format) <$> row ) <$> rows m |> weave EOL |> append
 
 instance forall m n a. (KnownNat m, KnownNat n, Formattable a) => Show (Matrix m n a) where    
     show = string . format

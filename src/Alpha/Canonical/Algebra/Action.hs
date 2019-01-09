@@ -12,6 +12,7 @@ module Alpha.Canonical.Algebra.Action
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 
+-- | Characterizes a left algebraic/group action
 class LeftAction k a where
     -- | Effects a left action by k on a
     leftmul::k -> a -> a
@@ -25,6 +26,7 @@ class LeftAction k a where
 instance (Additive a, Nullary a) => LeftAction Integer a where
     leftmul = nsum
     
+-- | Characterizes a right algebraic/group action    
 class RightAction a k where
 
     -- | Effects a right action by k on a

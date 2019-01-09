@@ -9,15 +9,16 @@
 module Alpha.Canonical.Relations.Related
 (    
     Relation(..),
+    Relational(..),
     Reflexive(..),
     Transitive(..),
     Symmetric(..),
     Antisymmetric(..),
     Asymmetric(..),
-    Preorder(..),
+    Preordering(..),
+    Preordered(..),
     Equivalence(..),
     Setoid(..),    
-    PartialOrd(..),
     TotalOrd(..),
     PartialOrder(..),
     TotalOrder(..),
@@ -41,7 +42,7 @@ module Alpha.Canonical.Relations.Related
     Quotient(..)
 
 ) where
-import Algebra.PartialOrd 
+--import Algebra.PartialOrd 
 import Alpha.Base
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Logical
@@ -63,11 +64,6 @@ type instance Individual (Interval a) = a
 -- | Synonym for default comparison predicate
 type Comparer a = a -> a -> Bool
 
--- -- | Defines a singleton value    
--- newtype Point a = Point a
---     deriving(Generic,Show)
--- instance Newtype (Point a)
-
 -- | Specifies the type of a point relative to a set/space
 type family Point d
 
@@ -76,134 +72,175 @@ newtype Pairs a b = Pairs [(a,b)]
     deriving (Show,Eq,Ord,Generic)
 instance Newtype (Pairs a b)
 
+newtype Relation a = Relation (a, a)
+    deriving(Eq,Generic,Ord)
+
 -- Characterizes a binary relation on a set s    
-class (Eq a) =>  Relation a where
-    type Related a
-    type Related a = (a,a)
+class (Eq a) =>  Relational a where
 
     -- | Determines whether two points are related
     related::P2 a
 
     -- | Establishes a relation between two points
-    relate::a -> a -> Related a
+    relate::a -> a -> Relation a
+    relate x y = Relation (x,y)
 
     -- | Infix synonym for 'related'
-    (~~)::P2 a
-    (~~) = related
-    infixl 6 ~~
-    
+    (~*~)::P2 a
+    (~*~) = related
+
+    infixl 6 ~*~
+
+newtype Reflexion a = Reflexion (a,a)
+    deriving(Eq,Generic,Ord)
 
 -- Characterizes an reflexive relation: a ~ a
 -- See https://en.wikipedia.org/wiki/Symmetric_relation 
-class Relation a => Reflexive a where
-    type Reflexed a
-    type Reflexed a = (a,a)
+class Relational a => Reflexive a where
 
     -- | Establishes a reflexive relation between two points
-    reflex::a -> Reflexed a
+    reflex::a -> Reflexion a
+
+newtype Trans a = Trans (a,a)    
+    deriving(Eq,Generic,Ord)
 
 -- Characterizes a transitive relation: a ~ b && b ~ c => a ~ c
 -- See https://en.wikipedia.org/wiki/Transitive_relation
-class Relation a => Transitive a where
-    type Trans a
-    type Trans a = (a,a)
+class Relational a => Transitive a where
 
     -- | Establishes a transitive relation between two elements
     trans::a -> a -> Trans a
 
-    -- Characterizes an symmetric relation: a ~ b <=> b ~ a
+newtype Symmetry a = Symmetry (a,a)    
+    deriving(Eq,Generic,Ord)
+
+-- Characterizes an symmetric relation: a ~ b <=> b ~ a
 -- See https://en.wikipedia.org/wiki/Symmetric_relation 
-class Relation a => Symmetric a where
-    type Symmetry a
-    type Symmetry a = (a,a)
+class Relational a => Symmetric a where
 
     -- | Establishes a symmetric relation between two elements
     symmetry::a -> a -> Symmetry a
+
+newtype Antisymmetry a = Antisymmetry (a,a)    
+    deriving(Eq,Generic,Ord)
     
 -- Characterizes an antisymmetric relation: a ~ b && b ~ a => a = b
 -- Or, alternately, an antisymmetric relation precludes both a ~ b and b ~ a
 -- from being true
 -- See https://en.wikipedia.org/wiki/Antisymmetric_relation 
-class Relation a => Antisymmetric a where
-    type Antisymmetry a
-    type Antisymmetry a = (a,a)
+class Relational a => Antisymmetric a where
 
     -- | Establishes an antisymmetric relationship between two elements
     antisymmetry::a -> a -> Antisymmetry a
 
-
+newtype Asymmetry a = Asymmetry (a,a)    
+    deriving(Eq,Generic,Ord)
+    
 -- Characterizes an asymmetric relaton: a ~ b => not(b ~ a)    
 -- See https://en.wikipedia.org/wiki/Asymmetric_relation
-class Relation a => Asymmetric a where
-    type Asymmetry a
-    type Asymmetry a = (a,a)
+class Relational a => Asymmetric a where
 
     -- | Establishes an asymmetry relationship between two elements
     asymmetry::a -> a -> Asymmetry a
+
+newtype Preordering a = Preordering (a,a)    
+    deriving(Eq,Generic,Ord)
     
 -- Characterizes a relation that is reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Preorder
-class (Reflexive a, Transitive a) => Preorder a where
-    type Preordered a
-    type Preordered a = (a,a)
+class (Reflexive a, Transitive a) => Preordered a where
 
     -- Establishes a preorder relationship between two elements
-    preorder::a -> a -> Preordered a
+    preorder::a -> a -> Preordering a
+
+newtype PartiallyOrdered a = PartiallyOrdered (a,a)    
+    deriving(Eq,Generic,Ord)
 
 -- Characterizes a relation that is 'Antisymmetric' and 'Reflexive' and 'Transitive'
 class (Antisymmetric a, Reflexive a, Transitive a) => PartialOrder a where
-    type PartiallyOrdered a
-    type PartiallyOrdered a = (a,a)
 
     (<:)::P2 a
     (<:) = related
     {-# INLINE (<:) #-}    
 
+newtype Connex a = Connex (a,a)    
+    deriving(Eq,Generic,Ord)
+
 -- Characterizes a relation that relates all elements of a set:
 -- For all x and y, x ~ y or y ~ x
 -- See https://en.wikipedia.org/wiki/Connex_relation
-class Relation a => Connexive a where
-    type Connex a
-    type Connex a = (a,a)    
+class Relational a => Connexive a where
 
     -- | Establish a connex relation between two points
     connex::a -> a -> Connex a
+
+newtype TotallyOrdered a = TotallyOrdered (a,a)    
+    deriving(Eq,Generic,Ord)
 
 -- | Characterizes a total order relation of the sort that exists
 -- amongst the real numbers.
 -- See https://en.wikipedia.org/wiki/Total_order     
 class (Connexive a, Antisymmetric a, Transitive a) => TotalOrder a where
-    type TotallyOrdered a
-    type TotallyOrdered a = (a,a)
 
     -- | Establish a total order relation between two points
     totalord::a -> a -> TotallyOrdered a
 
+
+-- | Encodes an element of an equivalance relation together with
+-- a canonical representative 
+newtype Equivalent a = Equivalent (a, [a])
+    deriving(Eq,Generic,Ord,Formattable)
+
+instance Formattable a => Show (Equivalent a) where
+    show = string . format
+    
+-- | Defines an equivalance relation via a partition and provides a
+-- representation for a collection of 'Equivalent' values    
+newtype Partition a = Partition (Map a [a] )
+    deriving(Eq,Generic,Ord,Formattable)
+
+instance Formattable a => Show (Partition a) where
+    show = string . format
+
 -- Characterizes a relation that is symmetric, reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Equivalence_relation
 class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
-    type Equivalent a
-    type Equivalent a = (a,a)
 
     -- Determines whether an equivalence relation exists between two elements
     (~=)::P2 a
     (~=) = related
     {-# INLINE (~=) #-}        
 
-    -- | Establishes an equivalence relationship between two points
-    eqivilate::a -> a -> Equivalent a
+    -- | Establishes an equivalence relationship among a collection of elements
+    -- together with a canonical representative
+    equivilate::a -> [a] -> Equivalent a
+    equivilate rep elems = Equivalent (rep, elems)
 
+    -- | Assings an element to its equivalance class in a partition
+    classify::a -> Partition a -> Partition a
+    default classify::Ord a => a -> Partition a -> Partition a
+    classify elem (Partition part) = Partition modified where
+        -- Search for a key that is equivalent to the supplied element
+        -- There should be at most 1
+        filtered = Map.keys part |> List.filter (\k -> k ~= elem)
+        -- Was an equivalent element found ?
+        contains = filtered |> List.null
+        -- Select the equivalence class representative
+        rep = ifelse contains elem ( List.head filtered)        
+        -- Bundle the supplied element with other members of the class
+        -- or create a new class as appropriate        
+        ec = ifelse contains (elem : (part Map.! rep) ) [elem]
+        -- Update the partition to include the new element
+        modified = ifelse contains 
+                          (Map.update (\_ -> Just ec) rep part) 
+                          (Map.insert elem [elem] part)
 
-    partition::[a] -> Partition a
-    partition _ = undefined
 
     -- | Divides a list into two parts: those that are related to a given
     -- element and those that are not not. Ironically, the library function
     -- that facilitates this is named 'partition'
     relations::a -> [a] -> ([a],[a])
     relations x candidates = List.partition (\y -> x ~= y) candidates
-    
-newtype Partition a = Partition (Map a [a] )
 
         
 -- | A set together with an equivalence relation
@@ -274,7 +311,7 @@ class (Ord a) => GTEQ a where
 
 class (GTEQ a, GT a, LTEQ a, LT a) => Comparable a where            
     between::P3 a
-    between x a b = x >= a || x <= b
+    between x a b = x >= a && x <= b
     {-# INLINE between #-}
 
 -- Defines a constraint that requires satisfaction of 
@@ -301,75 +338,6 @@ instance Infimal (Interval a) where
 instance Supremal (Interval a) where
     supremum = Interval.sup            
 
--- PartialOrd instances
--------------------------------------------------------------------------------
-instance PartialOrd Natural where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Integer where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Int where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Int8 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Int16 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Int32 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Int64 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Word where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Word8 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Word16 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Word32 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Word64 where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance (Integral a, Ord a) => PartialOrd (Ratio a) where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Float where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd Double where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd CFloat where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
-
-instance PartialOrd CDouble where
-    leq a b = a P.<= b
-    {-# INLINE leq #-}
 
 -- LTEQ instances
 -------------------------------------------------------------------------------

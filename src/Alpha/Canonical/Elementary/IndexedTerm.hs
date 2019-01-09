@@ -8,6 +8,7 @@
 {-# LANGUAGE DataKinds #-}
 module Alpha.Canonical.Elementary.IndexedTerm
 (
+    module X,
     IndexedTerm(..), 
     IndexRange(..),    
     IndexedFamily(..),
@@ -17,10 +18,9 @@ module Alpha.Canonical.Elementary.IndexedTerm
 
 ) 
 where
-import Alpha.Canonical.Elementary.Common
-import Alpha.Canonical.Elementary.Indexed
-import Alpha.Canonical.Elementary.Tuples
-import Alpha.Canonical.Elementary.Set
+import Alpha.Canonical.Elementary.Common as X
+import Alpha.Canonical.Elementary.Tuples as X
+import Alpha.Canonical.Elementary.Set as X
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -76,7 +76,7 @@ instance (Formattable i) => Show (IndexRange i) where
     show = string . format
     
 instance (OrdEnum a) => SetBuilder (IndexRange a) a where    
-    set (IndexRange (i,j)) = finiteSet s  where
+    set (IndexRange (i,j)) = finset s  where
         s = [i..j]
         count = add' (fromIntegral (List.length s)) 1
         

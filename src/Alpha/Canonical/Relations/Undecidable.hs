@@ -5,22 +5,12 @@ import Alpha.Canonical.Relations.Related
 
 import qualified Prelude as P
 
--- | Encodes that values of orderable types can be related via (<)
--- instance (Ord a) => LT a    
-
--- -- | Encodes that values of orderable types can be related via (>)
--- instance (Ord a) => GT a    
-
-
--- | Encodes that values of orderable types are uniformly comparable
---instance (Ord a, PartialOrd a, Antisymmetric a) => Comparable a
-
 -- | Encodes that reflexive and tansitive relations are, by definition, preorders
-instance (Reflexive a, Transitive a) => Preorder a where
-    preorder x y = (x,y)
+-- instance (Reflexive a, Transitive a) => Preorder a where
+--     preorder x y = (x,y)
 
 -- | Encodes that reflexive and tansitive relations are, by definition, equivalence relations
-instance (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
-    eqivilate x y = (x,y)
+-- instance (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
+--     eqivilate x y = (x,y)
 
 

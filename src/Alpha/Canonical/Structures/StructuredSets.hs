@@ -4,8 +4,6 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE DerivingVia #-}
 module Alpha.Canonical.Structures.StructuredSets
 (
     SpanningSet(..), spanning,

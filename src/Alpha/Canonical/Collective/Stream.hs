@@ -24,10 +24,10 @@ class (Headed (Stream a), Weave a (Stream a), Iterable (Stream a) ) => Sequentia
     -- Constructs a stream via opaque function calls
     blackbox::(() -> a) -> Stream a
 
-
-type instance Individual (Stream a) = a
-
-    
+instance SequentialStream (Stream s)  where
+    cycle (x:xs) = Stream.cycle(x :| xs)
+    blackbox f = Stream.iterate (\_ -> f ()) (f())        
+        
 instance IsList (Stream a) where
     type Item (Stream a) = a
     toList = Stream.takeWhile (\_ -> True)
@@ -36,21 +36,5 @@ instance IsList (Stream a) where
 instance Container (Stream a) where
     contain [x] = Stream.cycle [x]
     contents s = Stream.takeWhile (\_ -> True) s
-    
-instance SequentialStream (Stream s)  where
-    cycle (x:xs) = Stream.cycle(x :| xs)
-    blackbox f = Stream.iterate (\_ -> f ()) (f())        
-
-instance Singletary (Stream a) where
-    singleton x = Stream.cycle [x]
         
-instance Headed (Stream a) where        
-    head s = s Stream.!! 0
-    tail = Stream.tail
-
-instance Iterable (Stream a) where
-    iterate = Stream.iterate    
-            
-instance Weave g (Stream g) where
-    weave = Stream.intersperse
-    
+        

@@ -11,7 +11,6 @@ module Alpha.Canonical.Collective.Poset
 where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.List
 import qualified Data.Set as Set
 
 -- Encloses (constructively) a partially ordered set
