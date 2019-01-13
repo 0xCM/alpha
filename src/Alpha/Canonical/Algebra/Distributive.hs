@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Algebra.Distributive
 (
@@ -33,9 +39,11 @@ class (LeftDistributive a, RightDistributive a) => Distributive a where
     dist = distL
     {-# INLINE dist #-}
 
--- | Encodes the invariant that left + right distributivity = distributivity    
-instance (LeftDistributive a, RightDistributive a) => Distributive a   
- 
+
+-------------------------------------------------------------------------------
+-- * LeftDistributive instances
+-------------------------------------------------------------------------------
+
 instance LeftDistributive Natural
 instance LeftDistributive Integer
 instance LeftDistributive Int where 
@@ -53,6 +61,10 @@ instance LeftDistributive Float where
 instance LeftDistributive Double where 
 instance LeftDistributive CFloat where 
 instance LeftDistributive CDouble where 
+
+-------------------------------------------------------------------------------
+-- * RightDistributive instances
+-------------------------------------------------------------------------------
 
 instance RightDistributive Natural
 instance RightDistributive Integer
@@ -72,3 +84,9 @@ instance RightDistributive Double where
 instance RightDistributive CFloat where 
 instance RightDistributive CDouble where 
 
+-------------------------------------------------------------------------------
+-- * Distributive instance
+-------------------------------------------------------------------------------
+
+-- | Encodes the invariant that left + right distributivity = distributivity    
+instance (LeftDistributive a, RightDistributive a) => Distributive a   

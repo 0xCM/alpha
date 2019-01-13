@@ -15,8 +15,10 @@ import Alpha.Data.Gate as X
 import Alpha.Data.Grammar as X
 import Alpha.Data.PetriNet as X
 import Alpha.Data.Matrix as X
-import Alpha.Data.StateSpace as X
+import Alpha.Data.Machinery as X
 import Alpha.Data.Probability as X
+import Alpha.Data.Processes as X
+import Alpha.Data.Cubes as X
 
 
 

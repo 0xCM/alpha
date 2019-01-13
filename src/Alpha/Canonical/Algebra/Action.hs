@@ -31,6 +31,7 @@ class RightAction a k where
 
     -- | Effects a right action by k on a
     rightmul::a -> k -> a
+    rightmul = (.*)
 
     -- | Right-multiplication of a by a Action k    
     (.*)::a -> k -> a

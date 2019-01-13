@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
--- | Operations and types related to the ASCI character set
+-- |
 -- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com

@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Common.Individual
 (
     Individual(..),
@@ -8,7 +14,10 @@ module Alpha.Canonical.Common.Individual
     Universal(..),
     Existential(..),
     Constructive(..),
-    Construction(..)
+    Construction(..),
+    Initializing(..),
+    Terminating(..),
+    Degenerate(..)
 
 )
 where
@@ -84,6 +93,19 @@ class Universal c where
 class Constructive a where
     construct::a -> Individual a
 
+-- | Characterizes a type for which a "first" element is defined
+class Initializing a where
+    first::a -> Individual a
+
+-- | Characterizes a type for which a "last" element is defined
+class Terminating a where
+    last::a -> Individual a
+
+-- | Characterizes a type that supports a notion of degenerecy,
+-- e. g., an interval whose min/max values are identical
+class Degenerate a where
+    degenerate::a -> Bool    
+
 -- | Provides concrete evidence of an existential    
 newtype Construction a = Construction (Individual a)
 
@@ -94,7 +116,12 @@ instance Constructive (Construction a) where
             
 instance Universal [a] where
     all = List.all
-    
-            
+                
 instance Existential [a] where
     any = List.any
+
+instance Initializing [a] where
+    first = List.head
+
+instance Terminating [a] where
+    last = List.head . List.reverse

@@ -1,89 +1,112 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+{-# LANGUAGE PolyKinds #-}
 module Alpha.Data.Graph
 (
     Vertex(..),
+    Vertexed(..),
     Edge(..),
-    CrossEdge(..),
+    Edged(..),
     Graph(..),
-    edge,
-    xedge,
-    vertex, 
-    graph,
-    vertices, 
-    edges
+    Graphic(..),
+    Crossing(..),
+    CrossGraphic(..),    
 ) where
 import Alpha.Canonical
 import qualified Data.List as List
 
 -- | Represents a labeled graph node
-data Vertex l a = Vertex l a
+newtype Vertex l a = Vertex (l, a)
     deriving(Eq,Ord,Data,Typeable,Generic)
-
-type instance Individual (Vertex l a) = a
+instance Newtype(Vertex l a)    
 
 -- | Represents a directed, labled edge in a graph
 data Edge l a = Edge l (Vertex l a) (Vertex l a)
     deriving(Eq,Ord,Data,Typeable,Generic)
 
-type instance Individual (Edge l a) = Vertex l a
-
--- | Represents a directed, labeled edge that connects
--- an node in one graph to a node in another graph
-data CrossEdge l a b = CrossEdge l (Vertex l a) (Vertex l b)
-    deriving(Eq,Ord,Data,Typeable,Generic)
-    
 -- | Represents a directed grap
 newtype Graph l a = Graph [Edge l a]
     deriving(Eq,Ord,Data,Typeable,Generic)
 instance Newtype(Graph l a)    
 
-type instance Individual (Graph s a) = Edge s a        
+-- | Represents a path in a graph, i. e., an ordered sequence of
+-- edges
+newtype GraphPath l a = GraphPath [Edge l a]    
+    deriving(Eq,Ord,Data,Typeable,Generic,Initializing,Terminating)
+instance Newtype(GraphPath l a)    
 
+type instance Individual (Vertex l a) = a
+type instance Individual (Edge l a) = Vertex l a
+type instance Individual (Graph l a) = Edge l a        
+type instance Individual (GraphPath l a) = Edge l a 
 
--- | Defines a labeled edge
-edge::(Ord a, SemiOrd s) => s -> Vertex s a -> Vertex s a -> Edge s a
-edge label src dst = Edge label src dst
+-- | Characterizes a type that can be described by a vertex in a graph
+class (SemiOrd l, Ord a) => Vertexed l a n where
 
-xedge::(SemiOrd l, Ord a, Ord b) => l -> Vertex l a -> Vertex l b -> CrossEdge l a b
-xedge label src dst = CrossEdge label src dst
+    -- | Constructs a labled 'Vertex'
+    vertex::l -> a -> n
+    
+-- | Characterizes a type that can be described by an edge in a graph
+class (SemiOrd l, Ord n) => Edged l n e where
 
--- | Defines a labeled node
-vertex::(SemiOrd l, Ord a) => l -> a -> Vertex l a
-vertex = Vertex
+    -- | Constructs a labled 'Edge'
+    edge::l -> n -> n -> e
+    
+-- | Characterizes a type that can be described by a collection of edges
+-- that constitute a graph
+class Graphic g e n where  
 
--- | Constructs a graph defined by a set of edges
-graph::(SemiOrd l, Ord a) => [Edge l a] -> Graph l a
-graph = Graph
+    -- Constructs a graph from a set of edges
+    graph::[e] -> g
 
--- | Returns a graph's vertexes
-vertices::(Ord a, SemiOrd s) => Graph s a -> [Vertex s a]
-vertices (Graph edges) = result where
-    result = edges |> toList |> fmap (\(Edge _ v1 v2) -> [v1,v2] ) |> unions
+    -- Retrives the edges that comprise the graph
+    edges::g -> [e]
 
--- | Returns a graph's edges
-edges::(Ord a, SemiOrd s) => Graph s a -> [Edge s a]
-edges = unwrap
+    -- Retrieves the nodes contained in the graph
+    nodes::g -> [n]
 
-instance (SemiOrd l, Ord a, Ord b) => Connective l (Vertex l a) (Vertex l b) where
-    type Connection l (Vertex l a) (Vertex l b) = CrossEdge l a b
+-- | Characterizes a type that supports cross-graph associations    
+class (SemiOrd l, Ord a, Ord b) => CrossGraphic l a b where    
+    xedge::l -> Vertex l a -> Vertex l b -> Crossing l a b
+    xedge label src dst = Crossing label src dst
+            
+-- | Represents a directed, labeled edge that connects
+-- an node in one graph to a node in another graph
+data Crossing l a b = Crossing l (Vertex l a) (Vertex l b)
+    deriving(Eq,Ord,Data,Typeable,Generic)
+
+instance (SemiOrd l, Ord a) => Graphic (Graph l a) (Edge l a) (Vertex l a) where
+    edges = unwrap
+    graph = wrap 
+
+    nodes (Graph edges) = edges  |> fmap (\(Edge _ v1 v2) -> [v1,v2] ) |> unions
+
+instance (SemiOrd l, Ord a) => Vertexed l a (Vertex l a) where
+    vertex l a = Vertex (l, a)
+
+instance (SemiOrd l, Ord a) => Edged l (Vertex l a) (Edge l a) where
+    edge l v1 v2 = Edge l v1 v2
+        
+instance (CrossGraphic l a b) => Connective l (Vertex l a) (Vertex l b) where
+    type Connection l (Vertex l a) (Vertex l b) = Crossing l a b
     connect label a b= xedge label a b            
 
-instance (Ord a, SemiOrd l) => Concatenable (Vertex l a) (Vertex l a)  where    
-    type Concatenated (Vertex l a) (Vertex l a) = Edge l a
-    concat src dst = edge lbl src dst  where
-        lbl = (getLabel src) <> (getLabel dst)
-
 instance (Formattable l, Formattable a) => Formattable (Vertex l a) where
-    format (Vertex l a) = parenthetical (format l <> spaced Colon <> format a)        
+    format (Vertex (l, a)) = parenthetical (format l <> spaced Colon <> format a)        
 
 instance (Formattable s, Formattable a) => Show (Vertex s a) where
     show = string . format
 
 instance Functor (Vertex s) where
-    fmap f (Vertex s a) = Vertex s (f a)
+    fmap f (Vertex (s, a)) = Vertex (s, (f a))
     
 instance Labeled (Vertex l a) l where
-    label l (Vertex _ a) = Vertex l a
-    getLabel (Vertex l _) = l
+    label l (Vertex (_,a)) = Vertex (l, a)
+    getLabel (Vertex (l, _)) = l
         
 instance (Formattable s, Formattable a) => Formattable (Edge s a) where
     format (Edge s source target) 
@@ -130,26 +153,24 @@ instance (Formattable s, Formattable a) => Formattable (Graph s a) where
 instance (Formattable s, Formattable a) => Show (Graph s a) where
     show = string . format
         
-instance Bifunctor (CrossEdge s) where
-    bimap f1 f2 (CrossEdge l source target) = CrossEdge l (f1 <$> source) (f2 <$> target)
+instance Bifunctor (Crossing s) where
+    bimap f1 f2 (Crossing l source target) = Crossing l (f1 <$> source) (f2 <$> target)
                 
-instance Sourced (CrossEdge l a b) where
-    type Source (CrossEdge l a b) = Vertex l a
-    source (CrossEdge _ source _) = source
+instance Sourced (Crossing l a b) where
+    type Source (Crossing l a b) = Vertex l a
+    source (Crossing _ source _) = source
 
-instance Targeted (CrossEdge l a b) where
-    type Target (CrossEdge l a b) = Vertex l b
-    target (CrossEdge _ _ target) = target
+instance Targeted (Crossing l a b) where
+    type Target (Crossing l a b) = Vertex l b
+    target (Crossing _ _ target) = target
 
-instance Labeled (CrossEdge l a b) l where
-    label l (CrossEdge _ source target) = CrossEdge l source target
-    getLabel (CrossEdge l _ _) = l
+instance Labeled (Crossing l a b) l where
+    label l (Crossing _ source target) = Crossing l source target
+    getLabel (Crossing l _ _) = l
         
-instance (Formattable l, Formattable a, Formattable b) => Formattable (CrossEdge l a b) where
-    format (CrossEdge l source target) 
+instance (Formattable l, Formattable a, Formattable b) => Formattable (Crossing l a b) where
+    format (Crossing l source target) 
         = format l <> lspaced Colon <> format source <> spaced FSlash <> format target
 
-instance (Formattable l, Formattable a, Formattable b) => Show (CrossEdge l a b) where
-    show = string . format
-    
-        
+instance (Formattable l, Formattable a, Formattable b) => Show (Crossing l a b) where
+    show = string . format        

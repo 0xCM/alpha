@@ -12,73 +12,87 @@ module Alpha.Canonical.Structures.Group
     AbelianGroup(..),
     FiniteAbelianGroup(..),
     GroupMorphism(..),
-    commutator,
-    Invertible(..),
-    Inverter(..), 
+    Inverter(..),
     Identity(..), 
     abs,
+    group,
     
 ) where
-import Alpha.Canonical.Algebra
+import Alpha.Canonical.Structures.Common as X
 import Alpha.Canonical.Structures.Structure as X
 import Alpha.Canonical.Structures.Monoid as X
 import Alpha.Canonical.Structures.Magma as X
 
-class Identity a where
-    identity::a
+-- | A multiplicative group with unspecified commutativity
+newtype ProductGroup a = ProductGroup a
+    deriving (Eq,Generic,Data,Typeable,Show)
+instance Newtype (ProductGroup a)    
 
-class Invertible a where
-    invert::a -> a
+type instance Individual (ProductGroup a) = a    
 
-class UnaryOperator a => Inverter a where
-    inverter::O1 a
-    inverter = o1
-    
 newtype GroupMorphism a b = GroupMorphism (a -> b)    
 
-instance Morphic GroupMorphism AbelianGroup a b where
-    morphism (GroupMorphism f) = f
+class Identity a where
+    identity::Individual a
 
-class (Magma a, Inverter a, Identity a) => Group a where
-    inverse::a -> a
-    inverse = inverter
+class Identity a => Inverter a where
+    invert::Individual a -> Individual a
 
-    unit::a
-    unit = identity
+class Composer a where
+    compose::Individual a -> Individual a -> Individual a
 
-    combine::a -> a -> a
-    combine = composite
-    
 
--- | A multiplicative group, not necessarily commutive
-class (ProductMonoid a, Reciprocative a) => ProductGroup a where
-    
--- | An additive group, always commutative
-class (SumMonoid a, Negatable a) => AbelianGroup a where  
-    
-class (AbelianGroup a, Finite a) => FiniteAbelianGroup a where
+class Group a where
+    inverse::Individual a -> Individual a
 
+    unit::Individual a
+
+    combine::Individual a -> Individual a -> Individual a
+
+-- | Represents the category whose objects are groups and morphisms are homomorphisms
+-- See: https://www.ncatlab.org/nlab/show/Grp
+class Category g => Grp g where
+
+data instance Space (Grp g) = Grp
+data instance ObjSet (Grp g) = GrpObj
+data instance EndSet (Grp g) (Group a) (Group b) = GrpHom a b
+
+
+group::(Group g, Newtype g) => O g -> g
+group element = wrap element
 
 -- | Constructs a commutator for a binary operator
 -- See https://en.wikipedia.org/wiki/Commutator
-commutator::forall g a . (Inverter a) => O2 a -> O2 a
+commutator::forall g a . (Inverter a) => O2 (Individual a) -> O2 (Individual a)
 commutator o  =  \x y ->  o (o (i x) (i y)) (o x y) where
-    i = inverter @a
+    i = invert @a
  
 abs::(Nullary a, TotalOrd a, Negatable a) => a -> a
 abs a = ifelse (a >= zero) a (negate a)
 
+instance Unital a => Identity (ProductGroup a) where
+    identity = one
+
+instance (Unital a, Reciprocative a) => Inverter (ProductGroup a) where
+    invert = reciprocal
+
+instance (Multiplicative a) => Composer (ProductGroup a) where
+    compose = (*)
+
+instance (a ~ Individual (ProductGroup a),  ProductMonoid a, Unital a, Reciprocative a) => Group (ProductGroup a) where
+    inverse = reciprocal
+    unit = one
+    combine = (*)
+    
+-- | An additive group, always commutative
+class (AdditiveMonoid a, Negatable a) => AbelianGroup a where  
+    
+class (AbelianGroup a, Finite a) => FiniteAbelianGroup a where
+
+
 instance Structure 1 FiniteAbelianGroup
 instance Structure 1 Group
-instance Structure 1 ProductGroup
 instance Structure 1 AbelianGroup
-
-
-instance Integral a => ProductGroup (Ratio a) where
-instance ProductGroup Float where 
-instance ProductGroup Double where 
-instance ProductGroup CFloat where 
-instance ProductGroup CDouble where 
 
 instance AbelianGroup Integer where 
 instance AbelianGroup Int where 
@@ -96,8 +110,7 @@ instance (Integral a) => AbelianGroup (Ratio a) where
 instance AbelianGroup Float where 
 instance AbelianGroup Double where 
 instance AbelianGroup CFloat where 
-instance AbelianGroup CDouble where                         
-        
+instance AbelianGroup CDouble where                                 
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)
 type AG3 a1 a2 a3 = (AG2 a1 a2, AbelianGroup a3)

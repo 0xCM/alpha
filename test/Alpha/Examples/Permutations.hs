@@ -27,9 +27,9 @@ instance Example "p-3" where
 instance Example "p-4" where
     example = do
         let s4 = symgroup @4
-        let p2 = s4 ! 2
+        let p2 = s4 !! 2
         print p2
-        let p5 = s4 ! 5        
+        let p5 = s4 !! 5        
         print p5
         let p = p2 <> p5
         print p
@@ -38,7 +38,7 @@ instance Example "p-4" where
 instance Example "p-5" where
     example = do
         let s3 = symgroup @3
-        let p2 = s3 ! 2
+        let p2 = s3 !! 2
         print p2
 
         let p3 = switch (1,2) p2

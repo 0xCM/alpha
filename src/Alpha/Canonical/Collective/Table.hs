@@ -22,7 +22,6 @@ newtype DataTable m n a = DataTable (M.Matrix a)
     deriving (Eq, NFData, Functor, Semigroup, Monoid, Applicative, Foldable, Traversable, Num) 
     
 type instance Individual (DataTable m n a) = a
-type instance IndexedElement (Int,Int) (DataTable m n a) = a
 
 -- | Specifies the form of the matrix dimension type
 type TableDim = (Int, Int)

@@ -8,7 +8,7 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE NoStarIsType #-}
 
-module Alpha.Canonical.Structures.Naturals
+module Alpha.Canonical.Structures.NatK
 (
     NatK(..), NatKPair(..), NatKSpan(..),     
     KnownNatPair(..), KnownNatTriple(..), KnownNatQuad(..), 
@@ -52,9 +52,7 @@ type instance Divided (NatK m) (NatK n) = NatK (m / n)
 type instance Modulo (NatK m) (NatK n) = NatK (m % n)
 type instance Decrement (NatK m) = NatK (m - 1)
 type instance Increment (NatK m) = NatK (m + 1)
-type instance Raised (NatK m) (NatK n) = NatK (m ^ n)
-type instance Infimum (NatKSpan m n) = NatK m
-type instance Supremum (NatKSpan m n) = NatK n
+--type instance Powered (NatK m) (NatK n) = NatK (m ^ n)
 type instance Span (NatK m) (NatK n) = NatKSpan m n
 type instance Tripled (NatK m) (NatK n) (NatKPair m n) = NatKPair m n
 
@@ -125,9 +123,9 @@ instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
 
 instance forall m n. (KnownNatPair m n) =>  Triple (NatK m) (NatK n) (NatKPair m n) where    
-    third _ _ = NatKPair (natK @m, natK @n)
-    first _ = natK @m
-    second _ = natK @n
+    trip3 _ _ = NatKPair (natK @m, natK @n)
+    trip1 _ = natK @m
+    trip2 _ = natK @n
             
 instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where    
     span::NatK m -> NatK n -> Span (NatK m) (NatK n)
@@ -146,7 +144,8 @@ instance forall m. (KnownNat m) => Incrementable (NatK m) where
     inc::NatK m -> Increment (NatK m) 
     inc (NatK m)  = m + 1 |> NatK
     {-# INLINE inc #-}
-    
+
+        
 instance forall m n. (KnownNatPair m n) =>  Bimodular (NatK m) (NatK n) where    
     bimod::NatK m -> NatK n -> Modulo (NatK m) (NatK n)
     bimod (NatK m) (NatK n) = m % n |> NatK

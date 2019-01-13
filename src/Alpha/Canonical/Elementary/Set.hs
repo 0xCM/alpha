@@ -6,7 +6,6 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE UndecidableInstances #-}
-
 module Alpha.Canonical.Elementary.Set
 (
     module X,
@@ -16,6 +15,10 @@ module Alpha.Canonical.Elementary.Set
     SetInfo(..),
     Universe(..),
     Complementary(..),
+    Unionizable(..),
+    Difference(..),
+    Intersectable(..),    
+    Containment(..),
     emptyset, 
     finset,
     fneset,
@@ -29,6 +32,7 @@ import qualified Data.List as List
 import qualified Data.Text as Text
 import qualified Data.Sequence as Sequence
 import qualified Numeric.Interval as Interval
+import qualified Data.MultiSet as Bag
 
 -- | Represents a finite set that contains at least one element
 newtype FneSet a = FneSet (Set' a)    
@@ -48,17 +52,32 @@ type instance Individual (FneSet a) = a
 type instance Individual (Set a) = a
 type instance Individual (SetInfo a) = a
 
+class Unionizable a where        
+    -- The union operator
+    union::a -> a -> a 
 
-class (a ~ Individual b) => Subset a b where
-    subset::Set b -> Set a
+    unions::[a] -> a
+    default unions::(Nullity a, Unionizable a) => [a] -> a
+    unions u = reduce empty union u
 
--- data Even a = Even a
--- type instance Individual (Even a) = a
 
--- instance Subset Int8 Int8 where
---     subset s = undefined  where
---         evens = s |> filter (\x -> mod' x 2 == 0) |> (<$>) Even 
+class Difference a where
+    diff::a -> a -> a
 
+    (\\)::a -> a -> a
+    (\\) = diff
+    {-# INLINE (\\) #-}
+    infix 5 \\
+        
+class Intersectable a  where
+    intersect::a -> a -> a
+
+class Containment a where
+    isSubset::Bool -> a -> a -> Bool
+        
+class Subset a where
+    subset::Set a -> Set a
+    subset = id
 
 class (a ~ Individual b) =>  SetBuilder b a where
     set::b -> Set a
@@ -86,6 +105,19 @@ finset = FiniteSet . fromList
 infiniteSet::(Ord a) => [a] -> Set a
 infiniteSet = InfiniteSet
 
+isFinite::Set a -> Bool
+isFinite (FiniteSet x) = True
+isFinite _ = False
+
+isInfinite::Set a -> Bool
+isInfinite (InfiniteSet a) = True
+isInfinite _ = False
+
+isEmpty::Set a -> Bool
+isEmpty EmptySet = True
+isEmpty _ = False
+
+
 -- | Constructs a powerset
 powerset::Ord a => Set a -> Set(Set a)
 powerset (FiniteSet src) = Set.map FiniteSet (powerset' src) |> FiniteSet
@@ -95,7 +127,8 @@ fneset::(Ord a) => NonEmpty a -> FneSet a
 fneset (a :| xs) = FneSet (Set.fromList(a : xs))
 
     
--- FneSet
+-------------------------------------------------------------------------------            
+-- * FneSet class membership
 -------------------------------------------------------------------------------                
 instance Universal (FneSet a) where
     all pred (FneSet s) = s |> Set.toList |> List.all pred
@@ -148,7 +181,8 @@ instance (Formattable a, Ord a) => Formattable (FneSet a) where
 instance (Formattable a, Ord a) => Show (FneSet a) where
     show = Text.unpack . format            
 
--- Set
+-------------------------------------------------------------------------------            
+-- * Set class membership
 -------------------------------------------------------------------------------
 instance (Ord a, Ord b) => Mappable(Set a) a b where
     type Mapped (Set a) a b = Set b
@@ -159,7 +193,7 @@ instance (Ord a, Ord b) => Mappable(Set a) a b where
 instance (Formattable a, Ord a) => Show (Set a) where
     show = Text.unpack . format
 
-instance Ord a => Vacuous (Set a) where
+instance Ord a => Nullity (Set a) where
     empty = EmptySet
     null (EmptySet) = True
     null _ = False
@@ -240,7 +274,8 @@ instance (Formattable a, Ord a) => Formattable (Set a) where
     format (FiniteSet l) = setstring (toList l) where
         
     
--- Universe instances
+-------------------------------------------------------------------------------            
+-- * Universe instances
 -------------------------------------------------------------------------------            
 instance Universe Int8 where
     inhabitants = FiniteSet (fromList enumerate)
@@ -263,6 +298,7 @@ instance Universe Natural where
 instance Universe Bool where
     inhabitants = FiniteSet (fromList enumerate)
 
+-------------------------------------------------------------------------------            
 -- SetBuilder instances
 -------------------------------------------------------------------------------            
 instance (Ord a) => SetBuilder [a] a where
@@ -272,3 +308,58 @@ instance (Ord a) => SetBuilder (SetInfo a) a where
     set (SetInfo (Zero, items)) = EmptySet
     set (SetInfo (Finite, items)) = FiniteSet (fromList items)
     set (SetInfo (Infinite, items)) = InfiniteSet items
+
+-------------------------------------------------------------------------------            
+-- * Unionizable instances
+-------------------------------------------------------------------------------            
+    
+instance (Ord a) => Unionizable [a] where    
+    union = List.union
+            
+instance (Ord a) => Unionizable (Bag a) where    
+    union = Bag.union        
+
+-------------------------------------------------------------------------------            
+-- * Difference instances
+-------------------------------------------------------------------------------            
+instance (Ord a) => Difference (Bag a) where
+    diff = Bag.difference
+
+instance (Eq a, Ord a) => Difference [a] where        
+    diff =  (List.\\)
+
+instance (Ord a) => Difference (Set' a)  where        
+    diff =  (Set.\\)
+
+-------------------------------------------------------------------------------            
+-- * Intersectable instances
+-------------------------------------------------------------------------------            
+instance (Ord a) => Intersectable (Bag a) where    
+    intersect = Bag.intersection
+
+
+instance (Eq a, Ord a) => Intersectable [a] where    
+    intersect = List.intersect
+
+
+-------------------------------------------------------------------------------            
+-- * Containment instances
+-------------------------------------------------------------------------------            
+instance (Ord a) => Containment (Bag a) where
+    isSubset proper candidate source 
+        = ifelse proper 
+            (Bag.isProperSubsetOf candidate source) 
+            (Bag.isSubsetOf candidate source)
+    
+instance (Eq a, Ord a) => Containment [a] where        
+    isSubset proper candidate source  
+        = test (Set.fromList candidate) (Set.fromList source)
+            where test = ifelse proper Set.isProperSubsetOf Set.isSubsetOf 
+
+instance Ord a => Containment (Set' a) where
+    isSubset proper candidate source 
+        = ifelse proper  
+            (Set.isProperSubsetOf c' s')  
+            (Set.isSubsetOf c' s')  
+                where (c', s') = (candidate, source)
+                        

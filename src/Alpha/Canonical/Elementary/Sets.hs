@@ -6,17 +6,18 @@ module Alpha.Canonical.Elementary.Sets
 ) where
 import Alpha.Canonical.Elementary.Set
 
+
 -- | Represents a collection of subsets
 newtype Subsets a = Subsets (Set (Set a))
 
--- | A sigma algebra over a set A, σ(A), is a set of elemnts from
+-- | A sigma algebra over a set A, σ(A), is a set of elements from
 -- the powerset of a, P(A), where
 -- 1) A is in σ(A)
 -- 2) The union of a countable number of elements in σ(A) 
 -- is also in σ(A)
 -- 3) The complement of any element of σ(A) is also in σ(A)
 -- See Y2013PTCC
-newtype SigmaAlgebra a = SigmaAlgebra (Subsets a)
+class SigmaAlgebra a where
 
 -- | An algebra over a set A is a collection of subsets of
 -- A that contains A itself and is closed with respect to

@@ -14,7 +14,7 @@ import Alpha.Canonical.Common.Length as X
 import Alpha.Canonical.Common.Root as X
 import Alpha.Canonical.Common.Reversible as X
 import Alpha.Canonical.Common.Signage as X
-import Alpha.Canonical.Common.State as X
+import Alpha.Canonical.Common.Stateful as X
 import Alpha.Canonical.Common.Synonyms as X
 import Alpha.Canonical.Common.Types as X
 import Alpha.Canonical.Common.Individual as X

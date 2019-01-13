@@ -28,7 +28,6 @@ import qualified Data.Stream.Infinite as Stream
 import qualified Data.Tree as Tree
 import qualified Data.Text as Text
 import qualified Data.MultiSet as Bag
-import qualified Numeric.Interval as Interval
 import qualified Data.Sequence as Seq
 
 -- | Creates a nonempty collection
@@ -79,9 +78,9 @@ class Groupable c where
 
     
 instance Triple (Set a) (Set b) (DisjointUnion (Set a) (Set b)) where
-    third a b = DisjointUnion (a, b)
-    second (DisjointUnion (a,b)) = b
-    first (DisjointUnion (a,b)) = a
+    trip3 a b = DisjointUnion (a, b)
+    trip2 (DisjointUnion (a,b)) = b
+    trip1 (DisjointUnion (a,b)) = a
 
 -- | Container instances    
 -------------------------------------------------------------------------------

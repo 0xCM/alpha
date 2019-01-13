@@ -32,15 +32,10 @@ type family Summed a b
 type UniSum a = Summed a a
 type instance Summed (Set a) (Set a) = Set a    
 
--- | Represents an addition operator
-newtype Addition a = Addition (O2 a)    
-    deriving(Generic)
-instance Newtype (Addition a)
 
 -- | Represents a formal sum of an arbitrary
 -- number of elements
 newtype MultiSum a = MultiSum [a]    
-
 
 -- | Characterizes a type that supports a notion of  addition      
 class Additive a where
@@ -82,18 +77,9 @@ nsum::(Integral n, Nullary a, Additive a) => n -> a -> a
 nsum n a = reduce zero (+) (clone n a)
 
 
--- | Produces the canonical addition operator
--- addition::(Num a) => Addition a
--- addition = Addition add'
-addition::Additive a => Addition a
-addition = Addition add
-
 instance (Nullary a, Additive a) => Computable (MultiSum a) where
     type Computed (MultiSum a) = a
     compute (MultiSum items) = reduce zero (+) items
-
-instance Commutative (Addition a)
-instance Associative (Addition a)
     
 instance (Ord a) =>  Additive (Set a) where
     add x y = union x y

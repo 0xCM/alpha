@@ -17,7 +17,6 @@ import qualified Data.MultiSet as Bag
 import qualified Data.Set as Set
 
 
-
 -- | Characterizes measurable things, in the spirit, but not formally, of Lebesque
 class Measurable (n::Nat) a where
     measure::forall b. (Num b) => a -> b

@@ -47,7 +47,7 @@ class (LeftModule r m, s ~ BasisSet m) => Basis r m s where
     basis::s -> BasisSet m
             
 -- | Characterizes a finite module basis 
-class (KnownNat n, Basis r m s) => FiniteBasis n r m s where
+class (KnownNat n, Finite m, Basis r m s) => FiniteBasis n r m s where
 
 
 -- | A free module is a module with a basis
@@ -59,7 +59,6 @@ data ChainComplex = ChainComplex (forall r m. LeftModule r m => [(Integer, m)])
 
 instance Structure 2 LeftModule
 instance Structure 2 RightModule
--- instance Structure 2 Module
 instance Structure 3 Bimodule
 instance Structure 3 FreeModule
 
@@ -67,10 +66,17 @@ instance Structure 3 FreeModule
 -- ring of integers
 instance (AbelianGroup m, LeftAction Integer m) => LeftModule Integer m
 
+-- | Represents a module homomorphism, otherwise known as a linear map
 newtype ModuleHom a b  = ModuleHom (a -> b)
-    deriving(Generic)
+    deriving(Generic,Functor)
 instance Newtype(ModuleHom a b)
 
-instance Functor (ModuleHom a)  where
-    fmap f (ModuleHom h) = undefined
+instance Category ModuleHom where
+    id = ModuleHom(\x -> x)
+    g . f = wrap $ (unwrap g) . (unwrap f)
 
+instance End ModuleHom where
+    end x = unwrap x 
+
+instance Function ModuleHom where
+    fx f = end f

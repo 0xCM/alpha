@@ -21,14 +21,14 @@ type family Tripled a b c = r | r -> a b c
 class Triple a b c where
 
     -- | Constructs a triple
-    third::a -> b -> Tripled a b c
+    trip3::a -> b -> Tripled a b c
 
     --- | Extracts the second of the paired elements
-    second::Tripled a b c -> b
+    trip2::Tripled a b c -> b
 
     --- | Extracts the first of the paired elements
-    first::Tripled a b c -> a
+    trip1::Tripled a b c -> a
     
     swap::(Triple b a c) => Tripled a b c -> Tripled b a c
-    swap x = third (second x) (first x)
+    swap x = trip3 (trip2 x) (trip1 x)
     

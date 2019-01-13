@@ -400,7 +400,7 @@ instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2
   concat = bvConcat
 
 instance KnownNat w => Length (BitVector w) where
-  length  = convert . finiteBitSize  
+  length  = fromIntegral . finiteBitSize  
 
 newtype NatRepr (n::Nat) = NatRepr {
     natValue :: Integer

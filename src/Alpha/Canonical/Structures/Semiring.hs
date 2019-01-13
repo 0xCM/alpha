@@ -2,6 +2,7 @@ module Alpha.Canonical.Structures.Semiring
 (
     module X,
     Semiring(..),
+    OrdSemiring(..),
     interval
     
 
@@ -15,10 +16,12 @@ import Alpha.Canonical.Structures.Monoid as X
 -- The most elementary algebraic structure that supports both
 -- addition and multiplication
 -- See https://en.wikipedia.org/wiki/Semiring
-class (SumMonoid a, ProductMonoid a, Distributive a) 
+class (AdditiveMonoid a, ProductMonoid a, Distributive a) 
     => Semiring a where
         
---instance (Abelian a, Monoidal a, Distributive a) => Semiring a
+-- | Synonym that joins the 'Ord' and 'Semiring' constraints
+type OrdSemiring a = (Ord a, Semiring a)        
+
 
 interval::(Ord a, Semiring a) => a -> a -> Interval a
 interval = interval'

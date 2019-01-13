@@ -10,8 +10,9 @@ import Alpha.Canonical.Algebra.Divisive
 -- mulitiplicative inversion 
 class Reciprocative a where
     reciprocal::a -> a
-        
--- Reciprocative 
+
+-------------------------------------------------------------------------------        
+-- * Reciprocative instances
 -------------------------------------------------------------------------------
 instance (Integral a) => Reciprocative (Ratio a) where
     reciprocal = recip

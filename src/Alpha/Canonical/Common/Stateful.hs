@@ -1,4 +1,10 @@
-module Alpha.Canonical.Common.State where
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+module Alpha.Canonical.Common.Stateful where
 
 import Data.STRef
 import Control.Monad(forever, (>>=))
@@ -20,7 +26,6 @@ sunpack = readSTRef
 -- | Replace the existing value with a new value
 replace::STRef s a -> a -> ST s ()
 replace = writeSTRef
-
 
 newtype RefCell a = RefCell (IORef a)
     deriving (Eq)

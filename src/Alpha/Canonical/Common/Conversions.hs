@@ -55,9 +55,6 @@ class Convertible a b where
     -- | Requires that an 'a' value be converted to a 'b' value
     convert::a -> b    
 
--- | Characterizies a type whose values can be converted to/from 'Double' values    
-type Doubly a = (ToDouble a, FromDouble a)
-
 -- | Characterizies a type whose values can be materialized from 'Double' values
 class FromDouble d where
     -- | Converts a 'Double' value to a 'd' value
@@ -67,6 +64,10 @@ class FromDouble d where
 class ToDouble d where
     -- / Converts a 'd' value to a 'Double' value
     double::d -> Double
+
+-- | Characterizies a type whose values can be converted to/from 'Double' values    
+type Doubly a = (ToDouble a, FromDouble a)
+
 
 -- | Characterizies a type whose values can be converted to machine-sized 'Int' values
 class ToInt d where
@@ -120,35 +121,35 @@ enumerate = [minBound .. maxBound]
 
 -- | Constructs a 'Int8' from an integral value
 int8::(Integral n) => n -> Int8
-int8 n = convert n
+int8 n = fromIntegral n
 
 -- | Constructs a 'Int16' from an integral value
 int16::(Integral n) => n -> Int16
-int16 n = convert n
+int16 n = fromIntegral n
 
 -- | Constructs a 'Int32' from an integral value
 int32::(Integral n) => n -> Int32
-int32 n = convert n
+int32 n = fromIntegral n
 
 -- | Constructs a 'Int64' from an integral value
 int64::(Integral n) => n -> Int64
-int64 n = convert n
+int64 n = fromIntegral n
 
 -- | Constructs a 'Word8' from an integral value
 word8::(Integral n) => n -> Word8
-word8 n = convert n
+word8 n = fromIntegral n
 
 -- | Constructs a 'Word16' from an integral value
 word16::(Integral n) => n -> Word16
-word16 n = convert n
+word16 n = fromIntegral n
 
 -- | Constructs a 'Word32' from an integral value
 word32::(Integral n) => n -> Word32
-word32 n = convert n
+word32 n = fromIntegral n
 
 -- | Constructs a 'Word64' from an integral value
 word64::(Integral n) => n -> Word64
-word64 n = convert n
+word64 n = fromIntegral n
 {-# INLINE word64 #-}
 
 
@@ -162,6 +163,9 @@ fractional::(Real r, Fractional f) => r -> f
 fractional = realToFrac'
 {-# INLINE fractional #-} 
     
+-------------------------------------------------------------------------------
+-- * ToIntegral instances
+-------------------------------------------------------------------------------
 instance ToIntegral Int where
     integral = fromIntegral    
 instance ToIntegral Int8 where
@@ -187,7 +191,8 @@ instance ToIntegral Word64 where
 instance ToIntegral Natural where
     integral = fromIntegral    
 
--- FromDouble
+-------------------------------------------------------------------------------
+-- * FromDouble instances
 -------------------------------------------------------------------------------
 instance FromDouble Natural where 
     fromDouble = truncate
@@ -238,7 +243,8 @@ instance FromDouble CDouble where
     fromDouble = realToFrac
     {-# INLINE fromDouble #-}    
 
--- To Double
+-------------------------------------------------------------------------------
+-- * ToDouble instances
 -------------------------------------------------------------------------------
 instance ToDouble Natural where 
     double = fromIntegral
@@ -294,7 +300,8 @@ instance ToDouble CDouble where
     double = realToFrac
     {-# INLINE double #-}    
 
--- ToInt
+-------------------------------------------------------------------------------
+-- * ToInt instances
 -------------------------------------------------------------------------------
 instance ToInt Natural where 
     int = fromIntegral
@@ -345,7 +352,8 @@ instance ToInt CDouble where
     int = truncate
     {-# INLINE int #-}
 
--- FromInt
+-------------------------------------------------------------------------------
+-- * FromInt instances
 -------------------------------------------------------------------------------
 instance FromInt Natural where 
     fromInt = fromIntegral
@@ -396,7 +404,8 @@ instance FromInt CDouble where
     fromInt = realToFrac
     {-# INLINE fromInt #-}
 
--- ToInteger
+-------------------------------------------------------------------------------
+-- * ToInteger instances
 -------------------------------------------------------------------------------
 instance ToInteger Natural where 
     integer = fromIntegral
@@ -447,7 +456,8 @@ instance ToInteger CDouble where
     integer = truncate
     {-# INLINE integer #-}
 
--- ToWord
+-------------------------------------------------------------------------------
+-- * ToWord instances
 -------------------------------------------------------------------------------
 instance ToWord Natural where 
     word = fromIntegral
@@ -498,7 +508,9 @@ instance ToWord CDouble where
     word = truncate
     {-# INLINE word #-}
 
--- FromNatural
+
+-------------------------------------------------------------------------------
+-- * FromNatural instances
 -------------------------------------------------------------------------------
 instance FromNatural Natural where 
     fromNatural = id
@@ -549,7 +561,8 @@ instance FromNatural CDouble where
     fromNatural = realToFrac
     {-# INLINE fromNatural #-}
 
--- ToNatural
+-------------------------------------------------------------------------------
+-- * ToNatural instances
 -------------------------------------------------------------------------------
 instance ToNatural Natural where 
     natural = id
@@ -600,9 +613,12 @@ instance ToNatural CDouble where
     natural = truncate
     {-# INLINE natural #-}
 
-instance (Integral a, Num b) => Convertible a b where
-    convert = fromIntegral
-    
+-- instance (Integral a, Num b) => Convertible a b where
+--     convert = fromIntegral
+
+-------------------------------------------------------------------------------
+-- * ToString instances
+-------------------------------------------------------------------------------    
 instance ToString String where
     string = id
     

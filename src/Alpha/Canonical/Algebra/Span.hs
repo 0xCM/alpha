@@ -10,8 +10,10 @@ module Alpha.Canonical.Algebra.Span
     IntegralSpan(..),
     Spanned(..),
 
+
 ) where
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Numeric
 import qualified Data.List as List
 import qualified Numeric.Interval as I
 
@@ -34,8 +36,6 @@ class (Ord a, Ord b) => Spanned a b where
     (...) = span
     infixl 5 ...
 
-
-
 instance (Ord a, Integral a) => Associated (IntegralSpan a)  where
     associates (IntegralSpan l) = l
     
@@ -44,3 +44,4 @@ instance (Ord a, Integral a) => Spanned (Min a) (Max a) where
 
 instance (Ord a) => Spanned (Interval a) (Interval a) where
     span i1 i2 = (infimum i1) I.... (supremum i2)                
+

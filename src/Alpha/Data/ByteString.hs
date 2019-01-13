@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
--- | ByteString-related utilities
+-- | 
 -- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
@@ -31,20 +31,13 @@ import qualified Data.ByteString.Lazy as LZ
 import qualified Data.Ix as Ix
 import qualified Data.List as L
 
-
-
-
-
 type instance Individual LZ.ByteString = Word8
 type instance Individual EG.ByteString = Word8
 
-type instance IndexedElement Int LZ.ByteString = Word8
-type instance IndexedElement Int EG.ByteString = Word8
-
 -- Extracts a contiguous sequence of bytes from the source
 -- of length w starting at the 0-based index i
-bytes::(Indexed Int a) => Int -> Int -> a -> [IndexedElement Int a]
-bytes i width src = fmap (\k -> src ! k) [i..(i + width)]
+bytes::(Indexer a ~ Int, Indexable a) => Int -> Int -> a -> [Individual a]
+bytes i width src = fmap (\k -> src !! k) [i..(i + width)]
 
 segmentBS::(Int,Int) -> EG.ByteString -> EG.ByteString
 segmentBS (m, n) bs = EG.splitAt m bs |> snd |> EG.splitAt (n - m - 1) |> fst
@@ -71,10 +64,10 @@ segments width total = intervals
 
 
 instance Length EG.ByteString where
-    length = convert . EG.length 
+    length = fromIntegral . EG.length 
 
 instance Length LZ.ByteString where
-    length = convert . LZ.length 
+    length = fromIntegral . LZ.length 
             
 instance Formattable EG.ByteString where
     format x = (bytes 0 (EG.length x) x) |> format
@@ -106,11 +99,11 @@ instance Packable [Word8] LZ.ByteString where
     pack = LZ.pack
     unpack = LZ.unpack 
 
-instance Indexed Int EG.ByteString where 
-    at = EG.index
+instance Indexable EG.ByteString where 
+    idx = EG.index
     
-instance Indexed Int LZ.ByteString where    
-    at x n = LZ.index x (int64 n)
+instance Indexable LZ.ByteString where    
+    idx x n = LZ.index x (int64 n)
 
 instance Convertible EG.ByteString [Word8] where
     convert source = source |> bytes 0 (length source - 1)

@@ -30,16 +30,13 @@ module Alpha.Canonical.Relations.Related
     Maximal(..),  
     Infimal(..), 
     Supremal(..),
-    Infimum(..), 
-    Supremum(..), 
-    Extremum(..),
     Comparer(..), 
     LT(..), 
     GT(..), 
     LTEQ(..), 
     GTEQ(..), 
     Comparable(..),   
-    Quotient(..)
+    Quotient(..),
 
 ) where
 --import Algebra.PartialOrd 
@@ -52,13 +49,13 @@ import qualified Prelude as P
 import qualified Data.Map as Map
 import qualified Data.List as List
 
-type family Infimum a
-type family Supremum a    
-type family Extremum a
+--type family Infimum a
+--type family Supremum a    
+--type family Extremum a
 type family Quotient a
 
 
-type instance Extremum (Interval a) = a
+--type instance Extremum (Interval a) = a
 type instance Individual (Interval a) = a
 
 -- | Synonym for default comparison predicate
@@ -273,7 +270,7 @@ class Infimal a where
 -- See https://en.wikipedia.org/wiki/Infimum_and_supremum    
 class Supremal a where
     -- / The least upper bound
-    supremum::a -> Extremum a
+    supremum::a -> Individual a
             
 class (Ord a) => LTEQ a where  
     (<=)::Comparer a
@@ -337,6 +334,9 @@ instance Infimal (Interval a) where
 
 instance Supremal (Interval a) where
     supremum = Interval.sup            
+
+
+
 
 
 -- LTEQ instances

@@ -14,7 +14,6 @@ import Alpha.Canonical.Algebra.Cosets as X
 import Alpha.Canonical.Algebra.Complex as X
 import Alpha.Canonical.Algebra.Divisive as X
 import Alpha.Canonical.Algebra.Distributive as X
-import Alpha.Canonical.Algebra.Exponential as X
 import Alpha.Canonical.Algebra.Measurable as X
 import Alpha.Canonical.Algebra.Modular as X
 import Alpha.Canonical.Algebra.Multiplicative as X
@@ -27,5 +26,7 @@ import Alpha.Canonical.Algebra.Series as X
 import Alpha.Canonical.Algebra.Subtractive as X
 import Alpha.Canonical.Algebra.Successive as X
 import Alpha.Canonical.Algebra.Unsigned as X
+import Alpha.Canonical.Algebra.Unital as X
+import Alpha.Canonical.Algebra.Powers as X
 
 

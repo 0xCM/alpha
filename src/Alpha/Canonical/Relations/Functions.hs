@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------------
--- | Defines predicate operators and types
+-- | 
 -- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
@@ -11,10 +11,11 @@ module Alpha.Canonical.Relations.Functions
     Dom(..),
     Cod(..),
     Img(..),
-    Arity(..),
+    End(..),
+    Func(..),
+    Function(..),
     Composition(..), 
     Compositional(..), 
-    Function(..),
     Functional(..),
     Uncurried, Curried, 
     Curriable(..), Uncurriable(..),
@@ -46,13 +47,6 @@ instance Newtype (Func3 a1 a2 a3 a4)
 newtype Func4 a1 a2 a3 a4 a5 = Func4 (F4 a1 a2 a3 a4 a5)
     deriving (Generic)
 instance Newtype (Func4 a1 a2 a3 a4 a5)
-
-type family Func (n::Nat) a = r | r -> n where
-    Func 0 a = Func0 a
-    Func 1 (a1,a2) = Func1 a1 a2
-    Func 2 (a1,a2,a3) = Func2 a1 a2 a3
-    Func 3 (a1,a2,a3,a4) = Func3 a1 a2 a3 a4
-    Func 4 (a1,a2,a3,a4,a5) = Func4 a1 a2 a3 a4 a5
 
 -- | Synonym for function that saturates with 1 cartesian argument
 -- that aligns with the following definiion:
@@ -127,26 +121,33 @@ type instance Cod (Func4 a1 a2 a3 a4 a5) = a5
 -- function is a surjection
 type Img f = Cod f
 
-type family Function f      
-type instance Function (a -> b) = a -> b
-type instance Function (Map a b)  = Map a b
-type instance Function (Func0 a) = a
-type instance Function (Func1 a1 a2) = a1 -> a2
-type instance Function (Func2 a1 a2 a3) = (a1,a2) -> a3
-type instance Function (Func3 a1 a2 a3 a4) = (a1,a2,a3) -> a4
-type instance Function (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4) -> a5
-
-type family Arity f = (r::Nat) 
-type instance Arity (Func0 a) = 0
-type instance Arity (Func1 a1 a2) = 1
-type instance Arity (Func2 a1 a2 a3) = 2
-type instance Arity (Func3 a1 a2 a3 a4) = 3
-type instance Arity (Func4 a1 a2 a3 a4 a5) = 4
+type family Func f      
+type instance Func (a -> b) = a -> b
+type instance Func (Map a b)  = Map a b
+type instance Func (Func0 a) = a
+type instance Func (Func1 a1 a2) = a1 -> a2
+type instance Func (Func2 a1 a2 a3) = (a1,a2) -> a3
+type instance Func (Func3 a1 a2 a3 a4) = (a1,a2,a3) -> a4
+type instance Func (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4) -> a5
 
 
+-- | Characterizes a structure-preserving endomorphism
+class Category c => End c where
+    end::c a b -> (a -> b)
+
+
+newtype Hom c a b = Hom (Set (a -> b))
+
+    
+class Function f where
+    fx::f a b -> (a -> b)
+
+
+    
 -- | Characterizes a deferred computation or a computation
 -- specification    
 class Computable a where
+
     -- | The type of computed value
     type Computed a
 
@@ -155,11 +156,11 @@ class Computable a where
 
 -- | Characterizes function composition    
 class Compositional g f where
-    compose::g -> f -> Composition g f
+    compositon::g -> f -> Composition g f
     
 
 class Functional f where    
-    func::Function f -> ((Dom f) -> (Cod f))
+    func::Func f -> ((Dom f) -> (Cod f))
     
 
 instance Functional (Func0 a1 ) where
@@ -187,7 +188,7 @@ instance forall f a b. (a ~ Dom f, b ~ Cod f, f ~ (a -> b)) => Functional (a -> 
     func f = f
                         
 instance (Ord a, Ord b) => Compositional (Map b c) (Map a b) where
-    compose mg mf= mh where
+    compositon mg mf= mh where
         f = func' mf
         g = func' mg
         h = g . f

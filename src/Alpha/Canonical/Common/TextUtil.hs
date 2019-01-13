@@ -20,7 +20,6 @@ module Alpha.Canonical.Common.TextUtil
 import Alpha.Base
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Asci
-import Alpha.Canonical.Common.Symbols
 import Data.Aeson (FromJSON, ToJSON, decode, encode)
 import Data.Aeson.Encode.Pretty
 

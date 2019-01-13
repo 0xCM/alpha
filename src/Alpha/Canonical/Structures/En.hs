@@ -27,6 +27,8 @@ data instance En 3 k = E3 (UniTuple 3 k)
 data instance En 4 k = E4 (UniTuple 4 k) 
 data instance En 5 k = E5 (UniTuple 5 k) 
 
+--type instance Individual (En n k) = [k]
+
 -- | Characterizes the standard ith basis element in En
 class (KnownNat n, KnownNat i, Ring k) =>  NatBasisElement n i k where
     --en::UniTuple n k
@@ -36,7 +38,7 @@ class (KnownNat n, Ring k) => EuclideanVector n k where
     euvector::UniTuple n k -> En n k
                 
 class (KnownNat n, Ring k) => NatBasis n k where
-    natbasis::BasisSet (En n k)
+    natbasis::FiniteBasisSet (En n k)
 
 
 vecN::(KnownNat n) => UniTuple n k -> En n k
@@ -195,18 +197,18 @@ instance (OrderedRing k) => NatBasisElement 5 5 k where
     en = E5 (zero,zero,zero,zero, one)
 
 instance (OrderedRing k) => NatBasis 1 k where    
-    natbasis = BasisSet $ FiniteSet [en @1 @1]
+    natbasis = FiniteBasisSet $ FiniteSet [en @1 @1]
 instance (OrderedRing k) => NatBasis 2 k where
-    natbasis = BasisSet $ FiniteSet [en @2 @1, en @2 @2]
+    natbasis = FiniteBasisSet $ FiniteSet [en @2 @1, en @2 @2]
 instance (OrderedRing k) => NatBasis 3 k where
-    natbasis = BasisSet $ FiniteSet [en @3 @1, en @3 @2, en @3 @3]    
+    natbasis = FiniteBasisSet $ FiniteSet [en @3 @1, en @3 @2, en @3 @3]    
 instance (OrderedRing k) => NatBasis 4 k where
-    natbasis = BasisSet $ FiniteSet [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
+    natbasis = FiniteBasisSet $ FiniteSet [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
 instance (OrderedRing k) => NatBasis 5 k where
-    natbasis = BasisSet $ FiniteSet [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
+    natbasis = FiniteBasisSet $ FiniteSet [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
 
-instance (NatBasis n k, Euclidean n k v) => Basis k v (BasisSet v) where
-    basis  _ = natbasis @ n
+-- instance (NatBasis n k, Euclidean n k v) => Basis k v (FiniteBasisSet v) where
+--     basis  _ = natbasis @ n
 
-instance forall n k v s.  (KnownNat n, NatBasis n k, Euclidean n k v, s ~ BasisSet v) => FiniteBasis n k v s
+-- instance forall n k v s.  (KnownNat n, NatBasis n k, Euclidean n k v, s ~ FiniteBasisSet v) => FiniteBasis n k v s
     

@@ -16,9 +16,7 @@ module Alpha.Canonical.Relations.Operators
 
     scompose, associator,associative, 
     endoply, cartesian, dual, endo, left,right, 
-    Iterable(..),
-    
-    
+    Iterable(..),    
 ) where
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Functions
@@ -37,7 +35,6 @@ class KnownNat n => Operator n f a where
 -- | Characterizes a unary operator    
 class UnaryOperator a where
     o1::O1 a    
-
     
 -- | Characterizes a binary operator
 class BinaryOperator a where
@@ -47,21 +44,16 @@ class Commutative a where
 
 -- | Characterizes a type that can produce an associative binary operator
 class Associative a where
-
     
 -- | Characterizes a type over which function iterates may be computed
 class Iterable a where
     iterate :: O1 (Individual a) -> (Individual a) -> a
-
 
 -- | An operation is an operator with known domain and arity
 newtype Operation n f a = Operation f
     deriving (Generic)
 instance Newtype f =>  Newtype (Operation n f a)
 
---type instance Dom (Operation n f a) = UniProduct n a
-type instance Cod (Operation n f a) = a
-type instance Arity (Operation n f a) = n
 
 operation::forall n f a. (KnownNat n, Operator n f a) => f -> Operation n f a
 operation = Operation

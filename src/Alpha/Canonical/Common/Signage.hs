@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Canonical.Common.Signage
 (
     BoundedIntegral(..),
@@ -33,11 +39,6 @@ class Unsignable a where
 
 class (Bounded a, Integral a) => BoundedIntegral a where    
 
--- | Enumerates bounded integral values
--- integers::(BoundedIntegral n) => NonEmpty n
--- integers = (List.head range) :| (List.tail range)
---     where range = [minBound .. maxBound]
-
 -- Produces a 'Sign' of positive polarity
 positive::Sign
 positive = Positive
@@ -62,7 +63,6 @@ instance UnsignedIntegral Word32
 instance UnsignedIntegral Word64
 instance UnsignedIntegral Natural
 
-
 instance BoundedIntegral Int
 instance BoundedIntegral Int8
 instance BoundedIntegral Int16
@@ -74,7 +74,6 @@ instance BoundedIntegral Word16
 instance BoundedIntegral Word32
 instance BoundedIntegral Word64        
     
-
 instance Unsignable Natural
 instance Unsignable Word
 instance Unsignable Word8

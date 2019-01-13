@@ -28,7 +28,8 @@ module Alpha.Canonical.Common.Root
     Cardinality(..),   
     Cardinal(..),
     Discretion(..),
-    Habitation(..),
+    --Habitation(..),
+    Nullity(..),
     enumValues,
     typeSymbol,
     typeSymbols,
@@ -44,12 +45,17 @@ module Alpha.Canonical.Common.Root
 ) where
 import Alpha.Base as X
 import Alpha.Canonical.Common.Synonyms
-import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Stream.Infinite as Stream
-import qualified Numeric.Interval as Interval
 import qualified Data.Map as Map
+import qualified Data.MultiSet as Bag
+import qualified Data.Set as Set
+import qualified Data.Stream.Infinite as Stream
+import qualified Data.Text as Text
+import qualified Data.Sequence as Sequence
+import qualified Data.Stream.Infinite as Stream
+import qualified Data.Vector as Vector
+import qualified Numeric.Interval as Interval
 
 
 -- Characterizes a type with wich a description may be associated
@@ -68,7 +74,6 @@ class Packable a b where
     -- Restores an a-value from a b-value
     unpack::b -> a    
 
-
 -- | Characterizes a type for which a notion of dimensionality 
 -- can be defined, e.g., an array, matrix or more generally a tensor
 class Dimensional a where
@@ -84,6 +89,10 @@ class Labeled a l where
     -- | Read a label from a value
     getLabel::a -> l
     
+-- | Characterizes a type whose values can be embedded into another type's values
+-- via a suitably-defined inclusion map
+class Inclusional a b where
+    include::a -> b -> b
         
 -- | Characterizes a type with which an origin/initial object is related
 class Sourced a where
@@ -100,7 +109,6 @@ class Targeted a where
 class Connective p s t where 
     -- | The reification type
     type Connection p s t
-
 
     -- | Establishes a connection from a source to a target
     -- and bundles said connection with properties/attributes
@@ -146,10 +154,17 @@ data Discretion a =
     | Indiscrete
     deriving (Eq, Ord, Generic, Data, Typeable, Enum)
 
--- | Specifies whether a type/value is empty
-data Habitation a =
-      Inhabited
-    | Uninhabited    
+
+-- / Characterizes a type for which a canonical and unique Vacatable/void/empty
+-- value exists
+class Nullity a where
+
+    -- | Exhibits the canonical empty value
+    empty::a
+
+    -- | Determines whether a given value is the canonical
+    -- 'empty' value
+    null::a -> Bool
 
 
 -- | Specifies whether a construct is covariant or contravariant    
@@ -187,7 +202,7 @@ class Chunkable a where
 class Specifiable a where
     type Specified a
     specify::a -> Specified a
-            
+    
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    
     
@@ -265,8 +280,9 @@ instance Mappable (NonEmpty a) a b where
     type Mapped (NonEmpty a) a b = NonEmpty b
     map = NonEmpty.map    
         
--- Weavable instances    
--------------------------------------------------------------------------------
+-------------------------------------------------------------------------------        
+-- *Weavable instances
+-------------------------------------------------------------------------------    
 
 instance Weave Char Text where
     type Woven Char Text = Text
@@ -280,7 +296,26 @@ instance Weave g (Stream g) where
 
 instance Weave a (NonEmpty a) where
     weave = NonEmpty.intersperse        
-    
-    
 
+-------------------------------------------------------------------------------        
+-- *Nullity instances
+-------------------------------------------------------------------------------    
+instance (Eq a) => Nullity (Interval a) where
+    empty = Interval.empty
+    null = Interval.null
+
+instance Nullity [a] where
+    empty = []
+    null = List.null
     
+instance Nullity (Map k v) where
+    empty = Map.empty
+    null = Map.null
+        
+instance Nullity (Bag a) where
+    empty = Bag.empty
+    null = Bag.null
+
+instance Nullity (Vector a) where
+    empty = Vector.empty
+    null = Vector.null

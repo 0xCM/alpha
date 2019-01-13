@@ -7,8 +7,8 @@
 {-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Multiplicative
 (
+    module X,
     Multiplicative(..),
-    Unital(..),
     Bimultiplicative(..),    
     Multiplied(..),
     MultiProduct(..),
@@ -16,6 +16,7 @@ module Alpha.Canonical.Algebra.Multiplicative
 
 ) where
 import Alpha.Canonical.Relations
+import Alpha.Canonical.Algebra.Unital as X
 
 -- | Represents a family of types that support a notion of (potentially) heterogenous multiplication
 -- where a type instance is the multiplication result type
@@ -24,11 +25,6 @@ type family Multiplied a b
 -- | Represents a formal product of an arbitrary
 -- number of elements
 newtype MultiProduct a = MultiProduct [a]    
-
--- | Represents a multiplication operator
-newtype Multiplication a = Multiplication (O2 a)    
-    deriving(Generic)
-instance Newtype (Multiplication a)
 
 -- / Characterizes a type that supports a notion of *associative* multiplication    
 -- mul a b == mul b a
@@ -56,13 +52,6 @@ class Bimultiplicative a b where
     {-# INLINE (>*<) #-}    
     infixl 7 >*<
 
-class Unital a where
-    -- | Specifies the unique element 1 such that 1*a = a*1 = a forall a
-    one::a
-          
--- | Produces the canonical multiplication operator
-multiplication::Multiplicative a => Multiplication a
-multiplication = Multiplication mul
 
 -- | Constructs a summation
 multiproduct::[a] -> MultiProduct a
@@ -71,107 +60,14 @@ multiproduct = MultiProduct
 instance (Unital a, Multiplicative a) => Computable (MultiProduct a) where
     type Computed (MultiProduct a) = a
     compute (MultiProduct items) = reduce one (*) items
-
-instance Commutative (Multiplication a) 
-instance Associative (Multiplication a) 
         
-instance (Ord a, Unital a) =>  Unital (Set a) where
-    one = [one]
-    
+
+-------------------------------------------------------------------------------
+-- * Multiplicative instances
+-------------------------------------------------------------------------------
 instance (Ord a, Multiplicative a) =>  Multiplicative (Set a) where
     mul x y = intersect x y
-    
--- Unital
--------------------------------------------------------------------------------
-instance Unital Natural where 
-    one = 1
-    {-# INLINE one #-}
 
-instance Unital Integer where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Int where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Int8 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Int16 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Int32 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Int64 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Word where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Word8 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Word16 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Word32 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Word64 where 
-    one = 1
-    {-# INLINE one #-}
-
-instance (Integral a) => Unital (Ratio a) where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Float where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital Double where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital CFloat where 
-    one = 1
-    {-# INLINE one #-}
-
-instance Unital CDouble where 
-    one = 1
-    {-# INLINE one #-}
-
-    
----
-type Unital2 a1 a2 = (Unital a1, Unital a2)
-type Unital3 a1 a2 a3 = (Unital2 a1 a2, Unital a3)
-type Unital4 a1 a2 a3 a4 = (Unital3 a1 a2 a3, Unital a4)
-type Unital5 a1 a2 a3 a4 a5 = (Unital4 a1 a2 a3 a4, Unital a5)
-
-instance Unital2 a1 a2 => Unital (a1,a2) where
-    one = (one,one)
-
-instance Unital3 a1 a2 a3 => Unital (a1,a2,a3) where
-    one = (one,one,one)
-
-instance Unital4 a1 a2 a3 a4 => Unital (a1,a2,a3,a4) where
-    one = (one,one,one,one)
-
-instance Unital5 a1 a2 a3 a4 a5 => Unital (a1,a2,a3,a4,a5) where
-    one = (one,one,one,one,one)
-    
--- Multiplicative
--------------------------------------------------------------------------------
 instance Multiplicative Natural where 
     mul = mul'
     {-# INLINE mul #-}

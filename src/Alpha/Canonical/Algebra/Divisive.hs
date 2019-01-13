@@ -7,8 +7,6 @@
 module Alpha.Canonical.Algebra.Divisive
 (
     Divisive(..),
-    IntegralDivision(..), divisionI,
-    FloatingDivision(..), divisionF,
     Divided(..),     
     Bidivisive(..)
 
@@ -42,47 +40,9 @@ class Bidivisive a b where
     {-# INLINE (>/<) #-}        
     infixl 8 >/<
 
--- | Represents a Euclidean division operator
-newtype IntegralDivision a = IntegralDivision (O2 a)    
-    deriving(Generic)
-instance Newtype (IntegralDivision a)
-
--- | Produces the canonical Euclidean division operator
-divisionI::(Integral a, Divisive a) => IntegralDivision a
-divisionI = IntegralDivision div
-
-instance (Integral a, Divisive a) => Operator 2 (IntegralDivision a) a where
-
-    operator = operation divisionI
-    {-# INLINE operator #-}
-
-    evaluate (a1,a2) = f a1 a2 where (IntegralDivision f) = divisionI
-    {-# INLINE evaluate #-}
-
-
-
-
--- Floating Division
 -------------------------------------------------------------------------------
-
--- | Represents a floating division operator
-newtype FloatingDivision a = FloatingDivision (O2 a)    
-    deriving(Generic)
-instance Newtype (FloatingDivision a)
-
-
--- | Produces the canonical floating division operator    
-divisionF::(Divisive a, Floating a) => FloatingDivision a
-divisionF = FloatingDivision $ div
-
-instance (Divisive a, Floating a) => Operator 2 (FloatingDivision a) a where
-
-    operator = operation divisionF
-    {-# INLINE operator #-}
-
-    evaluate (a1,a2) = f a1 a2 where (FloatingDivision f) = divisionF
-    {-# INLINE evaluate #-}
-
+-- * Divisive instances
+-------------------------------------------------------------------------------
 
 instance Divisive Natural where 
     div = quot'

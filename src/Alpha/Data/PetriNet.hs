@@ -1,3 +1,9 @@
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 {-# LANGUAGE OverloadedLists #-}
 module Alpha.Data.PetriNet
 (
@@ -5,6 +11,7 @@ module Alpha.Data.PetriNet
     PetriNet, 
     PetriState, 
     PetriInput,
+
 
     -- Construction
     petriNet,
@@ -46,14 +53,14 @@ data PetriInput p t = PetriInput t [Place p]
 data PetriState p = PetriState [Place p]    
 
 -- | Represents an edge in a petri net    
-data Edge p t = Edge (PetriNode p t) (PetriNode p t)
+data PetriEdge p t = PetriEdge (PetriNode p t) (PetriNode p t)
     deriving (Show, Eq, Ord)
 
 -- | Represents a petri net
-data PetriNet p t = PetriNet (Set (Edge p t))
+data PetriNet p t = PetriNet (Set (PetriEdge p t))
     deriving (Eq, Ord)
 
-type instance Individual (PetriNet p t) = Edge p t
+type instance Individual (PetriNet p t) = PetriEdge p t
 
 -- | Determines whether a vertex represents a place    
 isPlace::PetriNode p t -> Bool
@@ -73,17 +80,17 @@ transition::t -> PetriNode p t
 transition = Transition
 
 -- | Defines an edge in a petri net
-edge::PetriNode p t -> PetriNode p t -> Edge p t
-edge src dst = Edge src dst
+edge::PetriNode p t -> PetriNode p t -> PetriEdge p t
+edge src dst = PetriEdge src dst
 
 -- | Constructs a petri net from a list of edges
-petriNet::(Ord p, Ord t) => [Edge p t] -> PetriNet p t
+petriNet::(Ord p, Ord t) => [PetriEdge p t] -> PetriNet p t
 petriNet = PetriNet . set
 
 -- | Extracts the vertrices from a petri net
 vertices::(Ord p, Ord t) => PetriNet p t -> [PetriNode p t]
 vertices (PetriNet edges) = result where
-    result = edges |> toList |> fmap (\(Edge v1 v2) -> [v1,v2] ) |> unions
+    result = edges |> toList |> fmap (\(PetriEdge v1 v2) -> [v1,v2] ) |> unions
                          
 
 -- | Calculates the state of a petri net
@@ -98,8 +105,8 @@ state pn = vertices pn  |> filter isPlace
 inputs::(Ord p, Ord t) => t -> PetriNet p t -> PetriInput p t
 inputs t (PetriNet edges) = edges 
                          |> toList
-                         |> filter (\(Edge (Place tokens p ) (Transition t')) -> t == t')
-                         |> fmap (\(Edge (Place tokens p ) _) ->  (tokens,p) )                         
+                         |> filter (\(PetriEdge (Place tokens p ) (Transition t')) -> t == t')
+                         |> fmap (\(PetriEdge (Place tokens p ) _) ->  (tokens,p) )                         
                          |> PetriInput t
 
 -- | Determines whether a transition is enabled which by definition is True

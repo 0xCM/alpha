@@ -10,7 +10,7 @@ module Alpha.Canonical.Structures.Permutation
 where
 import Alpha.Canonical.Collective
 import Alpha.Canonical.Algebra
-import Alpha.Canonical.Structures.Naturals
+import Alpha.Canonical.Structures.NatK
 import Alpha.Canonical.Structures.Group
 
 import qualified Data.Text as Text
@@ -29,19 +29,20 @@ newtype Permutation n = Permutation PermutationMap
     deriving(Eq,Generic,Functor,Ord)
 instance Newtype(Permutation n)
 
+newtype PermuMul n = PermuMul (O2 (Permutation n))
+    deriving(Generic)
+instance Newtype (PermuMul n)
+
 type instance Dom (Permutation n) = Int
 type instance Cod (Permutation n) = Int
-type instance IndexedElement Int (Permutation n) = Int
 type instance Individual (Permutation n) = Permutation n
 
 type SymmetricGroup n = [Permutation n]
 
+-- | Characterizes a structure of type s holding elements indexed by a value of type i
+class PermLookup p where
 
---type instance IndexedElement Int (SymmetricGroup n) = Permutation n
---type instance Individual (SymmetricGroup n) = Permutation n
-
--- instance forall n. KnownNat n => Indexed Int (SymmetricGroup n) where
---     at sg i = sg List.!! i
+    image::p -> Int -> Int
 
 
 -- Constructs the symmetric group of degree n        
@@ -65,8 +66,8 @@ mappings (Permutation p) = toList p
 perm::forall n. KnownNat n => [(Int,Int)] -> Permutation n
 perm = Permutation . Map.fromList
 
-image::forall n. KnownNat n => Permutation n -> Int -> Int
-image = (!)
+-- image::forall n. KnownNat n => Permutation n -> Int -> Int
+-- image = (!)
 
 preimage::forall n. KnownNat n =>Permutation n -> Int -> Int
 preimage (Permutation p) i =  toList p |> filter (\(k,v) -> k == i) |> fmap(\(k,v) -> k) |> head
@@ -76,13 +77,13 @@ switch::forall n. KnownNat n => (Int,Int) -> Permutation n -> Permutation n
 switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> perm 
     where
         rule::(Int,Int) -> (Int,Int)
-        rule (r,s) =  if r == i then (r, p ! j)
-                      else if r == j then (r, p ! i)   
+        rule (r,s) =  if r == i then (r, image p j)
+                      else if r == j then (r, image p i)   
                       else (r, s)
 
 permumul::KnownNat n => O2 (Permutation n)
 permumul g (Permutation f) = f |> Map.toList 
-                    |> fmap (\(i,j) -> (i, g ! j)) 
+                    |> fmap (\(i,j) -> (i, image g j)) 
                     |> Map.fromList 
                     |> Permutation
                       
@@ -96,12 +97,8 @@ instance KnownNat n => Formattable (Permutation n) where
 instance KnownNat n => Show (Permutation n) where
     show = string . format
 
-instance forall n a.KnownNat n =>  Indexed Int (Permutation n) where
-    at (Permutation s ) i = s Map.! i
-
-newtype PermuMul n = PermuMul (O2 (Permutation n))
-    deriving(Generic)
-instance Newtype (PermuMul n)
+instance forall n. KnownNat n =>  PermLookup (Permutation n ) where
+    image (Permutation s ) i = s Map.! i
 
 instance forall n. KnownNat n => Operator 2 (PermuMul n) (Permutation n)  where    
     operator = operation $ PermuMul permumul
@@ -131,8 +128,11 @@ instance forall n. KnownNat n =>  Unital (Permutation n) where
                 pt = int <$> associates s 
                 z =  Map.fromList (List.zip pt range)
 
-                
-instance forall n.  KnownNat n => Invertible (Permutation n) where
+
+instance forall n.  KnownNat n => Identity (Permutation n) where
+    identity = one
+                                
+instance forall n.  KnownNat n => Inverter (Permutation n) where
     invert (Permutation p) = Permutation $ flip p    
 
 instance forall n. KnownNat n => Monoid (Permutation n) where

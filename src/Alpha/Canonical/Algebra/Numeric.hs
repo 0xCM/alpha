@@ -9,35 +9,13 @@ module Alpha.Canonical.Algebra.Numeric
 (
     module X,
     Numeric(..),
-    IntegrallyPowered(..),
-    ApproximatelyPowered(..),
-    Number(..), number,
+    Number(..), 
+    number,
 ) where
 import Alpha.Canonical.Relations
-import Alpha.Canonical.Algebra.Subtractive as X
-import Alpha.Canonical.Algebra.Multiplicative as X
-import Alpha.Canonical.Algebra.Additive as X
-import Alpha.Canonical.Algebra.Divisive as X
-import Alpha.Canonical.Algebra.Distributive as X
-import Alpha.Canonical.Algebra.Exponential as X
+import Alpha.Canonical.Algebra.Powers as X
 
-class (Fractional a) => IntegrallyPowered a where
-    powi::(Integral p) => a -> p -> a
-
-    (^^)::(Integral p) => a -> p -> a
-    (^^) = powi
-    {-# INLINE (^^) #-}
-    infixr 8 ^^
-    
-class (Floating a) => ApproximatelyPowered a where
-    powa::a -> a -> a
-
-    (**)::a -> a -> a
-    (**) = powa
-    {-# INLINE (**) #-}
-    infixr 8 **
-
-type NumericContext a = (Ord a, Subtractive a, Distributive a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Powered a)    
+type NumericContext a = (Ord a, Subtractive a, Distributive a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Power a)    
 
 class NumericContext a => Numeric a where
     num::a -> a
@@ -50,6 +28,9 @@ newtype Number a = Number a
 number::(Numeric a) => a -> Number a
 number = Number
 
+-------------------------------------------------------------------------------
+-- * Number class membership
+-------------------------------------------------------------------------------
 deriving instance Num a  => Num (Number a)
 deriving instance Subtractive a  => Subtractive (Number a)
 deriving instance Additive a  => Additive (Number a)
@@ -58,17 +39,19 @@ deriving instance Multiplicative a  => Multiplicative (Number a)
 deriving instance Unital a  => Unital (Number a)
 deriving instance Divisive a  => Divisive (Number a)
 deriving instance Real a  => Real (Number a)
-deriving instance Powered a  => Powered (Number a)
+deriving instance Power a  => Power (Number a)
 deriving instance LeftDistributive a  => LeftDistributive (Number a)
 deriving instance RightDistributive a  => RightDistributive (Number a)
 deriving instance Numeric a => Numeric (Number a)
---deriving instance PartialOrd a => PartialOrd (Number a)   
 deriving instance LT a => LT (Number a)    
 deriving instance GT a => GT (Number a)    
 deriving instance LTEQ a => LTEQ (Number a)    
 deriving instance GTEQ a => GTEQ (Number a)    
 deriving instance Comparable a => Comparable (Number a)    
 
+-------------------------------------------------------------------------------
+-- * Numeric instances
+-------------------------------------------------------------------------------
 instance Numeric Natural
 instance Numeric Integer
 instance Numeric Int
@@ -89,42 +72,9 @@ instance Numeric CDouble
 
 
 
-instance (Show b, Show p) => Show (Exponential b p) where
-    show (Exponential (b,p)) = (show b) <> "^" <> (show p)
 
 
--- ApproximatelyPowered
--------------------------------------------------------------------------------
-instance ApproximatelyPowered Float where 
-    powa = powa'
-    {-# INLINE powa #-}
-instance ApproximatelyPowered Double where 
-    powa = powa'
-    {-# INLINE powa #-}
-instance ApproximatelyPowered CFloat where 
-    powa = powa'
-    {-# INLINE powa #-}
-instance ApproximatelyPowered CDouble where 
-    powa = powa'
-    {-# INLINE powa #-}
 
--- IntegrallyPowered
--------------------------------------------------------------------------------
-instance (Integral n) => IntegrallyPowered (Ratio n) where 
-    powi = pow''
-    {-# INLINE powi #-}
-instance IntegrallyPowered Float where 
-    powi = pow''
-    {-# INLINE powi #-}
-instance IntegrallyPowered Double where 
-    powi = pow''
-    {-# INLINE powi #-}
-instance IntegrallyPowered CFloat where 
-    powi = pow''
-    {-# INLINE powi #-}
-instance IntegrallyPowered CDouble where 
-    powi = pow''
-    {-# INLINE powi #-}
 
     
     

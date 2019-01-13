@@ -4,6 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Algebra.Successive
 (
     Incrementable(..), Increment(..),
@@ -57,7 +58,8 @@ type instance Decrement Double = Double
 type instance Decrement CFloat = CFloat
 type instance Decrement CDouble = CDouble
 
-
+-- / Characterizes a type that can be incremented an indefinite number of times
+-- but, depending on the realization, may eventually cycle
 class Incrementable a where
     -- Increments the operand by one unit
     inc::a -> Increment a
@@ -71,6 +73,8 @@ class Incrementable a where
     {-# INLINE (>++<) #-}
     infix 2 >++<
 
+-- / Characterizes a type that can be decremented an indefinite number of times
+-- but, depending on the realization, may eventually cycle
 class Decrementable a where
     -- Decrements the operand by one unit
     dec::a -> Decrement a 
@@ -84,12 +88,17 @@ class Decrementable a where
     {-# INLINE (>--<) #-}
     infix 2 >--<
 
--- / Characterizes a type with which a strictly monotonic sequence 
+    
+
+class (Incrementable a, Decrementable a) => Alternating a
+instance (Incrementable a, Decrementable a) => Alternating a 
+
+-- / Characterizes a type with which a strictly monotonic finite sequence 
 -- of ascending values is associated
 class Successive a where
     next::a -> Maybe a
 
--- / Characterizes a type with which a strictly monotonic sequence 
+-- / Characterizes a type with which a strictly monotonic finite sequence 
 -- of descending values is associated
 class Antecedent a where    
     prior::a -> Maybe a
