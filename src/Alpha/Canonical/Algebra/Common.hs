@@ -6,8 +6,9 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Algebra.Common
 (
-
+    module X
 ) where
+import Alpha.Canonical.Relations as X
 
 
 

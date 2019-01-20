@@ -33,7 +33,7 @@ type UniSum a = Summed a a
 type instance Summed (Set a) (Set a) = Set a    
 
 
--- | Represents a formal sum of an arbitrary
+-- | Represents a formal sum of an arbitrary (but finite)
 -- number of elements
 newtype MultiSum a = MultiSum [a]    
 

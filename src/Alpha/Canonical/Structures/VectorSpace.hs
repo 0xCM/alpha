@@ -6,6 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Alpha.Canonical.Structures.VectorSpace
 (
@@ -40,7 +41,7 @@ newtype VecN n a = VecN (Vector a)
     deriving (Eq,Ord,Generic,Data,Typeable,Functor,
         Applicative,Foldable,Traversable,Monad,IsList,
         Additive,Subtractive,Negatable,Multiplicative,
-        Componentized,Indexable,Length,Queryable)
+        Componentized,Indexable,Length,Queryable,Listed)
     deriving Formattable via (Vector a)
 instance Newtype (VecN n a)    
 
@@ -71,9 +72,7 @@ class (Componentized v , Semiring (Individual v)) => InnerProduct v where
 
 class (VectorSpace k v, InnerProduct v) => InnerProductSpace k v where
 
-data instance Space (VectorSpace k v) = VectorSpace v
-data instance Space (InnerProductSpace k v) = InnerProductSpace v
-    
+data instance Space (VectorSpace k a) (VecN n a) = VecNSpace
 
 vecN::forall n a. KnownNat n => [a] -> VecN n a
 vecN x = VecN (Vector.fromList x)
@@ -131,7 +130,14 @@ instance Multiplicative a => Multiplicative (Vector a) where
                 
 instance Semiring a => InnerProduct (Vector a)
 
+instance Listed (Vector a) where
+    head = Vector.unsafeHead
+    tail = Vector.unsafeTail
 
+
+instance IndexedMapping (Vector a) (Vector b) where     
+    mapi f src = (\i -> f (i, src !! i)) <$> range (0,length src - 1) |> vector 
+                        
 -- VecN instances    
 -------------------------------------------------------------------------------
 instance KnownNat n => Vectored (VecN n a) a where

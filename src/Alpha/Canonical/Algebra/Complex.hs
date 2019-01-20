@@ -40,7 +40,7 @@ conjugate::(Negatable a) => Complex a -> Complex a
 conjugate (Complex (r,i)) = complex (r, negate i)
 
 instance Formattable a => Formattable (Complex a) where
-    format (Complex (r,i)) = format r <> spaced Plus <> format i <> Il
+    format (Complex (r,i)) = format r <> pad Plus <> format i <> Il
 
 instance Formattable a => Show(Complex a) where
     show  = string . format
@@ -56,3 +56,7 @@ instance (Multiplicative a, Additive a, Subtractive a) => Multiplicative (Comple
 
 instance (Multiplicative a, Additive a, Subtractive a, Divisive a) => Reciprocative (Complex a) where
     reciprocal (Complex (x,y)) = complex(x / (x*x + y*y), y / (x*x + y*y))
+
+
+    
+    

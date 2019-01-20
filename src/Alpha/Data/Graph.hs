@@ -96,7 +96,7 @@ instance (CrossGraphic l a b) => Connective l (Vertex l a) (Vertex l b) where
     connect label a b= xedge label a b            
 
 instance (Formattable l, Formattable a) => Formattable (Vertex l a) where
-    format (Vertex (l, a)) = parenthetical (format l <> spaced Colon <> format a)        
+    format (Vertex (l, a)) = parenthetical (format l <> pad Colon <> format a)        
 
 instance (Formattable s, Formattable a) => Show (Vertex s a) where
     show = string . format
@@ -110,7 +110,7 @@ instance Labeled (Vertex l a) l where
         
 instance (Formattable s, Formattable a) => Formattable (Edge s a) where
     format (Edge s source target) 
-        = format s <> lspaced Colon <> format source <> spaced FSlash <> format target
+        = format s <> lpad Colon <> format source <> pad FSlash <> format target
 
 instance (Formattable l, Formattable a) => Show (Edge l a) where
     show = string . format
@@ -170,7 +170,7 @@ instance Labeled (Crossing l a b) l where
         
 instance (Formattable l, Formattable a, Formattable b) => Formattable (Crossing l a b) where
     format (Crossing l source target) 
-        = format l <> lspaced Colon <> format source <> spaced FSlash <> format target
+        = format l <> lpad Colon <> format source <> pad FSlash <> format target
 
 instance (Formattable l, Formattable a, Formattable b) => Show (Crossing l a b) where
     show = string . format        

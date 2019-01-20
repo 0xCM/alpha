@@ -6,8 +6,8 @@ module Alpha.Base.Alias
 
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
-    and',or',not', lt', gt',quotRem', divMod', gcd',lcm', quot', set',
-
+    and',or',not', quotRem', divMod', gcd',lcm', quot', set',
+    lt', gt', gteq', lteq', between',
     powerset',
 
 ) where
@@ -52,9 +52,23 @@ div' = div
 
 lt'::(Ord a) => a -> a -> Bool
 lt' = (<)
+{-# INLINE lt' #-}
 
 gt'::(Ord a) => a -> a -> Bool
 gt' = (>)
+{-# INLINE gt' #-}
+
+gteq'::(Ord a) => a -> a -> Bool
+gteq' = (>=)
+{-# INLINE gteq' #-}
+
+lteq'::(Ord a) => a -> a -> Bool
+lteq' = (<=)
+{-# INLINE lteq' #-}
+
+between'::(Ord a) => a -> (a,a) -> Bool
+between' x (a,b) = x >= a && x <= b
+{-# INLINE between' #-}
 
 negate'::(Num a) => a -> a
 negate' = negate

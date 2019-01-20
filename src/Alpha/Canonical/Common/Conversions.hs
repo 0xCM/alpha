@@ -21,7 +21,7 @@ module Alpha.Canonical.Common.Conversions
     list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
-    rational, fractional, integers,
+    fractional, integers,
     enumerate
     
 
@@ -31,6 +31,7 @@ import qualified Data.Text as Text
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Ratio as DR
+import qualified Data.Vector as Vector
 
 class Vectored s a where
     vector::s -> Vector a
@@ -153,16 +154,17 @@ word64 n = fromIntegral n
 {-# INLINE word64 #-}
 
 
--- Forms a 'Rational' number from a 'Real' number
-rational::(Real r) => r -> (Ratio Integer)
-rational x = toRational' x
-{-# INLINE rational #-} 
-
 -- Produces a 'Fractional' number from a 'Real' number
 fractional::(Real r, Fractional f) => r -> f
 fractional = realToFrac'
 {-# INLINE fractional #-} 
-    
+
+-------------------------------------------------------------------------------
+-- * Vectored instances
+-------------------------------------------------------------------------------
+instance Vectored [a] a where
+    vector = Vector.fromList
+
 -------------------------------------------------------------------------------
 -- * ToIntegral instances
 -------------------------------------------------------------------------------

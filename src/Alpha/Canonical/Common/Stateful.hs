@@ -30,7 +30,7 @@ replace = writeSTRef
 newtype RefCell a = RefCell (IORef a)
     deriving (Eq)
 
-class Cellular a where
+class StateCell a where
     newCell::a -> IO (RefCell a)
     newCell a = do
         c <- newIORef a
@@ -49,5 +49,5 @@ class Cellular a where
 instance (Show a) => Show (RefCell a) where
     show = show . shredIO . readCell
     
-instance Cellular a
+instance StateCell a
 

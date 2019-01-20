@@ -6,8 +6,17 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Product
 (
-    Product1(..), Product2(..), Product3(..), Product4(..), Product5(..),
-    Product(..), Factor(..), Projector(..), Productive(..)
+    Product,
+    NProduct(..), 
+    NFactor(..), 
+    Projector(..), 
+    Productive(..),
+    Product1(..), 
+    Product2(..), 
+    Product3(..), 
+    Product4(..), 
+    Product5(..),
+
 ) where
 import Alpha.Canonical.Elementary
 
@@ -50,36 +59,39 @@ data Product5 a1 a2 a3 a4 a5
 
 -- Defines an arity-5 homogenous product        
 type UniProduct5 a = Product5 a a a a a
-    
-type family Product (n::Nat) a = r | r -> n a where
-    Product 1 (Tuple1 a1) = Product1 a1 
-    Product 2 (Tuple2 a1 a2) = Product2 a1 a2
-    Product 3 (Tuple3 a1 a2 a3) = Product3 a1 a2 a3
-    Product 4 (Tuple4 a1 a2 a3 a4) = Product4 a1 a2 a3 a4
-    Product 5 (Tuple5 a1 a2 a3 a4 a5) = Product5 a1 a2 a3 a4 a5
 
-type family Factor (n::Nat) a = r  where
-    Factor 1 (Product1 a1) = a1
-    Factor 1 (Product2 a1 a2) = a1
-    Factor 2 (Product2 a1 a2) = a2
-    Factor 1 (Product3 a1 a2 a3)= a1
-    Factor 2 (Product3 a1 a2 a3) = a2
-    Factor 3 (Product3 a1 a2 a3) = a3
-    Factor 1 (Product4 a1 a2 a3 a4) = a1
-    Factor 2 (Product4 a1 a2 a3 a4) = a2
-    Factor 3 (Product4 a1 a2 a3 a4) = a3
-    Factor 4 (Product4 a1 a2 a3 a4) = a4
-    Factor 1 (Product5 a1 a2 a3 a4 a5) = a1
-    Factor 2 (Product5 a1 a2 a3 a4 a5) = a2
-    Factor 3 (Product5 a1 a2 a3 a4 a5) = a3
-    Factor 4 (Product5 a1 a2 a3 a4 a5) = a4
-    Factor 5 (Product5 a1 a2 a3 a4 a5) = a5
+-- | Defines the canonical bipartite product
+data family Product a b
+
+type family NProduct (n::Nat) a = r | r -> n a where
+    NProduct 1 (Tuple1 a1) = Product1 a1 
+    NProduct 2 (Tuple2 a1 a2) = Product2 a1 a2
+    NProduct 3 (Tuple3 a1 a2 a3) = Product3 a1 a2 a3
+    NProduct 4 (Tuple4 a1 a2 a3 a4) = Product4 a1 a2 a3 a4
+    NProduct 5 (Tuple5 a1 a2 a3 a4 a5) = Product5 a1 a2 a3 a4 a5
+
+type family NFactor (n::Nat) a = r  where
+    NFactor 1 (Product1 a1) = a1
+    NFactor 1 (Product2 a1 a2) = a1
+    NFactor 2 (Product2 a1 a2) = a2
+    NFactor 1 (Product3 a1 a2 a3)= a1
+    NFactor 2 (Product3 a1 a2 a3) = a2
+    NFactor 3 (Product3 a1 a2 a3) = a3
+    NFactor 1 (Product4 a1 a2 a3 a4) = a1
+    NFactor 2 (Product4 a1 a2 a3 a4) = a2
+    NFactor 3 (Product4 a1 a2 a3 a4) = a3
+    NFactor 4 (Product4 a1 a2 a3 a4) = a4
+    NFactor 1 (Product5 a1 a2 a3 a4 a5) = a1
+    NFactor 2 (Product5 a1 a2 a3 a4 a5) = a2
+    NFactor 3 (Product5 a1 a2 a3 a4 a5) = a3
+    NFactor 4 (Product5 a1 a2 a3 a4 a5) = a4
+    NFactor 5 (Product5 a1 a2 a3 a4 a5) = a5
 
 class Projector (i::Nat) a where
-    project::a -> Factor i a
+    project::a -> NFactor i a
 
 class Productive (n::Nat) a where
-     product::a -> Product n a
+     product::a -> NProduct n a
     
 instance Productive 2 (Tuple2 a1 a2) where
     product (a1,a2) = Product2 a1 a2

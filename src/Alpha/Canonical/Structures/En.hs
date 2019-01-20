@@ -44,8 +44,6 @@ class (KnownNat n, Ring k) => NatBasis n k where
 vecN::(KnownNat n) => UniTuple n k -> En n k
 vecN = undefined
 
-kdelta::forall i r. (KnownNat i, Integral r, Ring r) => r -> r
-kdelta j = ifelse (i == j) one zero where i = natg @i
 
 type Euclidean n k v = (v ~ En n k, KnownNat n, AbelianGroup v,  Ring k, LeftAction k v)
 

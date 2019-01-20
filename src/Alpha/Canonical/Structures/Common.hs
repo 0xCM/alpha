@@ -16,7 +16,7 @@ module Alpha.Canonical.Structures.Common
 ) where
 import Alpha.Canonical.Algebra as X
 
-data family Space (a::Constraint)    
+data family Space (a::Constraint) (b::Type)    
 
 -- Represents families of endomorphisms within the same category 
 data family EndSet (c::Constraint) (x::Constraint) (y::Constraint)

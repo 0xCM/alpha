@@ -20,7 +20,7 @@ import qualified Data.List as List
 
 -- | Defines the codomain of the sign function
 data Sign = Negative | Neutral | Positive
-    deriving (Show,Ord,Eq,Enum)
+    deriving (Show,Ord,Eq,Enum,Generic,Data,Typeable)
         
 -- | Characterizes type for which signs may be computed
 -- Alternately, characterizes types whose values may be 

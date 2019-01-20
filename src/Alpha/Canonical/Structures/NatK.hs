@@ -15,11 +15,12 @@ module Alpha.Canonical.Structures.NatK
     nats,
     natKpair,  natKspan,
     natK, nat2, natK2, nat3, natK3, nat4, natK4,
-    natKadd, natKsub, natKmod, natKdiv, natKmul, natKinc, natKdec
+    natKadd, natKsub, natKmod, natKdiv, natKmul, natKinc, natKdec,
+    natadd, natmul
 ) where
 
 import Alpha.Canonical.Algebra
-import Alpha.Canonical.Structures.IntDomain
+import Alpha.Canonical.Structures.Domain
 
 
 -- Unifies type naturals and value-level integers
@@ -93,6 +94,9 @@ natKspan = NatKSpan (natKpair @m @n)
 natKadd::forall m n. (KnownNatPair m n) => NatK (m + n)
 natKadd =  natK @m >+< natK @n
 
+natadd::forall m n .(KnownNatPair m n) => Int
+natadd =   nat @m + nat @n
+
 natKsub::forall m n. (KnownNatPair m n) => NatK (m - n)
 natKsub =  natK @m >-< natK @n
 
@@ -104,6 +108,10 @@ natKdiv =  natK @m >/< natK @n
 
 natKmul::forall m n. (KnownNatPair m n) => NatK (m * n)
 natKmul =   natK @m >*< natK @n
+
+natmul::forall m n .(KnownNatPair m n) => Int
+natmul =   nat @m * nat @n
+
 
 natKdec::forall m. (KnownNat m ) => NatK (m - 1)
 natKdec =  natK @m |> (>--<)
@@ -123,7 +131,7 @@ instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
 
 instance forall m n. (KnownNatPair m n) =>  Triple (NatK m) (NatK n) (NatKPair m n) where    
-    trip3 _ _ = NatKPair (natK @m, natK @n)
+    tripled _ _ = NatKPair (natK @m, natK @n)
     trip1 _ = natK @m
     trip2 _ = natK @n
             

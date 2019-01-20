@@ -19,5 +19,6 @@ import Alpha.Canonical.Common.Synonyms as X
 import Alpha.Canonical.Common.Types as X
 import Alpha.Canonical.Common.Individual as X
 import Alpha.Canonical.Common.Tuples as X
+import Alpha.Canonical.Common.FormalSum as X
 
 

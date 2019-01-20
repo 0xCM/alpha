@@ -1,4 +1,4 @@
-resolver: lts-13.0
+resolver: lts-13.3
 
 packages:
   - .
@@ -13,3 +13,4 @@ extra-deps:
   #   commit: 04f9fb144211e0c6bc0e76ee120d1891b5f27fb5
   # - Boolean-0.2.4@sha256:a16b532a00eb3f29e8e588f3ca5c225370eef3dd963ee833d88b241ac680dc71
   # - NumInstances-1.4@sha256:d498d51e0fb23822706ca5e24944d014fdc1fd55bcd57f075f9797316eec0187    
+  

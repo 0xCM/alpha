@@ -16,9 +16,12 @@ module Alpha.Canonical.Elementary.Set
     Universe(..),
     Complementary(..),
     Unionizable(..),
-    Difference(..),
+    Diff(..),
     Intersectable(..),    
     Containment(..),
+    Tripled(..), 
+    Triple(..),
+    Subsets(..),
     emptyset, 
     finset,
     fneset,
@@ -60,8 +63,7 @@ class Unionizable a where
     default unions::(Nullity a, Unionizable a) => [a] -> a
     unions u = reduce empty union u
 
-
-class Difference a where
+class Diff a where
     diff::a -> a -> a
 
     (\\)::a -> a -> a
@@ -75,9 +77,13 @@ class Intersectable a  where
 class Containment a where
     isSubset::Bool -> a -> a -> Bool
         
+-- | Characterizes a constructive subset    
 class Subset a where
     subset::Set a -> Set a
     subset = id
+
+-- | Represents a collection of subsets
+newtype Subsets a = Subsets (Set (Set a))
 
 class (a ~ Individual b) =>  SetBuilder b a where
     set::b -> Set a
@@ -117,7 +123,6 @@ isEmpty::Set a -> Bool
 isEmpty EmptySet = True
 isEmpty _ = False
 
-
 -- | Constructs a powerset
 powerset::Ord a => Set a -> Set(Set a)
 powerset (FiniteSet src) = Set.map FiniteSet (powerset' src) |> FiniteSet
@@ -126,7 +131,6 @@ powerset _ = EmptySet
 fneset::(Ord a) => NonEmpty a -> FneSet a
 fneset (a :| xs) = FneSet (Set.fromList(a : xs))
 
-    
 -------------------------------------------------------------------------------            
 -- * FneSet class membership
 -------------------------------------------------------------------------------                
@@ -155,7 +159,7 @@ instance (Ord a) => Unionizable (FneSet a) where
     union (FneSet x) (FneSet y )  =  FneSet $ Set.union x y  
     unions = undefined
     
-instance Ord a => Difference (FneSet a) where
+instance Ord a => Diff (FneSet a) where
     diff (FneSet x) (FneSet y) = FneSet $ x \\ y
     
 instance Ord a => Intersectable (FneSet a) where
@@ -257,7 +261,7 @@ instance Ord a => Containment (Set a) where
     isSubset proper (InfiniteSet x) (FiniteSet y) = False
     isSubset proper x (InfiniteSet y) =  List.intersect (toList x) y |> fromList |> (==) x
 
-instance Ord a => Difference (Set a) where
+instance Ord a => Diff (Set a) where
     diff (FiniteSet x) (FiniteSet y) = FiniteSet $ x \\ y
     diff (InfiniteSet x) (InfiniteSet y) = InfiniteSet $ x \\ y
     diff (FiniteSet x) (InfiniteSet y) = InfiniteSet $ (list x) \\ y
@@ -320,15 +324,15 @@ instance (Ord a) => Unionizable (Bag a) where
     union = Bag.union        
 
 -------------------------------------------------------------------------------            
--- * Difference instances
+-- * Diff instances
 -------------------------------------------------------------------------------            
-instance (Ord a) => Difference (Bag a) where
+instance (Ord a) => Diff (Bag a) where
     diff = Bag.difference
 
-instance (Eq a, Ord a) => Difference [a] where        
+instance (Eq a, Ord a) => Diff [a] where        
     diff =  (List.\\)
 
-instance (Ord a) => Difference (Set' a)  where        
+instance (Ord a) => Diff (Set' a)  where        
     diff =  (Set.\\)
 
 -------------------------------------------------------------------------------            
@@ -337,10 +341,8 @@ instance (Ord a) => Difference (Set' a)  where
 instance (Ord a) => Intersectable (Bag a) where    
     intersect = Bag.intersection
 
-
 instance (Eq a, Ord a) => Intersectable [a] where    
     intersect = List.intersect
-
 
 -------------------------------------------------------------------------------            
 -- * Containment instances
@@ -363,3 +365,39 @@ instance Ord a => Containment (Set' a) where
             (Set.isSubsetOf c' s')  
                 where (c', s') = (candidate, source)
                         
+-- | Represents a dijoint union of elements
+-- See https://en.wikipedia.org/wiki/Disjoint_union
+newtype DisjointUnion a b = DisjointUnion (a, b)
+
+type instance Tripled a b (DisjointUnion a b) = (DisjointUnion a b)
+
+instance Triple (Set a) (Set b) (DisjointUnion (Set a) (Set b)) where
+    tripled a b = DisjointUnion (a, b)
+    trip2 (DisjointUnion (a,b)) = b
+    trip1 (DisjointUnion (a,b)) = a
+
+-- | Constructs a disjoint union
+disjoint::a -> b -> DisjointUnion a b
+disjoint a b = DisjointUnion (a,b)
+
+-- Codifies a ternary relationship among three types:
+-- The first type, the second type and the unification of
+-- the two types as a pair
+type family Tripled a b c = r | r -> a b c    
+
+-- Codifies, at the value level, a ternary relatioship among
+-- three types: The first type, second type and the unification 
+-- of the two types as a pair
+class Triple a b c where
+
+    -- | Constructs a triple
+    tripled::a -> b -> Tripled a b c
+
+    --- | Extracts the second of the paired elements
+    trip2::Tripled a b c -> b
+
+    --- | Extracts the first of the paired elements
+    trip1::Tripled a b c -> a
+    
+    swap::(Triple b a c) => Tripled a b c -> Tripled b a c
+    swap x = tripled (trip2 x) (trip1 x)

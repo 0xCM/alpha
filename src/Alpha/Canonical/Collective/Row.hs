@@ -79,7 +79,6 @@ type instance DropProxy (x ': xs) = DropProxy x ': DropProxy xs
 type instance DropProxy '[] = '[]
 type instance DropProxy (Proxy x) = x
 
-
 instance Show (Row '[]) where
     show _ = "R[]"
 
@@ -115,7 +114,6 @@ instance (ReverseAppend xs '[] sx,
           ReverseAppend sx '[] xs) => Reversal xs sx where
     reverse r = rappend r ZRow
 
-
 class Inits a b | a -> b, b -> a where
     inits :: Row a -> Row b
 
@@ -141,11 +139,7 @@ type instance MapTail '[] = '[]
 class RowBuilder l r where
     row :: Row l -> r
 
-
 instance RowBuilder (a ': l) r => RowBuilder l (a->r) where
     row l x = row (x :++: l)
     
-
 -- > let r1 = "a" :++: 'b' :++: 5 :++: ZRow        
-
-    

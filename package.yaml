@@ -1,5 +1,5 @@
 name:                alpha
-version:             0.0.133
+version:             0.0.139
 github:              "0xCM/alpha"
 license:             MIT
 author:              "Chris Moore"
@@ -115,32 +115,6 @@ dependencies:
 - vector
 - unicode-show
 
-# - adjunctions
-# - async
-# - attoparsec
-# - base-orphans
-# - bytestring-builder
-# - cmdargs
-# - contravariant
-# - dlist
-# - fail
-# - generic-deriving
-# - haskell-src-exts
-# - integer-gmp
-# - integer-logarithms
-# - mwc-random
-# - nats
-# - typed-process
-# - pipes
-# - prettyclass
-# - profunctors
-# - scientific
-# - statistics
-
-# - th-abstraction
-# - time-locale-compat
-# - uuid-types
-# - void
 
 
 library:

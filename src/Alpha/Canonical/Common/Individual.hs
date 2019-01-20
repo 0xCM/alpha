@@ -17,7 +17,8 @@ module Alpha.Canonical.Common.Individual
     Construction(..),
     Initializing(..),
     Terminating(..),
-    Degenerate(..)
+    Degenerate(..),
+    IndexedMapping(..)
 
 )
 where
@@ -37,20 +38,20 @@ type instance Individual (Stream a) = a
 type instance Individual (NonEmpty a) = a
 type instance Individual (Seq a) = a
 type instance Individual (Vector a) = a
-type instance Individual Integer = Integer
-type instance Individual Int = Int
-type instance Individual Int8 = Int8
-type instance Individual Int16 = Int16
-type instance Individual Int32 = Int32
-type instance Individual Int64 = Int64
-type instance Individual (Ratio a) = Ratio a
-type instance Individual Natural = Natural
-type instance Individual Word = Word
-type instance Individual Word8 = Word8
-type instance Individual Word16 = Word16
-type instance Individual Word32 = Word32
-type instance Individual Word64 = Word64
-type instance Individual Bool = Bool
+--type instance Individual Integer = Integer
+--type instance Individual Int = Int
+-- type instance Individual Int8 = Int8
+-- type instance Individual Int16 = Int16
+-- type instance Individual Int32 = Int32
+-- type instance Individual Int64 = Int64
+-- type instance Individual (Ratio a) = Ratio a
+-- type instance Individual Natural = Natural
+-- type instance Individual Word = Word
+-- type instance Individual Word8 = Word8
+-- type instance Individual Word16 = Word16
+-- type instance Individual Word32 = Word32
+-- type instance Individual Word64 = Word64
+--type instance Individual Bool = Bool
 
 -- | Characterizes a type that is comprised of individuals or
 -- can be discretized as such
@@ -110,7 +111,16 @@ class Degenerate a where
 newtype Construction a = Construction (Individual a)
 
 type instance Individual (Construction a) = Individual a
+
+class IndexedMapping a b where
+    mapi::((Int, Individual a) -> Individual b) -> a -> b    
     
+instance IndexedMapping [a] [b] where
+    mapi f l = f <$> z where 
+        idx = [0..upper]
+        upper  = sub'  (fromIntegral $ List.length l) 1
+        z = List.zip idx l
+
 instance Constructive (Construction a) where
     construct (Construction x) = x
             

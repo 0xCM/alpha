@@ -8,22 +8,17 @@
 
 module Alpha.Data.Bits 
 (
-    toggled, bitcount, 
+    bitcount, 
     (.^.), (.~.), (.<<.), (.>>.), (.?.),
-    lobyte,hibyte,bitsplat
+    lobyte,hibyte,bitsplat,
     
 )
 where
-import Alpha.Canonical.Common
+import Alpha.Canonical
 import Alpha.Data.Bit
     
 import qualified Data.Text as Text
 import Data.Bits hiding(bit)
-
-
-toggled :: Bits a => a -> Int -> Bit
-toggled n i = testBit n i |> bit
-{-# INLINE toggled #-}
 
 -- | Delegates to the finiteBitSize function
 bitcount :: (FiniteBits a) => a -> Int
@@ -62,11 +57,6 @@ lobyte x = x .&. 0xFF |> fromIntegral
 -- | Extracts the high-order byte 
 hibyte :: Word16 -> Word8
 hibyte x  = (x .>>.8) .&. 0xFF |> fromIntegral
-
--- type Concatenated Int64 Int64 = Integer
--- type Concatenated Word64 Word64 = Natural
--- type Concatenated Integer Integer = Integer
--- type Concatenated Natural Natural = Natural
 
 instance Concatenable Word8 Word8 where
     type Concatenated Word8 Word8 = Word16

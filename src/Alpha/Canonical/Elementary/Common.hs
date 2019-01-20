@@ -42,7 +42,6 @@ class Transposable a where
     type Transposed a
     transpose::a -> Transposed a
             
-
 class Queryable a where
 
     -- | Excludes elements that don't satisfy a predicate
@@ -53,7 +52,6 @@ class Queryable a where
     single p src = ifelse (List.length filtered == 1) (Just $ List.head filtered) Nothing  
         where
             filtered = filter p src
-                        
             
 -------------------------------------------------------------------------------            
 -- *Transposable instances
@@ -81,12 +79,9 @@ instance Singletary (Vector a) where
 instance Singletary (Stream a) where
     singleton x = Stream.cycle (x :| [])
         
-
 instance (Ord a) => Singletary (Bag a) where
     singleton a = Bag.fromList [a]
-    
                 
-
 -------------------------------------------------------------------------------            
 -- * Queryable instances
 -------------------------------------------------------------------------------            
@@ -95,4 +90,3 @@ instance Queryable [a] where
     
 instance Queryable (Seq a) where
     filter pred source =  toList source |> List.filter pred
-

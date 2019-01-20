@@ -7,18 +7,18 @@
 module Alpha.Canonical.Common.Format
 (
     Formattable2, Formattable3, Formattable4, Formattable5,
+    trepeat,
     fence,
     parenthetical, 
     embrace,
     dots, 
     dashes, 
-    arrow,
-    spaces,
+    blanks,
     tuplestring,
     setstring,
-    spaced, 
-    lspaced, 
-    rspaced,
+    pad, 
+    lpad, 
+    rpad,
     suffix,
     prefix,
     text,
@@ -45,6 +45,8 @@ import qualified Data.MultiSet as Bag
 text::String -> Text
 text = Text.pack 
     
+-- | Produces a string by formatting an input value that is enclosed within
+-- a formatted boundary
 fence::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
 fence left right content = Text.concat [format left, format content, format right]
 
@@ -67,15 +69,26 @@ setstring::(Formattable a) => [a] -> Text
 setstring s = fence LBrace RBrace (format elements) where
     elements =  weave Comma (format <$> s)
           
--- | Surrounds the input text within a space on each side
-spaced::Text -> Text
-spaced t = Space <> t <> Space
+-- | Formats the input and encloses the result within a space on either side
+pad::(Formattable a) => a -> Text
+pad t = Blank <> format t <> Blank
 
-lspaced::Text -> Text
-lspaced t = Space <> t
+-- | Formats the input and encloses left-pads the result with a space
+lpad::(Formattable a) => a -> Text
+lpad t = Blank <> format t
 
-rspaced::Text -> Text
-rspaced t = t <> Space
+-- | Formats the input and encloses right-pads the result with a space
+rpad::(Formattable a) => a -> Text
+rpad t = format t <> Blank
+
+-- | Produces a string formed by concatenating a 
+-- specified number of copies of an input string
+trepeat::Integral i => i -> Text -> Text
+trepeat i t = Text.replicate (fromIntegral i) t
+
+-- | Produces text containing a specified number of blanks
+blanks::Integral i => i -> Text
+blanks i = trepeat i Blank
 
 suffix::Text -> Text -> Text
 suffix = Text.append
@@ -83,23 +96,13 @@ suffix = Text.append
 prefix::Text -> Text -> Text
 prefix a b = Text.append b a
 
-repeat::Integral i => i -> Text -> Text
-repeat i t = Text.replicate (fromIntegral i) t
-
 -- | Produces text containing a specified number of "." characters
 dots::Integral i => i -> Text
-dots i = repeat i Period
+dots i = trepeat i Period
 
 -- | Produces text containing a specified number of "-" characters
 dashes::Integral i => i -> Text
-dashes i = repeat i Dash
-
-arrow::Integral i => i -> Text
-arrow i = dashes i <> Greater
-
--- | Produces text containing a specified number of spaces
-spaces::Integral i => i -> Text
-spaces i = repeat i Space
+dashes i = trepeat i Dash
 
 -- | Encodes a finite integral value as a base-16 Text
 hexstring :: (Show n, Integral n, FiniteBits n) => n -> Text

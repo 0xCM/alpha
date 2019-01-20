@@ -5,13 +5,12 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE BangPatterns #-}
-module Alpha.Canonical.Structures.IntDomain
+module Alpha.Canonical.Structures.Domain
 (
     module X,
     IntegralDomain(..),
     IntegralNumeric(..),
     NaturalNumeric(..),
-    Rational(..),
     IntDomain(..),
     GcdDomain(..),
     Ufd(..),
@@ -19,9 +18,7 @@ module Alpha.Canonical.Structures.IntDomain
     Eud(..),
     Residue(..),
     modN,
-    Zn, zN, even,odd
-    
-
+    Zn, zN, even,odd,    
 ) where
 import Alpha.Canonical.Algebra as X
 import Alpha.Canonical.Structures.Ring as X
@@ -264,10 +261,6 @@ instance (KnownNat n, IntDomain i) => RightDistributive (Residue n i)
 instance (KnownNat n, IntDomain i) => Ring (Residue n i)    
     
 
-class (IntegralNumeric a) => Rational a where
-    numerator::Ratio a -> a
-    denominator::Ratio a -> a
-
 -- | Extended gcd function in a Euclidean domain
 -- Implementation taken from arithmoi
 -- egcd a b = (s,t,d) where d = gcd(a,b) = sa + tb
@@ -279,3 +272,4 @@ egcd a b = (d, x * signum a, y * signum b)
         | s == 0    = (r, o1, o2)
         | otherwise = case r `quotRem` s of
                         (q, t) -> eGCD (o1 - q*n1) n1 (o2 - q*n2) n2 s t
+

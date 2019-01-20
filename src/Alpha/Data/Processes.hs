@@ -12,7 +12,7 @@ module Alpha.Data.Processes
 where
 import Alpha.Canonical
 import Alpha.Data.Machinery
-import Alpha.Data.Probability
+
 
 
 -- | Represents a Markov decision process

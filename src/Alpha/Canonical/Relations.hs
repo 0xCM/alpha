@@ -10,7 +10,6 @@ import Alpha.Canonical.Relations.Bicomp as X
 import Alpha.Canonical.Relations.Coproduct as X
 import Alpha.Canonical.Relations.Functions as X
 import Alpha.Canonical.Relations.Logical as X
-import Alpha.Canonical.Relations.Tripling as X
 import Alpha.Canonical.Relations.Operators as X
 import Alpha.Canonical.Relations.Related as X
 import Alpha.Canonical.Relations.Undecidable as X

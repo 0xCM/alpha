@@ -9,31 +9,19 @@
 
 module Alpha.Canonical.Relations.Coproduct
 (
-    DisjointUnion(..),
-    disjoint,
-    Sum1(..), Sum2(..), Sum3(..), Sum4(..), Sum5(..),
+    
+    NSum, Sum1(..), Sum2(..), Sum3(..), Sum4(..), Sum5(..),
     type (!+!),
     (!+), (+!),
-
-    Coproductive(..),
+    Injector(..),
     comap1, comap2, comap3, comap4, comap5,
 
 ) where
 import Alpha.Base
 import Alpha.Canonical.Common
-import Alpha.Canonical.Relations.Tripling
 import Alpha.Canonical.Relations.Product
 import Alpha.Canonical.Relations.Functions
 
--- | Represents a dijoint union of elements
--- See https://en.wikipedia.org/wiki/Disjoint_union
-newtype DisjointUnion a b = DisjointUnion (a, b)
-
-type instance Tripled a b (DisjointUnion a b) = (DisjointUnion a b)
-
--- | Constructs a disjoint union
-disjoint::a -> b -> DisjointUnion a b
-disjoint a b = DisjointUnion (a,b)
     
 -- A single-case sum
 data Sum1 a1 
@@ -60,12 +48,18 @@ data Sum5 a1 a2 a3 a4 a5
     = Sum51 !a1 | Sum52 !a2 | Sum53 !a3 | Sum54 !a4 | Sum55 !a5
     deriving (Eq, Ord, Data, Generic, Typeable, Show)
 
-type family Sum a | a -> a where
-    Sum (Sum1 a1) = Sum1 a1    
-    Sum (Sum2 a1 a2) = Sum2 a1 a2
-    Sum (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
-    Sum (Sum4 a1 a2 a3 a4) = Sum4 a1 a2 a3 a4
-    Sum (Sum5 a1 a2 a3 a4 a5) = Sum5 a1 a2 a3 a4 a5
+data family Coprod a b
+data instance Coprod (Sum1 a) (Sum1 b) = Coprod a b
+data instance Coprod a1 (Sum2 a2 a3) = Coprod3 a1 a2 a3
+data instance Coprod a1 (Sum3 a2 a3 a4) = Coprod4 a1 a2 a3 a4
+data instance Coprod a1 (Sum4 a2 a3 a4 a5) = Coprod5 a1 a2 a3 a4 a5
+
+type family NSum a | a -> a where
+    NSum (Sum1 a1) = Sum1 a1    
+    NSum (Sum2 a1 a2) = Sum2 a1 a2
+    NSum (Sum3 a1 a2 a3) = Sum3 a1 a2 a3
+    NSum (Sum4 a1 a2 a3 a4) = Sum4 a1 a2 a3 a4
+    NSum (Sum5 a1 a2 a3 a4 a5) = Sum5 a1 a2 a3 a4 a5
     
 type a !+! b = Sum2 a b
 
@@ -77,43 +71,43 @@ type a !+! b = Sum2 a b
 (+!)::b -> a !+! b
 (+!) = Sum22
     
-class Coproductive (n::Nat) a b where
+class Injector (n::Nat) a b where
     -- | Injects an a-value into a b-valued coproduct
-    inject::b -> Sum a
+    inject::b -> NSum a
 
-instance Coproductive 1 (Sum1 a) a where
+instance Injector 1 (Sum1 a) a where
     inject a = Sum1 a    
     
-instance Coproductive 1 (Sum2 a1 a2) a1 where
+instance Injector 1 (Sum2 a1 a2) a1 where
     inject a = Sum21 a
-instance Coproductive 2 (Sum2 a1 a2) a2 where
+instance Injector 2 (Sum2 a1 a2) a2 where
     inject a = Sum22 a
         
-instance Coproductive 1 (Sum3 a1 a2 a3) a1 where
+instance Injector 1 (Sum3 a1 a2 a3) a1 where
     inject a = Sum31 a
-instance Coproductive 2 (Sum3 a1 a2 a3) a2 where
+instance Injector 2 (Sum3 a1 a2 a3) a2 where
     inject a = Sum32 a
-instance Coproductive 3 (Sum3 a1 a2 a3) a3 where
+instance Injector 3 (Sum3 a1 a2 a3) a3 where
     inject a = Sum33 a
         
-instance Coproductive 1 (Sum4 a1 a2 a3 a4) a1 where
+instance Injector 1 (Sum4 a1 a2 a3 a4) a1 where
     inject a = Sum41 a
-instance Coproductive 2 (Sum4 a1 a2 a3 a4) a2 where
+instance Injector 2 (Sum4 a1 a2 a3 a4) a2 where
     inject a = Sum42 a
-instance Coproductive 3 (Sum4 a1 a2 a3 a4) a3 where
+instance Injector 3 (Sum4 a1 a2 a3 a4) a3 where
     inject a = Sum43 a
-instance Coproductive 4 (Sum4 a1 a2 a3 a4) a4 where
+instance Injector 4 (Sum4 a1 a2 a3 a4) a4 where
     inject a = Sum44 a
                 
-instance Coproductive 5 (Sum5 a1 a2 a3 a4 a5) a1 where
+instance Injector 5 (Sum5 a1 a2 a3 a4 a5) a1 where
     inject a = Sum51 a
-instance Coproductive 5 (Sum5 a1 a2 a3 a4 a5) a2 where
+instance Injector 5 (Sum5 a1 a2 a3 a4 a5) a2 where
     inject a = Sum52 a
-instance Coproductive 5 (Sum5 a1 a2 a3 a4 a5) a3 where
+instance Injector 5 (Sum5 a1 a2 a3 a4 a5) a3 where
     inject a = Sum53 a
-instance Coproductive 5 (Sum5 a1 a2 a3 a4 a5) a4 where
+instance Injector 5 (Sum5 a1 a2 a3 a4 a5) a4 where
     inject a = Sum54 a
-instance Coproductive 5 (Sum5 a1 a2 a3 a4 a5) a5 where
+instance Injector 5 (Sum5 a1 a2 a3 a4 a5) a5 where
     inject a = Sum55 a
 
 type CoFunc1 f a b = f ~ F1 a b

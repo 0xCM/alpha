@@ -77,10 +77,6 @@ class Groupable c where
     groups::(Individual c -> Individual c -> Bool) -> c -> [[Individual c]]
 
     
-instance Triple (Set a) (Set b) (DisjointUnion (Set a) (Set b)) where
-    trip3 a b = DisjointUnion (a, b)
-    trip2 (DisjointUnion (a,b)) = b
-    trip1 (DisjointUnion (a,b)) = a
 
 -- | Container instances    
 -------------------------------------------------------------------------------

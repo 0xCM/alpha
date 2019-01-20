@@ -61,7 +61,6 @@ type family (a::Bool) || (b::Bool) :: Bool where
     True || False = True
     False || True = True
     False || False = False
-
 infixl 2 ||
 
 
@@ -70,7 +69,6 @@ type family (a::Bool) && (b::Bool) :: Bool where
     True && False = False
     False && True = False
     False && False = False    
-
 infixl 3 &&    
 
 type family Not (a::Bool) :: Bool where    
@@ -89,26 +87,28 @@ type family a :=> b where
 
 infixl 5 :=>
     
--- | Characterizes a value that can be converted to a 'Bool'
+-- | Characterizes types for which a truth value can be assigned
 class Boolean a where
     bool::a -> Bool    
 
-    
-
 -- | Characterizes a type's logical disjunction operator 
 class Disjunctive a where
-    (||)::a -> a -> Bool
+    type Disjunction a
+    type Disjunction a = Bool
+
+    (||)::a -> a -> Disjunction a
 
 -- | Characterizes a type's logical conjunction operator 
 class Conjunctive a where
-    (&&)::a -> a -> Bool    
+    type Conjunction a
+    type Conjunction a = Bool
 
+    (&&)::a -> a -> Conjunction a
 
 -- | The modus ponens of propositional logic
 -- See https://en.wikipedia.org/wiki/Modus_ponens    
 class Implication a where
     implies::a -> a -> Bool
-
 
 class Biconditional a where
     iff::a -> a -> Bool

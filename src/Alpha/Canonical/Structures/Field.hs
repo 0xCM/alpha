@@ -7,21 +7,16 @@ module Alpha.Canonical.Structures.Field
 where
 import Alpha.Canonical.Relations    
 import Alpha.Canonical.Structures.Ring as X
-import Alpha.Canonical.Structures.IntDomain as X
+import Alpha.Canonical.Structures.Domain as X
 
 
 -- | Characterizes a field as a commutative division ring
 class (Commutative a, DivisionRing a) => Field a where
-instance Structure 1 Field    
 
 -- | Characterizes a field with a finite number of elements
 -- See https://en.wikipedia.org/wiki/Finite_field
 class (Field a, Finite a) => FiniteField a where
-instance Structure 1 FiniteField    
 
-    
-
--- The rationals
 instance (Integral a) => Field (Ratio a) where 
 
 -- The (approximate) reals

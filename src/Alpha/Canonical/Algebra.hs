@@ -28,5 +28,6 @@ import Alpha.Canonical.Algebra.Successive as X
 import Alpha.Canonical.Algebra.Unsigned as X
 import Alpha.Canonical.Algebra.Unital as X
 import Alpha.Canonical.Algebra.Powers as X
+import Alpha.Canonical.Algebra.Rational as X
 
 

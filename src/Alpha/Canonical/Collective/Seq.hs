@@ -7,10 +7,7 @@
 module Alpha.Canonical.Collective.Seq
 (
     Sequence(..), fseq
-)
-
-where
-
+) where
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Collective.Container
 

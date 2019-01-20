@@ -9,10 +9,10 @@
 {-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Based
 (
-    BasedInt,
-    Base(..),
+    Based,
+    Radix(..),
     based, base2, base10, base16,
-    base, digits,
+    radix, digits,
     
 ) where
 import Alpha.Canonical.Relations
@@ -23,34 +23,34 @@ import qualified Data.List as List
 import qualified Data.Set as Set
 
 -- Represents a numeric base
-newtype Base b = Base Natural
+newtype Radix b = Radix Natural
     deriving(Show,Eq,Ord,Num)
 
--- | Represents an integer with a particular base
-data BasedInt (b::Nat) i = BasedInt !i
+-- | Represents an number in a particular base
+data Based (b::Nat) i = Based !i
 
 -- Represents a sequence of digits expressed with respect to a
 -- particular basis    
 newtype Digits b = Digits [Char]    
 
 -- | Constructs an integer with a specified base
-based::forall (n::Nat) i. (Integral i) => i -> BasedInt n i
-based i = BasedInt i
+based::forall (n::Nat) a. a -> Based n a
+based i = Based i
 
--- | Constructs a base-2 integer
-base2::Integer -> BasedInt 2 Integer
+-- | Constructs a base-2 number
+base2::a -> Based 2 a
 base2 = based @2
 
 -- | Constructs a base-10 integer
-base10::Integer -> BasedInt 10 Integer
+base10::a -> Based 10 a
 base10 = based @10
 
 -- | Constructs a base-16 integer
-base16::Integer -> BasedInt 16 Integer
+base16::a -> Based 16 a
 base16 = based @16
 
-base::forall b. KnownNat b => Base b
-base = Base $ natg @b
+radix::forall b. KnownNat b => Radix b
+radix = Radix $ natg @b
 
 --encoding64::Vector.Vector Char
 --See https://en.wikipedia.org/wiki/Base64 for table    
@@ -78,15 +78,15 @@ digits i = Digits $ recurse (quotRem' i b) []
 
 instance forall b. KnownNat b => Formattable (Digits b ) where
     format (Digits n) = format n <> b where 
-        b = format (nat @b) |> parenthetical |> spaced
+        b = format (nat @b) |> parenthetical |> pad
 
 instance forall b. KnownNat b => Show (Digits b ) where
     show = string . format
                 
-instance forall b i. (KnownNat b, Formattable i) => Formattable (BasedInt b i) where
-    format (BasedInt i) = format i <> b where
-        b = format (nat @b) |> parenthetical |> spaced
+instance forall b i. (KnownNat b, Formattable i) => Formattable (Based b i) where
+    format (Based i) = format i <> b where
+        b = format (nat @b) |> parenthetical |> pad
 
-instance forall b i. (KnownNat b, Formattable i) => Show(BasedInt b i) where
+instance forall b i. (KnownNat b, Formattable i) => Show(Based b i) where
     show = string . format
     

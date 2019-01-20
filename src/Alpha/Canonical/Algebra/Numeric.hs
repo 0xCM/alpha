@@ -14,6 +14,7 @@ module Alpha.Canonical.Algebra.Numeric
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Powers as X
+import Alpha.Canonical.Algebra.Complex as X
 
 type NumericContext a = (Ord a, Subtractive a, Distributive a, Multiplicative a, Additive a, Divisive a, Num a, Real a, Power a)    
 
@@ -69,6 +70,7 @@ instance Numeric Float
 instance Numeric Double
 instance Numeric CFloat
 instance Numeric CDouble
+--instance Numeric a => Numeric (Complex a)
 
 
 

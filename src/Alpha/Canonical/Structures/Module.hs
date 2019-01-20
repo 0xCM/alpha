@@ -78,5 +78,5 @@ instance Category ModuleHom where
 instance End ModuleHom where
     end x = unwrap x 
 
-instance Function ModuleHom where
-    fx f = end f
+-- instance Function ModuleHom where
+--     fx f = end f

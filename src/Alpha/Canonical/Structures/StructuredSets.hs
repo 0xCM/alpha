@@ -6,25 +6,28 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Structures.StructuredSets
 (
-    SpanningSet(..), spanning,
+    GeneratingSet(..), 
     IndependentSet(..),
     BasisSet(..),
-    FiniteBasisSet(..)
+    FiniteBasisSet(..),
+
 )
 where
 
 import Alpha.Canonical.Algebra
 
 -- | Represents a generating set for m, i.e., every element of
--- m can be expressed as a finite linear combination of elements
+-- m can be expressed as a finite combination of elements
 -- in the set
--- See https://en.wikipedia.org/wiki/Free_module
-newtype SpanningSet m = SpanningSet (Set m)
+-- See 
+-- https://en.wikipedia.org/wiki/Generator_(mathematics)
+-- https://en.wikipedia.org/wiki/Free_module
+newtype GeneratingSet a = GeneratingSet (Set a)
     deriving(Eq, Ord, Generic, Data, Typeable, Associated, Discrete)
-    deriving(Formattable,Show) via (Set m)
-instance Newtype (SpanningSet m)
+    deriving(Formattable,Show) via (Set a)
+instance Newtype (GeneratingSet a)
 
-type instance Individual (SpanningSet m) = m
+type instance Individual (GeneratingSet a) = a
 
 -- | Represents a set of independent elements of 'm'
 -- See https://en.wikipedia.org/wiki/Free_module
@@ -51,9 +54,6 @@ instance Newtype (FiniteBasisSet m)
 type instance Individual (FiniteBasisSet m) = m
 
 instance Ord m => Finite (FiniteBasisSet m)
-
-spanning::(Ord a) => [a] -> SpanningSet a
-spanning = SpanningSet . fromList
 
 
 finiteBasis::(Ord a) => [a] -> BasisSet a

@@ -7,7 +7,7 @@ default(Int,Double,Text)
 
 instance Example "p-1" where
     example = do
-        let idperm = perm @3 [(i,i) | i <- [1..10]]
+        let idperm = permutation @3 [(i,i) | i <- [1..10]]
         print $ format  idperm
     
 -- instance Example "p-2" where
@@ -21,12 +21,12 @@ instance Example "p-1" where
         
 instance Example "p-3" where
     example = do
-        let s3 = symgroup @3
+        let s3 = symmetries @3
         print (format s3)
 
 instance Example "p-4" where
     example = do
-        let s4 = symgroup @4
+        let s4 = symmetries @4
         let p2 = s4 !! 2
         print p2
         let p5 = s4 !! 5        
@@ -37,7 +37,7 @@ instance Example "p-4" where
 
 instance Example "p-5" where
     example = do
-        let s3 = symgroup @3
+        let s3 = symmetries @3
         let p2 = s3 !! 2
         print p2
 

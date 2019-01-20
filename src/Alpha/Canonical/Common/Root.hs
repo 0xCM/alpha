@@ -28,15 +28,17 @@ module Alpha.Canonical.Common.Root
     Cardinality(..),   
     Cardinal(..),
     Discretion(..),
-    --Habitation(..),
+    Generative(..),
     Nullity(..),
+    Cell(..),
+    Cellular(..),
     enumValues,
     typeSymbol,
     typeSymbols,
     facetVal,
-    mapi,
     ifelse, 
     clone,
+    range,
     reduce,
     associate, 
     associated,
@@ -56,6 +58,24 @@ import qualified Data.Sequence as Sequence
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Vector as Vector
 import qualified Numeric.Interval as Interval
+
+-- | Represents a located value
+newtype Cell l v = Cell (l, v)
+    deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
+
+-- | Characterizes a located value
+class Cellular a where
+    type Location a
+    type Value a
+    
+    -- | Constructs a cell given a location and value
+    cell::Location a -> Value a -> Cell (Location a) (Value a)
+
+    -- | Extracts a cell's value
+    value::Cell (Location a) (Value a) -> Value a
+    
+    -- | Extracts a cell's location
+    location::Cell (Location a) (Value a) -> Location a
 
 
 -- Characterizes a type with wich a description may be associated
@@ -202,7 +222,14 @@ class Chunkable a where
 class Specifiable a where
     type Specified a
     specify::a -> Specified a
+
+-- | Characterizes a type that induces the construction of 
+-- colleciton of values
+class Generative a where
+    type Generated a
+    generate::a -> [Generated a]
     
+
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    
     
@@ -225,12 +252,11 @@ typeSymbol = someSymbolVal
 typeSymbols::[String] ->[SomeSymbol]
 typeSymbols s = typeSymbol <$> s
 
+-- | Constructs a contiguous sequence of values inclusively between
+-- a spcified min and max value
+range::(Ord i, Enum i) => (i,i) -> [i]
+range (min,max) = [min..max]
 
-mapi::(Integral i) => ((i,a) -> b) -> [a] -> [b]
-mapi f l = f <$> z where 
-    idx = [0..upper]
-    upper  = sub'  (fromIntegral $ List.length l) 1
-    z = List.zip idx l
 
 -- | If the first input value is true, returns the 2nd input value,
 -- otherwise, returns the third input value

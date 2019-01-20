@@ -9,7 +9,7 @@
 module Alpha.Canonical.Elementary.Indexing
 (
     NatIx(..),
-    SafeIndex(..),
+    SafeIx(..),
     Indexable(..),
     IxTerm(..), 
     IxRange(..),    
@@ -17,10 +17,11 @@ module Alpha.Canonical.Elementary.Indexing
     UIx(..),
     LIx(..),
     MIx(..),
-    IndexComplex(..),
+    BiIx(..),
     MultiIndexed(..),
     lix,
     uix,
+    bix,
     term,
     termix,
     ixrange,
@@ -40,16 +41,16 @@ import qualified Data.Sequence as Sequence
 
 -- | Represents a lower index
 newtype LIx a = LIx a
-    deriving (Eq, Ord)
+    deriving (Eq, Ord,Generic,Data,Typeable)
 
 -- | Represents an upper index
 newtype UIx a = UIx a
-    deriving (Eq, Ord)
+    deriving (Eq, Ord,Generic,Data,Typeable)
 
--- | Defines a collection of index complexes as a unit that consists
--- of an ordered pair of contravariant and covariant components    
-newtype IndexComplex a = IndexComplex ([LIx a],[UIx a])
-    deriving (Eq, Ord,Generic)
+-- | Represents a bipartite index consisting (potentially) of both
+-- lower indexes and upper indexes
+newtype BiIx a = BiIx ([LIx a],[UIx a])
+    deriving (Eq, Ord,Generic,Data,Typeable)
         
 -- | Defines a family of multi-indexes    
 type family MIx (i::Nat) a = r | r -> i a where
@@ -59,13 +60,16 @@ type family MIx (i::Nat) a = r | r -> i a where
     MIx 4 a = UniTuple4 (IxRange a)
     MIx 5 a = UniTuple5 (IxRange a)
 
-
 -- | Represents a term t indexed by i
+-- A term in this context can be considered a function/delayed 
+-- computation predicated on an index i that saturates 
+-- when the index is itself applied
 newtype IxTerm i t = IxTerm (i, (i -> t))
     deriving (Generic)
 instance Newtype (IxTerm i t)
 
--- | Represents a family 'f' of elements with indexing set 'i'
+-- | Represents a family 't' of terms indexed by a set 'i'
+-- See https://en.wikipedia.org/wiki/Indexed_family
 newtype IxFamily i t = IxFamily (Map i (IxTerm i t))
     deriving (Eq, Ord, Generic, Functor)    
 instance Newtype (IxFamily i t)    
@@ -89,7 +93,7 @@ class Indexable a where
     infixr 9 !!
 
 -- | Characterizes an index that can safely fail
-class SafeIndex s i where
+class SafeIx s i where
     
     lookup::s -> i -> Maybe (Individual s)
 
@@ -134,8 +138,11 @@ lix = LIx
 uix::a -> UIx a
 uix = UIx
 
+bix::[LIx a] -> [UIx a] -> BiIx a
+bix l u = BiIx (l,u)
+
 -------------------------------------------------------------------------------            
--- * Indexable instances
+-- * Indexable class memberships
 -------------------------------------------------------------------------------            
 instance (Eq a) => Indexable [a] where    
     idx = (List.!!)
@@ -149,22 +156,37 @@ instance Indexable (Vector a) where
 instance (Ord k) => Indexable (Map k v) where
     type Indexer (Map k v) = k
     idx map k = (k, map Map.! k)
-        
-instance (Ord k) => SafeIndex (Map k v) k where
-     lookup map k = case (map Map.!? k) of
-                        Just v -> Just (k, v)
-                        _      -> Nothing
 
-instance (Ord k) => Indexable (IxFamily k v) where
-    type Indexer (IxFamily k v) = k
-    idx (IxFamily map) k = map Map.! k
+
+-------------------------------------------------------------------------------            
+-- * SafeIx class membership
+-------------------------------------------------------------------------------            
+
+instance (Ord k) => SafeIx (Map k v) k where
+    lookup map k = case (map Map.!? k) of
+                    Just v -> Just (k, v)
+                    _      -> Nothing
+   
+instance (Eq a,Integral k) =>  SafeIx [a] k where
+    lookup src k = case valid of
+            True -> Just (src !! (fromIntegral k))
+            _    -> Nothing
+        where            
+            nonempty = (List.null src) == False
+            upperBound = fromIntegral (sub' (List.length src) 1)
+            inbounds = between' k (0, upperBound)
+            valid = and' inbounds nonempty
+                    
+-------------------------------------------------------------------------------            
+-- * IxRange class membership
+-------------------------------------------------------------------------------            
 
 instance OrdEnum i => Associated (IxRange i) where
     associates (IxRange (a,b)) = [a..b]
         
 instance (Formattable i) => Formattable (IxRange i) where
     format (IxRange (min,max)) 
-        = fence LBrack RBrack (format min <> spaced Dots <> format max)
+        = fence LBrack RBrack (format min <> pad Dots <> format max)
 
 instance (Formattable i) => Show (IxRange i) where        
     show = string . format
@@ -174,8 +196,13 @@ instance (OrdEnum a) => SetBuilder (IxRange a) a where
         s = [i..j]
         count = add' (fromIntegral (List.length s)) 1
         
+-------------------------------------------------------------------------------            
+-- * IxRange class membership
+-------------------------------------------------------------------------------            
+
 instance (Formattable i, Formattable t) => Formattable (IxTerm i t) where
     format (IxTerm (i,f)) = format (i, f i)
+
 
 instance (Formattable i, Formattable t) => Show (IxTerm i t) where
     show = string . format
@@ -188,13 +215,24 @@ instance (Eq i) => Eq (IxTerm i t) where
 
 instance (Ord i) => Ord (IxTerm i t) where
     compare (IxTerm (i,t)) (IxTerm (j,s)) = compare i j
+
+-------------------------------------------------------------------------------            
+-- * IxFamily class membership
+-------------------------------------------------------------------------------            
     
 instance (Ord i) => IsList (IxFamily i a) where
     type Item (IxFamily i a) = IxTerm i a
     toList (IxFamily map) = associated map
-    fromList l = ixfamily l
-                            
+    fromList l = ixfamily l                            
 
+instance (Ord k) => Indexable (IxFamily k v) where
+    type Indexer (IxFamily k v) = k
+    idx (IxFamily map) k = map Map.! k
+
+-------------------------------------------------------------------------------            
+-- * MultiIndexed instances
+-------------------------------------------------------------------------------            
+    
 instance (OrdEnum a) => MultiIndexed 1 a where    
     mix (UniTuple1 r) =  UniTuple1 r
     milevels (UniTuple1 r) = [UniTuple1 a | a <- associates r]

@@ -20,8 +20,8 @@ module Alpha.Canonical.Structures.Group
 ) where
 import Alpha.Canonical.Structures.Common as X
 import Alpha.Canonical.Structures.Structure as X
-import Alpha.Canonical.Structures.Monoid as X
 import Alpha.Canonical.Structures.Magma as X
+import Alpha.Canonical.Structures.Semiring as X
 
 -- | A multiplicative group with unspecified commutativity
 newtype ProductGroup a = ProductGroup a
@@ -53,7 +53,7 @@ class Group a where
 -- See: https://www.ncatlab.org/nlab/show/Grp
 class Category g => Grp g where
 
-data instance Space (Grp g) = Grp
+
 data instance ObjSet (Grp g) = GrpObj
 data instance EndSet (Grp g) (Group a) (Group b) = GrpHom a b
 
@@ -90,10 +90,6 @@ class (AdditiveMonoid a, Negatable a) => AbelianGroup a where
 class (AbelianGroup a, Finite a) => FiniteAbelianGroup a where
 
 
-instance Structure 1 FiniteAbelianGroup
-instance Structure 1 Group
-instance Structure 1 AbelianGroup
-
 instance AbelianGroup Integer where 
 instance AbelianGroup Int where 
 instance AbelianGroup Int8 where 
@@ -111,6 +107,8 @@ instance AbelianGroup Float where
 instance AbelianGroup Double where 
 instance AbelianGroup CFloat where 
 instance AbelianGroup CDouble where                                 
+instance (Eq a, Negatable a, Additive a,Nullary a) => AbelianGroup (Complex a)
+instance AbelianGroup Rational
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)
 type AG3 a1 a2 a3 = (AG2 a1 a2, AbelianGroup a3)

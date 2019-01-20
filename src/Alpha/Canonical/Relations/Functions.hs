@@ -13,7 +13,8 @@ module Alpha.Canonical.Relations.Functions
     Img(..),
     End(..),
     Func(..),
-    Function(..),
+    Preimage(..),
+    --Function(..),
     Composition(..), 
     Compositional(..), 
     Functional(..),
@@ -115,11 +116,10 @@ type instance Cod (Func2 a1 a2 a3) = a3
 type instance Cod (Func3 a1 a2 a3 a4) = a4
 type instance Cod (Func4 a1 a2 a3 a4 a5) = a5
 
--- | Represents the image of a function which is the same type as
--- a codomain but may not represent the same set of values. When
--- the codomain and image are indeed equal as sets then the
--- function is a surjection
-type Img f = Cod f
+
+-- | The image is a subset of the codomain and can be typed accordingly
+type Img f  = Cod f
+
 
 type family Func f      
 type instance Func (a -> b) = a -> b
@@ -130,20 +130,27 @@ type instance Func (Func2 a1 a2 a3) = (a1,a2) -> a3
 type instance Func (Func3 a1 a2 a3 a4) = (a1,a2,a3) -> a4
 type instance Func (Func4 a1 a2 a3 a4 a5) = (a1,a2,a3,a4) -> a5
 
+-- Encodes a bijective function
+newtype Bijection a b = Bijection (a -> b, b -> a)
+
+-- | Characterizes a function for which preimages of codomain sets
+-- can be calculated
+class Preimage f where
+    preimage::f -> Cod f -> Dom f
 
 -- | Characterizes a structure-preserving endomorphism
 class Category c => End c where
     end::c a b -> (a -> b)
 
-
-newtype Hom c a b = Hom (Set (a -> b))
-
+type Hom f a b = (Function f, a ~ Dom f, b ~ Cod f)
     
 class Function f where
-    fx::f a b -> (a -> b)
+    fx::f -> Func f
 
+instance Function (a -> b) where
+    fx::(a -> b) -> a -> b
+    fx = id
 
-    
 -- | Characterizes a deferred computation or a computation
 -- specification    
 class Computable a where
@@ -162,7 +169,6 @@ class Compositional g f where
 class Functional f where    
     func::Func f -> ((Dom f) -> (Cod f))
     
-
 instance Functional (Func0 a1 ) where
     func a = id
     

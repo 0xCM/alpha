@@ -5,44 +5,54 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingVia #-}
-
 module Alpha.Data.Bit 
 (
     Bit(..),
     ToBit(..), 
     Flag(..),
+    BitString,
     on, isOn,
     off, isOff,
+    bitstring,
 )
 where
-import Alpha.Canonical.Structures
+import Alpha.Canonical
 import Data.Bits(Bits(..))
 import qualified Data.List as List
 
 -- | Taken from bool8
 data {-# CTYPE "HsBool" #-} Flag = On | Off
-    deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read,Bounded)
+    deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read, Bounded)
 
 newtype Bit = Bit Flag
-    deriving (
-        Eq, Ord, Generic, Data, Typeable, Read, 
-        Disjunctive, Conjunctive, Invertive, 
-        Implication, ExclusivelyDisjunct, Biconditional, 
-        Propositional, JoinSemiLattice,MeetSemiLattice, 
-        Lattice)
+    deriving (Eq, Ord, Generic, Data, Typeable, Read, 
+        Invertive, Implication, ExclusivelyDisjunct, Biconditional, 
+        Propositional, JoinSemiLattice,MeetSemiLattice,  Lattice
+        )
 
-
+-- | Encapsulates an ordered sequence of bits
+newtype BitString = BitString [Bit]   
+    deriving (Eq, Ord, Generic, Data, Typeable, Read)
+instance Newtype (BitString)
+        
 type instance Unsigned Bit = Bit
-type instance Individual Bit = Bit
-type instance Individual Flag = Flag
+type instance Individual Integer = Bit
+type instance Individual Int = Bit
+type instance Individual Int8 = Bit
+type instance Individual Int16 = Bit
+type instance Individual Int32 = Bit
+type instance Individual Int64 = Bit
+type instance Individual Natural = Bit
+type instance Individual Word = Bit
+type instance Individual Word8 = Bit
+type instance Individual Word16 = Bit
+type instance Individual Word32 = Bit
+type instance Individual Word64 = Bit
 
-instance Unsignable Bit
 
 class ToBit a where
     bit::a -> Bit    
-
-        
+    
 -- | Constructs a 'Bit' in the 'Off' state    
 off::Bit
 off = Bit Off
@@ -67,6 +77,30 @@ bitref'::Ptr Bit -> Ptr Word8
 bitref' = castPtr
 {-# INLINE bitref' #-}
 
+-- | Returns the value of an identified bit
+ibit::Bits a => a -> Int -> Bit
+ibit n i = ifelse (testBit n i == True) on off
+{-# INLINE ibit #-}
+
+-- | Constrcts a 'Bitstring' value from an integer
+bitstring::(IntegralDomain a, Integral a) => a -> BitString
+bitstring i = BitString $ bitstring' (quotRem i 2) []  where
+    bitstring' (n,d) r = seq c $
+        case n of
+        0 -> r'
+        _ -> bitstring' (quotRem n 2) r' 
+        where
+            c  = ifelse (d == 0) off on
+            r' = c : r            
+
+
+instance Unsignable Bit
+
+instance Disjunctive (Bit) where
+    (Bit x) || (Bit y) = x || y
+
+instance Conjunctive (Bit) where
+    (Bit x) && (Bit y) = x && y
 
 instance Disjunctive Flag where
     On || On = True
@@ -123,7 +157,6 @@ instance Lattice Flag where
 instance Universe Flag where
     inhabitants = FiniteSet (fromList enumerate)
     
-
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
     {-# INLINE int #-}
@@ -266,3 +299,54 @@ instance Bits Bit where
 
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
+
+instance Formattable BitString where
+    format (BitString bits) =  format <$> bits |> append |> prefix n
+        where n =  ((length bits)::Int) |> format |> parenthetical |> pad
+                
+instance ToInteger BitString where
+    integer = undefined
+
+instance Show BitString where
+    show = string . format
+                
+instance Indexable Integer where
+    idx = ibit
+    {-# INLINE idx #-}
+
+instance Indexable Natural where
+    idx = ibit
+    {-# INLINE idx #-}
+    
+instance Indexable Int8 where
+    idx = ibit
+    {-# INLINE idx #-}
+
+instance Indexable Int16 where
+    idx = ibit
+    {-# INLINE idx #-}
+
+instance Indexable Int32 where
+    idx = ibit
+    {-# INLINE idx #-}
+        
+instance Indexable Int64 where
+    idx = ibit
+    {-# INLINE idx #-}
+        
+instance Indexable Word8 where
+    idx = ibit
+    {-# INLINE idx #-}
+
+instance Indexable Word16 where
+    idx = ibit
+    {-# INLINE idx #-}
+
+instance Indexable Word32 where
+    idx = ibit
+    {-# INLINE idx #-}
+        
+instance Indexable Word64 where
+    idx = ibit
+    {-# INLINE idx #-}
+    

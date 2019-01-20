@@ -9,8 +9,7 @@ module Alpha.Canonical.Algebra.Subtractive
     Subtractive(..), 
     Subtraction(..), subtraction,
     Subtracted(..), 
-    Bisubtractive(..),
-    
+    Bisubtractive(..),    
 ) where
 import Alpha.Canonical.Relations
 
@@ -18,7 +17,6 @@ import Alpha.Canonical.Relations
 -- subtraction where the instance type is the result type of applying a 
 -- conforming subtraction operation
 type family Subtracted a b
-
 
 -- / Characterizes a type that supports a notion of subtraction
 class Subtractive a where

@@ -143,7 +143,7 @@ instance (SemiOrd l, Ord e, Ord s) => Labeled (Rule l s e) l where
     
 instance (Formattable3 l s e) => Formattable (Rule l s e) where
     format (Rule (l,s1,e,s2)) 
-        = format l <> lspaced Colon <> format (s1,e) <> spaced RMap <> format s2
+        = format l <> lpad Colon <> format (s1,e) <> pad RMap <> format s2
 
 instance (Formattable3 l s e) => Show (Rule l s e) where
     show = string . format
