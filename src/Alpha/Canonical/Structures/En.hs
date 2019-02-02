@@ -10,10 +10,10 @@
 
 module Alpha.Canonical.Structures.En
 (
-    En(..),
-    NatBasisElement(..),
-    NatBasis(..),
-    EuclideanVector(..)
+    -- En(..),
+    -- NatBasisElement(..),
+    -- NatBasis(..),
+    -- EuclideanVector(..)
 )
 where 
 import Alpha.Canonical.Algebra
@@ -38,7 +38,7 @@ class (KnownNat n, Ring k) => EuclideanVector n k where
     euvector::UniTuple n k -> En n k
                 
 class (KnownNat n, Ring k) => NatBasis n k where
-    natbasis::FiniteBasisSet (En n k)
+    natbasis::BasisSet (En n k)
 
 
 vecN::(KnownNat n) => UniTuple n k -> En n k
@@ -49,7 +49,7 @@ type Euclidean n k v = (v ~ En n k, KnownNat n, AbelianGroup v,  Ring k, LeftAct
 
 -- | Defines Euclidean n-space as as k-module with respect
 -- to the type v ~ En n k
-instance Euclidean n k v => LeftModule k v
+--instance Euclidean n k v => LeftModule k v
 
 instance (Eq k) => Eq (En 1 k) where
     (E1 x) == (E1 y) = x == y
@@ -195,18 +195,13 @@ instance (OrderedRing k) => NatBasisElement 5 5 k where
     en = E5 (zero,zero,zero,zero, one)
 
 instance (OrderedRing k) => NatBasis 1 k where    
-    natbasis = FiniteBasisSet $ FiniteSet [en @1 @1]
+    natbasis = BasisSet $ FiniteSet [en @1 @1]
 instance (OrderedRing k) => NatBasis 2 k where
-    natbasis = FiniteBasisSet $ FiniteSet [en @2 @1, en @2 @2]
+    natbasis = BasisSet $ FiniteSet [en @2 @1, en @2 @2]
 instance (OrderedRing k) => NatBasis 3 k where
-    natbasis = FiniteBasisSet $ FiniteSet [en @3 @1, en @3 @2, en @3 @3]    
+    natbasis = BasisSet $ FiniteSet [en @3 @1, en @3 @2, en @3 @3]    
 instance (OrderedRing k) => NatBasis 4 k where
-    natbasis = FiniteBasisSet $ FiniteSet [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
+    natbasis = BasisSet $ FiniteSet [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
 instance (OrderedRing k) => NatBasis 5 k where
-    natbasis = FiniteBasisSet $ FiniteSet [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
+    natbasis = BasisSet $ FiniteSet [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
 
--- instance (NatBasis n k, Euclidean n k v) => Basis k v (FiniteBasisSet v) where
---     basis  _ = natbasis @ n
-
--- instance forall n k v s.  (KnownNat n, NatBasis n k, Euclidean n k v, s ~ FiniteBasisSet v) => FiniteBasis n k v s
-    

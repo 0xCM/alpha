@@ -73,7 +73,7 @@ instance KnownNat n => ToPermutation n [Int] where
     permutation range = Permutation  $ Map.fromList (List.zip pt range) 
         where                
             domain = natKspan @1 @n
-            pt = int <$> associates (domain)
+            pt = int <$> members (domain)
                 
 instance KnownNat n => ToPermutation n [(Int,Int)] where
     permutation = Permutation . Map.fromList    

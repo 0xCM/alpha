@@ -17,11 +17,17 @@ module Alpha.Canonical.Common.Signage
 ) where
 import Alpha.Canonical.Common.Root
 import qualified Data.List as List
+import Alpha.Canonical.Common.Asci
+import qualified Data.Text as Text
 
 -- | Defines the codomain of the sign function
 data Sign = Negative | Neutral | Positive
     deriving (Show,Ord,Eq,Enum,Generic,Data,Typeable)
-        
+
+-- | Represents the cocept of an infinite value    
+newtype Infinity a = Infinity Sign    
+    deriving (Eq,Generic,Data,Typeable)
+
 -- | Characterizes type for which signs may be computed
 -- Alternately, characterizes types whose values may be 
 -- partitioned into three disjoint subsets, one called 'Negative'
@@ -56,6 +62,17 @@ sign' a | lt' a 0 = Negative
         | gt' a 0 = Positive
         | a == 0 = Neutral
 
+instance Signable (Infinity a) where
+    sign (Infinity s) = s
+
+instance Formattable (Infinity a)  where
+    format (Infinity Negative) = Plus <> " inf"
+    format (Infinity Positive) = Dash <> " inf"
+    format (Infinity Neutral) = PlusMinus <> " inf"
+
+instance Show (Infinity a) where
+    show = Text.unpack . format
+        
 instance UnsignedIntegral Word
 instance UnsignedIntegral Word8
 instance UnsignedIntegral Word16

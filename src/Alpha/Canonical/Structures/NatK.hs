@@ -112,7 +112,6 @@ natKmul =   natK @m >*< natK @n
 natmul::forall m n .(KnownNatPair m n) => Int
 natmul =   nat @m * nat @n
 
-
 natKdec::forall m. (KnownNat m ) => NatK (m - 1)
 natKdec =  natK @m |> (>--<)
 
@@ -140,8 +139,8 @@ instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where
     span (NatK m) (NatK n) = NatKSpan $ NatKPair $ (natK @m, natK @n)
     {-# INLINE span #-}
     
-instance forall m n. (KnownNatPair m n) => Associated (NatKSpan m n)  where        
-    associates (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
+instance forall m n. (KnownNatPair m n) => Membership (NatKSpan m n)  where        
+    members (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
     
 instance forall m. (KnownNat m) => Decrementable (NatK m) where    
     dec::NatK m -> Decrement (NatK m) 

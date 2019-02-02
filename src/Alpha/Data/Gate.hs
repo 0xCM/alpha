@@ -6,17 +6,17 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE ViewPatterns #-}
-
-module Alpha.Data.Gate where
-
+module Alpha.Data.Gate
+(
+    Gate(..)
+)
+where
 
 import Alpha.Canonical
-import Alpha.Data.BitVector
 import Alpha.Data.Bit
-import Alpha.Data.Bits
+import Alpha.Data.BitVector
 
--- A model of a logic gate
+--A model of a logic gate
 class Gate (s::Symbol) (n::Nat) where
     type Input n    
     type Input n = BitVector n
@@ -24,13 +24,13 @@ class Gate (s::Symbol) (n::Nat) where
     process::Input n -> Bit
 
 instance Gate "and" 2 where
-    process x = (x .?. 0) && (x .?. 1) |> bit
+    process x = (x !! 0) && (x !! 1) |> bit
 
 instance Gate "or" 2 where
-    process x = (x .?. 0) || (x .?. 1) |> bit
+    process x = (x !! 0) || (x !! 1) |> bit
     
 instance Gate "not" 1 where
-    process x = ifelse (x .?. 0) on off
+    process x = (x !! 0) |> isOn  |> bit
     
 
 

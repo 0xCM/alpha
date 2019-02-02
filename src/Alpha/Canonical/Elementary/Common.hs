@@ -8,7 +8,6 @@ module Alpha.Canonical.Elementary.Common
 (
     module X,
     Singletary(..),
-    Tabular(..),
     Transposable(..),    
     Queryable(..),
     Filter(..),
@@ -33,11 +32,6 @@ class Filter a where
 class Singletary a where
     singleton::Individual a -> a
 
--- | Characterizes a rectangular data source
-class Tabular a where
-    rows::a -> [[Individual a]]
-    cols::a -> [[Individual a]]
-    
 class Transposable a where
     type Transposed a
     transpose::a -> Transposed a

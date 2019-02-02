@@ -7,6 +7,7 @@
 {-# LANGUAGE NoStarIsType #-}
 module Alpha.Base.Collections
 (
+    module X,
     HashSet, 
     StrictHashMap, LazyHashMap,
     StrictMap, LazyMap,    
@@ -20,26 +21,28 @@ module Alpha.Base.Collections
     Vector,
 )
 where
+import Control.DeepSeq(NFData)
+import Control.Monad
+import Data.Data(Data)
+import Data.Eq(Eq)
+import Data.Foldable(Foldable)
+import Data.Foldable
 import Data.HashSet(HashSet)
+import Data.Ix(Ix(..))
+import Data.List.NonEmpty
 import Data.Map.Strict(Map)
-import Data.Tree(Tree,Forest)
+import Data.Monoid(Monoid)
+import Data.Ord
 import Data.Set(Set)
 import Data.Sequence(Seq)
 import Data.Stream.Infinite
-import Data.List.NonEmpty
-import Data.Ix(Ix(..))
-import Data.Vector(Vector)
-import Data.Foldable
-import GHC.Exts(IsList(..))
-import Data.Ord
-import Data.Eq(Eq)
-import GHC.Generics(Generic)
 import Data.Semigroup(Semigroup)
-import Data.Monoid(Monoid)
-import Data.Foldable(Foldable)
-import Data.Data(Data)
-import Control.DeepSeq(NFData)
-import Alpha.Base.Newtype
+import Data.Tree(Tree,Forest)
+import Data.Vector(Vector)
+import GHC.Exts(IsList(..))
+import GHC.Generics(Generic)
+
+import Alpha.Base.Newtype as X
 
 import qualified Data.Map.Strict as SM
 import qualified Data.Map as LM
@@ -52,12 +55,4 @@ type StrictHashMap = SHM.HashMap
 
 type StrictMap = SM.Map
 type LazyMap = LM.Map
-
-
-
-
-
-
-
-
 

@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE PolyKinds #-}
-module Alpha.Data.TensorProduct
+module Alpha.Linear.Tensor
 (
 
 )

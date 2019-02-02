@@ -38,8 +38,6 @@ type UnitalRing a = (Unital a, Ring a)
 -- | A unital ring in which every nonzero element ahs a multiplicative inverse
 -- See https://en.wikipedia.org/wiki/Division_ring    
 type DivisionRing a = (UnitalRing a, Reciprocative a, Divisive a)
-
-instance Structure 1 Ring
     
 instance Ring Integer    
 instance Ring Int
@@ -58,3 +56,4 @@ instance Ring Float where
 instance Ring Double where 
 instance Ring CFloat where 
 instance Ring CDouble where
+instance Ring a => Ring (Complex a)

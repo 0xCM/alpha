@@ -7,7 +7,7 @@
 module Alpha.Canonical.Common.Individual
 (
     Individual(..),
-    Associated(..),
+    Membership(..),
     Discrete(..),
     Finite(..),
     Componentized(..),
@@ -18,8 +18,7 @@ module Alpha.Canonical.Common.Individual
     Initializing(..),
     Terminating(..),
     Degenerate(..),
-    IndexedMapping(..)
-
+    mapi,
 )
 where
 import Alpha.Canonical.Common.Root
@@ -38,20 +37,6 @@ type instance Individual (Stream a) = a
 type instance Individual (NonEmpty a) = a
 type instance Individual (Seq a) = a
 type instance Individual (Vector a) = a
---type instance Individual Integer = Integer
---type instance Individual Int = Int
--- type instance Individual Int8 = Int8
--- type instance Individual Int16 = Int16
--- type instance Individual Int32 = Int32
--- type instance Individual Int64 = Int64
--- type instance Individual (Ratio a) = Ratio a
--- type instance Individual Natural = Natural
--- type instance Individual Word = Word
--- type instance Individual Word8 = Word8
--- type instance Individual Word16 = Word16
--- type instance Individual Word32 = Word32
--- type instance Individual Word64 = Word64
---type instance Individual Bool = Bool
 
 -- | Characterizes a type that is comprised of individuals or
 -- can be discretized as such
@@ -67,9 +52,9 @@ class (Discrete a) => Finite a where
         
 -- | Characterizes a type that defines an association among a 
 -- collection of individuals
-class Associated a where
+class Membership a where
     -- | Specifies the members that participate in the association
-    associates::a -> [Individual a]    
+    members::a -> [Individual a]    
 
 -- / Characterizes a type that owns a collection of individuals
 class Componentized a where
@@ -112,14 +97,20 @@ newtype Construction a = Construction (Individual a)
 
 type instance Individual (Construction a) = Individual a
 
-class IndexedMapping a b where
-    mapi::((Int, Individual a) -> Individual b) -> a -> b    
+mapi::Eq a => ((Int, a) -> b) -> [a] -> [b]
+mapi f l = f <$> z where 
+    idx = [0..upper]
+    upper  = sub'  (fromIntegral $ List.length l) 1
+    z = List.zip idx l
+
+-- class IndexedMapping a b where
+--     mapi::((Int, Individual a) -> Individual b) -> a -> b    
     
-instance IndexedMapping [a] [b] where
-    mapi f l = f <$> z where 
-        idx = [0..upper]
-        upper  = sub'  (fromIntegral $ List.length l) 1
-        z = List.zip idx l
+-- instance IndexedMapping [a] [b] where
+--     mapi f l = f <$> z where 
+--         idx = [0..upper]
+--         upper  = sub'  (fromIntegral $ List.length l) 1
+--         z = List.zip idx l
 
 instance Constructive (Construction a) where
     construct (Construction x) = x

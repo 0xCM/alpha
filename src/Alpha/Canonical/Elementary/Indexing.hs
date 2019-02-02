@@ -24,6 +24,7 @@ module Alpha.Canonical.Elementary.Indexing
     bix,
     term,
     termix,
+    termval,
     ixrange,
 
 ) where
@@ -87,18 +88,24 @@ class Indexable a where
     type Indexer a = Int
     
     idx::a -> Indexer a -> Individual a
+    idx = (!!)
+    {-# INLINE idx #-}
 
     (!!)::a -> Indexer a -> Individual a
     (!!) = idx
+    {-# INLINE (!!) #-}
     infixr 9 !!
 
 -- | Characterizes an index that can safely fail
 class SafeIx s i where
     
     lookup::s -> i -> Maybe (Individual s)
+    lookup = (!?)
+    {-# INLINE lookup #-}
 
     (!?)::s -> i -> Maybe (Individual  s)
     (!?) = lookup
+    {-# INLINE (!?) #-}
     infixr 9 !?
 
 -- | Characterizes an element indexed via type-level naturals    
@@ -122,6 +129,10 @@ ixrange = IxRange
 -- | Constructs a t-parametric term indexed by 'i'
 term::i -> (i -> t) -> IxTerm i t
 term i t = IxTerm (i,t)
+
+-- | Evaluates a term
+termval::IxTerm i t -> t
+termval (IxTerm (i,f)) = f i
 
 -- | Determines the value of the terms's index
 termix::IxTerm i t -> i
@@ -181,8 +192,8 @@ instance (Eq a,Integral k) =>  SafeIx [a] k where
 -- * IxRange class membership
 -------------------------------------------------------------------------------            
 
-instance OrdEnum i => Associated (IxRange i) where
-    associates (IxRange (a,b)) = [a..b]
+instance OrdEnum i => Membership (IxRange i) where
+    members (IxRange (a,b)) = [a..b]
         
 instance (Formattable i) => Formattable (IxRange i) where
     format (IxRange (min,max)) 
@@ -197,7 +208,7 @@ instance (OrdEnum a) => SetBuilder (IxRange a) a where
         count = add' (fromIntegral (List.length s)) 1
         
 -------------------------------------------------------------------------------            
--- * IxRange class membership
+-- * IxTerm class membership
 -------------------------------------------------------------------------------            
 
 instance (Formattable i, Formattable t) => Formattable (IxTerm i t) where
@@ -235,33 +246,33 @@ instance (Ord k) => Indexable (IxFamily k v) where
     
 instance (OrdEnum a) => MultiIndexed 1 a where    
     mix (UniTuple1 r) =  UniTuple1 r
-    milevels (UniTuple1 r) = [UniTuple1 a | a <- associates r]
+    milevels (UniTuple1 r) = [UniTuple1 a | a <- members r]
 
 instance (OrdEnum a) => MultiIndexed 2 a where    
     mix (r1, r2) = (r1, r2)
     milevels (r1, r2) 
-        = [(a1,a2) | a1 <- associates r1, a2 <- associates r2]
+        = [(a1,a2) | a1 <- members r1, a2 <- members r2]
                     
 instance (OrdEnum a) => MultiIndexed 3 a where    
     mix (r1, r2, r3) = (r1 , r2, r3)
     milevels (r1, r2, r3) 
-        = [(a1,a2,a3) | a1 <- associates r1, a2 <- associates r2, a3 <- associates r3]
+        = [(a1,a2,a3) | a1 <- members r1, a2 <- members r2, a3 <- members r3]
 
 instance (OrdEnum a) => MultiIndexed 4 a where    
     mix (r1, r2, r3, r4) = (r1 , r2, r3, r4)
     milevels (r1, r2, r3, r4) 
         =  [(a1,a2,a3,a4) | 
-                a1 <- associates r1, 
-                a2 <- associates r2, 
-                a3 <- associates r3, 
-                a4 <- associates r4]
+                a1 <- members r1, 
+                a2 <- members r2, 
+                a3 <- members r3, 
+                a4 <- members r4]
 
 instance (OrdEnum a) => MultiIndexed 5 a where    
     mix (r1, r2, r3, r4, r5) = (r1 , r2, r3, r4, r5)
     milevels (r1, r2, r3, r4, r5) 
         =  [(a1,a2,a3,a4,a5) | 
-                a1 <- associates r1, 
-                a2 <- associates r2, 
-                a3 <- associates r3, 
-                a4 <- associates r4, 
-                a5 <- associates r5]    
+                a1 <- members r1, 
+                a2 <- members r2, 
+                a3 <- members r3, 
+                a4 <- members r4, 
+                a5 <- members r5]    

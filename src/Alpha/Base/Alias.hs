@@ -8,7 +8,10 @@ module Alpha.Base.Alias
     out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
     and',or',not', quotRem', divMod', gcd',lcm', quot', set',
     lt', gt', gteq', lteq', between',
+    sin', cos', tan', asin', acos', atan', sinh', cosh', asinh', acosh', atanh',
+    exp', log', logBase',
     powerset',
+    floatToDigits',complement'
 
 ) where
 import System.IO(IO,print)
@@ -21,13 +24,14 @@ import Data.Bool(Bool(..), (&&), (||), not)
 import Data.Set(Set(..),powerSet)
 import Data.Bits(Bits(..), xor,bit)
 import Data.Int(Int)
+import GHC.Float(RealFloat,Floating,(**), sin, cos, tan, asin, acos, atan, sinh, cosh, asinh, acosh, atanh, exp, log, logBase,floatToDigits )
 import GHC.Num(Num, (+),(-),(*),negate,abs)
-import GHC.Real(div,(/),(^),(^^), mod, rem, quot, quotRem, divMod, lcm, gcd, Fractional,Integral, numerator, denominator, Real, realToFrac,toRational)
-import GHC.Float(Floating,(**))
+import GHC.Real(div,(/),(^),(^^), mod, rem, quot, quotRem, divMod, lcm, gcd, Fractional, Integral, numerator, denominator, Real, realToFrac,toRational)
 import GHC.Base(flip)
 import GHC.Enum(Bounded(..))
 import GHC.Show(Show)
 import Data.Typeable(typeOf)
+import Prelude(Integer)
 
 import qualified Data.Set as Set
 import qualified Data.Map.Lazy as LM
@@ -190,3 +194,65 @@ set' = Set.fromList
 powerset'::Set' a -> Set' (Set' a)
 powerset' s =  Set.filter  (\x -> not (Set.null x)) (powerSet s)
 
+sin'::(Floating a) => a -> a
+sin' = sin
+{-# INLINE sin' #-}
+
+cos'::(Floating a) => a -> a 
+cos' = cos
+{-# INLINE cos' #-}
+
+tan'::(Floating a) => a -> a
+tan' = tan
+{-# INLINE tan' #-}
+
+asin'::(Floating a) => a -> a
+asin' = asin
+{-# INLINE asin' #-}
+
+acos'::(Floating a) => a -> a
+acos' = acos
+{-# INLINE acos' #-}
+
+atan'::(Floating a) => a -> a
+atan' = atan
+{-# INLINE atan' #-}
+
+sinh'::(Floating a) => a -> a
+sinh' = sinh
+{-# INLINE sinh' #-}
+
+cosh'::(Floating a) => a -> a
+cosh' = cosh
+{-# INLINE cosh' #-}
+
+asinh'::(Floating a) => a -> a
+asinh' = asinh
+{-# INLINE asinh' #-}
+
+acosh'::(Floating a) => a -> a
+acosh' = acosh
+{-# INLINE acosh' #-}
+
+atanh'::(Floating a) => a -> a
+atanh' = atanh
+{-# INLINE atanh' #-}
+
+exp'::(Floating a) => a -> a
+exp' = exp
+{-# INLINE exp' #-}
+
+log'::Floating a => a -> a
+log' = log
+{-# INLINE log' #-}
+
+logBase'::Floating a => a -> a -> a
+logBase' = logBase
+{-# INLINE logBase' #-}
+
+floatToDigits'::RealFloat a => Integer -> a -> ([Int],Int)
+floatToDigits' = floatToDigits
+{-# INLINE floatToDigits' #-}
+
+complement'::(Bits a) => a -> a
+complement' = complement

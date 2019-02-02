@@ -113,9 +113,9 @@ class Implication a where
 class Biconditional a where
     iff::a -> a -> Bool
 
-    (<->)::a -> a -> Bool
-    (<->) = iff
-    infixr 1 <->
+    (<=>)::a -> a -> Bool
+    (<=>) = iff
+    infixr 1 <=>
     
 class Invertive a where
     not::a -> Bool

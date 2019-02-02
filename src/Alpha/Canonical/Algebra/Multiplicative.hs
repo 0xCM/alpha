@@ -45,6 +45,8 @@ class Multiplicative a where
 class Bimultiplicative a b where
     -- | Multiplies the first operand by the second
     bimul::a -> b -> Multiplied a b
+    bimul = (>*<)
+    {-# INLINE bimul #-}    
 
     -- | Infix synonym for 'hmul'
     (>*<)::a -> b -> Multiplied a b

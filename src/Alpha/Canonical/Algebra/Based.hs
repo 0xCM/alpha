@@ -17,15 +17,25 @@ module Alpha.Canonical.Algebra.Based
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Common
+import Alpha.Canonical.Algebra.Numeric
 
 import qualified Data.Vector as Vector
 import qualified Data.List as List
 import qualified Data.Set as Set
 
 -- Represents a numeric base
-newtype Radix b = Radix Natural
-    deriving(Show,Eq,Ord,Num)
+newtype Radix = Radix Natural
+    deriving(Eq,Ord,Num, 
+        Subtractive, LeftDistributive, RightDistributive,
+        Additive, Divisive,Real,Power, Multiplicative, Unital,
+        Numeric, ToDouble,ToInt,ToInteger,FromDouble,FromInt,FromNatural,ToNatural)
 
+instance Formattable Radix where
+    format (Radix n) = format n
+
+instance Show Radix where
+    show = string . format
+    
 -- | Represents an number in a particular base
 data Based (b::Nat) i = Based !i
 
@@ -49,7 +59,7 @@ base10 = based @10
 base16::a -> Based 16 a
 base16 = based @16
 
-radix::forall b. KnownNat b => Radix b
+radix::forall b. KnownNat b => Radix
 radix = Radix $ natg @b
 
 --encoding64::Vector.Vector Char

@@ -10,7 +10,7 @@ module Alpha.Base.Text
     String, Text,
     IsString,
     Show(..), 
-    Read(..), readEither, readMaybe,
+    Read(..), readEither, readMaybe, read, 
     Char,chr,intToDigit,
     SomeSymbol, KnownSymbol, Symbol, SymbolPair, symbolVal, symbolVal', symbol,
 )
@@ -24,7 +24,7 @@ import Data.Proxy
 import Data.Function
 import Data.Text(Text)
 import Data.String(IsString(..))
-import Text.Read(readEither,readMaybe)
+import Text.Read(readEither,readMaybe,read)
 import Data.String(String,IsString)
 import Data.Char(Char,intToDigit)
 import qualified Data.Char as Char

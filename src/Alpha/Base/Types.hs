@@ -23,7 +23,7 @@ module Alpha.Base.Types
     Proxy(..), proxy, 
 
     SomeSymbol, KnownSymbol, symstr, symtext, someSymbolVal,
-    KnownNat, SomeNat, Nat, nat, natg, 
+    KnownNat, SomeNat, Nat, nat, natg, natrange,natpair,
     
     
     typeof,
@@ -54,6 +54,7 @@ import Data.Int(Int)
 import Data.Data(Data(..),)  
 import Data.Text(Text)
 import GHC.Show(Show)
+import Alpha.Base.Alias
 
 import qualified Data.Text as Text
 import qualified Type.Reflection as Reflect
@@ -109,12 +110,12 @@ infixl 5 %
 type (/) m n = Div m n
 infixl 7 /
 
-proxy:: Proxy n
+proxy::Proxy n
 proxy = Proxy
 {-# INLINE proxy #-}
 
 -- | Produces a string for a symbol
-symstr :: forall s. KnownSymbol s => String
+symstr::forall s. KnownSymbol s => String
 symstr = symbolVal @s Proxy
 
 -- | Produces a text for a symbol
@@ -131,3 +132,14 @@ natg::forall m i. (KnownNat m, Integral i) => i
 natg = fromIntegral (natVal (proxy @m))
 {-# INLINE natg #-}
 
+-- | Constructs a list of integers [0..n - 1] where n is a type-level natural
+natrange::forall n i. (KnownNat n, Integral i) => [i]
+natrange =[0 .. (sub' (natg @n) 1)]
+{-# INLINE natrange #-}
+
+-- | Constructs a pair of integers determined by type-level naturals
+natpair::forall m n i. (KnownNat m, KnownNat n, Integral i) => (i,i)
+natpair = (natg @m, natg @n)
+{-# INLINE natpair #-}
+
+--natrange2::forall m n i (KnownNat m, KnownNat n, Integral i,)

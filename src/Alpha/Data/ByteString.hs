@@ -16,7 +16,7 @@ module Alpha.Data.ByteString
 )
 where
 import Alpha.Canonical hiding(range)
-import Alpha.Data.Bits
+import Alpha.Data.Bit
 import System.Entropy
 import Data.Ix(range)
 import Data.Aeson (FromJSON, ToJSON, decode, encode)

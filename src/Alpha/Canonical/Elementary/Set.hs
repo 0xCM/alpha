@@ -147,11 +147,11 @@ instance Ord a => IsList (FneSet a) where
     fromList ([]) = error "no"
     fromList (xs) = FneSet (fromList xs)
 
-instance Ord a => Associated (FneSet a) where
-    associates (FneSet s) = toList s
+instance Ord a => Membership (FneSet a) where
+    members (FneSet s) = toList s
 
 instance Ord a => Discrete (FneSet a) where
-    individuals = associates        
+    individuals = members
 
 instance Ord a => Finite (FneSet a)
     
@@ -224,16 +224,16 @@ instance Ord a => IsList (Set a) where
 
     fromList (xs) = FiniteSet (fromList xs)    
 
-instance Ord a => Associated (Set a) where
-    associates (FiniteSet s) = toList s
-    associates (InfiniteSet s) = s
-    associates (_) = []
+instance Ord a => Membership (Set a) where
+    members (FiniteSet s) = toList s
+    members (InfiniteSet s) = s
+    members (_) = []
     
 instance Ord a => Discrete (Set a) where
-    individuals = associates
+    individuals = members
 
 instance Ord a => Finite (Set a) where
-    count = fromIntegral . List.length . associates
+    count = fromIntegral . List.length . members
         
 instance (Ord a) => Unionizable (Set a) where
     union EmptySet x = x

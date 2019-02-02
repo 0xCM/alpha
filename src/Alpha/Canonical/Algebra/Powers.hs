@@ -10,7 +10,7 @@ module Alpha.Canonical.Algebra.Powers
     Power(..),    
     IntegralPower(..),
     FloatingPower(..),
-
+    Exponential(..),
 )
 where
 

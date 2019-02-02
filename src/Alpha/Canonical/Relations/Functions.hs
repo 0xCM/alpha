@@ -14,13 +14,11 @@ module Alpha.Canonical.Relations.Functions
     End(..),
     Func(..),
     Preimage(..),
-    --Function(..),
     Composition(..), 
     Compositional(..), 
     Functional(..),
     Uncurried, Curried, 
     Curriable(..), Uncurriable(..),
-    Computable(..),    
 ) where
 import Alpha.Base
 import Alpha.Canonical.Elementary
@@ -151,15 +149,6 @@ instance Function (a -> b) where
     fx::(a -> b) -> a -> b
     fx = id
 
--- | Characterizes a deferred computation or a computation
--- specification    
-class Computable a where
-
-    -- | The type of computed value
-    type Computed a
-
-    -- | Effects the computation
-    compute::a -> Computed a
 
 -- | Characterizes function composition    
 class Compositional g f where

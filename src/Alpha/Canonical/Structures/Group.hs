@@ -41,7 +41,6 @@ class Identity a => Inverter a where
 class Composer a where
     compose::Individual a -> Individual a -> Individual a
 
-
 class Group a where
     inverse::Individual a -> Individual a
 
@@ -109,6 +108,7 @@ instance AbelianGroup CFloat where
 instance AbelianGroup CDouble where                                 
 instance (Eq a, Negatable a, Additive a,Nullary a) => AbelianGroup (Complex a)
 instance AbelianGroup Rational
+
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)
 type AG3 a1 a2 a3 = (AG2 a1 a2, AbelianGroup a3)

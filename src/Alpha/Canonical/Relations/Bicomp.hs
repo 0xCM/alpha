@@ -32,20 +32,21 @@ type BiComparer a b = a -> b -> Bool
 class BiLT a b where
     lt::BiComparer a b
 
-    (.<.)::BiComparer a b
-    (.<.) = lt
-    {-# INLINE (.<.) #-}
-    infix 4 .<.
+    (><<)::BiComparer a b
+    (><<) = lt
+    {-# INLINE (><<) #-}
+    infix 4 ><<
 
 -- / Characterizes pairs of (potentially) heterogenous types that
 -- support a greater than relation
 class BiGT a b where
     gt::BiComparer a b
 
-    (.>.)::BiComparer a b
-    (.>.) = gt
-    {-# INLINE (.>.) #-}
-    infix 4 .>.
+    
+    (>><)::BiComparer a b
+    (>><) = gt
+    {-# INLINE (>><) #-}
+    infix 4 >><
 
 class BiEQ a b where
     eq::BiComparer a b
@@ -58,18 +59,18 @@ class BiEQ a b where
 class BiLTEQ a b where
     lteq::BiComparer a b
 
-    (.<=.)::BiComparer a b
-    (.<=.) = lteq
-    {-# INLINE (.<=.) #-}
-    infix 4 .<=.
+    (><=<)::BiComparer a b
+    (><=<) = lteq
+    {-# INLINE (><=<) #-}
+    infix 4 ><=<
 
 class BiGTEQ a b where
     gteq::BiComparer a b
 
-    (.>=.)::BiComparer a b
-    (.>=.) = gteq
-    {-# INLINE (.>=.) #-}
-    infix 4 .>=.
+    (>>=<)::BiComparer a b
+    (>>=<) = gteq
+    {-# INLINE (>>=<) #-}
+    infix 4 >>=<
 
 class (BiLT a b, BiGT a b, BiEQ a b, BiLTEQ a b, BiGTEQ a b) => BiComparable a b where
 

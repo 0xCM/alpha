@@ -1,11 +1,11 @@
 module Alpha.Canonical.Structures.Simplex
 (
-    Simplex(..),
-    SimplicalComplex(..)
+
 )
 where
 import Alpha.Canonical.Algebra
--- This development foolows the interpretation of a simplex as defined by Y2008DAT
+
+-- This development folows the interpretation of a simplex as defined by Y2008DAT
 -- which states on p. 197 that:
 -- A simplicial complex K := (E,S) consists of a set 
 -- E of vertices and a set S of finite non-empty subsets of E. 

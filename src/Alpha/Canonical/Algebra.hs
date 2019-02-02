@@ -4,7 +4,7 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Algebra(module X) where
+module Alpha.Canonical.Algebra(module X, kdelta) where
 import Alpha.Canonical.Collective as X
 import Alpha.Canonical.Algebra.Action as X
 import Alpha.Canonical.Algebra.Metrizable as X
@@ -31,3 +31,5 @@ import Alpha.Canonical.Algebra.Powers as X
 import Alpha.Canonical.Algebra.Rational as X
 
 
+kdelta::(Eq a, Nullary a, Unital a) => a -> a -> a
+kdelta i j = ifelse (i == j) one zero 

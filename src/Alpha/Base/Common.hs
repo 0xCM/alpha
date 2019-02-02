@@ -19,8 +19,7 @@ module Alpha.Base.Common
     Enum, fromEnum, toEnum,
     ($),undefined, const,    
     error, fst, snd,
-    Bounded, minBound, maxBound,    
-    Ptr, Storable, poke, peek, sizeOf, alignment, castPtr,     
+    Bounded, minBound, maxBound,         
     when,
     seq,
 )
@@ -31,6 +30,9 @@ import Data.Either(Either(..))
 import Data.Maybe(Maybe(..),isNothing,fromJust)
 import Data.Function(const)
 import Data.ByteString(ByteString)
+import Data.Int
+import Data.Word
+import Data.Bool
 import Data.Ord(Ord)
 import Data.Hashable(Hashable(..))
 import GHC.Natural(Natural(..))
@@ -38,16 +40,11 @@ import GHC.Base(($),undefined, id, (.),seq,when)
 import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
 import GHC.Real(Integral(..))
 import GHC.Exts(Constraint(..))
-import Foreign.Storable(Storable,poke, peek, sizeOf, alignment)
-import Foreign.Ptr (Ptr, castPtr)
 import Prelude(error,fst,snd)
-import Data.Int
-import Data.Word
-import Data.Bool
 import Data.Type.Equality as Equality
 import Data.Proxy as Proxy
-import qualified GHC.Natural as TN
-import qualified GHC.TypeLits as TL
+-- import qualified GHC.Natural as TN
+-- import qualified GHC.TypeLits as TL
 
 
     
@@ -66,8 +63,3 @@ isNone = isNothing
 -- | Determines whether the 'Maybe' is non-valued
 isSome :: Maybe b -> Bool
 isSome = not . isNothing
-
-
-
-    
-

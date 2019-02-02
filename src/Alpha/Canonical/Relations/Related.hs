@@ -37,9 +37,10 @@ module Alpha.Canonical.Relations.Related
     GTEQ(..), 
     Comparable(..),   
     Quotient(..),
+    Equation(..),
+    Inversion(..),
 
 ) where
---import Algebra.PartialOrd 
 import Alpha.Base
 import Alpha.Canonical.Elementary
 import Alpha.Canonical.Relations.Logical
@@ -49,9 +50,6 @@ import qualified Prelude as P
 import qualified Data.Map as Map
 import qualified Data.List as List
 
---type family Infimum a
---type family Supremum a    
---type family Extremum a
 type family Quotient a
 
 
@@ -69,8 +67,21 @@ newtype Pairs a b = Pairs [(a,b)]
     deriving (Show,Eq,Ord,Generic)
 instance Newtype (Pairs a b)
 
+-- | Represents a relation between two expressions/values of
+-- the same type
 newtype Relation a = Relation (a, a)
     deriving(Eq,Generic,Ord)
+
+-- | Represents a relation between two expressions/values
+-- of the form a := b of (potentially) different types
+newtype Equation a b = Equation (a,b)
+    deriving (Eq, Ord, Generic, Data, Typeable)     
+
+-- | Captures an inversion relation between two values
+-- of the same type. What *inversion* means is context 
+-- dependent.
+newtype Inversion a = Inversion (a, a)    
+    deriving (Eq, Ord, Generic, Data, Typeable)     
 
 -- Characterizes a binary relation on a set s    
 class (Eq a) =>  Relational a where
@@ -242,7 +253,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
         
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
-class Equivalence a => Setoid a where
+class (Membership a, Equivalence a) => Setoid a where
 
 
 -- | Characterizes a type for which a minimal element can be identified

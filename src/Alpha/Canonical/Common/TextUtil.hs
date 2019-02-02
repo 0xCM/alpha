@@ -4,8 +4,6 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE FlexibleInstances #-}
-
 module Alpha.Canonical.Common.TextUtil
 (    
     splat, isPrefix, isSuffix,

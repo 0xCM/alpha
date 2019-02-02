@@ -32,6 +32,10 @@ module Alpha.Canonical.Common.Root
     Nullity(..),
     Cell(..),
     Cellular(..),
+    Computable(..),    
+    Complementable(..),
+    FloatInfo(..),
+    floatinfo,
     enumValues,
     typeSymbol,
     typeSymbols,
@@ -59,6 +63,7 @@ import qualified Data.Stream.Infinite as Stream
 import qualified Data.Vector as Vector
 import qualified Numeric.Interval as Interval
 
+
 -- | Represents a located value
 newtype Cell l v = Cell (l, v)
     deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
@@ -77,6 +82,7 @@ class Cellular a where
     -- | Extracts a cell's location
     location::Cell (Location a) (Value a) -> Location a
 
+    
 
 -- Characterizes a type with wich a description may be associated
 class Descriptor a b where
@@ -145,8 +151,17 @@ class Weave g t where
 
     -- Weaves a grain 'g' with a target 't' to produce a 'Woven g t' value
     weave::g -> t -> Woven g t        
-    
-    
+        
+-- | Characterizes a deferred computation or a computation
+-- specification    
+class Computable a where
+
+    -- | The type of computed value
+    type Computed a
+
+    -- | Effects the computation
+    compute::a -> Computed a
+
 -- | Classifies a type to which a cardinality may be assigned    
 class Cardinal a where
 
@@ -229,6 +244,22 @@ class Generative a where
     type Generated a
     generate::a -> [Generated a]
     
+-- | Characterizes a type that supports the notion of 'complement'
+-- in the following sense: complement . complement = id
+class Complementable a where
+    complement::a -> a    
+
+-- | Describes floating-point characteristics that are speific to the
+-- executing machine that includes 
+-- 1. floating point radix ,
+-- 2. the number of digits in the significand (relative to the radix)
+-- 3. the min/max value of the floating point exponent
+-- For a typical x86-64bit machine, the respective values are 2, 53 and (-1021,1024)
+data FloatInfo a = FloatInfo Integer Int (Int,Int)
+    deriving(Eq,Ord,Generic,Data,Typeable,Show)
+
+floatinfo:: forall a. RealFloat a => FloatInfo a
+floatinfo = FloatInfo (floatRadix zed ) (floatDigits zed) (floatRange zed)
 
 facetVal::(Faceted f v) => v -> FacetValue f v
 facetVal val = FacetValue val    

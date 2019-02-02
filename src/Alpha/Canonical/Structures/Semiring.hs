@@ -73,3 +73,4 @@ instance Semiring Float
 instance Semiring Double
 instance Semiring CFloat
 instance Semiring CDouble
+instance (Semiring a, Subtractive a) => Semiring (Complex a)

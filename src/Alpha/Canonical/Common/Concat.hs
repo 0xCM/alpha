@@ -26,9 +26,12 @@ class Concatenable a b where
     type Concatenated a b
 
     concat::a -> b -> Concatenated a b
+    concat = (++)
+    {-# INLINE concat #-}
 
     (++)::a -> b -> Concatenated a b
     (++) x y = concat x y
+    {-# INLINE (++) #-}
     infixr 5 ++
 
 -- | Defines a family of type-level functions with the intent

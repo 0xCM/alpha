@@ -111,6 +111,7 @@ pattern Period = "."::Text
 pattern LArrow = "<--"::Text
 -- | Produces "->"
 pattern RArrow = "-->"::Text
+pattern PlusMinus = "+/-"::Text
 
 pattern RMap = ":-->"::Text
 pattern LMap = "<--:"::Text

@@ -16,4 +16,6 @@ import Alpha.Base.Types as X
 import Alpha.Base.Common as X
 import Alpha.Base.System as X
 import Alpha.Base.Alias as X
+import Alpha.Base.Foreign as X
+import Alpha.Base.Array as X
 

@@ -26,7 +26,6 @@ import qualified Data.List as List
 import Math.NumberTheory.Primes(factorise) 
 import Math.NumberTheory.Euclidean(extendedGCD)
 
-
 modN::forall n i. (KnownNat n, Integral i) => Residue n i
 modN = Residue (natg @n)
 
@@ -133,9 +132,9 @@ newtype Factorization a = Factorization [(a,Int)]
 
 -- | Characterizes a unique factorization domain    
 class (GcdDomain a) => Ufd a where
-    factor::a -> Factorization a
-    default factor::(Integral a) => a -> Factorization a        
-    factor a = (\(n,p) -> (fromIntegral n,p)) <$> factors  |> Factorization where
+    factor::a -> [(a,Int)]
+    default factor::(Integral a) => a -> [(a,Int)] 
+    factor a = (\(n,p) -> (fromIntegral n,p)) <$> factors  where
         factors = factorise (fromIntegral a)
 
 -- | Characterizes a principal ideal domain        

@@ -13,9 +13,8 @@ module Alpha.Canonical.Structures.Module
     LeftModule(..), 
     RightModule(..),
     Module(..),
+    FreeModule(..),
     Bimodule(..),
-    Basis(..),
-    FiniteBasis(..),
         
 ) where
 import Alpha.Canonical.Algebra
@@ -40,27 +39,15 @@ type Module r m = (LeftModule r m, RightModule m r)
 -- | Represents a bimodule where left and right rings potentially differ
 -- See https://en.wikipedia.org/wiki/Bimodule   
 class (LeftModule r m, RightModule m s) => Bimodule r m s where
-
     
--- | Characterizes a module basis    
-class (LeftModule r m, s ~ BasisSet m) => Basis r m s where
-    basis::s -> BasisSet m
-            
--- | Characterizes a finite module basis 
-class (KnownNat n, Finite m, Basis r m s) => FiniteBasis n r m s where
-
-
+                
 -- | A free module is a module with a basis
 -- See https://en.wikipedia.org/wiki/Free_module    
-class (LeftModule r m, Basis r m s) => FreeModule r m s where
+class (KnownNat n, LeftModule r m) => FreeModule n r m where
+    basis::m -> BasisSet m
 
 
 data ChainComplex = ChainComplex (forall r m. LeftModule r m => [(Integer, m)])
-
-instance Structure 2 LeftModule
-instance Structure 2 RightModule
-instance Structure 3 Bimodule
-instance Structure 3 FreeModule
 
 -- | Captures the invariant that every Abelian group is a module over the
 -- ring of integers
@@ -78,5 +65,3 @@ instance Category ModuleHom where
 instance End ModuleHom where
     end x = unwrap x 
 
--- instance Function ModuleHom where
---     fx f = end f
