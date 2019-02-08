@@ -8,11 +8,9 @@
 module Alpha.Base.Algebra
 (
     Arg, ArgMin, ArgMax,
-    Bool(..),
-    --(&&), (||), not, 
-    otherwise, 
+    Bool(..), otherwise, 
     Monoid(..),
-    Dual(..), Endo(..), All(..), Any(..),
+    Endo(..), All(..), Any(..),
     Semigroup(..), Min(..), Max(..), First(..), Last(..),
     Groupoid(..),
     Semigroupoid(..), 
@@ -21,13 +19,11 @@ module Alpha.Base.Algebra
     Functor(..),
     Eq(..), (!=),
     Bounded(..), Enum(..),
-    JoinSemiLattice(..), MeetSemiLattice(..), Lattice(..),
-
 )
 where
 import Data.Eq(Eq(..),(==),(/=))
 import Data.Monoid(Monoid(mempty, mappend,mconcat))
-import Data.Monoid(Dual(..), Endo(..), All(..), Any(..),  Alt(..))    
+import Data.Monoid(Endo(..), All(..), Any(..),  Alt(..))    
 import Data.Bool(Bool(..), (&&), (||), not, otherwise)
 import Data.Functor(Functor(..))
 import Data.Groupoid(Groupoid(..))
@@ -36,7 +32,6 @@ import Data.Ord(Ord(..),Ordering)
 import Data.Semigroupoid(Semigroupoid(..))
 import Data.Foldable(Foldable, foldMap, fold, foldr, foldr', foldl, foldl')
 import GHC.Enum(Bounded(..),Enum(..))
-import Algebra.Lattice(JoinSemiLattice((\/)),MeetSemiLattice((/\)))
 import Algebra.Lattice(Lattice(..))   
 
 

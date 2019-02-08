@@ -22,6 +22,8 @@ module Alpha.Base.Common
     Bounded, minBound, maxBound,         
     when,
     seq,
+    asTypeOf,
+    foldl'
 )
 where
 
@@ -34,9 +36,10 @@ import Data.Int
 import Data.Word
 import Data.Bool
 import Data.Ord(Ord)
+import Data.List(foldl')
 import Data.Hashable(Hashable(..))
 import GHC.Natural(Natural(..))
-import GHC.Base(($),undefined, id, (.),seq,when)
+import GHC.Base(($),undefined, id, (.),seq,when,asTypeOf)
 import GHC.Enum(Enum, fromEnum,toEnum, Bounded,minBound,maxBound)
 import GHC.Real(Integral(..))
 import GHC.Exts(Constraint(..))

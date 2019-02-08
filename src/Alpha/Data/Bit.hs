@@ -24,14 +24,14 @@ where
 import Alpha.Canonical
 import Data.Bits(Bits(..))
 import qualified Data.List as List
+import qualified Algebra.Lattice as Lattice
 
 -- | Taken from bool8
 data {-# CTYPE "HsBool" #-} Flag = On | Off
     deriving (Eq, Enum, Ord, Generic, Data, Typeable, Read, Bounded)
 
 newtype Bit = Bit Flag
-    deriving (Eq, Ord, Generic, Data, Typeable, Read, 
-        Invertive, Implication, ExclusivelyDisjunct, Biconditional, 
+    deriving (Eq, Ord, Generic, Data, Typeable, Read, Invertive, 
         Propositional, JoinSemiLattice,MeetSemiLattice,  Lattice
         )
 
@@ -146,12 +146,21 @@ hibyte x  = (x .>.8) .&. 0xFF |> integral
             
 instance Unsignable Bit
 
-
-instance Disjunctive (Bit) where
+instance Disjunctive Bit where
     (Bit x) || (Bit y) = x || y
+    {-# INLINE (||) #-}
 
-instance Conjunctive (Bit) where
+instance XDisjunctive Bit where
+    (Bit x) ^| (Bit y) = x ^| y
+    {-# INLINE (^|) #-}    
+
+instance Conjunctive Bit where
     (Bit x) && (Bit y) = x && y
+    {-# INLINE (&&) #-}
+
+instance Biconditional Bit where
+    (Bit x) <=> (Bit y) = x <=> y
+    {-# INLINE (<=>) #-}
 
 instance Disjunctive Flag where
     On || On = True
@@ -160,12 +169,12 @@ instance Disjunctive Flag where
     Off || Off = False
     {-# INLINE (||) #-}
 
-instance ExclusivelyDisjunct Flag where
-    lxor On On = False
-    lxor On Off = True
-    lxor Off On = True
-    lxor Off Off = False
-    {-# INLINE lxor #-}
+instance XDisjunctive Flag where
+    On ^| On = False
+    On ^| Off = True
+    Off ^| On = True
+    Off ^| Off = False
+    {-# INLINE (^|) #-}
     
 instance Conjunctive Flag where
     On && On = True
@@ -174,19 +183,19 @@ instance Conjunctive Flag where
     Off && Off = False
     {-# INLINE (&&) #-}
 
-instance Implication Flag where
-    implies On On = True
-    implies On Off = False
-    implies Off On = True
-    implies Off Off = True
-    {-# INLINE implies #-}
+instance Implicative Flag where
+    On ==> On = True
+    On ==> Off = False
+    Off ==> On = True
+    Off ==> Off = True
+    {-# INLINE (==>) #-}
 
 instance Biconditional Flag where
-    iff On On = True
-    iff On Off = False
-    iff Off On = False
-    iff Off Off = True
-    {-# INLINE iff #-}
+    On <=> On = True
+    On <=> Off = False
+    Off <=> On = False
+    Off <=> Off = True
+    {-# INLINE (<=>) #-}
         
 instance Invertive Flag where
     not On = False
@@ -195,11 +204,11 @@ instance Invertive Flag where
         
 instance Propositional Flag    
 
-instance JoinSemiLattice Flag where
+instance Lattice.JoinSemiLattice Flag where
     (\/) x y = ifelse (x || y) On Off
     {-# INLINE (\/) #-}
 
-instance MeetSemiLattice Flag where
+instance Lattice.MeetSemiLattice Flag where
     (/\) x y = ifelse (x && y) On Off
     {-# INLINE (/\) #-}
 
@@ -209,8 +218,11 @@ instance ToBit Flag where
 instance Lattice Flag where                
 
 instance Universe Flag where
-    inhabitants = FiniteSet (fromList enumerate)
-    
+    inhabitants = set ivalues
+
+instance Implicative Bit where
+    (Bit a) ==> (Bit b) = a ==> b
+        
 instance ToInt Bit where
     int (Bit flag) = ifelse (flag == On) 1 0
     {-# INLINE int #-}
@@ -312,7 +324,7 @@ instance Enum Bit where
     {-# INLINE toEnum #-}
 
 instance Universe Bit where
-    inhabitants = FiniteSet (fromList enumerate)
+    inhabitants = set ivalues
     
 instance Storable Bit where
     sizeOf _ = 1
@@ -361,29 +373,24 @@ instance Bits Bit where
     popCount (Bit On) = 1
     popCount (Bit Off) = 0
 
-instance Concatenable Word8 Word8 where
-    type Concatenated Word8 Word8 = Word16
+instance Concatenable Word8 where
     concat x y = bitsplat 8 x y
             
-instance Concatenable Word16 Word16 where    
-    type Concatenated Word16 Word16 = Word32
+instance Concatenable Word16 where    
     concat x y = bitsplat 16 x y
 
-instance Concatenable Word32 Word32 where
-    type Concatenated Word32 Word32 = Word64
+instance Concatenable Word32 where
     concat x y = bitsplat 32 x y
 
-instance Concatenable Int8 Int8 where
-    type Concatenated Int8 Int8 = Int16
+instance Concatenable Int8 where
     concat x y = bitsplat 8 x y
             
-instance Concatenable Int16 Int16 where
-    type Concatenated Int16 Int16 = Int32
+instance Concatenable Int16 where
     concat x y = bitsplat 16 x y
 
-instance Concatenable Int32 Int32 where
-    type Concatenated Int32 Int32 = Int64
+instance Concatenable Int32 where
     concat x y = bitsplat 32 x y    
+    
 instance Formattable BitString where
     format (BitString bits) =  format <$> bits |> append |> prefix n
         where n = ((length bits)::Int) |> format |> parenthetical |> pad
@@ -484,4 +491,3 @@ instance FiniteBitfield Word32 where
     bitcount = finiteBitSize
 instance FiniteBitfield Word64 where
     bitcount = finiteBitSize
-

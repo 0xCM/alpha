@@ -10,6 +10,7 @@ module Alpha.Canonical.Structures.Domain
     module X,
     IntegralDomain(..),
     IntegralNumeric(..),
+    DomainInt(..),
     NaturalNumeric(..),
     IntDomain(..),
     GcdDomain(..),
@@ -123,7 +124,7 @@ class IntegralDomain a => GcdDomain a where
     {-# INLINE lcm #-}
 
 type IntegralNumeric a = (Numeric a, Integral a, IntegralDomain a)
-
+type DomainInt a = (Integral a, Numeric a, TotalOrd a, IntegralDomain a) 
 -- | Classifies unsigned integral numeric values    
 type NaturalNumeric a = (IntegralNumeric a, UnsignedIntegral a) 
 
@@ -242,16 +243,17 @@ instance forall n i. (KnownNat n, IntDomain i) => Multiplicative (Residue n i) w
 instance forall n i. (KnownNat n, IntDomain i) => Unital (Residue n i) where        
     one = residue one
 
-instance forall n i. (KnownNat n, IntDomain i) => Discrete (Zn n i) where        
+instance forall n i. (KnownNat n, IntDomain i) => Discrete (Zn n i) where 
     individuals (Zn x) = x
     
-instance forall n i. (KnownNat n, IntDomain i) => Finite (Zn n i)
+instance forall n i. (KnownNat n, IntDomain i) => FinitelyCountable (Zn n i) where
+    count _ = natg @n
     
 instance (KnownNat n, IntDomain i) => Discrete (Residue n i) where
     individuals _ = individuals $ zN @n    
 
-instance (KnownNat n, IntDomain i) => Finite (Residue n i)
-    
+instance forall n i. (KnownNat n, IntDomain i) => FinitelyCountable (Residue n i) where
+    count _ = natg @n
 
 instance (KnownNat n, IntDomain i) => AbelianGroup (Residue n i)        
 instance (KnownNat n, IntDomain i) => FiniteAbelianGroup (Residue n i)        

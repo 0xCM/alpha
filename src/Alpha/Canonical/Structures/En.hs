@@ -195,13 +195,13 @@ instance (OrderedRing k) => NatBasisElement 5 5 k where
     en = E5 (zero,zero,zero,zero, one)
 
 instance (OrderedRing k) => NatBasis 1 k where    
-    natbasis = BasisSet $ FiniteSet [en @1 @1]
+    natbasis = BasisSet $ set [en @1 @1]
 instance (OrderedRing k) => NatBasis 2 k where
-    natbasis = BasisSet $ FiniteSet [en @2 @1, en @2 @2]
+    natbasis = BasisSet $ set [en @2 @1, en @2 @2]
 instance (OrderedRing k) => NatBasis 3 k where
-    natbasis = BasisSet $ FiniteSet [en @3 @1, en @3 @2, en @3 @3]    
+    natbasis = BasisSet $ set [en @3 @1, en @3 @2, en @3 @3]    
 instance (OrderedRing k) => NatBasis 4 k where
-    natbasis = BasisSet $ FiniteSet [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
+    natbasis = BasisSet $ set [en @4 @1, en @4 @2, en @4 @3, en @4 @4]        
 instance (OrderedRing k) => NatBasis 5 k where
-    natbasis = BasisSet $ FiniteSet [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
+    natbasis = BasisSet $ set [en @5 @1, en @5 @2, en @5 @3, en @5 @4, en @5 @5]
 

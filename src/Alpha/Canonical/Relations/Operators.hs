@@ -7,6 +7,7 @@
 {-# LANGUAGE DataKinds #-}
 module Alpha.Canonical.Relations.Operators
 (    
+    module X,
     Operator(..), operation,
 
     Commutative(..), 
@@ -15,17 +16,15 @@ module Alpha.Canonical.Relations.Operators
     UnaryOperator(..),
 
     scompose, associator,associative, 
-    endoply, cartesian, dual, endo, left,right, 
-    Iterable(..),    
+    endoply, cartesian, endo, left,right, 
 ) where
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Relations.Functions
+import Alpha.Canonical.Relations.Common
+import Alpha.Canonical.Relations.Functions as X
 
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Map as Map
 import qualified Data.List as List
 import qualified Data.Text as Text
-
 
 -- | Characterizes an operator defined in a structured context
 class KnownNat n => Operator n f a where            
@@ -45,9 +44,6 @@ class Commutative a where
 -- | Characterizes a type that can produce an associative binary operator
 class Associative a where
     
--- | Characterizes a type over which function iterates may be computed
-class Iterable a where
-    iterate :: O1 (Individual a) -> (Individual a) -> a
 
 -- | An operation is an operator with known domain and arity
 newtype Operation n f a = Operation f
@@ -98,8 +94,6 @@ endo f = Endo f
 cartesian::[a] -> [a] -> [(a,a)]
 cartesian xs ys =  [(x,y) | x <- xs, y <- ys]
         
-dual::Monoid a => [a] -> Dual a
-dual src = fold (fmap  Dual src)
 
 
 instance Iterable [a] where

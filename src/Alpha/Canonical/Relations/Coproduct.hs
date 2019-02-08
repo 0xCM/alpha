@@ -9,7 +9,7 @@
 
 module Alpha.Canonical.Relations.Coproduct
 (
-    
+    module X,    
     NSum, Sum1(..), Sum2(..), Sum3(..), Sum4(..), Sum5(..),
     type (!+!),
     (!+), (+!),
@@ -17,11 +17,9 @@ module Alpha.Canonical.Relations.Coproduct
     comap1, comap2, comap3, comap4, comap5,
 
 ) where
-import Alpha.Base
-import Alpha.Canonical.Common
-import Alpha.Canonical.Relations.Product
-import Alpha.Canonical.Relations.Functions
-
+import Alpha.Canonical.Relations.Common    
+import Alpha.Canonical.Relations.Product as X
+import Alpha.Canonical.Relations.Functions as X
     
 -- A single-case sum
 data Sum1 a1 

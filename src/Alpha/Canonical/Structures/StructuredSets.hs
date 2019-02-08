@@ -20,25 +20,25 @@ import Alpha.Canonical.Algebra
 -- See 
 -- https://en.wikipedia.org/wiki/Generator_(mathematics)
 -- https://en.wikipedia.org/wiki/Free_module
-newtype GeneratingSet a = GeneratingSet (Set a)
-    deriving(Eq, Ord, Generic, Data, Typeable, Membership, Discrete)
-    deriving(Formattable,Show) via (Set a)
+newtype GeneratingSet a = GeneratingSet (FiniteSet a)
+    deriving(Eq, Ord, Generic, Data, Typeable, Discrete)
+    deriving(Formattable,Show) via (FiniteSet a)
 instance Newtype (GeneratingSet a)
 type instance Individual (GeneratingSet a) = a
 
 -- | Represents a finite set of independent elements of a space
 -- See https://en.wikipedia.org/wiki/Free_module
-newtype IndependentSet m = IndependentSet (Set m)
-    deriving(Eq, Ord, Generic, Data, Typeable, Membership, Discrete)
-    deriving(Formattable,Show) via (Set m)
+newtype IndependentSet m = IndependentSet (FiniteSet m)
+    deriving(Eq, Ord, Generic, Data, Typeable, Discrete)
+    deriving(Formattable,Show) via (FiniteSet m)
 instance Newtype (IndependentSet m)
 type instance Individual (IndependentSet m) = m
 
 -- | Represents a finite set of elements which constitute a basis
 -- within the context of some space
 -- See https://en.wikipedia.org/wiki/Free_module
-newtype BasisSet m = BasisSet (Set m)
-    deriving(Eq, Ord, Generic, Data, Typeable, Membership, Discrete)
-    deriving(Formattable, Show) via (Set m)
+newtype BasisSet m = BasisSet (FiniteSet m)
+    deriving(Eq, Ord, Generic, Data, Typeable, Discrete)
+    deriving(Formattable, Show) via (FiniteSet m)
 instance Newtype (BasisSet m)
 type instance Individual (BasisSet m) = m

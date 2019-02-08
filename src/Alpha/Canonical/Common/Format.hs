@@ -6,6 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Common.Format
 (
+    module X,
     Formattable2, Formattable3, Formattable4, Formattable5,
     trepeat,
     fence,
@@ -29,9 +30,9 @@ module Alpha.Canonical.Common.Format
 
 ) where
 import Alpha.Canonical.Common.Root
-import Alpha.Canonical.Common.Asci
-import Alpha.Canonical.Common.TextUtil(zpadL)
-import Alpha.Canonical.Common.Synonyms
+import Alpha.Canonical.Common.Asci as X
+import Alpha.Canonical.Common.Synonyms as X
+import Alpha.Canonical.Common.TextUtil as X--(zpadL)
 import Numeric(showIntAtBase)
 
 import qualified Data.Text as Text

@@ -10,8 +10,7 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE PostfixOperators #-}
-
-module Alpha.Canonical.Collective.Row
+module Alpha.Canonical.Common.Row
 (
     Row(..), RowLabel(..)
 )

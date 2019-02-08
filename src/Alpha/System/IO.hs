@@ -21,7 +21,6 @@ module Alpha.System.IO
 )
 where
 
-import Alpha.Canonical.Collective
 import Alpha.System.FilePath
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Common.Asci

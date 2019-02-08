@@ -10,7 +10,7 @@ module Alpha.Base.Control
     filterM,
     forM,
 
-    NFData(..), force, ($!!), deepseq,
+    NFData(..), force, ($!!), ($!), deepseq,
     Category(..),
     Comonad(..),
     liftW,     -- :: Comonad w => (a -> b) -> w a -> w b
@@ -42,3 +42,4 @@ import Control.Monad
 import Control.Comonad
 import Control.DeepSeq
 import Control.Exception(bracket)
+import GHC.Base(($!))

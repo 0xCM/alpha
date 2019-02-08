@@ -20,6 +20,7 @@ import Alpha.Canonical.Structures.Group as X
 
 import qualified Data.List as List
 
+
 -- | A ring (with identity)
 -- See https://en.wikipedia.org/wiki/Ring_(mathematics)     
 class (AbelianGroup a, ProductMonoid a, Distributive a) => Ring a where
@@ -37,7 +38,7 @@ type UnitalRing a = (Unital a, Ring a)
 
 -- | A unital ring in which every nonzero element ahs a multiplicative inverse
 -- See https://en.wikipedia.org/wiki/Division_ring    
-type DivisionRing a = (UnitalRing a, Reciprocative a, Divisive a)
+type DivisionRing a = (UnitalRing a, Invertible a, Divisive a)
     
 instance Ring Integer    
 instance Ring Int
@@ -56,4 +57,4 @@ instance Ring Float where
 instance Ring Double where 
 instance Ring CFloat where 
 instance Ring CDouble where
-instance Ring a => Ring (Complex a)
+instance Ring a => Ring (ComplexNumber a)

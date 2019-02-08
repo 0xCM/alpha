@@ -22,6 +22,22 @@ module Alpha.Canonical.Structures.NatK
 import Alpha.Canonical.Algebra
 import Alpha.Canonical.Structures.Domain
 
+type family Tripled a b c = r | r -> a b c    
+
+class Triple a b c where
+
+    -- | Constructs a triple
+    tripled::a -> b -> Tripled a b c
+
+    --- | Extracts the second of the paired elements
+    trip2::Tripled a b c -> b
+
+    --- | Extracts the first of the paired elements
+    trip1::Tripled a b c -> a
+    
+    swap::(Triple b a c) => Tripled a b c -> Tripled b a c
+    swap x = tripled (trip2 x) (trip1 x)
+
 
 -- Unifies type naturals and value-level integers
 newtype NatK k = NatK Integer    
@@ -50,7 +66,7 @@ type instance Summed (NatK m) (NatK n) = NatK(m + n)
 type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
 type instance Subtracted (NatK m) (NatK n) = NatK(m - n)
 type instance Divided (NatK m) (NatK n) = NatK (m / n)
-type instance Modulo (NatK m) (NatK n) = NatK (m % n)
+type instance BiModulus (NatK m) (NatK n) = NatK (m % n)
 type instance Decrement (NatK m) = NatK (m - 1)
 type instance Increment (NatK m) = NatK (m + 1)
 --type instance Powered (NatK m) (NatK n) = NatK (m ^ n)
@@ -109,14 +125,14 @@ natKdiv =  natK @m >/< natK @n
 natKmul::forall m n. (KnownNatPair m n) => NatK (m * n)
 natKmul =   natK @m >*< natK @n
 
-natmul::forall m n .(KnownNatPair m n) => Int
-natmul =   nat @m * nat @n
+natmul::forall m n.(KnownNatPair m n) => Int
+natmul =   natg @m * natg @n
 
 natKdec::forall m. (KnownNat m ) => NatK (m - 1)
-natKdec =  natK @m |> (>--<)
+natKdec =  natK @m |> bidec
 
 natKinc::forall m. (KnownNat m) => NatK (m + 1)
-natKinc = natK @m |> (>++<)
+natKinc = natK @m |> biinc
 
 -- | Produces a list of lenth m of integral values of the form [0,...,m-1]
 nats::forall m i. (KnownNat m, Integral i) => [i]
@@ -129,7 +145,7 @@ instance forall k. KnownNat k => Formattable (NatK k) where
 instance forall k. KnownNat k =>  Show (NatK k) where
     show k  = string (format k)
 
-instance forall m n. (KnownNatPair m n) =>  Triple (NatK m) (NatK n) (NatKPair m n) where    
+instance forall m n. (KnownNatPair m n) => Triple (NatK m) (NatK n) (NatKPair m n) where    
     tripled _ _ = NatKPair (natK @m, natK @n)
     trip1 _ = natK @m
     trip2 _ = natK @n
@@ -139,22 +155,23 @@ instance forall m n. (KnownNatPair m n) =>  Spanned (NatK m) (NatK n) where
     span (NatK m) (NatK n) = NatKSpan $ NatKPair $ (natK @m, natK @n)
     {-# INLINE span #-}
     
-instance forall m n. (KnownNatPair m n) => Membership (NatKSpan m n)  where        
-    members (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
+instance forall m n. (KnownNatPair m n) => Discrete (NatKSpan m n)  where        
+    individuals (NatKSpan (NatKPair (NatK m, NatK n))) = [m .. n]
     
-instance forall m. (KnownNat m) => Decrementable (NatK m) where    
-    dec::NatK m -> Decrement (NatK m) 
-    dec (NatK m)  = m - 1 |> NatK
-    {-# INLINE dec #-}
 
-instance forall m. (KnownNat m) => Incrementable (NatK m) where    
-    inc::NatK m -> Increment (NatK m) 
-    inc (NatK m)  = m + 1 |> NatK
-    {-# INLINE inc #-}
+instance forall m. (KnownNat m) => Bidecrementable (NatK m) where    
+    bidec::NatK m -> Decrement (NatK m) 
+    bidec (NatK m)  = m - 1 |> NatK
+    {-# INLINE bidec #-}
+
+instance forall m. (KnownNat m) => Biincrementable (NatK m) where    
+    biinc::NatK m -> Increment (NatK m) 
+    biinc (NatK m)  = m + 1 |> NatK
+    {-# INLINE biinc #-}
 
         
 instance forall m n. (KnownNatPair m n) =>  Bimodular (NatK m) (NatK n) where    
-    bimod::NatK m -> NatK n -> Modulo (NatK m) (NatK n)
+    bimod::NatK m -> NatK n -> BiModulus (NatK m) (NatK n)
     bimod (NatK m) (NatK n) = m % n |> NatK
     {-# INLINE bimod #-}
 

@@ -43,7 +43,7 @@ class (Multiplicative b, Unital b) =>  Power b where
     infixr 8 ^
 
 -- | Characterizes a type that can be Raised to an integral power
-class (Fractional a) => IntegralPower a where
+class Fractional a => IntegralPower a where
     powi::(Integral p) => a -> p -> a
 
     (^^)::(Integral p) => a -> p -> a
@@ -52,7 +52,7 @@ class (Fractional a) => IntegralPower a where
     infixr 8 ^^
 
 -- | Characterizes a type that can be Raised to a floating power    
-class (Floating a) => FloatingPower a where
+class Floating a => FloatingPower a where
     powa::a -> a -> a
 
     (**)::a -> a -> a

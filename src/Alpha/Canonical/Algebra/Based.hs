@@ -28,6 +28,7 @@ newtype Radix = Radix Natural
     deriving(Eq,Ord,Num, 
         Subtractive, LeftDistributive, RightDistributive,
         Additive, Divisive,Real,Power, Multiplicative, Unital,
+        Incrementable,Decrementable,
         Numeric, ToDouble,ToInt,ToInteger,FromDouble,FromInt,FromNatural,ToNatural)
 
 instance Formattable Radix where

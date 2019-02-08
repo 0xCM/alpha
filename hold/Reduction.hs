@@ -6,8 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Collective.Reduction
 (
-    Reduced(..),
-    intermix,
+    
 )
 where
 
@@ -16,9 +15,6 @@ import Alpha.Canonical.Relations hiding(reduce)
 import qualified Data.List as List
 import qualified Data.Set as Set
 import qualified Data.List.NonEmpty as NonEmpty
-
-type family Reduced a
-type instance Reduced [a] = a
 
 
 class Reductive a where
@@ -57,15 +53,7 @@ instance (Monoid a) => Reductive [a] where
 
     scan::O2 a -> [a] -> [a]
     scan op x = (reduce op) <$> (inits x)                
-
-    
         
 instance Formattable a => Formattable (NonEmpty a) where
     format ne = format (toList ne)
 
-intermix::[a] -> [a] -> [a]
-intermix x y = join <| do
-    i <- [0 .. n]
-    [[x List.!! i, y List.!! i] ] where
-        len = min (length x) (length y)  
-        n = sub' len 1  

@@ -17,14 +17,17 @@ import qualified Data.List as List
 import qualified Data.ByteString as EG
 import qualified Data.ByteString.Lazy as LZ
 import qualified Data.List.NonEmpty as NonEmpty
-
+import qualified Data.Vector as Vector
 
 class Length a where    
-    length::(Integral n) => a -> n
+    length::(Integral m) => a -> m
 
 instance Length [a] where
     length =  integral . List.length
 
+instance Length (Vector a) where
+    length =  integral . Vector.length
+    
 instance Length Text where
     length =  integral . Text.length    
 
@@ -35,5 +38,7 @@ instance Ord a => Length (Set' a) where
     length  =  integral . Set.size  
     
 instance Length (NonEmpty a) where
-    length = fromIntegral . NonEmpty.length
+    length  =  integral . NonEmpty.length
+
+
     

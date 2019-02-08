@@ -43,6 +43,6 @@ instance (Integral i, Nullary t) => Computable (SummationSeries i t) where
     type Computed (SummationSeries i t) = t
     compute (SummationSeries (SeriesSpec (op, range, term))) = result where
         f = unwrap term |> snd
-        items = f <$> (members range)
+        items = f <$> (individuals range)
         result = items |> reduce zero op
        

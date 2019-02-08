@@ -395,9 +395,9 @@ instance ToBitVector Word32 32 where
 instance ToBitVector Word64 64 where
   bv x = bitvector (fromIntegral x)
 
-instance (KnownNat w1, KnownNat w2) => Concatenable (BitVector w1) (BitVector w2)  where
-  type Concatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
-  concat = bvConcat
+instance (KnownNat w1, KnownNat w2) => BiConcatenable (BitVector w1) (BitVector w2)  where
+  type BiConcatenated (BitVector w1) (BitVector w2) = BitVector (w1 + w2)
+  biconcat = bvConcat
 
 instance KnownNat w => Length (BitVector w) where
   length  = fromIntegral . finiteBitSize  

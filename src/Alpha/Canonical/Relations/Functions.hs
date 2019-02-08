@@ -20,8 +20,7 @@ module Alpha.Canonical.Relations.Functions
     Uncurried, Curried, 
     Curriable(..), Uncurriable(..),
 ) where
-import Alpha.Base
-import Alpha.Canonical.Elementary
+import Alpha.Canonical.Relations.Common
 
 import qualified Data.Map as Map
 import qualified Data.Maybe as Maybe

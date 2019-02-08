@@ -53,6 +53,8 @@ subtraction = Subtraction sub
 
 instance Associative (Subtraction a)
 
+instance Subtractive a => Subtractive (Vector a) where
+    v1 - v2 = vmix (-) (vecpair v1 v2)
 
 -- Subtractive
 -------------------------------------------------------------------------------

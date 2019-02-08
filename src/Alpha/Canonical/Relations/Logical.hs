@@ -6,87 +6,56 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Logical
 (    
+    module X,
     Disjunctive(..), 
-    ExclusivelyDisjunct(..), 
+    XDisjunctive(..), 
     Conjunctive(..), 
     Invertive(..), 
-    Implication(..), 
+    Implicative(..), 
     Propositional(..),
     Biconditional(..),
     Boolean(..),    
     Predicate(..), 
-
-    type (==),
     type (&&),
     type (||),
-    type (:=>),
-    If, Not,
-    Disjunct(..), Conjunct(..), Implies(..),
-
-    Segmenter(..),
+    type (^|),
+    type (==>),
+    type (<=>),
+    Not,
 
 
 ) where
-import Alpha.Base
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Relations.Functions
+import Alpha.Canonical.Relations.Common
+import Alpha.Canonical.Relations.Functions as X
+
 import qualified Data.List as List
-
-class Segmenter a where
-    segment::Int -> [a] -> [[a]]
-    segment width = List.takeWhile (not . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
-
-instance Segmenter a    
 
 
 type True = 'True
 type False = 'False
 
-type family a == b :: Bool where
-    a == a = True
-    a == b = False    
-    
-infixl 1 ==
+-- | Captures a disjunction relation
+data a || b = Or (a,b)
 
-data Disjunct a b = Disjunct (Either a b)
-data Conjunct a b = Conjunct (a,b)
+-- | Captures a conjunction relation
+data a && b = And (a,b)
 
-data Implies a b = Implies (a->b)
+-- | Captures an exclusive or relation
+-- See https://en.wikipedia.org/wiki/Exclusive_or
+data a ^| b = XOr (a, b)
 
-type a :-> b = Implies a b    
-infixl 5 :->
+-- | Captures a material implication relation: if a then b
+-- See https://en.wikipedia.org/wiki/Material_conditional
+data a ==> b = Implies (a, b)
 
-type family (a::Bool) || (b::Bool) :: Bool where
-    True || True = True
-    True || False = True
-    False || True = True
-    False || False = False
-infixl 2 ||
+-- | Captures a bicondition relation: a iff b
+-- See https://en.wikipedia.org/wiki/Logical_biconditional
+data a <=> b = Iff (a,b)
 
+-- | Captures a logical negation: not a
+-- See https://en.wikipedia.org/wiki/Negation
+data Not a = Not a
 
-type family (a::Bool) && (b::Bool) :: Bool where
-    True && True = True
-    True && False = False
-    False && True = False
-    False && False = False    
-infixl 3 &&    
-
-type family Not (a::Bool) :: Bool where    
-    Not True = False
-    Not False = True
-
-type family If (a::Bool) (b::k) (c::k) :: k where
-    If True b c = b
-    If False b c = c    
-
-type family a :=> b where
-    False :=> False = True
-    False :=> True = True
-    True :=> False = False
-    True :=> True = True
-
-infixl 5 :=>
-    
 -- | Characterizes types for which a truth value can be assigned
 class Boolean a where
     bool::a -> Bool    
@@ -97,6 +66,7 @@ class Disjunctive a where
     type Disjunction a = Bool
 
     (||)::a -> a -> Disjunction a
+    infixl 2 ||
 
 -- | Characterizes a type's logical conjunction operator 
 class Conjunctive a where
@@ -104,26 +74,35 @@ class Conjunctive a where
     type Conjunction a = Bool
 
     (&&)::a -> a -> Conjunction a
+    infixl 3 &&    
 
 -- | The modus ponens of propositional logic
 -- See https://en.wikipedia.org/wiki/Modus_ponens    
-class Implication a where
-    implies::a -> a -> Bool
+class Implicative a where
+    type Implication a
+    type Implication a = Bool
 
+    (==>)::a -> a -> Implication a
+    infixl 4 ==>
+
+-- | Characterizes a type's biconditional operator
 class Biconditional a where
-    iff::a -> a -> Bool
+    type Bicondition a
+    type Bicondition a = Bool
 
-    (<=>)::a -> a -> Bool
-    (<=>) = iff
+    (<=>)::a -> a -> Bicondition a
     infixr 1 <=>
     
 class Invertive a where
     not::a -> Bool
 
-class ExclusivelyDisjunct a where
-    lxor::a -> a -> Bool    
+class XDisjunctive a where
+    type XDisjunction a
+    type XDisjunction a = Bool
+
+    (^|)::a -> a -> XDisjunction a
     
-class (Disjunctive a, ExclusivelyDisjunct a, Conjunctive a, Invertive a, Implication a, Biconditional a) => Propositional a where
+class (Disjunctive a, XDisjunctive a, Conjunctive a, Invertive a, Implicative a, Biconditional a) => Propositional a where
 
 -- | Defines arity-polymorphic families of operators
 data family Predicate (n::Nat) f :: Type
@@ -148,7 +127,6 @@ data instance Predicate 2 (P2 a)
 
 data instance Predicate 3 (P3 a) 
     = TernaryPredicate (P1 a)    
-
         
 instance Disjunctive Bool where
     (||) = or'    
@@ -162,27 +140,48 @@ instance Invertive Bool where
     not = not'
     {-# INLINE not #-}
     
-instance Implication Bool where
-    implies True True = True
-    implies True False = False
-    implies False True = True
-    implies False False = True 
-    {-# INLINE implies #-}
+instance Implicative Bool where
+    True ==> True = True
+    True ==> False = False
+    False ==> True = True
+    False ==> False = True 
+    {-# INLINE (==>) #-}
     
-instance ExclusivelyDisjunct Bool where
-    lxor True True = False
-    lxor True False = True
-    lxor False True = True
-    lxor False False = False
-    {-# INLINE lxor #-}
+instance XDisjunctive Bool where
+    True ^| True = False
+    True ^| False = True
+    False ^| True = True
+    False ^| False = False
+    {-# INLINE (^|) #-}
 
 instance Biconditional Bool where
-    iff True True = True
-    iff True False = False
-    iff False True = False
-    iff False False = True
-    {-# INLINE iff #-}
-    
-    
+    True <=> True = True
+    True <=> False = False
+    False <=> True = False
+    False <=> False = True
+    {-# INLINE (<=>) #-}
+        
 instance Propositional Bool    
                     
+instance (Boolean a, Boolean b) => Boolean (a || b) where
+    bool (Or (a,b)) = (bool a) || (bool b)
+
+instance Related (a || b) where
+    type Relation (a || b) = a || b
+    type LeftPart (a || b) = a
+    type RightPart (a || b) = b
+    relate a b = Or(a,b)
+    
+instance (Boolean a, Boolean b) => Boolean (a && b) where
+    bool (And (a,b)) = (bool a) && (bool b)
+    
+instance (Boolean a, Boolean b) => Boolean (a ==> b) where
+    bool (Implies (a,b)) = (bool a) ==> (bool b)
+
+instance (Boolean a, Boolean b) => Boolean (a <=> b) where
+    bool (Iff (a,b)) = (bool a) <=> (bool b)
+        
+instance (Boolean a, Boolean b) => Boolean (a ^| b) where
+    bool (XOr (a,b)) = (bool a) ^| (bool b)
+    
+    

@@ -5,6 +5,9 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 module Alpha.Base(module X) where
+import Alpha.Base.Alias as X
+import Alpha.Base.Array as X
+import Alpha.Base.Arithmoi as X
 import Alpha.Base.Functors as X
 import Alpha.Base.Control as X
 import Alpha.Base.Algebra as X
@@ -15,7 +18,5 @@ import Alpha.Base.Text as X
 import Alpha.Base.Types as X
 import Alpha.Base.Common as X
 import Alpha.Base.System as X
-import Alpha.Base.Alias as X
 import Alpha.Base.Foreign as X
-import Alpha.Base.Array as X
 

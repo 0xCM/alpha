@@ -31,7 +31,7 @@ module Alpha.Base.Types
     datavaltype,
     typeOf, 
     
-    type (+), type (-), type (*), Mod(..), type (%), Div(..), type (/), type (^),        
+    type (+), type (-), type (*), type (%), type (/), type (^),        
 )
 where
 
@@ -101,6 +101,8 @@ valtype = typeOf
 
 datavaltype::Data a => a -> DataType
 datavaltype = dataTypeOf
+
+
 
 -- Modulus infix operator synonm
 type (%) m n = Mod m n

@@ -11,12 +11,12 @@ module Alpha.Canonical.Structures.Permutation
     Permutation(..),
     ToPermutation(..),
     switch,
-    symmetries
+    symgroup
 )
 where
 import Alpha.Canonical.Common
 import Alpha.Canonical.Structures.NatK as X
-import Alpha.Canonical.Structures.Group as X
+import Alpha.Canonical.Structures.StructuredGroup as X
 
 import qualified Data.Text as Text
 import qualified Data.Vector as Vector
@@ -25,10 +25,8 @@ import qualified Data.Map as Map
 
 default (Int, Double, Text)
 
-type PermutationMap = Map Int Int
-
 -- Represents a bijective function over the set {1,2...,n}
-newtype Permutation n = Permutation PermutationMap
+newtype Permutation n = Permutation (Map Int Int)
     deriving(Eq,Generic,Functor,Ord)
 instance Newtype(Permutation n)
 
@@ -51,11 +49,11 @@ class (KnownNat n) => ToPermutation n a where
     permutation::a -> Permutation n
 
 -- Constructs the symmetric group of degree n        
-symmetries::forall n. KnownNat n => SymmetricGroup n
-symmetries = sg where
+symgroup::forall n. KnownNat n => SymmetricGroup n
+symgroup = sg where
     symbols = [1..nat @n]
     perms = List.permutations symbols
-    sg = perms |> fmap (\p ->  (List.zip symbols p) ) 
+    sg = perms |> fmap (\p ->  (pairzip symbols p) ) 
                |> fmap (\p -> Map.fromList p) 
                |> fmap Permutation
        
@@ -70,10 +68,10 @@ switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> permutat
                       else (r, s)
 
 instance KnownNat n => ToPermutation n [Int] where
-    permutation range = Permutation  $ Map.fromList (List.zip pt range) 
+    permutation range = Permutation  $ Map.fromList (pairzip pt range) 
         where                
             domain = natKspan @1 @n
-            pt = int <$> members (domain)
+            pt = int <$> individuals domain
                 
 instance KnownNat n => ToPermutation n [(Int,Int)] where
     permutation = Permutation . Map.fromList    
@@ -116,11 +114,11 @@ instance  KnownNat n => Semigroup (Permutation n) where
 instance forall n. KnownNat n =>  Unital (Permutation n) where
     one = permutation @n [1..(natg @n)] where
         
-instance forall n.  KnownNat n => Identity (Permutation n) where
-    identity = one
+instance forall n.  KnownNat n => IdentityStructure (Permutation n) where
+    sidentity = one
                                 
-instance forall n.  KnownNat n => Inverter (Permutation n) where
-    invert (Permutation p) = Permutation $ flip p    
+instance forall n.  KnownNat n => InversionStructure (Permutation n) where
+    sinvert (Permutation p) = Permutation $ flip p    
 
 instance forall n. KnownNat n => Monoid (Permutation n) where
     mempty = one

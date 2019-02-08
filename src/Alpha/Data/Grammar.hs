@@ -32,7 +32,7 @@ newtype Atom a = Atom a
     deriving(Eq, Show, Data, Typeable, Ord)
 
 -- | A collection of atoms frm which phrases may be formed
-newtype Alphabet a = Alphabet (FneSet (Atom a)) 
+newtype Alphabet a = Alphabet (FiniteSet (Atom a)) 
     deriving(Eq, Show, Ord, Data, Typeable)
 
 -- | A sequence of adjacent atoms    
@@ -45,7 +45,7 @@ atom = Atom
 
 -- | Constructs an alphabet from from list of atoms
 alphabet::(Ord a) => [Atom a] -> Alphabet a
-alphabet atoms = Alphabet (fneset (head atoms :| tail atoms) )
+alphabet atoms = Alphabet (set atoms)
 
 -- | Constructs a 'Phrase' from a list of 'Symbol' values
 phrase::[Atom a] -> Phrase a 
@@ -58,21 +58,19 @@ digital = alphabet $ atom <$> asciD
 instance (Ord a, Nullary a) => Nullary (Atom a) where
     zero = atom zero
 
-instance Componentized (Phrase a) where
-    components (Phrase x) = x
-
 instance (Formattable a) => Formattable (Atom a) where
     format (Atom x) = format x
 
 instance (Formattable a) =>  Formattable (Phrase a) where
     format (Phrase x) = embrace( fmap format x)
     
-instance (Ord a, Concatenable a a) => Concatenable (Atom a) (Atom a) where        
-    type Concatenated (Atom a) (Atom a) = Phrase a    
-    concat a1 a2 = Phrase [a1, a2]
+instance (Ord a, BiConcatenable a a) => BiConcatenable (Atom a) (Atom a) where        
+    type BiConcatenated (Atom a) (Atom a) = Phrase a    
+    biconcat a1 a2 = Phrase [a1, a2]
 
-instance Discrete (Phrase a) where    
+instance Discrete (Phrase a) where  
     individuals (Phrase a) = a
 
-instance Finite (Phrase a)
+instance FinitelyCountable (Phrase a) where
+    count (Phrase atoms) = length atoms
     

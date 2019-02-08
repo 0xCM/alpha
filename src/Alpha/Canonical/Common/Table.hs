@@ -1,11 +1,16 @@
-module Alpha.Canonical.Collective.Table
+-----------------------------------------------------------------------------
+-- |
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
+module Alpha.Canonical.Common.Table
 (
     Tabled(..),
     DataTable(..),
 ) where
-import Alpha.Canonical.Relations
-import Alpha.Canonical.Collective.Container
-import Alpha.Canonical.Collective.Reduction
+import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Individual
 import qualified Data.Matrix as M
 
 -- | Characterizes a rectangular array of data
@@ -38,7 +43,6 @@ instance Tabled (DataTable m n a) where
     type TableSource (DataTable m n a) = [[a]]
     table = table'
 
---instance Container (DataTable m n a)    
 instance (Show a) => Show(DataTable m n a) where
     show (DataTable m) = show m
 
@@ -51,6 +55,3 @@ instance forall m n a.(KnownNat m, KnownNat n) =>  IsList (DataTable m n a) wher
             width = fromIntegral $ nat @n
             p = segment width elements 
 
-instance forall m n a. (KnownNat m, KnownNat n) => Container (DataTable m n a) where
-    contain = fromList
-    contents = toList

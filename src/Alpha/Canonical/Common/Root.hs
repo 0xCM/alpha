@@ -35,6 +35,17 @@ module Alpha.Canonical.Common.Root
     Computable(..),    
     Complementable(..),
     FloatInfo(..),
+    Partitionable(..),
+    SymbolicName(..),
+    Simplifiable(..),
+    JoinableMeet(..),
+    Concatenable(..), 
+    BiConcatenable(..),
+    Appended(..), 
+    Appendable(..),
+    Space(..),
+    Point(..),
+    Expansive(..),
     floatinfo,
     enumValues,
     typeSymbol,
@@ -47,10 +58,17 @@ module Alpha.Canonical.Common.Root
     associate, 
     associated,
     (<|),(|>), 
+    mapi,
+    zip,
+    pairzip,
+    mix,
+    intermix,
+    segment,
+    exclude,
 
 ) where
 import Alpha.Base as X
-import Alpha.Canonical.Common.Synonyms
+import Alpha.Canonical.Common.Synonyms as X
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
@@ -62,8 +80,64 @@ import qualified Data.Sequence as Sequence
 import qualified Data.Stream.Infinite as Stream
 import qualified Data.Vector as Vector
 import qualified Numeric.Interval as Interval
+import qualified Data.Text as Text
+import qualified Data.ByteString as EG
+import qualified Data.ByteString.Lazy as LZ
+import qualified Data.Tree as Tree
+
+-- | Specifies the type of a point relative to a set/space
+type family Point d
+
+--data family Space (a::Constraint) (b::Type)  
+
+--newtype DualSpace a b = DualSpace (Space a b)
+
+-- Classifies a type that has a distinguished value    
+-- class Pointed a where
+--     point::a -> Point a    
+
+class Space a where
+    type PointSource a
+    
+    -- | Constructs a point in the product space
+    point::PointSource a -> Point a
+
+class JoinableMeet a where
+    -- | The join
+    (\/)::a -> a -> a
+    infixr 5 \/
+
+    -- | The meet
+    (/\)::a -> a -> a
+    infixr 6 /\
+    
+class Duality a where
+    type Dual a
+
+    -- | Calculates a dual value
+    dual::a -> Dual a
+
+    -- | Calculates a dual of a dual which is required 
+    -- to match the primal value
+    codual::Dual a -> a
+
+-- | Characterizes a type that can be reduced to a cononical, but equivalent, form
+class Simplifiable a where
+    
+    -- Idempotent operation yields the canonical "simplified" value of a given type
+    simplify::a -> a
+
+class (KnownSymbol s) => SymbolicName s a where
+    symname::Text
+    symname = Text.pack (symbol @s)
 
 
+class Partitionable a where
+    type PartitionSegment a
+    type PartitionCriteria a
+
+    partition::PartitionCriteria a -> a -> [PartitionSegment a]
+    
 -- | Represents a located value
 newtype Cell l v = Cell (l, v)
     deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
@@ -81,9 +155,7 @@ class Cellular a where
     
     -- | Extracts a cell's location
     location::Cell (Location a) (Value a) -> Location a
-
     
-
 -- Characterizes a type with wich a description may be associated
 class Descriptor a b where
     describe::a -> b
@@ -140,7 +212,7 @@ class Connective p s t where
     -- and bundles said connection with properties/attributes
     -- that further characterize the association
     connect::p -> s -> t -> Connection p s t        
-
+    
 class Mappable c a b where    
     type Mapped c a b
     map::(a -> b) -> c -> Mapped c a b
@@ -168,6 +240,15 @@ class Cardinal a where
     -- | Determines the cardinality of 'a'
     cardinality::a -> Cardinality
 
+    isFinite::a -> Bool
+    isFinite a = (cardinality a) != Infinite
+
+    isUnbounded::a -> Bool
+    isUnbounded a = (cardinality a) == Infinite
+
+    isEmpty::a -> Bool
+    isEmpty a = (cardinality a) == Zero
+
 -- | Specifies the cardinality of a set and partitions the universe
 -- of sets under consideration
 -- See https://en.wikipedia.org/wiki/Cardinality
@@ -178,17 +259,13 @@ data Cardinality =
    | Finite
    -- | A countably-infinite number of elements
    | Infinite
-   -- | An unknown number of elements
-   | Uncounted
    deriving (Eq, Ord, Generic, Data, Typeable, Enum)
-
 
 -- | Specifies whether a type/value is discrete
 data Discretion a =
       Discrete
     | Indiscrete
     deriving (Eq, Ord, Generic, Data, Typeable, Enum)
-
 
 -- / Characterizes a type for which a canonical and unique Vacatable/void/empty
 -- value exists
@@ -249,6 +326,44 @@ class Generative a where
 class Complementable a where
     complement::a -> a    
 
+class BiConcatenable a b where
+    type BiConcatenated a b
+
+    biconcat::a -> b -> BiConcatenated a b
+    biconcat = (>++<)
+    {-# INLINE biconcat #-}
+
+    (>++<)::a -> b -> BiConcatenated a b
+    (>++<) x y = biconcat x y
+    {-# INLINE (>++<) #-}
+    infixr 5 >++<
+
+
+-- | Characterizes a pair whose terms can be related via an append operation
+class Concatenable a where
+    concat::a -> a -> a
+    concat = (++)
+    {-# INLINE concat #-}
+
+    (++)::a -> a -> a
+    (++) x y = concat x y
+    {-# INLINE (++) #-}
+    infixr 5 ++
+
+-- | Defines a family of type-level functions with the intent
+-- of projecting nested a sequence of elements to a (relatively)
+-- non-nested sequence of elements. An instance need not be
+-- Element-invariant
+type family Appended a
+type instance Appended [[a]] = [a]
+type instance Appended [a] = a
+type instance Appended (Tree a) = [a]
+
+-- Classifies a type that can be transformed into an 'Appended' value
+class Appendable a where
+    append::a -> Appended a
+
+    
 -- | Describes floating-point characteristics that are speific to the
 -- executing machine that includes 
 -- 1. floating point radix ,
@@ -257,6 +372,23 @@ class Complementable a where
 -- For a typical x86-64bit machine, the respective values are 2, 53 and (-1021,1024)
 data FloatInfo a = FloatInfo Integer Int (Int,Int)
     deriving(Eq,Ord,Generic,Data,Typeable,Show)
+
+-- | Characterizes a type that can be expressed as a sequence of terms
+-- of a specified type    
+class Expansive a where
+    type Expanded a
+
+    expand::a -> [Expanded a]
+
+-- | The forward pipe operator
+(|>) :: a -> (a -> b) -> b
+x |> f = f x
+infixl 0 |>
+
+-- | The backward pipe operator
+(<|) :: (a -> b) -> a -> b
+f <| x = f x
+infixr 0 <|
 
 floatinfo:: forall a. RealFloat a => FloatInfo a
 floatinfo = FloatInfo (floatRadix zed ) (floatDigits zed) (floatRange zed)
@@ -296,21 +428,10 @@ ifelse x aye no = case x of
             True -> aye
             _ -> no
 
--- | The forward pipe operator
-(|>) :: a -> (a -> b) -> b
-x |> f = f x
-infixl 0 |>
-
--- | The backward pipe operator
-(<|) :: (a -> b) -> a -> b
-f <| x = f x
-infixr 0 <|
-
 reduce::a -> O2 a -> [a] -> a
 reduce id op (a:b:tail) =  op (op a b)  (reduce id op tail)
 reduce id op (a:[]) = a
 reduce id op [] = id
-
 
 clone::(Integral n) => n -> a -> [a]
 clone n a = List.replicate (fromIntegral n) a
@@ -322,6 +443,35 @@ associate = Map.fromList
 -- | Extracts the indexed values from a map
 associated::Ord k => Map k v -> [v]
 associated m = snd <$> (toList m)
+
+zip::(a -> b -> c) -> [a] -> [b] -> [c]
+zip = List.zipWith            
+
+pairzip::[a] -> [b] -> [(a,b)]
+pairzip = List.zip
+
+mapi::Eq a => ((Int, a) -> b) -> [a] -> [b]
+mapi f l = f <$> z where 
+    idx = [0..upper]
+    upper  = sub'  (fromIntegral $ List.length l) 1
+    z = pairzip idx l
+
+mix::(a -> b -> c) -> ([a],[b]) -> [c]
+mix f (a,b) = (\(x,y) -> f x y) <$> pairzip a b
+
+intermix::[a] -> [a] -> [a]
+intermix x y = join <| do
+    i <- [0 .. n]
+    [[x List.!! i, y List.!! i] ] where
+        len = min' (List.length x) (List.length y)  
+        n = sub' len 1  
+
+segment::Int -> [a] -> [[a]]
+segment width = List.takeWhile (not' . List.null) . fmap (List.take width) . List.iterate (List.drop width)    
+
+-- | Excludes a specified subset of list elements from the result list
+exclude::(Eq a) => [a] -> [a] -> [a] 
+exclude exclusions source = source |>  List.filter ( `List.notElem` exclusions) 
 
 -- Mappable instances
 -------------------------------------------------------------------------------
@@ -376,3 +526,43 @@ instance Nullity (Bag a) where
 instance Nullity (Vector a) where
     empty = Vector.empty
     null = Vector.null
+
+-------------------------------------------------------------------------------        
+-- *Appendable instances
+-------------------------------------------------------------------------------    
+instance Appendable (Tree a) where
+    append = Tree.flatten
+
+instance Appendable [[a]] where
+    append = List.concat    
+    
+instance Appendable [Text] where    
+    append = Text.concat        
+
+-------------------------------------------------------------------------------        
+-- *Concatenable instances
+-------------------------------------------------------------------------------        
+instance Concatenable [a] where
+    concat = (List.++)            
+    
+instance Concatenable Text where
+    concat = Text.append    
+
+instance Concatenable (Seq a) where
+    concat a b = a <> b
+    
+-------------------------------------------------------------------------------        
+-- *BiConcatenable instances
+-------------------------------------------------------------------------------            
+instance BiConcatenable Text Char where
+    type BiConcatenated Text Char = Text
+    biconcat t c  = Text.pack  [c] |> Text.append t 
+    
+instance BiConcatenable Char Text where    
+    type BiConcatenated Char Text = Text
+    biconcat c t  = Text.append (Text.pack [c]) t
+    
+instance BiConcatenable Char Char where    
+    type BiConcatenated Char Char = Text
+    biconcat c1 c2  = Text.pack ([c1] List.++ [c2])
+            

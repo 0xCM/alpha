@@ -88,9 +88,6 @@ instance IsList LZ.ByteString where
     toList = LZ.unpack
     fromList = LZ.pack
     
-instance Container EG.ByteString
-instance Container LZ.ByteString
-
 instance Packable [Word8] EG.ByteString where
     pack = EG.pack
     unpack = EG.unpack 
@@ -112,12 +109,10 @@ instance Chunkable EG.ByteString where
     chunk n = while (not . EG.null) . fmap (EG.take n) . iterate (EG.drop n)    
 
         
-instance Concatenable EG.ByteString EG.ByteString where    
-    type Concatenated EG.ByteString EG.ByteString = EG.ByteString
+instance Concatenable EG.ByteString  where    
     concat = EG.append
         
-instance Concatenable LZ.ByteString LZ.ByteString where
-    type Concatenated LZ.ByteString LZ.ByteString = LZ.ByteString
+instance Concatenable LZ.ByteString where
     concat = LZ.append
         
 -- | Converts json to formatted text    

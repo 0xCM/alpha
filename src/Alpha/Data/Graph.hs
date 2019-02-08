@@ -36,7 +36,7 @@ instance Newtype(Graph l a)
 -- | Represents a path in a graph, i. e., an ordered sequence of
 -- edges
 newtype GraphPath l a = GraphPath [Edge l a]    
-    deriving(Eq,Ord,Data,Typeable,Generic,Initializing,Terminating)
+    deriving(Eq,Ord,Data,Typeable,Generic,HasFirst,HasLast)
 instance Newtype(GraphPath l a)    
 
 type instance Individual (Vertex l a) = a
@@ -127,14 +127,14 @@ instance Labeled (Edge l a) l where
     label s (Edge _ source target) = Edge s source target
     getLabel (Edge l _ _) = l
     
-instance Componentized (Edge s a) where
-    components (Edge _ s t) = [s,t]
+instance Discrete (Edge s a) where
+    individuals (Edge _ s t) = [s,t]
         
 instance Functor (Edge s) where
     fmap f (Edge s source target) = Edge s (f <$> source) (f <$> target)
 
-instance Componentized (Graph s a) where
-    components (Graph g) = g
+instance Discrete (Graph s a) where
+    individuals (Graph g) = g
         
 instance Functor (Graph s) where
     fmap f (Graph edges) = Graph [f <$> e | e <- edges]

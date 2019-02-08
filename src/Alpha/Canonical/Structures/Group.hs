@@ -5,17 +5,14 @@
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
 {-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE DataKinds #-}
 module Alpha.Canonical.Structures.Group
 (
     module X,
-    ProductGroup(..),
+    Group(..),
     AbelianGroup(..),
     FiniteAbelianGroup(..),
-    GroupMorphism(..),
-    Inverter(..),
-    Identity(..), 
-    abs,
-    group,
+    Punctured(..),
     
 ) where
 import Alpha.Canonical.Structures.Common as X
@@ -23,72 +20,45 @@ import Alpha.Canonical.Structures.Structure as X
 import Alpha.Canonical.Structures.Magma as X
 import Alpha.Canonical.Structures.Semiring as X
 
--- | A multiplicative group with unspecified commutativity
-newtype ProductGroup a = ProductGroup a
-    deriving (Eq,Generic,Data,Typeable,Show)
-instance Newtype (ProductGroup a)    
-
-type instance Individual (ProductGroup a) = a    
-
-newtype GroupMorphism a b = GroupMorphism (a -> b)    
-
-class Identity a where
-    identity::Individual a
-
-class Identity a => Inverter a where
-    invert::Individual a -> Individual a
-
-class Composer a where
-    compose::Individual a -> Individual a -> Individual a
-
-class Group a where
-    inverse::Individual a -> Individual a
-
-    unit::Individual a
-
-    combine::Individual a -> Individual a -> Individual a
-
--- | Represents the category whose objects are groups and morphisms are homomorphisms
--- See: https://www.ncatlab.org/nlab/show/Grp
-class Category g => Grp g where
-
-
-data instance ObjSet (Grp g) = GrpObj
-data instance EndSet (Grp g) (Group a) (Group b) = GrpHom a b
-
-
-group::(Group g, Newtype g) => O g -> g
-group element = wrap element
-
--- | Constructs a commutator for a binary operator
--- See https://en.wikipedia.org/wiki/Commutator
-commutator::forall g a . (Inverter a) => O2 (Individual a) -> O2 (Individual a)
-commutator o  =  \x y ->  o (o (i x) (i y)) (o x y) where
-    i = invert @a
- 
-abs::(Nullary a, TotalOrd a, Negatable a) => a -> a
-abs a = ifelse (a >= zero) a (negate a)
-
-instance Unital a => Identity (ProductGroup a) where
-    identity = one
-
-instance (Unital a, Reciprocative a) => Inverter (ProductGroup a) where
-    invert = reciprocal
-
-instance (Multiplicative a) => Composer (ProductGroup a) where
-    compose = (*)
-
-instance (a ~ Individual (ProductGroup a),  ProductMonoid a, Unital a, Reciprocative a) => Group (ProductGroup a) where
-    inverse = reciprocal
+class (Semigroup a, Unital a, Multiplicative a, Invertible a) => Group a where
+    -- | Specifies the unit element of the group
+    unit::a
     unit = one
-    combine = (*)
-    
+    {-# INLINE unit #-}
+
+    -- | The binary group operation
+    compose::a -> a -> a
+    compose = (*)
+    {-# INLINE compose #-}    
+
+class (KnownNat n, Group a, FinitelyCountable a) => FiniteGroup n a where
+
 -- | An additive group, always commutative
 class (AdditiveMonoid a, Negatable a) => AbelianGroup a where  
     
-class (AbelianGroup a, Finite a) => FiniteAbelianGroup a where
+-- | A group with a basis
+-- See https://en.wikipedia.org/wiki/Free_abelian_group
+class AbelianGroup a => FreeAbelianGroup a where
+    basis::a -> [a]    
 
+class (AbelianGroup a, FinitelyCountable a) => FiniteAbelianGroup a where
+    
+instance Integral a => Semigroup (Ratio a)  where
+    (<>) = (*)
+    {-# INLINE (<>) #-}
 
+instance Semigroup Float  where
+    (<>) = (*)
+    {-# INLINE (<>) #-}
+
+instance Semigroup NonzeroDouble where
+    a <> b =  wrap ( (unwrap a) * (unwrap b))
+    {-# INLINE (<>) #-}
+        
+-- | Note: for this to really be a group, the 0 element must be deleted
+instance Integral a => Group (Ratio a)    
+instance Group Float where 
+    
 instance AbelianGroup Integer where 
 instance AbelianGroup Int where 
 instance AbelianGroup Int8 where 
@@ -102,12 +72,12 @@ instance AbelianGroup Word16 where
 instance AbelianGroup Word32 where 
 instance AbelianGroup Word64 where     
 instance (Integral a) => AbelianGroup (Ratio a) where 
+instance Integral a => AbelianGroup (RationalNumber a)
 instance AbelianGroup Float where 
 instance AbelianGroup Double where 
 instance AbelianGroup CFloat where 
 instance AbelianGroup CDouble where                                 
-instance (Eq a, Negatable a, Additive a,Nullary a) => AbelianGroup (Complex a)
-instance AbelianGroup Rational
+instance (Eq a, Negatable a, Additive a,Nullary a) => AbelianGroup (ComplexNumber a)
 
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)

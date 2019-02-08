@@ -6,6 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Bicomp
 (        
+    module X,
     BiLT(..), 
     BiGT(..), 
     BiEQ(..), 
@@ -15,9 +16,8 @@ module Alpha.Canonical.Relations.Bicomp
     BiComparer(..),
 
 ) where
-import Alpha.Base
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Relations.Related
+import Alpha.Canonical.Relations.Common
+import Alpha.Canonical.Relations.Related as X
 
 import qualified Numeric.Interval as Interval
 import qualified Prelude as P

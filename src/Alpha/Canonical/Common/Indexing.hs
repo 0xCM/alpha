@@ -4,32 +4,35 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE DataKinds #-}
-module Alpha.Canonical.Elementary.Indexing
+module Alpha.Canonical.Common.Indexing
 (
+    module X,
     NatIx(..),
     SafeIx(..),
-    Indexable(..),
     IxTerm(..), 
     IxRange(..),    
     IxFamily(..),
-    UIx(..),
-    LIx(..),
-    MIx(..),
-    BiIx(..),
-    MultiIndexed(..),
-    lix,
-    uix,
-    bix,
+    UpperIx(..),
+    LowerIx(..),
+    MultiIx(..),
+    NestedTerm(..),
+    lowerix,
+    upperix,
+    multix,
     term,
     termix,
-    termval,
+    termvalue,
     ixrange,
+    rangedterm,
+    nestedrange,
+    nestedterm
 
 ) where
-import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Set as X
+import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Individual as X
+import Alpha.Canonical.Common.Format as X
+import Alpha.Canonical.Common.Conversions as X
 
 import qualified Data.Map as Map
 import qualified Numeric.Interval as Interval
@@ -41,26 +44,18 @@ import qualified Data.Stream.Infinite as Stream
 import qualified Data.Sequence as Sequence
 
 -- | Represents a lower index
-newtype LIx a = LIx a
-    deriving (Eq, Ord,Generic,Data,Typeable)
+newtype LowerIx a = LowerIx a
+    deriving (Eq, Ord, Enum, Generic, Data, Typeable)
 
 -- | Represents an upper index
-newtype UIx a = UIx a
-    deriving (Eq, Ord,Generic,Data,Typeable)
+newtype UpperIx a = UpperIx a
+    deriving (Eq, Ord, Enum, Generic, Data, Typeable)
 
--- | Represents a bipartite index consisting (potentially) of both
--- lower indexes and upper indexes
-newtype BiIx a = BiIx ([LIx a],[UIx a])
-    deriving (Eq, Ord,Generic,Data,Typeable)
+-- | Represents a bipartite index consisting of an arbitrary
+-- number of lower and upper indexes
+newtype MultiIx a = MultiIx (Vector (LowerIx a), Vector (UpperIx a))
+    deriving (Eq, Ord, Generic, Data, Typeable)
         
--- | Defines a family of multi-indexes    
-type family MIx (i::Nat) a = r | r -> i a where
-    MIx 1 a = UniTuple1 (IxRange a)
-    MIx 2 a = UniTuple2 (IxRange a)
-    MIx 3 a = UniTuple3 (IxRange a)
-    MIx 4 a = UniTuple4 (IxRange a)
-    MIx 5 a = UniTuple5 (IxRange a)
-
 -- | Represents a term t indexed by i
 -- A term in this context can be considered a function/delayed 
 -- computation predicated on an index i that saturates 
@@ -77,25 +72,31 @@ instance Newtype (IxFamily i t)
 
 -- | Defines the lower and upper bounds for an index
 newtype IxRange i = IxRange (i,i)
-    deriving (Eq,Ord,Generic,Functor)
+    deriving (Eq,Ord,Generic,Data,Functor,Typeable)
 instance Newtype (IxRange i)    
 
 type instance Individual (IxFamily i t) = IxTerm i t
 type instance Individual (IxRange i) = i
 
-class Indexable a where
-    type Indexer a
-    type Indexer a = Int
-    
-    idx::a -> Indexer a -> Individual a
-    idx = (!!)
-    {-# INLINE idx #-}
+-- | Defines a term together with the range that will be used
+-- upon expansion
+newtype RangedTerm i t = RangedTerm (IxRange i, IxTerm i t)
+    deriving (Generic)
+instance Newtype (RangedTerm i t)
 
-    (!!)::a -> Indexer a -> Individual a
-    (!!) = idx
-    {-# INLINE (!!) #-}
-    infixr 9 !!
+newtype NestedRange i = NestedRange (IxRange i, IxRange i)
+    deriving (Eq,Ord,Generic,Data,Functor,Typeable)
 
+newtype NestedTerm i t = NestedTerm 
+    (
+        IxRange i,      -- The outer range
+        IxRange i,       -- The inner range
+        IxTerm (i,i) t  -- The inner term
+    )
+    deriving (Generic)
+instance Newtype (NestedTerm i t)      
+
+        
 -- | Characterizes an index that can safely fail
 class SafeIx s i where
     
@@ -117,10 +118,10 @@ class KnownNat i => NatIx i a where
     -- | Retrieves the indexed value
     natix::a -> NatIndexed i a
 
--- | Characterizes a multi-level index    
-class  (KnownNat i, OrdEnum a) => MultiIndexed i a where
-    mix::UniTuple i (IxRange a) -> MIx i a
-    milevels::MIx i a -> [UniTuple i a]
+-- | Associates an individual with an index value
+newtype Indexed a = Indexed (Indexer a, Individual a)
+    deriving (Generic)
+instance Newtype (Indexed a)
 
 -- | Constructs an index range given a pair representing a lower/uppper bound    
 ixrange::(OrdEnum a) => (a,a) -> IxRange a
@@ -130,9 +131,18 @@ ixrange = IxRange
 term::i -> (i -> t) -> IxTerm i t
 term i t = IxTerm (i,t)
 
+rangedterm::IxRange i -> IxTerm i t -> RangedTerm i t
+rangedterm range term = RangedTerm (range, term)
+
+nestedterm::(OrdEnum i) => (i,i) -> (i,i) -> IxTerm (i,i) t -> NestedTerm i t
+nestedterm or ir term  = NestedTerm (ixrange or, ixrange ir,term)
+
+nestedrange::(OrdEnum i) => (i,i) -> (i,i) -> NestedRange i
+nestedrange or ir = NestedRange (ixrange or, ixrange ir)
+
 -- | Evaluates a term
-termval::IxTerm i t -> t
-termval (IxTerm (i,f)) = f i
+termvalue::IxTerm i t -> t
+termvalue (IxTerm (i,f)) = f i
 
 -- | Determines the value of the terms's index
 termix::IxTerm i t -> i
@@ -142,31 +152,19 @@ ixfamily::(Ord i) => [IxTerm i t] -> IxFamily i t
 ixfamily terms = (\t -> (termix t, t)) <$> terms |> Map.fromList |> IxFamily
 
 -- | Constructs a lower index
-lix::a -> LIx a
-lix = LIx
+lowerix::a -> LowerIx a
+lowerix = LowerIx
 
 -- | Constructs a upper index
-uix::a -> UIx a
-uix = UIx
+upperix::a -> UpperIx a
+upperix = UpperIx
 
-bix::[LIx a] -> [UIx a] -> BiIx a
-bix l u = BiIx (l,u)
+multix::Vector(LowerIx a) -> Vector(UpperIx a) -> MultiIx a
+multix l u = MultiIx (l,u)
 
--------------------------------------------------------------------------------            
--- * Indexable class memberships
--------------------------------------------------------------------------------            
-instance (Eq a) => Indexable [a] where    
-    idx = (List.!!)
-
-instance Indexable (Seq a) where
-    idx = Sequence.index
-    
-instance Indexable (Vector a) where
-    idx vector i = vector Vector.! i
-
-instance (Ord k) => Indexable (Map k v) where
-    type Indexer (Map k v) = k
-    idx map k = (k, map Map.! k)
+-- | Constructs  an indexed value
+indexed::Indexable a => Indexer a -> Individual a -> Indexed a
+indexed i ind = Indexed (i, ind)
 
 
 -------------------------------------------------------------------------------            
@@ -192,8 +190,8 @@ instance (Eq a,Integral k) =>  SafeIx [a] k where
 -- * IxRange class membership
 -------------------------------------------------------------------------------            
 
-instance OrdEnum i => Membership (IxRange i) where
-    members (IxRange (a,b)) = [a..b]
+instance OrdEnum i => Discrete (IxRange i) where
+    individuals (IxRange (a,b)) = [a..b]
         
 instance (Formattable i) => Formattable (IxRange i) where
     format (IxRange (min,max)) 
@@ -201,19 +199,11 @@ instance (Formattable i) => Formattable (IxRange i) where
 
 instance (Formattable i) => Show (IxRange i) where        
     show = string . format
-    
-instance (OrdEnum a) => SetBuilder (IxRange a) a where    
-    set (IxRange (i,j)) = finset s  where
-        s = [i..j]
-        count = add' (fromIntegral (List.length s)) 1
-        
--------------------------------------------------------------------------------            
+            
 -- * IxTerm class membership
 -------------------------------------------------------------------------------            
-
 instance (Formattable i, Formattable t) => Formattable (IxTerm i t) where
     format (IxTerm (i,f)) = format (i, f i)
-
 
 instance (Formattable i, Formattable t) => Show (IxTerm i t) where
     show = string . format
@@ -227,10 +217,8 @@ instance (Eq i) => Eq (IxTerm i t) where
 instance (Ord i) => Ord (IxTerm i t) where
     compare (IxTerm (i,t)) (IxTerm (j,s)) = compare i j
 
--------------------------------------------------------------------------------            
 -- * IxFamily class membership
--------------------------------------------------------------------------------            
-    
+-------------------------------------------------------------------------------                
 instance (Ord i) => IsList (IxFamily i a) where
     type Item (IxFamily i a) = IxTerm i a
     toList (IxFamily map) = associated map
@@ -240,39 +228,27 @@ instance (Ord k) => Indexable (IxFamily k v) where
     type Indexer (IxFamily k v) = k
     idx (IxFamily map) k = map Map.! k
 
+-- * NestedRange membership
 -------------------------------------------------------------------------------            
--- * MultiIndexed instances
--------------------------------------------------------------------------------            
+instance (Formattable i) => Formattable (NestedRange i) where
+    format (NestedRange r) = format r
+
+instance (Formattable i) => Show (NestedRange i) where        
+    show = string . format
+
+instance (OrdEnum i) => Expansive (NestedRange i) where
+    type Expanded (NestedRange i) = (i,i)
+
+    expand (NestedRange (outer,inner)) = do
+        o <- individuals outer
+        i <- individuals inner
+        return (o,i)
     
-instance (OrdEnum a) => MultiIndexed 1 a where    
-    mix (UniTuple1 r) =  UniTuple1 r
-    milevels (UniTuple1 r) = [UniTuple1 a | a <- members r]
+-- * NestedTerm membership
+-------------------------------------------------------------------------------            
+instance (OrdEnum i) => Expansive (NestedTerm i t) where
+    type Expanded (NestedTerm i t) = t
 
-instance (OrdEnum a) => MultiIndexed 2 a where    
-    mix (r1, r2) = (r1, r2)
-    milevels (r1, r2) 
-        = [(a1,a2) | a1 <- members r1, a2 <- members r2]
-                    
-instance (OrdEnum a) => MultiIndexed 3 a where    
-    mix (r1, r2, r3) = (r1 , r2, r3)
-    milevels (r1, r2, r3) 
-        = [(a1,a2,a3) | a1 <- members r1, a2 <- members r2, a3 <- members r3]
-
-instance (OrdEnum a) => MultiIndexed 4 a where    
-    mix (r1, r2, r3, r4) = (r1 , r2, r3, r4)
-    milevels (r1, r2, r3, r4) 
-        =  [(a1,a2,a3,a4) | 
-                a1 <- members r1, 
-                a2 <- members r2, 
-                a3 <- members r3, 
-                a4 <- members r4]
-
-instance (OrdEnum a) => MultiIndexed 5 a where    
-    mix (r1, r2, r3, r4, r5) = (r1 , r2, r3, r4, r5)
-    milevels (r1, r2, r3, r4, r5) 
-        =  [(a1,a2,a3,a4,a5) | 
-                a1 <- members r1, 
-                a2 <- members r2, 
-                a3 <- members r3, 
-                a4 <- members r4, 
-                a5 <- members r5]    
+    expand (NestedTerm (or, ir, (IxTerm (_, f ) ))) 
+        = [termvalue (term (i,j) f)  | i <- individuals or, j <- individuals ir]
+    

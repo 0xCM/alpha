@@ -30,7 +30,7 @@ import qualified Numeric.Interval as Interval
 -- where a type instance is the addition result type
 type family Summed a b
 type UniSum a = Summed a a
-type instance Summed (Set a) (Set a) = Set a    
+type instance Summed (FiniteSet a) (FiniteSet a) = FiniteSet a    
 
 
 -- | Represents a formal sum of an arbitrary (but finite)
@@ -76,17 +76,17 @@ multisum = MultiSum
 nsum::(Integral n, Nullary a, Additive a) => n -> a -> a
 nsum n a = reduce zero (+) (clone n a)
 
+instance (Additive a) => Additive (Vector a) where
+    v1 + v2 = vmix (+) (VecPair (v1,v2))
 
 instance (Nullary a, Additive a) => Computable (MultiSum a) where
     type Computed (MultiSum a) = a
     compute (MultiSum items) = reduce zero (+) items
     
-instance (Ord a) =>  Additive (Set a) where
+instance (Ord a) => Additive (FiniteSet a) where
     add x y = union x y
     {-# INLINE add #-}
 
-instance (Ord a) => Nullary (Set a) where
-    zero = EmptySet
 
     
 -- Additive numbers
@@ -228,7 +228,7 @@ instance Nullary CFloat where
 
 instance Nullary CDouble where 
     zero = 0
-    {-# INLINE zero #-}
+    {-# INLINE zero #-}    
 
 -- Additive tuples
 -------------------------------------------------------------------------------

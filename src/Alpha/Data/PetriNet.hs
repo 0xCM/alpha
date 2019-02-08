@@ -57,7 +57,7 @@ data PetriEdge p t = PetriEdge (PetriNode p t) (PetriNode p t)
     deriving (Show, Eq, Ord)
 
 -- | Represents a petri net
-data PetriNet p t = PetriNet (Set (PetriEdge p t))
+data PetriNet p t = PetriNet (FiniteSet (PetriEdge p t))
     deriving (Eq, Ord)
 
 type instance Individual (PetriNet p t) = PetriEdge p t

@@ -8,8 +8,7 @@
 {-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Relations.Related
 (    
-    Relation(..),
-    Relational(..),
+    module X,
     Reflexive(..),
     Transitive(..),
     Symmetric(..),
@@ -23,8 +22,6 @@ module Alpha.Canonical.Relations.Related
     PartialOrder(..),
     TotalOrder(..),
     OrdNum(..),
-    Point(..), 
-    Pointed(..),
     Pairs(..),
     Minimal(..), 
     Maximal(..),  
@@ -39,12 +36,12 @@ module Alpha.Canonical.Relations.Related
     Quotient(..),
     Equation(..),
     Inversion(..),
+    Poset, poset
 
 ) where
-import Alpha.Base
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Relations.Logical
-import Alpha.Canonical.Relations.Operators
+import Alpha.Canonical.Relations.Common    
+import Alpha.Canonical.Relations.Logical as X
+import Alpha.Canonical.Relations.Operators as X
 import qualified Numeric.Interval as Interval
 import qualified Prelude as P
 import qualified Data.Map as Map
@@ -59,18 +56,11 @@ type instance Individual (Interval a) = a
 -- | Synonym for default comparison predicate
 type Comparer a = a -> a -> Bool
 
--- | Specifies the type of a point relative to a set/space
-type family Point d
-
 -- | Defines a collection of ordered pairs    
 newtype Pairs a b = Pairs [(a,b)]
     deriving (Show,Eq,Ord,Generic)
 instance Newtype (Pairs a b)
 
--- | Represents a relation between two expressions/values of
--- the same type
-newtype Relation a = Relation (a, a)
-    deriving(Eq,Generic,Ord)
 
 -- | Represents a relation between two expressions/values
 -- of the form a := b of (potentially) different types
@@ -82,23 +72,7 @@ newtype Equation a b = Equation (a,b)
 -- dependent.
 newtype Inversion a = Inversion (a, a)    
     deriving (Eq, Ord, Generic, Data, Typeable)     
-
--- Characterizes a binary relation on a set s    
-class (Eq a) =>  Relational a where
-
-    -- | Determines whether two points are related
-    related::P2 a
-
-    -- | Establishes a relation between two points
-    relate::a -> a -> Relation a
-    relate x y = Relation (x,y)
-
-    -- | Infix synonym for 'related'
-    (~*~)::P2 a
-    (~*~) = related
-
-    infixl 6 ~*~
-
+    
 newtype Reflexion a = Reflexion (a,a)
     deriving(Eq,Generic,Ord)
 
@@ -216,7 +190,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
 
     -- Determines whether an equivalence relation exists between two elements
     (~=)::P2 a
-    (~=) = related
+    (~=) = (~?)
     {-# INLINE (~=) #-}        
 
     -- | Establishes an equivalence relationship among a collection of elements
@@ -253,7 +227,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
         
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
-class (Membership a, Equivalence a) => Setoid a where
+class (Discrete a, Equivalence a) => Setoid a where
 
 
 -- | Characterizes a type for which a minimal element can be identified
@@ -293,27 +267,27 @@ class (Ord a) => LTEQ a where
     min x y = ifelse (x <= y) x y
     {-# INLINE min #-}    
 
-class (Ord a) => LT a where
+class Ord a => LT a where
     (<)::Comparer a
     (<) a b = a P.< b
 
     infix 4 <    
     {-# INLINE (<) #-}
 
-class (Ord a) => GT a where    
+class Ord a => GT a where    
     (>)::Comparer a
     (>) a b = a P.> b
     infix 4 >
     {-# INLINE (>) #-}
 
-class (Ord a) => GTEQ a where
+class Ord a => GTEQ a where
     (>=)::Comparer a
     (>=) a b = a P.>= b
     infix 4 >=
     {-# INLINE (>=) #-}
 
     -- Computes the maximum of two values
-    max::(Ord a) => a -> a -> a
+    max::a -> a -> a
     max x y = ifelse (x >= y) x y
     {-# INLINE max #-}
 
@@ -330,9 +304,6 @@ type TotalOrd a = (Ord a, Comparable a)
 -- both 'TotalOrd' and 'Num' constraints
 type OrdNum a = (TotalOrd a, Num a)   
 
--- Classifies a type that has a distinguished value    
-class Pointed a where
-    point::a -> Point a    
 
 instance (Ord a) => Minimal [a] where
     minimum (x:xs) = Min <$> (x :| xs) |> sconcat |> getMin
@@ -347,7 +318,18 @@ instance Supremal (Interval a) where
     supremum = Interval.sup            
 
 
+-- Encloses (constructively) a partially ordered set
+newtype Poset a = Poset [a]
+    deriving(Formattable, Nullity, Setwise)
 
+-- Constructs a partially ordered set from a list
+poset::(PartialOrder a) => [a] -> Poset a
+poset = Poset . fromList
+
+instance (PartialOrder a) =>  IsList (Poset a) where
+    type Item (Poset a) = a
+    toList (Poset s) = toList s    
+    fromList = poset
 
 
 -- LTEQ instances
@@ -449,4 +431,3 @@ instance Comparable Float
 instance Comparable Double
 instance Comparable CFloat
 instance Comparable CDouble
-

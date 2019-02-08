@@ -39,3 +39,4 @@ symbol = symbolVal (Proxy @s)
 
 chr::Integral n => n -> Char
 chr = Char.chr . fromIntegral
+

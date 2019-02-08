@@ -7,24 +7,25 @@
 module Alpha.Canonical.Common.Conversions
 (
     Convertible(..),
-    FromDouble(..), ToDouble(..),
-    FromInt(..), ToInt(..),
-    ToWord(..), FromWord(..),
+    FromDouble(..), 
+    ToDouble(..),
+    FromInt(..), 
+    ToInt(..),
+    ToWord(..), 
+    FromWord(..),
     ToInteger(..),
-    ToNatural(..), FromNatural(..),
+    ToNatural(..), 
+    FromNatural(..),
     Doubly(..),
     ToIntegral(..),
     FromText(..),
     ToString(..),
     ToLines(..),
-    Vectored(..),
     list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
     fractional, integers,
-    enumerate
-    
-
+    ivalues
 ) where
 import Alpha.Canonical.Common.Root
 import qualified Data.Text as Text
@@ -33,8 +34,6 @@ import qualified Data.Map as Map
 import qualified Data.Ratio as DR
 import qualified Data.Vector as Vector
 
-class Vectored s a where
-    vector::s -> Vector a
 
 -- | Characterizes a value that can be converted to a list of 'Text' values
 class ToLines a where
@@ -69,7 +68,6 @@ class ToDouble d where
 -- | Characterizies a type whose values can be converted to/from 'Double' values    
 type Doubly a = (ToDouble a, FromDouble a)
 
-
 -- | Characterizies a type whose values can be converted to machine-sized 'Int' values
 class ToInt d where
     int::d -> Int  
@@ -101,6 +99,8 @@ class ToNatural d where
 class FromNatural a where
     fromNatural::Natural -> a
 
+    
+
 list::(IsList a) => a -> [Item a]
 list = toList
 
@@ -116,9 +116,9 @@ words src = word <$> src
 integers::(Bounded i, Integral i) => [i]    
 integers = [minBound .. maxBound]
 
--- | constructs a list of all potential 'i' -values
-enumerate::(Bounded i, Enum i) => [i]
-enumerate = [minBound .. maxBound]
+-- | Constructs a list of intrinsic values
+ivalues::(Bounded i, Enum i) => [i]
+ivalues = [minBound .. maxBound]
 
 -- | Constructs a 'Int8' from an integral value
 int8::(Integral n) => n -> Int8
@@ -159,11 +159,6 @@ fractional::(Real r, Fractional f) => r -> f
 fractional = realToFrac'
 {-# INLINE fractional #-} 
 
--------------------------------------------------------------------------------
--- * Vectored instances
--------------------------------------------------------------------------------
-instance Vectored [a] a where
-    vector = Vector.fromList
 
 -------------------------------------------------------------------------------
 -- * ToIntegral instances
@@ -244,8 +239,10 @@ instance FromDouble CFloat where
 instance FromDouble CDouble where 
     fromDouble = realToFrac
     {-# INLINE fromDouble #-}    
-
--------------------------------------------------------------------------------
+instance Integral a => FromDouble (Ratio a) where 
+    fromDouble = realToFrac
+    {-# INLINE fromDouble #-}    
+    
 -- * ToDouble instances
 -------------------------------------------------------------------------------
 instance ToDouble Natural where 
@@ -405,7 +402,10 @@ instance FromInt CFloat where
 instance FromInt CDouble where 
     fromInt = realToFrac
     {-# INLINE fromInt #-}
-
+instance Integral a => FromInt (Ratio a) where 
+    fromInt = realToFrac
+    {-# INLINE fromInt #-}    
+    
 -------------------------------------------------------------------------------
 -- * ToInteger instances
 -------------------------------------------------------------------------------
@@ -562,7 +562,10 @@ instance FromNatural CFloat where
 instance FromNatural CDouble where 
     fromNatural = realToFrac
     {-# INLINE fromNatural #-}
-
+instance Integral a => FromNatural (Ratio a) where 
+    fromNatural = realToFrac
+    {-# INLINE fromNatural #-}
+    
 -------------------------------------------------------------------------------
 -- * ToNatural instances
 -------------------------------------------------------------------------------
@@ -614,9 +617,6 @@ instance ToNatural CFloat where
 instance ToNatural CDouble where 
     natural = truncate
     {-# INLINE natural #-}
-
--- instance (Integral a, Num b) => Convertible a b where
---     convert = fromIntegral
 
 -------------------------------------------------------------------------------
 -- * ToString instances

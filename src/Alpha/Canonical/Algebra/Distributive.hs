@@ -14,7 +14,6 @@ module Alpha.Canonical.Algebra.Distributive
 import Alpha.Canonical.Common
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
-import Alpha.Canonical.Algebra.Complex
 import Alpha.Canonical.Algebra.Subtractive
 
 -- | Characterizes a type that supports both addition,
@@ -62,7 +61,6 @@ instance LeftDistributive Float where
 instance LeftDistributive Double where 
 instance LeftDistributive CFloat where 
 instance LeftDistributive CDouble where 
-instance (Additive a, Multiplicative a, Subtractive a) => LeftDistributive (Complex a) where 
 
 -------------------------------------------------------------------------------
 -- * RightDistributive instances
@@ -85,7 +83,6 @@ instance RightDistributive Float where
 instance RightDistributive Double where 
 instance RightDistributive CFloat where 
 instance RightDistributive CDouble where 
-instance (Additive a, Multiplicative a, Subtractive a) => RightDistributive (Complex a) where 
 -------------------------------------------------------------------------------
 -- * Distributive instance
 -------------------------------------------------------------------------------

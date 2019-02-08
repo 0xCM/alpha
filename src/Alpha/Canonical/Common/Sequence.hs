@@ -4,12 +4,14 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
-module Alpha.Canonical.Collective.Seq
+module Alpha.Canonical.Common.Sequence
 (
-    Sequence(..), fseq
+    Sequence(..), sequence
 ) where
-import Alpha.Canonical.Elementary
-import Alpha.Canonical.Collective.Container
+import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Indexing
+import Alpha.Canonical.Common.Setwise
+import Alpha.Canonical.Common.Sequential
 
 import qualified Data.Sequence as Seq
 import qualified Data.List as List
@@ -23,20 +25,21 @@ instance Newtype(Sequence i a)
 
 type instance Individual (Sequence i t) = IxTerm i t
 
--- | Constructs a finite sequence
-fseq::(Integral i) => [IxTerm i t] -> Sequence i t
-fseq terms = (\t -> (termix t, t)) <$> terms |> Map.fromList |> Sequence
+-- | Constructs finite sequence
+sequence::(Integral i) => [IxTerm i t] -> Sequence i t
+sequence terms = (\t -> (termix t, t)) <$> terms |> Map.fromList |> Sequence
 
 seqsort::(Ord i) => Sequence i a -> [(i,IxTerm i a)]
 seqsort = (List.sortOn fst) . toList . unwrap
 
-instance (Integral i) => Unionizable (Sequence i a) where
+instance (Integral i) => Setwise (Sequence i a) where
     union x y = wrap $ Map.union (unwrap x) (unwrap y)
-    
+    intersect x y = wrap $ Map.intersection (unwrap x) (unwrap y)
+
 instance (Integral i) => IsList (Sequence i a) where
     type Item (Sequence i a) = IxTerm i a
     toList (Sequence terms) = associated terms
-    fromList l = fseq l
+    fromList l = sequence l
     
 instance (Integral i) => Indexable (Sequence i a) where
     type Indexer (Sequence i a) = i
@@ -49,8 +52,8 @@ instance  (Integral i) => Nullity (Sequence i a) where
     null (Sequence m) = (Map.null m)
     empty = fromList []
 
-instance  (Integral i) => Singletary (Sequence i a) where
-    singleton term = fseq [term]
+instance  (Integral i) => Singleton (Sequence i a) where
+    singleton term = sequence [term]
 
 instance Ord i => Paged (Sequence i a) where    
     take n s = s |> seqsort |> List.take (fromIntegral n) |> fromList |> wrap

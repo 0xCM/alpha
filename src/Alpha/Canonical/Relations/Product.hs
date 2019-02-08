@@ -6,11 +6,11 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Relations.Product
 (
-    Product,
+    --Product,
     NProduct(..), 
     NFactor(..), 
     Projector(..), 
-    Productive(..),
+    ProductSpace(..),
     Product1(..), 
     Product2(..), 
     Product3(..), 
@@ -18,7 +18,7 @@ module Alpha.Canonical.Relations.Product
     Product5(..),
 
 ) where
-import Alpha.Canonical.Elementary
+import Alpha.Canonical.Relations.Common
 
 -- Defines an arity-1 heterogenous product
 data Product1 a1 
@@ -61,7 +61,7 @@ data Product5 a1 a2 a3 a4 a5
 type UniProduct5 a = Product5 a a a a a
 
 -- | Defines the canonical bipartite product
-data family Product a b
+--data family Product a b
 
 type family NProduct (n::Nat) a = r | r -> n a where
     NProduct 1 (Tuple1 a1) = Product1 a1 
@@ -90,18 +90,39 @@ type family NFactor (n::Nat) a = r  where
 class Projector (i::Nat) a where
     project::a -> NFactor i a
 
-class Productive (n::Nat) a where
-     product::a -> NProduct n a
+
+class (KnownNat n, Space a) => ProductSpace n a where
     
-instance Productive 2 (Tuple2 a1 a2) where
-    product (a1,a2) = Product2 a1 a2
-instance Productive 3 (Tuple3 a1 a2 a3) where
-    product (a1,a2,a3) = Product3 a1 a2 a3
-instance Productive 4 (Tuple4 a1 a2 a3 a4) where
-    product (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
-instance Productive 5 (Tuple5 a1 a2 a3 a4 a5) where
-    product (a1,a2,a3,a4,a5) = Product5 a1 a2 a3 a4 a5
-            
+
+
+-- * ProductSpace instances
+-------------------------------------------------------------------------------
+type instance Point (Product2 a1 a2) = Product2 a1 a2
+instance Space (Product2 a1 a2) where
+    type PointSource (Product2 a1 a2) = (a1,a2)
+    point (a1,a2) = Product2 a1 a2
+instance ProductSpace 2 (Product2 a1 a2)
+
+type instance Point (Product3 a1 a2 a3) = Product3 a1 a2 a3
+instance Space (Product3 a1 a2 a3) where
+    type PointSource (Product3 a1 a2 a3) = (a1,a2,a3)
+    point (a1,a2,a3) = Product3 a1 a2 a3
+instance ProductSpace 3 (Product3 a1 a2 a3)
+
+type instance Point (Product4 a1 a2 a3 a4) = Product4 a1 a2 a3 a4
+instance Space (Product4 a1 a2 a3 a4) where
+    type PointSource (Product4 a1 a2 a3 a4) = (a1,a2,a3,a4)
+    point (a1,a2,a3,a4) = Product4 a1 a2 a3 a4
+instance ProductSpace 4 (Product4 a1 a2 a3 a4)
+
+type instance Point (Product5 a1 a2 a3 a4 a5) = Product5 a1 a2 a3 a4 a5
+instance Space (Product5 a1 a2 a3 a4 a5) where
+    type PointSource (Product5 a1 a2 a3 a4 a5) = (a1,a2,a3,a4,a5)
+    point (a1,a2,a3,a4,a5) = Product5 a1 a2 a3 a4 a5
+instance ProductSpace 5 (Product5 a1 a2 a3 a4 a5)
+
+-- * Projector instances
+-------------------------------------------------------------------------------            
 instance Projector 1 (Product2 a1 a2) where
     project (Product2 a1 _) = a1
 instance Projector 2 (Product2 a1 a2) where 
@@ -133,26 +154,31 @@ instance Projector 4 (Product5 a1 a2 a3 a4 a5) where
     project (Product5 _ _ _ a4 _) = a4
 instance Projector 5 (Product5 a1 a2 a3 a4 a5) where 
     project (Product5 _ _ _ _ a5) = a5
-                
+              
+-- * Formattable and Show instances
+-------------------------------------------------------------------------------    
 instance Formattable a => Formattable (Product1 a) where
     format (Product1 a) = tuplestring [format a]
-instance Formattable2 a1 a2 => Formattable (Product2 a1 a2) where
-    format (Product2 a1 a2) = tuplestring [format a1, format a2]
-instance Formattable3 a1 a2 a3 => Formattable (Product3 a1 a2 a3) where
-    format (Product3 a1 a2 a3) = tuplestring [format a1, format a2, format a3]
-instance Formattable4 a1 a2 a3 a4 => Formattable (Product4 a1 a2 a3 a4) where
-    format (Product4 a1 a2 a3 a4) = tuplestring [format a1, format a2, format a3, format a4]        
-instance Formattable5 a1 a2 a3 a4 a5 => Formattable (Product5 a1 a2 a3 a4 a5) where
-    format (Product5 a1 a2 a3 a4 a5) = tuplestring [format a1, format a2, format a3, format a4, format a5]
-    
 instance Formattable a => Show (Product1 a) where    
     show = string . format
+    
+instance Formattable2 a1 a2 => Formattable (Product2 a1 a2) where
+    format (Product2 a1 a2) = tuplestring [format a1, format a2]
 instance Formattable2 a1 a2 => Show (Product2 a1 a2) where    
     show = string . format
+    
+instance Formattable3 a1 a2 a3 => Formattable (Product3 a1 a2 a3) where
+    format (Product3 a1 a2 a3) = tuplestring [format a1, format a2, format a3]
 instance Formattable3 a1 a2 a3 => Show (Product3 a1 a2 a3) where    
     show = string . format
+    
+instance Formattable4 a1 a2 a3 a4 => Formattable (Product4 a1 a2 a3 a4) where
+    format (Product4 a1 a2 a3 a4) = tuplestring [format a1, format a2, format a3, format a4]        
 instance Formattable4 a1 a2 a3 a4 => Show (Product4 a1 a2 a3 a4) where    
     show = string . format    
+
+instance Formattable5 a1 a2 a3 a4 a5 => Formattable (Product5 a1 a2 a3 a4 a5) where
+    format (Product5 a1 a2 a3 a4 a5) = tuplestring [format a1, format a2, format a3, format a4, format a5]    
 instance Formattable5 a1 a2 a3 a4 a5 => Show (Product5 a1 a2 a3 a4 a5) where    
     show = string . format        
 
@@ -180,7 +206,9 @@ instance Biapplicative Product2 where
 instance Comonad (Product2 e) where
     duplicate src = Product2 (project @1 src) src
     extract src = project @2 src
-    
+
+-- * Semigroup instances
+-------------------------------------------------------------------------------        
 instance Semigroup2 a1 a2 => Semigroup (Product2 a1 a2) where 
     (<>) (Product2 x1 x2) (Product2 y1 y2)  
         = Product2 (x1 <> y1) (x2 <> y2)
@@ -197,6 +225,8 @@ instance Semigroup5 a1 a2 a3 a4 a5 => Semigroup (Product5 a1 a2 a3 a4 a5) where
     (<>) (Product5 x1 x2 x3 x4 x5) (Product5 y1 y2 y3 y4 y5)  
         = Product5 (x1 <> y1) (x2 <> y2) (x3 <> y3) (x4 <> y4) (x5 <> y5)
     
+-- * Monoid instances
+-------------------------------------------------------------------------------    
 instance Monoid2 a1 a2 => Monoid (Product2 a1 a2) where 
     mempty = Product2 mempty mempty
 

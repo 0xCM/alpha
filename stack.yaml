@@ -1,16 +1,8 @@
-resolver: lts-13.3
+resolver: lts-13.5
 
 packages:
   - .
 extra-deps:
-  # - git: https://github.com/0xCM/freer-effects.git
-  #   commit: 25108490ec41811fd321c9a09392c3d59ca09cbd    
-  # - algebra-4.3.1@sha256:38b3e2e7f1058b8f51dcb97c906d4e9871876fd82029a316970ee613fcca130f
-  # - vector-sized-1.0.4.0@sha256:d5cdea82b87ff7a5158d784e6869866e6a2c258f0a035279e0168b55350a723f
-  # - finite-typelits-0.1.4.2@sha256:d243523297c0526d32e9b7de98e04b79a4227577ddb25d3fecd7981439de243c
-  # - indexed-list-literals-0.2.1.2@sha256:0760e2a86605b5557af7180d4d50e317d75a5a92ca12aaabb6948ce97b7a94ac
-  # - git: https://github.com/0xCM/vector-space.git
-  #   commit: 04f9fb144211e0c6bc0e76ee120d1891b5f27fb5
-  # - Boolean-0.2.4@sha256:a16b532a00eb3f29e8e588f3ca5c225370eef3dd963ee833d88b241ac680dc71
-  # - NumInstances-1.4@sha256:d498d51e0fb23822706ca5e24944d014fdc1fd55bcd57f075f9797316eec0187    
-  
+  - git: https://github.com/0xCM/rounded
+    commit: f97ff3228b22b828accbe4761f61585d742f4718
+  - combinat-0.2.9.0@sha256:3daed23a2376f8d9903dc2c1c3758f1f2a0527178c81023080507e5f5ddf5b7a

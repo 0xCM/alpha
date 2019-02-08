@@ -19,7 +19,7 @@ class Unital a where
 -------------------------------------------------------------------------------    
 -- * Unital instances
 -------------------------------------------------------------------------------
-instance (Ord a, Unital a) =>  Unital (Set a) where
+instance (Ord a, Unital a) =>  Unital (FiniteSet a) where
     one = [one]
 
 instance Unital Natural where 

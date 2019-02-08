@@ -1,24 +1,34 @@
+-----------------------------------------------------------------------------
+-- | 
+-- Copyright   :  (c) Chris Moore, 2018
+-- License     :  MIT
+-- Maintainer  :  0xCM00@gmail.com
+-----------------------------------------------------------------------------
 module Alpha.Base.Alias
 (
     FiniteInt(..),
-    Set'(..),
+    Set'(..),BalancedSet(..),
     Bag(..),
-
+    DualMonoid, mdual',
+    JoinSemiLattice, sljoin',
+    MeetSemiLattice, slmeet',
+    Lattice(..),
+    OrdPair(..),
     sub', add', div', negate', mul', abs', pow', pow'', powa',mod', flip',
-    out', range',interval',union',intersect', rem',numerator',denominator', realToFrac', toRational',
+    out', range',interval',union',intersect', rem',numerator',denominator', realToFrac',
     and',or',not', quotRem', divMod', gcd',lcm', quot', set',
     lt', gt', gteq', lteq', between',
     sin', cos', tan', asin', acos', atan', sinh', cosh', asinh', acosh', atanh',
-    exp', log', logBase',
+    exp', log', logBase',min',max',
     powerset',
-    floatToDigits',complement'
+    floatToDigits',complement', frac',
 
 ) where
 import System.IO(IO,print)
 import Data.Ix(Ix(..))
 import Data.Ord
 import Data.Maybe(fromJust)
-import Data.Ratio(Ratio(..),Rational)
+import Data.Ratio(Ratio(..), (%))
 import Numeric.Interval(Interval, interval)
 import Data.Bool(Bool(..), (&&), (||), not)
 import Data.Set(Set(..),powerSet)
@@ -31,7 +41,12 @@ import GHC.Base(flip)
 import GHC.Enum(Bounded(..))
 import GHC.Show(Show)
 import Data.Typeable(typeOf)
+import Data.Functor(fmap)
+import Data.Foldable(fold)
+import Data.Monoid(Monoid(..),Dual(..))
 import Prelude(Integer)
+import Algebra.Lattice(Lattice(..), JoinSemiLattice((\/)),MeetSemiLattice((/\)))
+
 
 import qualified Data.Set as Set
 import qualified Data.Map.Lazy as LM
@@ -40,7 +55,22 @@ import qualified Data.MultiSet as MS
 type FiniteInt a = (Integral a, Bounded a)
 type Bag a = MS.MultiSet a
 type Set' a = Set a
+type BalancedSet a = Set a
+type DualMonoid a = Dual a
 
+type OrdPair a b = (Ord a, Ord b)
+
+sljoin'::(JoinSemiLattice a) => a -> a -> a
+sljoin' = (\/)
+{-# INLINE sljoin' #-}
+
+slmeet'::(MeetSemiLattice a) => a -> a -> a
+slmeet' = (/\)
+{-# INLINE slmeet' #-}
+
+mdual'::Monoid a => [a] -> DualMonoid a
+mdual' src = fold (fmap  Dual src)
+{-# INLINE mdual' #-}
 
 sub'::(Num a) => a -> a -> a
 sub' = (-)
@@ -151,21 +181,21 @@ rem'::(Integral a) => a -> a -> a
 rem' = rem
 {-# INLINE rem' #-}
 
-numerator'::(Integral a) => Ratio a -> a
+numerator'::Integral a => Ratio a -> a
 numerator' = numerator
 {-# INLINE numerator' #-}
 
-denominator'::(Integral a) => Ratio a -> a
+denominator'::Integral a => Ratio a -> a
 denominator' = denominator
 {-# INLINE denominator' #-}
+
+frac'::Integral a => a -> a -> Ratio a
+frac' = (%)
+{-# INLINE frac' #-}
 
 realToFrac'::(Real a, Fractional b) => a -> b
 realToFrac' = realToFrac
 {-# INLINE realToFrac' #-}
-
-toRational'::(Real r) => r -> Rational
-toRational' = toRational
-{-# INLINE toRational' #-}
 
 and'::Bool -> Bool -> Bool
 and' = (&&)
@@ -242,6 +272,14 @@ exp'::(Floating a) => a -> a
 exp' = exp
 {-# INLINE exp' #-}
 
+min'::Ord a => a -> a -> a
+min' = min
+{-# INLINE min' #-}
+
+max'::Ord a => a -> a -> a
+max' = max
+{-# INLINE max' #-}
+
 log'::Floating a => a -> a
 log' = log
 {-# INLINE log' #-}
@@ -256,3 +294,4 @@ floatToDigits' = floatToDigits
 
 complement'::(Bits a) => a -> a
 complement' = complement
+{-# INLINE complement' #-}

@@ -110,6 +110,7 @@ type Monoid2 a1 a2 = (Monoid a1, Monoid a2)
 -- Joins three 'Monoid' constraints to form a single three-parameter 'Monoid' constraint
 type Monoid3 a1 a2 a3 = (Monoid2 a1 a2, Monoid a3)
 
+-- Joins four 'Monoid' constraints to form a single four-parameter 'Monoid' constraint
 type Monoid4 a1 a2 a3 a4 = (Monoid3 a1 a2 a3, Monoid a4)
 
 type Monoid5 a1 a2 a3 a4 a5 = (Monoid4 a1 a2 a3 a4, Monoid a5)

@@ -24,4 +24,3 @@ class VectorSpace k a => Algebra k a where
     -- Furthermore, in general, <&> is not necessarily associative
     (<&>)::a -> a -> a
 
-instance Structure 2 Algebra

@@ -15,6 +15,7 @@ module Alpha.Linear.Operators
     LinearOperator(..),
     minor,
     cofactor,
+    det,
     rowswap,
     colswap,    
     rowsub,
@@ -40,13 +41,18 @@ newtype LinearOperator n k = LinearOperator (SquareMatrix n k)
 
 -- | Represents the data required to compute the determinant of a matrix
 newtype Det n a = Det (SquareMatrix n a)
-    deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
+    deriving (Eq, Functor, Foldable, Formattable, Show, Traversable, Generic, Data, Typeable)
+    --deriving (Formattable, Show) via (SquareMatrix n a)
 
 -- | Represents the cofactor of square matrix of dimension n + 1
 newtype Cofactor n a = Cofactor (Sign, Det n a)
     deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
 
--- Construct a minor representation from a matrix
+-- | Constructs, but does not evaluate, a determinant representation    
+det::forall n a.(KnownNat n) => SquareMatrix n a -> Det n a
+det = Det
+
+-- Constructs a minor representation from a matrix
 minor::forall n a. (KnownNat n, KnownNat (n - 1)) => (Int,Int) -> Matrix n n a -> Det (n - 1) a
 minor (i,j) m = minor  where
      keep (Cell ((r,c), _)) = r != i && c != j
@@ -86,3 +92,7 @@ colsub i c src = pick <$> natrange @m |> append |> matrix where
 -- rowscale::forall m n a. (KnownNatPair m n, Semiring a) => Int -> a -> Matrix m n a -> Matrix m n a
 -- rowscale i s m = undefined where
 --     scaled = (row i m)
+
+instance forall m n p a. (KnownNatTriple m n p, Semiring a) => Bimultiplicative  (Matrix m n a) (Matrix n p a) where
+    a >*< b = (\(r,c) -> r >*< c) <$> [(r,c) | r <- rows a, c <- cols b] |> matrix
+

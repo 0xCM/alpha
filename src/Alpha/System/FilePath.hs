@@ -126,46 +126,46 @@ instance PathComponent RelativeFilePath where
 instance PathComponent RelativeFolderPath where
     path (RelativeFolderPath x) = x
     
-instance Concatenable DriveLetter FolderName where
-    type Concatenated DriveLetter FolderName = FolderPath
-    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance BiConcatenable DriveLetter FolderName where
+    type BiConcatenated DriveLetter FolderName = FolderPath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> folder
 
-instance Concatenable DriveLetter RelativeFolderPath where
-    type Concatenated DriveLetter RelativeFolderPath = FolderPath
-    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance BiConcatenable DriveLetter RelativeFolderPath where
+    type BiConcatenated DriveLetter RelativeFolderPath = FolderPath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> folder
 
-instance Concatenable DriveLetter FileName where
-    type Concatenated DriveLetter FileName = FilePath 
-    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance BiConcatenable DriveLetter FileName where
+    type BiConcatenated DriveLetter FileName = FilePath 
+    biconcat x y = Text.concat [path x, FSlash, path y] |> file
 
-instance Concatenable DriveLetter RelativeFilePath where
-    type Concatenated DriveLetter RelativeFilePath = FilePath 
-    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance BiConcatenable DriveLetter RelativeFilePath where
+    type BiConcatenated DriveLetter RelativeFilePath = FilePath 
+    biconcat x y = Text.concat [path x, FSlash, path y] |> file
 
-instance Concatenable FolderPath FolderName where
-    type Concatenated FolderPath FolderName = FolderPath
-    concat x y = Text.concat [path x, FSlash, path y] |> folder        
+instance BiConcatenable FolderPath FolderName where
+    type BiConcatenated FolderPath FolderName = FolderPath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> folder        
 
-instance Concatenable FolderPath FileName where
-    type Concatenated FolderPath FileName = FilePath
-    concat x y = Text.concat [path x, FSlash, path y] |> file
+instance BiConcatenable FolderPath FileName where
+    type BiConcatenated FolderPath FileName = FilePath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> file
 
-instance Concatenable FolderPath RelativeFolderPath where
-    type Concatenated FolderPath RelativeFolderPath = FolderPath
-    concat x y = Text.concat [path x, FSlash, path y] |> folder
+instance BiConcatenable FolderPath RelativeFolderPath where
+    type BiConcatenated FolderPath RelativeFolderPath = FolderPath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> folder
 
-instance Concatenable FolderPath RelativeFilePath where
-    type Concatenated FolderPath RelativeFilePath = FilePath
-    concat x y = Text.concat [path x, FSlash, path y] |> file            
+instance BiConcatenable FolderPath RelativeFilePath where
+    type BiConcatenated FolderPath RelativeFilePath = FilePath
+    biconcat x y = Text.concat [path x, FSlash, path y] |> file            
 
-instance Concatenable FileName FileExtension where
-    type Concatenated FileName FileExtension = FilePath
-    concat x y = Text.concat [path x, Period, path y] |> file
+instance BiConcatenable FileName FileExtension where
+    type BiConcatenated FileName FileExtension = FilePath
+    biconcat x y = Text.concat [path x, Period, path y] |> file
     
-instance Concatenable FilePath FileExtension where
-    type Concatenated FilePath FileExtension = FilePath
-    concat x y = Text.concat [path x, Period, path y] |> file    
+instance BiConcatenable FilePath FileExtension where
+    type BiConcatenated FilePath FileExtension = FilePath
+    biconcat x y = Text.concat [path x, Period, path y] |> file    
 
-instance Concatenable FileExtension FileExtension where
-    type Concatenated FileExtension FileExtension = FileExtension
-    concat x y = Text.concat [path x, Period, path y] |> extension    
+instance BiConcatenable FileExtension FileExtension where
+    type BiConcatenated FileExtension FileExtension = FileExtension
+    biconcat x y = Text.concat [path x, Period, path y] |> extension    

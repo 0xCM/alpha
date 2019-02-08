@@ -9,10 +9,11 @@ module Alpha.Canonical.Algebra.Multiplicative
 (
     module X,
     Multiplicative(..),
+    Invertible(..),
     Bimultiplicative(..),    
     Multiplied(..),
-    MultiProduct(..),
-    multiproduct,
+    Product(..),
+    product,
 
 ) where
 import Alpha.Canonical.Relations
@@ -24,7 +25,7 @@ type family Multiplied a b
 
 -- | Represents a formal product of an arbitrary
 -- number of elements
-newtype MultiProduct a = MultiProduct [a]    
+newtype Product a = Product [a]    
 
 -- / Characterizes a type that supports a notion of *associative* multiplication    
 -- mul a b == mul b a
@@ -54,20 +55,49 @@ class Bimultiplicative a b where
     {-# INLINE (>*<) #-}    
     infixl 7 >*<
 
+-- | Characterizes types whose values are closed under 
+-- mulitiplicative inversion 
+class Invertible a where
+    invert::a -> a
+
+-------------------------------------------------------------------------------        
+-- * Invertible instances
+-------------------------------------------------------------------------------
+instance (Integral a) => Invertible (Ratio a) where
+    invert = recip
+    {-# INLINE invert #-}
+
+instance Invertible Float where 
+    invert = recip
+    {-# INLINE invert #-}
+
+instance Invertible Double where 
+    invert =  recip
+    {-# INLINE invert #-}
+
+instance Invertible CFloat where 
+    invert = recip
+    {-# INLINE invert #-}
+
+instance Invertible CDouble where 
+    invert = recip
+    {-# INLINE invert #-}    
 
 -- | Constructs a summation
-multiproduct::[a] -> MultiProduct a
-multiproduct = MultiProduct
+product::[a] -> Product a
+product = Product
 
-instance (Unital a, Multiplicative a) => Computable (MultiProduct a) where
-    type Computed (MultiProduct a) = a
-    compute (MultiProduct items) = reduce one (*) items
-        
-
+instance (Unital a, Multiplicative a) => Computable (Product a) where
+    type Computed (Product a) = a
+    compute (Product items) = reduce one (*) items
+            
+instance Multiplicative a => Multiplicative (Vector a) where
+    v1 * v2 = vmix (*) (vecpair v1 v2)  where
+    
 -------------------------------------------------------------------------------
 -- * Multiplicative instances
 -------------------------------------------------------------------------------
-instance (Ord a, Multiplicative a) =>  Multiplicative (Set a) where
+instance (Ord a, Multiplicative a) =>  Multiplicative (FiniteSet a) where
     mul x y = intersect x y
 
 instance Multiplicative Natural where 

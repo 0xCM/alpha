@@ -7,9 +7,14 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Alpha.Canonical.Algebra.Successive
 (
-    Incrementable(..), Increment(..),
-    Decrementable(..), Decrement(..),
-    Successive(..), Antecedent(..),
+    Incrementable(..), 
+    Decrementable(..), 
+    Successive(..), 
+    Antecedent(..),
+    Bidecrementable(..),
+    Increment(..),
+    Biincrementable(..),
+    Decrement(..),
     
 ) where
 import Alpha.Canonical.Relations
@@ -19,78 +24,35 @@ import Alpha.Canonical.Algebra.Multiplicative
 import qualified Data.List as List
 
 type family Increment a 
-
-type instance Increment Int = Int
-type instance Increment Int8 = Int8
-type instance Increment Int16 = Int16
-type instance Increment Int32 = Int32
-type instance Increment Int64 = Int64
-type instance Increment Integer = Integer
-type instance Increment Word = Word
-type instance Increment Word8 = Word8
-type instance Increment Word16 = Word16
-type instance Increment Word32 = Word32
-type instance Increment Word64 = Word64
-type instance Increment Natural = Natural
-type instance Increment (Ratio a) = Ratio a
-type instance Increment Float = Float
-type instance Increment Double = Double
-type instance Increment CFloat = CFloat
-type instance Increment CDouble = CDouble
-
 type family Decrement a 
 
-type instance Decrement Int = Int
-type instance Decrement Int8 = Int8
-type instance Decrement Int16 = Int16
-type instance Decrement Int32 = Int32
-type instance Decrement Int64 = Int64
-type instance Decrement Integer = Integer
-type instance Decrement Word = Word
-type instance Decrement Word8 = Word8
-type instance Decrement Word16 = Word16
-type instance Decrement Word32 = Word32
-type instance Decrement Word64 = Word64
-type instance Decrement Natural = Natural
-type instance Decrement (Ratio a) = Ratio a
-type instance Decrement Float = Float
-type instance Decrement Double = Double
-type instance Decrement CFloat = CFloat
-type instance Decrement CDouble = CDouble
+class Bidecrementable a where
+    bidec::a -> Decrement a
+
+class Biincrementable a where
+    biinc::a -> Increment a
 
 -- / Characterizes a type that can be incremented an indefinite number of times
 -- but, depending on the realization, may eventually cycle
 class Incrementable a where
     -- Increments the operand by one unit
-    inc::a -> Increment a
-    default inc::(a ~ Increment a,Additive a, Unital a) => a -> Increment a
+    inc::a -> a
+    default inc::(Additive a, Unital a) => a -> a
     inc a = a + one
     {-# INLINE inc #-}
 
-    -- | Infix synonym for 'inc'
-    (>++<)::a -> Increment a
-    (>++<) = inc
-    {-# INLINE (>++<) #-}
-    infix 2 >++<
 
 -- / Characterizes a type that can be decremented an indefinite number of times
 -- but, depending on the realization, may eventually cycle
 class Decrementable a where
     -- Decrements the operand by one unit
-    dec::a -> Decrement a 
-    default dec::(a ~ Decrement a, Subtractive a, Unital a) => a -> Decrement a
+    dec::a -> a 
+    default dec::(Subtractive a, Unital a) => a -> a
     dec a = a - one
     {-# INLINE dec #-}
 
-    -- | Infix synonym for 'inc'
-    (>--<)::a -> Decrement a 
-    (>--<) = dec
-    {-# INLINE (>--<) #-}
-    infix 2 >--<
 
-    
-
-class (Incrementable a, Decrementable a) => Alternating a
+class (Incrementable a, Decrementable a) => Alternating a where
 instance (Incrementable a, Decrementable a) => Alternating a 
 
 -- / Characterizes a type with which a strictly monotonic finite sequence 
@@ -226,4 +188,3 @@ instance Antecedent Int32 where
 
 instance Antecedent Int64 where
     prior n = ifelse (n == minBound) none (just (n - 1))
-

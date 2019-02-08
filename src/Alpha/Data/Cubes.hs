@@ -6,6 +6,8 @@
 -----------------------------------------------------------------------------
 module Alpha.Data.Cubes
 (
+    Cube(..),
+    cube,
     ElementaryInterval(..),
     ElementaryCube(..),
     embeddingNumber,
@@ -16,7 +18,17 @@ where
 import Alpha.Canonical
 
 -- See p. 40 of Y2004CHOMO
-    
+
+-- | Represents an n-dimensional cube
+newtype Cube n a = Cube (VecN n (Interval a))
+    deriving (Eq,Ord,Generic,Data,Typeable,Discrete)
+
+type instance Individual (Cube n a) = Interval a
+
+-- | Constructs an n-dimensional cube
+cube::forall n a. KnownNat n => [Interval a] -> Cube n a
+cube intervals = Cube $ vecN intervals
+
 -- | Represents a closed interval of the form [a, a + one] or [a,a] which is degenerate
 -- and represents a singleton
 newtype ElementaryInterval a = ElementaryInterval (Interval a)
@@ -24,7 +36,7 @@ newtype ElementaryInterval a = ElementaryInterval (Interval a)
 
 -- | Represents an n-dimensional cube composed of n 'ElementaryInterval' values
 newtype ElementaryCube n a = ElementaryCube (VecN n (ElementaryInterval a))
-    deriving (Eq,Ord,Generic,Data,Typeable,Componentized)
+    deriving (Eq,Ord,Generic,Data,Typeable,Discrete)
 
 type instance Individual (ElementaryInterval a) = a
 type instance Individual (ElementaryCube n a) = ElementaryInterval a        

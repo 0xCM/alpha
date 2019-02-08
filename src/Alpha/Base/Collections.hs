@@ -23,10 +23,11 @@ module Alpha.Base.Collections
 where
 import Control.DeepSeq(NFData)
 import Control.Monad
-import Data.Data(Data)
+import Data.Data(Data,Typeable)
 import Data.Eq(Eq)
 import Data.Foldable(Foldable)
 import Data.Foldable
+import Data.Functor
 import Data.HashSet(HashSet)
 import Data.Ix(Ix(..))
 import Data.List.NonEmpty
@@ -49,6 +50,7 @@ import qualified Data.Map as LM
 import qualified Data.Set as Set
 import qualified Data.HashMap.Lazy as LHM
 import qualified Data.HashMap.Strict as SHM
+import qualified Data.Vector as Vector
 
 type LazyHashMap = LHM.HashMap
 type StrictHashMap = SHM.HashMap

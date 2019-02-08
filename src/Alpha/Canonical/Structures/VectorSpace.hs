@@ -17,7 +17,7 @@ module Alpha.Canonical.Structures.VectorSpace
     VecN(..),
     VecPair(..),
     VecNPair(..),
-    VectorBasis(..),
+    VecNBasis(..),
     NVectored(..),
     vecN
 
@@ -32,34 +32,26 @@ import qualified Data.Vector.Storable as Storable
 import qualified Data.Vector as Vector
 import qualified Data.List as List
 
--- | Represents a pair of vectors
-newtype VecPair a = VecPair (Vector a, Vector a)
-    deriving (Eq,Ord,Generic,Data,Typeable)
-instance Newtype (VecPair a)    
-
--- | Represents a pair of n-vectors
-newtype VecNPair n a = VecNPair (VecPair a) 
-    deriving (Eq,Ord,Generic,Data,Typeable,Componentized)
-instance Newtype (VecNPair n a)    
-
 -- | Represents a vector with type-level dimension
 newtype VecN n a = VecN (Vector a)
     deriving (Eq,Ord,Generic,Data,Typeable,Functor,
         Applicative,Foldable,Traversable,Monad,IsList,
         Additive,Subtractive,Negatable,Multiplicative,
-        Componentized,Indexable,Length,Queryable,Listed)
+        Discrete,Indexable,Length,Queryable,Listed)
     deriving Formattable via (Vector a)
 instance Newtype (VecN n a)    
+type instance Individual (VecN n a) = a
+
+-- | Represents a pair of n-vectors
+newtype VecNPair n a = VecNPair (VecPair a) 
+    deriving (Eq,Ord,Generic,Data,Typeable,Discrete)
+instance Newtype (VecNPair n a)    
+type instance Individual (VecNPair n a) = (a,a)
 
 -- | Represents a basis in an n-dimensional vector space
-newtype VectorBasis n a = VectorBasis [VecN n a]
+newtype VecNBasis n a = VecNBasis [VecN n a]
     deriving (Eq,Ord,Generic,Data,Typeable,Functor, Foldable,Traversable)
-instance Newtype (VectorBasis n a)    
-
-type instance Individual (Vector a) = a
-type instance Individual (VecPair a) = (a,a)
-type instance Individual (VecN n a) = a
-type instance Individual (VecNPair n a) = (a,a)
+instance Newtype (VecNBasis n a)    
 
 class (Field k, LeftModule k v, Dimensional v) => VectorSpace k v where
 
@@ -67,9 +59,9 @@ class (KnownNat n, VectorSpace k v) => VectorSpaceN n k v where
     dim::(Integral i) => i
     dim = natg @n
 
-class (Componentized v , Semiring (Individual v)) => InnerProduct v where
+class (Discrete v , Semiring (Individual v)) => InnerProduct v where
     dot::v -> v -> Individual v
-    dot v1 v2 = reduce zero (+) [x * y | (x,y) <- List.zip (components v1) (components v2)]        
+    dot v1 v2 = reduce zero (+) [x * y | (x,y) <- pairzip (individuals v1) (individuals v2)]        
 
     (.*.)::v -> v -> Individual v
     (.*.) = dot
@@ -77,75 +69,35 @@ class (Componentized v , Semiring (Individual v)) => InnerProduct v where
 
 class (VectorSpace k v, InnerProduct v) => InnerProductSpace k v where
 
-data instance Space (VectorSpace k a) (VecN n a) = VecNSpace
+--data instance Space (VectorSpace k a) (VecN n a) = VecNSpace
 
 type Euclidean n k v = (KnownNat n, v ~ VecN n k, AbelianGroup v,  Ring k, LeftAction k v)
---instance Euclidean n k v => LeftModule k v
+
 
 class KnownNat n => NVectored n s where
     nvector::s -> VecN n (Individual s)
 
-instance KnownNat n => NVectored n [a] where
-    nvector = vecN
 
 vecN::forall n a. KnownNat n => [a] -> VecN n a
 vecN x = VecN (Vector.fromList x)
 
 applyVecN::forall n a. KnownNat n => O2 a -> VecNPair n a -> VecN n a    
-applyVecN f v = vecN @n ((\(x,y) -> f x y) <$> components v)
-
-applyVec::O2 a -> VecPair a -> Vector a    
-applyVec f v = fromList ((\(x,y) -> f x y) <$> components v)
-
-vecpair::Vector a -> Vector a -> VecPair a
-vecpair v1 v2 = VecPair (v1,v2)
+applyVecN f v = vecN @n ((\(x,y) -> f x y) <$> individuals v)
 
 vecpairN::forall n a. KnownNat n => VecN n a -> VecN n a -> VecNPair n a
 vecpairN (VecN v1) (VecN v2) = VecNPair (vecpair v1 v2)
                 
--- Vector instances
+instance KnownNat n => NVectored n [a] where
+    nvector = vecN
+
+-- *Vector membership
 -------------------------------------------------------------------------------
-instance Vectored (Vector a) a where
-    vector  = id
     
-instance Componentized (Vector a) where
-    components = toList
-
-instance Queryable (Vector a) where
-    filter pred source =  toList source |> filter pred
-
-instance Length (Vector a) where
-    length = fromIntegral . Vector.length
-        
-instance (Formattable a) => Formattable (Vector a) where
-    format v = v |> components |> tuplestring
-
-instance (Additive a) => Additive (Vector a) where
-    v1 + v2 = applyVec (+) (VecPair (v1,v2))
-    
-instance Negatable a => Negatable (Vector a) where
-    negate v = negate <$> v 
-   
-instance Subtractive a => Subtractive (Vector a) where
-    v1 - v2 = applyVec (-) (vecpair v1 v2)
-
-instance Multiplicative a => Multiplicative (Vector a) where
-    v1 * v2 = applyVec (*) (vecpair v1 v2)  where
-                
 instance Semiring a => InnerProduct (Vector a)
-
-instance Listed (Vector a) where
-    head = Vector.unsafeHead
-    tail = Vector.unsafeTail
-
--- VecPair instances    
--------------------------------------------------------------------------------
-instance Componentized (VecPair a) where
-    components (VecPair (v1,v2)) = Vector.zipWith (\x y -> (x,y)) v1 v2 |> toList
     
--- VecN instances    
+-- *VecN membership
 -------------------------------------------------------------------------------
-instance KnownNat n => Vectored (VecN n a) a where
+instance KnownNat n => Vectored (VecN n a) where
     vector (VecN v) = v
 
 instance forall n a. (KnownNat n, Formattable a) => Show (VecN n a) where    
@@ -160,7 +112,7 @@ instance forall n a. (KnownNat n, Nullary a) => Nullary (VecN n a) where
 instance forall n a. (KnownNat n, AbelianGroup a) => AbelianGroup (VecN n a)
         
 instance forall n k a. (KnownNat n, LeftAction k a) => LeftAction k (VecN n a) where
-    k *. v = (\c -> k *. c) <$> components v |> vecN
+    k *. v = (\c -> k *. c) <$> individuals v |> vecN
 
 instance forall n a. (KnownNat n, Semiring a) => InnerProduct (VecN n a)
 

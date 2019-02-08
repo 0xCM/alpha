@@ -9,7 +9,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Alpha.Canonical.Algebra.Modular
 (
-    Modulo(..),
+    BiModulus(..),
     Bimodular(..),(/%), (/%%),
 
 ) where
@@ -24,14 +24,14 @@ import qualified Data.Set as Set
 -- type 'mod' the second type. Intended to represent to the result of the 
 -- modulus operation on integers, a paritioning of a set by a subset or
 -- more generally, quotient groups and similar
-type family Modulo a b
+type family BiModulus a b
 
 class Bimodular a b where
     -- | Calculates the remainder of dividing the first operand by the second
-    bimod::a -> b -> Modulo a b
+    bimod::a -> b -> BiModulus a b
 
     -- | Infix synonym for 'bimod'
-    (>%<)::a -> b -> Modulo a b
+    (>%<)::a -> b -> BiModulus a b
     (>%<) = bimod
     {-# INLINE (>%<) #-}
     infix 8 >%<

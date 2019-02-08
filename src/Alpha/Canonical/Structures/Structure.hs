@@ -15,7 +15,6 @@ module Alpha.Canonical.Structures.Structure
 )
 where
 import Alpha.Canonical.Common
-import Alpha.Canonical.Elementary.Set
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
