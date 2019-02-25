@@ -41,7 +41,6 @@ newtype BitString = BitString [Bit]
 instance Newtype (BitString)
 
     
-type instance Unsigned Bit = Bit
 type instance Individual Integer = Bit
 type instance Individual Int = Bit
 type instance Individual Int8 = Bit
@@ -392,7 +391,7 @@ instance Concatenable Int32 where
     concat x y = bitsplat 32 x y    
     
 instance Formattable BitString where
-    format (BitString bits) =  format <$> bits |> append |> prefix n
+    format (BitString bits) =  format <$> bits |> collapse |> prefix n
         where n = ((length bits)::Int) |> format |> parenthetical |> pad
                 
 instance ToInteger BitString where

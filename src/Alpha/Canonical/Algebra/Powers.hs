@@ -29,8 +29,9 @@ newtype Exponential b p = Exponential (b, p)
 instance Newtype (Exponential b p)    
     
 -- | Characterizes a type that can be Raised to a natural (nonnegative) power
-class (Multiplicative b, Unital b) =>  Power b where
+class Power b where
     pow::b -> Natural -> b
+    default pow::(Multiplicative b, Unital b) => b -> Natural -> b
     pow b p = product where
          factors = List.replicate (integral p) b
          product = reduce one (*) factors
@@ -38,6 +39,7 @@ class (Multiplicative b, Unital b) =>  Power b where
 
     -- | Infix synonym for 'pow'
     (^)::b -> Natural -> b
+    default (^)::(Multiplicative b, Unital b) => b -> Natural -> b
     (^) = pow
     {-# INLINE (^) #-}
     infixr 8 ^
@@ -60,7 +62,7 @@ class Floating a => FloatingPower a where
     {-# INLINE (**) #-}
     infixr 8 **
 
---------------------------------------------------------------------------------
+    
 -- * Power Instances
 --------------------------------------------------------------------------------
 instance Power Natural where 
@@ -115,7 +117,6 @@ instance Power CDouble where
     pow = pow'
     {-# INLINE pow #-}
 
---------------------------------------------------------------------------------
 -- * FloatingPower Instances
 --------------------------------------------------------------------------------
 instance FloatingPower Float where 
@@ -131,7 +132,6 @@ instance FloatingPower CDouble where
     powa = powa'
     {-# INLINE powa #-}
 
---------------------------------------------------------------------------------
 -- * IntegralPower Instances
 --------------------------------------------------------------------------------
 instance (Integral n) => IntegralPower (Ratio n) where 
@@ -149,3 +149,4 @@ instance IntegralPower CFloat where
 instance IntegralPower CDouble where 
     powi = pow''
     {-# INLINE powi #-}    
+

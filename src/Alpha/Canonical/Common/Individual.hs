@@ -4,11 +4,14 @@
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE PolyKinds #-}
 module Alpha.Canonical.Common.Individual
 (
+    module X,
     Individual(..),
+    Membership(..),
+    Container(..),
     Reduced(..),
-    FinitelyConstructible(..),
     FinitelyCountable(..),
     Discrete(..),
     Discretizable(..),
@@ -27,25 +30,23 @@ module Alpha.Canonical.Common.Individual
     Filter(..),
     Queryable(..),
     Transposable(..),
-    Indexable(..),
-    Container(..),
     Selector(..),
     Iterable(..),    
 )
 where
-import Alpha.Canonical.Common.Root
-import Alpha.Canonical.Common.Synonyms
+import Alpha.Canonical.Common.Root as X
+import Alpha.Canonical.Common.Synonyms as X
 import qualified Data.List as List
 import qualified Data.MultiSet as Bag
 import qualified Data.List as List
 import qualified Data.Set as Set
 import qualified Data.Vector as Vector
 import qualified Data.Stream.Infinite as Stream
-import qualified Data.Sequence as Sequence
+import qualified Data.Sequence as Seq
 import qualified Data.Map as Map
 
 -- | Defines the canonical constituent type of an aggregant
-type family Individual a
+type family Individual (a::k)
 
 type instance Individual [a] = a
 type instance Individual (Bag a) = a
@@ -54,27 +55,15 @@ type instance Individual (Stream a) = a
 type instance Individual (NonEmpty a) = a
 type instance Individual (Seq a) = a
 type instance Individual (Vector a) = a
+type instance Individual (BalancedSet a) = a
+type instance Individual (Queryable a) = a
 
 type family Reduced a
 type instance Reduced [a] = a
 
-
 class Container a where
-    contains::Bool -> a -> a -> Bool
     content::a -> [Individual a]
 
-class Indexable a where
-    type Indexer a
-    type Indexer a = Int
-    
-    idx::a -> Indexer a -> Individual a
-    idx = (!!)
-    {-# INLINE idx #-}
-
-    (!!)::a -> Indexer a -> Individual a
-    (!!) = idx
-    {-# INLINE (!!) #-}
-    infixr 9 !!
 
 type Grouping a = [Individual a]    
 
@@ -119,14 +108,7 @@ class Discrete a where
 class Discretizable a where
     type Discretized a
     discretize::a -> [Discretized a]
-        
--- | Characterizes a type that can be constructed from a finite
--- number of individuals
-class FinitelyConstructible a where
-    
-    -- Constructs an aggregant from a list of supplied constituents
-    finite::[Individual a] -> a
-    
+            
 -- | Characterizes types inhabited by a finite number of
 -- values for which a count can be determined
 class FinitelyCountable a where
@@ -177,7 +159,7 @@ class (HasFirst a, HasLast a) => Endpointed a where
 -- | Characterizes a type over which function iterates may be computed
 class Iterable a where
     iterate :: O1 (Individual a) -> (Individual a) -> a
-
+    
 
 -- | Provides concrete evidence of an existential    
 newtype Construction a = Construction (Individual a)
@@ -186,12 +168,8 @@ type instance Individual (Construction a) = Individual a
 instance Singletary (Construction a) where
     individual (Construction x) = x
 
-instance FinitelyConstructible [a] where
-    finite = id
-
 instance FinitelyCountable [a] where
     count = fromIntegral . List.length
-
 
 -------------------------------------------------------------------------------
 -- * Vectored instances
@@ -229,10 +207,14 @@ instance Groupable [a] where
     groups = List.groupBy
 
 -- | Reserved names
-class Membership a where    
+class Membership a where  
+    members::a -> [Individual a]  
+
 class Componentized a where
     
-    
+instance Membership [a] where
+    members a = a
+
 -------------------------------------------------------------------------------            
 -- * Singleton instances
 -------------------------------------------------------------------------------        
@@ -277,19 +259,20 @@ instance Transposable [[a]] where
     type Transposed [[a]] = [[a]]
     transpose = List.transpose
 
--- * Indexable instances
--------------------------------------------------------------------------------            
-instance Eq a => Indexable [a] where    
-    idx = (List.!!)
+-- *Container instances
+-------------------------------------------------------------------------------        
+instance Ord a => Container (BalancedSet a) where
+    content src = Set.toList src
 
-instance Indexable (Seq a) where
-    idx = Sequence.index
+instance Ord a => Container (Bag a) where
+    content src = Bag.toList src
+
+instance Ord a => Container (Seq a) where
+    content src = toList src
+        
+instance Container [a] where        
+    content src = src
     
-instance Indexable (Vector a) where
-    idx vector i = vector Vector.! i
-
-instance Ord k => Indexable (Map k v) where
-    type Indexer (Map k v) = k
-    idx map k = (k, map Map.! k)
-
-
+instance Container (Vector a) where        
+    content src = toList src
+    

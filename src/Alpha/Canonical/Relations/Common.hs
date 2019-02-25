@@ -9,12 +9,16 @@ module Alpha.Canonical.Relations.Common
 (        
     module X,
     Relational(..),
-    Related(..)
+    Relation(..),
 
 
 ) where
 import Alpha.Base as X
 import Alpha.Canonical.Common as X
+
+-- | Specifies a relation between two elements    
+newtype Relation a = Relation (a,a)    
+    deriving (Eq,Ord,Data,Typeable)
 
 -- Characterizes a binary relation on a set s    
 class Eq a => Relational a where
@@ -28,14 +32,16 @@ class Eq a => Relational a where
     (~?)::P2 a
     (~?) = related
     infixl 6 ~?
-    
 
-class Related a where
-    type Relation a 
-    type LeftPart a 
-    type RightPart a 
+    relate::a -> a -> Relation a
+    relate a b = Relation (a,b)
 
-    -- | Establishes a relation between two elements
-    relate::LeftPart a -> RightPart a -> Relation a 
+-- class Related a where
+--     type Relation a 
+--     type LeftPart a 
+--     type RightPart a 
+
+--     -- | Establishes a relation between two elements
+--     relate::LeftPart a -> RightPart a -> Relation a 
     
 

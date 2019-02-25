@@ -16,7 +16,6 @@ module Alpha.Linear.Groups
 where
 import Alpha.Canonical
 import Alpha.Linear.Matrix as X
-import Alpha.Linear.Shapes as X
 
 class KnownNat n => LinearGroup n g where
 

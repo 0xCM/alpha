@@ -19,8 +19,6 @@ module Alpha.Canonical.Common.Conversions
     Doubly(..),
     ToIntegral(..),
     FromText(..),
-    ToString(..),
-    ToLines(..),
     list,
     int8, int16, int32, int64,
     word8, word16, word32, word64,
@@ -33,17 +31,6 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Ratio as DR
 import qualified Data.Vector as Vector
-
-
--- | Characterizes a value that can be converted to a list of 'Text' values
-class ToLines a where
-    -- | Converts an 'a' value to a list of 'Text' values
-    lines::a -> [Text]    
-
--- | Characterizes a value that can be converted to a 'String'
-class ToString a where
-    -- | Convers an 'a' value to a 'String'
-    string::a -> String
 
 -- | Characterizes a value that can be materialized from 'Text'
 class FromText a where
@@ -99,8 +86,6 @@ class ToNatural d where
 class FromNatural a where
     fromNatural::Natural -> a
 
-    
-
 list::(IsList a) => a -> [Item a]
 list = toList
 
@@ -153,14 +138,11 @@ word64::(Integral n) => n -> Word64
 word64 n = fromIntegral n
 {-# INLINE word64 #-}
 
-
 -- Produces a 'Fractional' number from a 'Real' number
 fractional::(Real r, Fractional f) => r -> f
 fractional = realToFrac'
 {-# INLINE fractional #-} 
 
-
--------------------------------------------------------------------------------
 -- * ToIntegral instances
 -------------------------------------------------------------------------------
 instance ToIntegral Int where
@@ -188,7 +170,6 @@ instance ToIntegral Word64 where
 instance ToIntegral Natural where
     integral = fromIntegral    
 
--------------------------------------------------------------------------------
 -- * FromDouble instances
 -------------------------------------------------------------------------------
 instance FromDouble Natural where 
@@ -299,7 +280,6 @@ instance ToDouble CDouble where
     double = realToFrac
     {-# INLINE double #-}    
 
--------------------------------------------------------------------------------
 -- * ToInt instances
 -------------------------------------------------------------------------------
 instance ToInt Natural where 
@@ -351,7 +331,6 @@ instance ToInt CDouble where
     int = truncate
     {-# INLINE int #-}
 
--------------------------------------------------------------------------------
 -- * FromInt instances
 -------------------------------------------------------------------------------
 instance FromInt Natural where 
@@ -617,22 +596,3 @@ instance ToNatural CFloat where
 instance ToNatural CDouble where 
     natural = truncate
     {-# INLINE natural #-}
-
--------------------------------------------------------------------------------
--- * ToString instances
--------------------------------------------------------------------------------    
-instance ToString String where
-    string = id
-    
-instance ToString Text where
-    string x = Text.unpack x    
-
-instance ToString Char where
-    string x = [x]
-    
-instance ToLines Text where    
-    lines = Text.lines
-
-instance ToLines String where    
-    lines = Text.lines . Text.pack    
-    

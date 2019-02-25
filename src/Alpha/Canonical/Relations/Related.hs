@@ -19,8 +19,10 @@ module Alpha.Canonical.Relations.Related
     Equivalence(..),
     Setoid(..),    
     TotalOrd(..),
+    StrictPartialOrder(..),
     PartialOrder(..),
-    TotalOrder(..),
+    PartiallyOrdered(..),
+    TotallyOrdered(..),
     OrdNum(..),
     Pairs(..),
     Minimal(..), 
@@ -36,7 +38,6 @@ module Alpha.Canonical.Relations.Related
     Quotient(..),
     Equation(..),
     Inversion(..),
-    Poset, poset
 
 ) where
 import Alpha.Canonical.Relations.Common    
@@ -49,7 +50,6 @@ import qualified Data.List as List
 
 type family Quotient a
 
-
 --type instance Extremum (Interval a) = a
 type instance Individual (Interval a) = a
 
@@ -60,7 +60,6 @@ type Comparer a = a -> a -> Bool
 newtype Pairs a b = Pairs [(a,b)]
     deriving (Show,Eq,Ord,Generic)
 instance Newtype (Pairs a b)
-
 
 -- | Represents a relation between two expressions/values
 -- of the form a := b of (potentially) different types
@@ -79,30 +78,32 @@ newtype Reflexion a = Reflexion (a,a)
 -- Characterizes an reflexive relation: a ~ a
 -- See https://en.wikipedia.org/wiki/Symmetric_relation 
 class Relational a => Reflexive a where
-
     -- | Establishes a reflexive relation between two points
     reflex::a -> Reflexion a
 
-newtype Trans a = Trans (a,a)    
+-- | Captures a transitive relation
+newtype Trans a = Trans (Relation a, Relation a)    
     deriving(Eq,Generic,Ord)
 
 -- Characterizes a transitive relation: a ~ b && b ~ c => a ~ c
 -- See https://en.wikipedia.org/wiki/Transitive_relation
 class Relational a => Transitive a where
-
     -- | Establishes a transitive relation between two elements
-    trans::a -> a -> Trans a
+    trans::Relation a -> Relation a -> Trans a
+    trans ab bc = Trans(ab,bc)
 
+-- | Captures an a symmetric relation between two values
 newtype Symmetry a = Symmetry (a,a)    
     deriving(Eq,Generic,Ord)
 
 -- Characterizes an symmetric relation: a ~ b <=> b ~ a
 -- See https://en.wikipedia.org/wiki/Symmetric_relation 
 class Relational a => Symmetric a where
-
     -- | Establishes a symmetric relation between two elements
     symmetry::a -> a -> Symmetry a
+    symmetry a b = Symmetry (a,b)
 
+-- | Captures an antisymmetry relation between two values
 newtype Antisymmetry a = Antisymmetry (a,a)    
     deriving(Eq,Generic,Ord)
     
@@ -111,39 +112,46 @@ newtype Antisymmetry a = Antisymmetry (a,a)
 -- from being true
 -- See https://en.wikipedia.org/wiki/Antisymmetric_relation 
 class Relational a => Antisymmetric a where
-
     -- | Establishes an antisymmetric relationship between two elements
     antisymmetry::a -> a -> Antisymmetry a
+    antisymmetry a b = Antisymmetry(a,b)
 
+-- | Captures an asymmetry relation between two values
 newtype Asymmetry a = Asymmetry (a,a)    
     deriving(Eq,Generic,Ord)
     
 -- Characterizes an asymmetric relaton: a ~ b => not(b ~ a)    
 -- See https://en.wikipedia.org/wiki/Asymmetric_relation
 class Relational a => Asymmetric a where
-
     -- | Establishes an asymmetry relationship between two elements
     asymmetry::a -> a -> Asymmetry a
+    asymmetry a b = Asymmetry (a,b)
 
+-- | Captures a preorder relation between two values
 newtype Preordering a = Preordering (a,a)    
     deriving(Eq,Generic,Ord)
     
--- Characterizes a relation that is reflexive and transitive
+-- | Characterizes a relation that is reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Preorder
 class (Reflexive a, Transitive a) => Preordered a where
-
     -- Establishes a preorder relationship between two elements
     preorder::a -> a -> Preordering a
+    preorder a b = Preordering (a,b)
 
-newtype PartiallyOrdered a = PartiallyOrdered (a,a)    
-    deriving(Eq,Generic,Ord)
-
--- Characterizes a relation that is 'Antisymmetric' and 'Reflexive' and 'Transitive'
-class (Antisymmetric a, Reflexive a, Transitive a) => PartialOrder a where
-
+-- | Characterizes a relation that is 'Antisymmetric' and 'Transitive'
+-- See http://localhost:9000/refs/books/Y2008LOS.pdf#page=21
+class (Antisymmetric a, Transitive a)  => StrictPartialOrder a where
+    (<::)::P2 a
+    
+-- | Characterizes a relation that is 'Antisymmetric', 'Transitive', and 'Reflexive'
+class (Antisymmetric a, Transitive a, Reflexive a) => PartialOrder a where
     (<:)::P2 a
     (<:) = related
     {-# INLINE (<:) #-}    
+
+    
+-- | Characterizes a container whose elements are partially ordered    
+class (PartialOrder (Individual a), Container a) => PartiallyOrdered a where
 
 newtype Connex a = Connex (a,a)    
     deriving(Eq,Generic,Ord)
@@ -152,22 +160,14 @@ newtype Connex a = Connex (a,a)
 -- For all x and y, x ~ y or y ~ x
 -- See https://en.wikipedia.org/wiki/Connex_relation
 class Relational a => Connexive a where
-
     -- | Establish a connex relation between two points
     connex::a -> a -> Connex a
-
-newtype TotallyOrdered a = TotallyOrdered (a,a)    
-    deriving(Eq,Generic,Ord)
 
 -- | Characterizes a total order relation of the sort that exists
 -- amongst the real numbers.
 -- See https://en.wikipedia.org/wiki/Total_order     
-class (Connexive a, Antisymmetric a, Transitive a) => TotalOrder a where
-
-    -- | Establish a total order relation between two points
-    totalord::a -> a -> TotallyOrdered a
-
-
+class (Connexive a, Antisymmetric a, Transitive a) => TotallyOrdered a where
+    
 -- | Encodes an element of an equivalance relation together with
 -- a canonical representative 
 newtype Equivalent a = Equivalent (a, [a])
@@ -187,7 +187,6 @@ instance Formattable a => Show (Partition a) where
 -- Characterizes a relation that is symmetric, reflexive and transitive
 -- See https://en.wikipedia.org/wiki/Equivalence_relation
 class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
-
     -- Determines whether an equivalence relation exists between two elements
     (~=)::P2 a
     (~=) = (~?)
@@ -201,22 +200,7 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
     -- | Assings an element to its equivalance class in a partition
     classify::a -> Partition a -> Partition a
     default classify::Ord a => a -> Partition a -> Partition a
-    classify elem (Partition part) = Partition modified where
-        -- Search for a key that is equivalent to the supplied element
-        -- There should be at most 1
-        filtered = Map.keys part |> List.filter (\k -> k ~= elem)
-        -- Was an equivalent element found ?
-        contains = filtered |> List.null
-        -- Select the equivalence class representative
-        rep = ifelse contains elem ( List.head filtered)        
-        -- Bundle the supplied element with other members of the class
-        -- or create a new class as appropriate        
-        ec = ifelse contains (elem : (part Map.! rep) ) [elem]
-        -- Update the partition to include the new element
-        modified = ifelse contains 
-                          (Map.update (\_ -> Just ec) rep part) 
-                          (Map.insert elem [elem] part)
-
+    classify = classify'
 
     -- | Divides a list into two parts: those that are related to a given
     -- element and those that are not not. Ironically, the library function
@@ -224,11 +208,10 @@ class (Reflexive a, Symmetric a, Transitive a) => Equivalence a where
     relations::a -> [a] -> ([a],[a])
     relations x candidates = List.partition (\y -> x ~= y) candidates
 
-        
+    
 -- | A set together with an equivalence relation
 -- See https://en.wikipedia.org/wiki/Setoid
 class (Discrete a, Equivalence a) => Setoid a where
-
 
 -- | Characterizes a type for which a minimal element can be identified
 -- i.e., a is minimal in A if a <= x for all x in A
@@ -257,37 +240,43 @@ class Supremal a where
     -- / The least upper bound
     supremum::a -> Individual a
             
-class (Ord a) => LTEQ a where  
+class LTEQ a where  
     (<=)::Comparer a
+    default (<=)::Ord a => Comparer a
     (<=) = (P.<=)
     infix 4 <=
     {-# INLINE (<=) #-}
 
+    -- | Computes the minimum of two values
     min::a -> a -> a
+    default min::Ord a => a -> a -> a
     min x y = ifelse (x <= y) x y
     {-# INLINE min #-}    
 
-class Ord a => LT a where
+class LT a where
     (<)::Comparer a
+    default (<)::Ord a => Comparer a
     (<) a b = a P.< b
-
     infix 4 <    
     {-# INLINE (<) #-}
 
-class Ord a => GT a where    
+class GT a where    
     (>)::Comparer a
+    default (>)::Ord a => Comparer a
     (>) a b = a P.> b
     infix 4 >
     {-# INLINE (>) #-}
 
-class Ord a => GTEQ a where
+class GTEQ a where
     (>=)::Comparer a
+    default (>=)::Ord a => Comparer a
     (>=) a b = a P.>= b
     infix 4 >=
     {-# INLINE (>=) #-}
 
-    -- Computes the maximum of two values
+    -- | Computes the maximum of two values
     max::a -> a -> a
+    default max::Ord a => a -> a -> a
     max x y = ifelse (x >= y) x y
     {-# INLINE max #-}
 
@@ -300,15 +289,14 @@ class (GTEQ a, GT a, LTEQ a, LT a) => Comparable a where
 -- both 'Ord' and 'Comparable' constraints
 type TotalOrd a = (Ord a, Comparable a)
 
--- Defines a constraint that requires satisfaction of 
+-- | Defines a constraint that requires satisfaction of 
 -- both 'TotalOrd' and 'Num' constraints
 type OrdNum a = (TotalOrd a, Num a)   
 
-
-instance (Ord a) => Minimal [a] where
+instance Ord a => Minimal [a] where
     minimum (x:xs) = Min <$> (x :| xs) |> sconcat |> getMin
 
-instance (Ord a) => Maximal [a] where
+instance Ord a => Maximal [a] where
     maximum (x:xs) = Max <$> (x :| xs) |> sconcat |> getMax
         
 instance Infimal (Interval a) where
@@ -317,22 +305,24 @@ instance Infimal (Interval a) where
 instance Supremal (Interval a) where
     supremum = Interval.sup            
 
-
--- Encloses (constructively) a partially ordered set
-newtype Poset a = Poset [a]
-    deriving(Formattable, Nullity, Setwise)
-
--- Constructs a partially ordered set from a list
-poset::(PartialOrder a) => [a] -> Poset a
-poset = Poset . fromList
-
-instance (PartialOrder a) =>  IsList (Poset a) where
-    type Item (Poset a) = a
-    toList (Poset s) = toList s    
-    fromList = poset
-
-
--- LTEQ instances
+classify'::(Equivalence a, Ord a) => a -> Partition a -> Partition a
+classify' elem (Partition part) = Partition modified where
+    -- Search for a key that is equivalent to the supplied element
+    -- There should be at most 1
+    filtered = Map.keys part |> List.filter (\k -> k ~= elem)
+    -- Was an equivalent element found ?
+    contains = filtered |> List.null
+    -- Select the equivalence class representative
+    rep = ifelse contains elem ( List.head filtered)        
+    -- Bundle the supplied element with other members of the class
+    -- or create a new class as appropriate        
+    ec = ifelse contains (elem : (part Map.! rep) ) [elem]
+    -- Update the partition to include the new element
+    modified = ifelse contains 
+                        (Map.update (\_ -> Just ec) rep part) 
+                        (Map.insert elem [elem] part)
+    
+-- * LTEQ instances
 -------------------------------------------------------------------------------
 instance LTEQ Natural
 instance LTEQ Integer
@@ -352,7 +342,7 @@ instance LTEQ Double
 instance LTEQ CFloat
 instance LTEQ CDouble
 
--- GTEQ instances
+-- *  GTEQ instances
 -------------------------------------------------------------------------------
 instance GTEQ Natural
 instance GTEQ Integer
@@ -372,7 +362,7 @@ instance GTEQ Double
 instance GTEQ CFloat
 instance GTEQ CDouble
 
--- LT instances
+-- * LT instances
 -------------------------------------------------------------------------------
 instance LT Natural
 instance LT Integer
@@ -392,7 +382,7 @@ instance LT Double
 instance LT CFloat
 instance LT CDouble
 
--- GT instances
+-- * GT instances
 -------------------------------------------------------------------------------
 instance GT Natural
 instance GT Integer
@@ -412,7 +402,7 @@ instance GT Double
 instance GT CFloat
 instance GT CDouble
 
--- Comparable instances
+-- * Comparable instances
 -------------------------------------------------------------------------------
 instance Comparable Natural
 instance Comparable Integer

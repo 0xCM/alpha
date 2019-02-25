@@ -22,7 +22,7 @@ module Alpha.Base.Functors
     Comonad, (=>=), (=<=),(<<=), (=>>),
     Const, fconst,
     Contravariant, phantom, ($<), (>$<),  (>$$<),
-    Opposite, opposite,
+    OpF, fopposite,
     --Distributive, distribute, collect, cotraverse,
     Extend, duplicated, extended,
     Functor, fmap, (<$>), ($>), (<$),
@@ -80,7 +80,7 @@ fconst :: forall k a (b :: k). a -> Const a b
 fconst = Const
 
 -- A synonym for the Opposite (contravariant) arrow/function
-type Opposite = Op
+type OpF = Op
 
 -- Constructs a product functor
 product::(Functor f, Functor g) => f a -> g a -> Product f g a
@@ -102,8 +102,9 @@ identity = Identity
 --const::a -> b -> Const a b
 --const = Const
 
-opposite::(b -> a) -> Opposite a b
-opposite f = Op {getOp = f}
+-- | Constructs the opposite functor
+fopposite::(b -> a) -> OpF a b
+fopposite f = Op {getOp = f}
 
 -- | Folds a structure projected into a 'Monoid' by a supplied function
 foldby :: (Monoid m, Foldable t) => (a -> m) -> t a -> m

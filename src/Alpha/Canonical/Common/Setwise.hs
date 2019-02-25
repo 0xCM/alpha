@@ -9,20 +9,23 @@
 module Alpha.Canonical.Common.Setwise
 (
     module X,
-    Union(..),
-    Intersection(..),
     FiniteSet(..),
     Universe(..),
     Complementary(..),
     Setwise(..),
-
+    Set(..),
+    SetRep(..),    
+    powerset,
     set,
+    setrep,
 )
 where
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Individual as X
+import Alpha.Canonical.Common.Container as X
 import Alpha.Canonical.Common.Conversions as X
 import Alpha.Canonical.Common.Format as X
+import Alpha.Canonical.Common.Cardinality as X
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
@@ -33,7 +36,11 @@ import qualified Data.Sequence as Sequence
 import qualified Numeric.Interval as Interval
 import qualified Data.MultiSet as Bag
 
-class Nullity a => Setwise a where
+class Set a where
+    -- | Determines whether a given set is a subset
+    contains::Bool -> a -> a -> Bool
+
+class (Set a, Nullity a) => Setwise a where
 
     -- Forms the union of two sets
     union::a -> a -> a 
@@ -73,8 +80,6 @@ class Nullity a => Setwise a where
     {-# INLINE (//\\) #-}
     infix 5 //\\
 
-
-
 -- | A universe is a type that may be populated with and 
 -- intrinsic collection of inhabitants    
 class (a ~ Individual (FiniteSet a)) => Universe a where
@@ -85,17 +90,24 @@ class (a ~ Individual (FiniteSet a) , Universe a, Ord a) => Complementary a wher
     comp x = diff inhabitants x
 
 instance (a ~ Individual (FiniteSet a) , Universe a, Ord a) =>  Complementary a
-    
--- | Represents a (possibley empty) finite set that contains at least one element
+
+-- | Specifies a set representation that contains either all elements of
+-- a specified type or a finite number of elements of said type
+newtype SetRep a = SetRep [a]
+    deriving (Eq,Ord,Generic,Data,Typeable,Foldable,Traversable,Functor,Applicative,Monad)
+    deriving (Membership)
+    deriving (Formattable, Show) via ([a])
+
+instance Cardinal (SetRep a) where
+    cardinality (SetRep content) = ifelse (null content) Infinite Finite
+
+-- | Represents a (possibly empty) finite set that contains at least one element
 newtype FiniteSet a = FiniteSet (BalancedSet a)    
     deriving (Eq,Ord,Generic,Data,Typeable,Foldable)
-    deriving (Universal,Existential,Discrete,FinitelyCountable,Setwise)
+    deriving (Universal,Existential,Discrete,FinitelyCountable,Set,Setwise)
     deriving (Container,Queryable,Nullity,Cardinal)
     deriving (Formattable) via (BalancedSet a)
-instance Newtype(FiniteSet a)    
-
-type instance Individual (BalancedSet a) = a
-type instance Individual (FiniteSet a) = a
+instance Newtype(FiniteSet a)
 
 -- | Represents a union of an homogenous collection of sets
 newtype Union a = Union [FiniteSet a]
@@ -105,13 +117,44 @@ newtype Union a = Union [FiniteSet a]
 newtype Intersection a = Intersection [FiniteSet a]
     deriving(Eq,Ord,Generic,Data,Typeable)
 
+type instance Individual (Set a) = a
+type instance Individual (FiniteSet a) = a
+type instance Individual (SetRep a) = a
+    
 powerset::Ord a => FiniteSet a -> FiniteSet (FiniteSet a)
 powerset (FiniteSet s) = FiniteSet $ Set.map FiniteSet (Set.powerSet s) 
-    
+        
 set::Ord a => [a] -> FiniteSet a
 set = FiniteSet . fromList
 
--------------------------------------------------------------------------------            
+-- | Constructs a set representative
+setrep::[a] -> SetRep a
+setrep = SetRep
+
+-- * Set instances
+-------------------------------------------------------------------------------                        
+instance Ord a => Set (SetRep a) where    
+    contains proper candidate (SetRep []) = True
+    contains proper (SetRep candidate) (SetRep source) = contains proper candidate source
+    
+instance Ord a => Set (BalancedSet a) where
+    contains proper candidate source 
+        = ifelse proper  
+            (Set.isProperSubsetOf c' s')  
+            (Set.isSubsetOf c' s')  
+                where (c', s') = (candidate, source)
+
+instance Ord a => Set [a] where        
+    contains proper candidate source  
+        = test (Set.fromList candidate) (Set.fromList source)
+            where test = ifelse proper Set.isProperSubsetOf Set.isSubsetOf 
+        
+instance Ord a => Set (Bag a) where    
+    contains proper candidate source 
+        = ifelse proper 
+            (Bag.isProperSubsetOf candidate source) 
+            (Bag.isSubsetOf candidate source)
+                
 -- * FinitelyCountable instances
 -------------------------------------------------------------------------------                        
 instance Ord a => Discrete (BalancedSet a) where
@@ -120,23 +163,18 @@ instance Ord a => Discrete (BalancedSet a) where
 instance Ord a => FinitelyCountable (BalancedSet a) where
     count  = fromIntegral . Set.size 
 
--- *Nullity instances
--------------------------------------------------------------------------------                
-instance Ord a => Nullity (BalancedSet a) where
-    empty = Set.empty
-    null = Set.null
                     
--- *Existential instances
+-- * Existential instances
 -------------------------------------------------------------------------------            
 instance Existential (BalancedSet a) where
     any pred s = s |> Set.toList |> List.any pred
     
--- *Universal instances
+-- * Universal instances
 -------------------------------------------------------------------------------            
 instance Universal (BalancedSet a) where
     all pred s = s |> Set.toList |> List.all pred
 
--- *Queryable instances
+-- * Queryable instances
 -------------------------------------------------------------------------------            
 instance Ord a => Queryable (BalancedSet a) where
     filter p s = s |> toList |> List.filter p
@@ -153,13 +191,13 @@ instance Ord a => Setwise [a] where
     union = List.union
     intersect = List.intersect
     diff =  (List.\\)
-            
+ 
 instance Ord a => Setwise (Bag a) where    
     union = Bag.union        
     intersect = Bag.intersection
     diff = Bag.difference
     
--------------------------------------------------------------------------------            
+
 -- * JoinableMeet instances
 -------------------------------------------------------------------------------                        
 instance Ord a => JoinableMeet (BalancedSet a)  where
@@ -173,31 +211,7 @@ instance Ord a => JoinableMeet (Bag a)  where
 instance Ord a => JoinableMeet [a]  where
     (\/) = union
     (/\) = intersect
-        
-    
--- * Containment instances
--------------------------------------------------------------------------------            
-instance Ord a => Container (Bag a) where
-    contains proper candidate source 
-        = ifelse proper 
-            (Bag.isProperSubsetOf candidate source) 
-            (Bag.isSubsetOf candidate source)
-    content src = Bag.toList src
-    
-instance Ord a => Container [a] where        
-    contains proper candidate source  
-        = test (Set.fromList candidate) (Set.fromList source)
-            where test = ifelse proper Set.isProperSubsetOf Set.isSubsetOf 
-
-    content src = src
-
-instance Ord a => Container (BalancedSet a) where
-    contains proper candidate source 
-        = ifelse proper  
-            (Set.isProperSubsetOf c' s')  
-            (Set.isSubsetOf c' s')  
-                where (c', s') = (candidate, source)
-    content src = Set.toList src
+            
 
 -- * Cardinal instances
 -------------------------------------------------------------------------------            
@@ -213,15 +227,12 @@ instance Ord a => Cardinal (Union a) where
 
 -- *Mappable instances
 -------------------------------------------------------------------------------            
-instance OrdPair a b => Mappable(BalancedSet a) a b where
-    type Mapped (BalancedSet a) a b = BalancedSet b
-    map f s = Set.map f s
 
 instance OrdPair a b => Mappable(FiniteSet a) a b where
     type Mapped (FiniteSet a) a b = FiniteSet b
     map f (FiniteSet s) = FiniteSet $ map f s
         
--- *IsList instances
+-- * IsList instances
 -------------------------------------------------------------------------------            
 instance Ord a => IsList (FiniteSet a) where
     type Item (FiniteSet a) = a

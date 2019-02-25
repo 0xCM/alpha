@@ -10,7 +10,7 @@ module Alpha.Canonical.Structures.Semiring
     OrdSemiring(..),
     ProductMonoid(..),
     AdditiveMonoid(..),
-    interval
+    seminterval
 ) where
 import Alpha.Canonical.Algebra
 import qualified Data.Monoid as Monoid
@@ -39,8 +39,8 @@ class (AdditiveMonoid a, ProductMonoid a, Distributive a)
 type OrdSemiring a = (Ord a, Semiring a)        
 
 -- | Constructs a contiguous sequence of values in an ordered semiring
-interval::(OrdSemiring a) => a -> a -> Interval a
-interval = interval'
+seminterval::OrdSemiring a => a -> a -> Interval a
+seminterval = interval'
 
 -- Lifts the input into the Alt monoid
 -- Example:
@@ -54,7 +54,6 @@ sumM = Monoid.Sum
 
 prodM::Monoid a => a -> MonoidalProduct a
 prodM = Monoid.Product
-
 
 instance Semiring Natural
 instance Semiring Integer

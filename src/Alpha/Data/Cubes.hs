@@ -47,12 +47,12 @@ embeddingNumber::forall n a. KnownNat n => ElementaryCube n a -> Int
 embeddingNumber _ = natg @n
 
 -- | Constructs a nondegenerate 'ElementaryInterval'
-elinterval::(OrdSemiring a) => a -> ElementaryInterval a
-elinterval min = interval min (min + one) |> ElementaryInterval
+elinterval::OrdSemiring a => a -> ElementaryInterval a
+elinterval min = seminterval min (min + one) |> ElementaryInterval
 
 -- | Constructs a degenerate 'ElementaryInterval'
 elpoint::(OrdSemiring a) => a -> ElementaryInterval a
-elpoint p = interval p p |> ElementaryInterval
+elpoint p = seminterval p p |> ElementaryInterval
 
 -- | Constructs a 'ElementaryCube'
 elcube::forall n a. (KnownNat n, OrdSemiring a) => VecN n (ElementaryInterval a) -> ElementaryCube n a

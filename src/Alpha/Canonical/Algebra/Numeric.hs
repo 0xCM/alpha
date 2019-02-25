@@ -10,25 +10,38 @@ module Alpha.Canonical.Algebra.Numeric
     module X,
     Numeric(..),
     RealNumber(..), 
+    ExtendedReal(..),
     Magnitude(..),
     Rational(..),
     RationalNumber(..),
+    UnsignedRational(..),
     ComplexNumber(..),
-    Complex(..),
+    ComplexNumeric(..),
+    RealInterval(..),
     rational,
+    urational,
     real,
+    ureal,
     complex,
-    euler
+    euler,
+    xreal,
+    xrealNI,
+    xrealPI,
+    closed,
+    open,
+    lopen,
+    ropen
 
 ) where
-import Alpha.Canonical.Relations
+import Alpha.Canonical.Relations as X
 import Alpha.Canonical.Algebra.Powers as X
 import Alpha.Canonical.Algebra.Successive as X
 import Alpha.Canonical.Algebra.Negatable as X
 import Alpha.Canonical.Algebra.Action as X
 
+-- | Represents a real number
 newtype RealNumber a = RealNumber a
-    deriving (Eq, Ord, Generic, Data, Typeable, Enum, Num, Real, Fractional, Floating, Show)
+    deriving (Eq, Ord, Generic, Data, Typeable, Num, Real, Fractional, Floating)
     deriving (Additive, Subtractive, Negatable, Nullary, Multiplicative, Unital, Divisive)
     deriving (LeftDistributive,RightDistributive)
     deriving (Incrementable,Decrementable)
@@ -36,7 +49,8 @@ newtype RealNumber a = RealNumber a
     deriving (ToDouble,ToInt,ToInteger,FromDouble,FromInt,FromNatural,ToNatural)
     deriving (Power,IntegralPower,FloatingPower,Magnitude)
     deriving (Numeric)
-        
+
+-- | Represents a rational number
 newtype RationalNumber a = RationalNumber (Ratio a)
     deriving (Eq, Ord, Generic, Data, Typeable)
     deriving (Enum, Num, Real, Fractional, RealFrac)
@@ -52,8 +66,70 @@ newtype RationalNumber a = RationalNumber (Ratio a)
 newtype ComplexNumber a = ComplexNumber (a,a)
     deriving(Eq, Additive, Subtractive, Negatable, Unital, Nullary)
 
+-- | Represents an unsigned rational number
+newtype UnsignedRational a = UnsignedRational (RationalNumber a)
+    deriving (Eq, Ord, Generic, Data, Typeable)
+    deriving (Enum, Num, Real, Fractional, RealFrac)
+    deriving (Additive, Subtractive, Negatable, Nullary, Multiplicative, Unital, Divisive)
+    deriving (LeftDistributive,RightDistributive)
+    deriving (Incrementable,Decrementable)
+    deriving (LT,GT,LTEQ,GTEQ,Comparable)
+    deriving (ToDouble,FromDouble,FromInt,FromNatural)
+    deriving (Power,IntegralPower,Magnitude)
+    deriving (Numeric,Rational)
+    deriving (Show,Formattable) via (RationalNumber a)
+instance Newtype (UnsignedRational a)    
+
+-- | Represents an unsigned rational number
+newtype UnsignedReal a = UnsignedReal (RealNumber a)
+    deriving (Eq, Ord, Generic, Data, Typeable, Num, Real, Fractional, Floating)
+    deriving (Additive, Subtractive, Negatable, Nullary, Multiplicative, Unital, Divisive)
+    deriving (LeftDistributive,RightDistributive)
+    deriving (Incrementable,Decrementable)
+    deriving (LT,GT,LTEQ,GTEQ,Comparable)
+    deriving (ToDouble,ToInt,ToInteger,FromDouble,FromInt,FromNatural,ToNatural)
+    deriving (Power,IntegralPower,FloatingPower,Magnitude)
+    deriving (Numeric)
+    deriving (Show,Formattable) via (RealNumber a)
+instance Newtype (UnsignedReal a)    
+
+-- | Represents an extended real number
+-- | See https://en.wikipedia.org/wiki/Extended_real_number_line
+data ExtendedReal a 
+    = InfiniteReal (Infinity a)
+    | BoundedReal (RealNumber a)
+    | UndefinedReal (Indeterminate a)
+    deriving (Eq, Ord, Generic, Data, Typeable)
+
+-- | Represents an interval of real numbers    
+data RealInterval a 
+    = ClosedInterval (RealNumber a, RealNumber a)
+    -- |^ A closed inverval [a,b] where a and b are finite real numbers
+    | OpenInterval (ExtendedReal a, ExtendedReal a)
+    -- |^ An open interval (a,b) where a and b are extended real numbers
+    | LeftOpenInterval (ExtendedReal a, RealNumber a)
+    -- |^ A left-open (a,b] where a is an extended real number and b is a finite real number
+    | RightOpenInterval (RealNumber a, ExtendedReal a)
+    -- |^ A right-open [a,b) where a is finite real number and b is an extended real
+
+class NumericInterval a where
+    
+    
+closed::RealNumber a -> RealNumber a -> RealInterval a
+closed left right = ClosedInterval(left,right)
+
+open::ExtendedReal a -> ExtendedReal a -> RealInterval a
+open left right = OpenInterval (left,right)
+
+lopen::ExtendedReal a -> RealNumber a -> RealInterval a
+lopen left right = LeftOpenInterval (left,right)
+
+ropen::RealNumber a -> ExtendedReal a -> RealInterval a
+ropen left right = RightOpenInterval (left,right)
+
 type instance Individual (RationalNumber a) = a    
 type instance Individual (ComplexNumber a) = a
+type instance Individual (UnsignedRational a) = a
 
 class Magnitude a where
     abs::a -> a
@@ -72,28 +148,58 @@ class Rational a where
     
     denominator::a -> Individual a
 
-class Complex a where
+class ComplexNumeric a where
     conjugate::a -> a
 
     re::a -> Individual a
 
     im::a -> Individual a
 
+-- Constructs a 'Complex' number from an ordered pair
 complex::(a,a) -> ComplexNumber a
 complex (r,i) = ComplexNumber (r,i)
+
 
 -- | Evaluates Euler's formula for e^{ix} := cos x + i(sin x)
 -- See https://en.wikipedia.org/wiki/Euler%27s_formula
 euler::Trigonometric a => a -> ComplexNumber a
 euler x = complex (cos x, sin x)            
         
--- Forms a 'Rational' number from a 'Real' number
+-- Constructs a 'Rational' number from a 'Real' number
 rational::Integral i => i -> i -> RationalNumber i
 rational a b = RationalNumber  $ frac' a b
 {-# INLINE rational #-} 
 
-real::(Numeric a) => a -> RealNumber a
+-- | Constructs a 'UnsignedRational' value 
+urational::Integral i  => i -> i -> UnsignedRational i
+urational a b = UnsignedRational $ rational (abs' a) (abs' b)
+{-# INLINE urational #-}
+
+-- | Constructs a 'RealNumber' value 
+real::Num a => a -> RealNumber a
 real = RealNumber
+{-# INLINE real #-}
+
+-- | Constructs a 'UnsignedReal' value 
+ureal::Num a => a -> UnsignedReal a
+ureal =  UnsignedReal . real . abs'
+{-# INLINE ureal #-}
+    
+-- | Constructs an extended negative infinite value
+xrealNI::ExtendedReal a
+xrealNI = InfiniteReal neginf
+{-# INLINE xrealNI #-}
+
+-- | Constructs an extended positive infinite value
+xrealPI::ExtendedReal a
+xrealPI = InfiniteReal posinf
+{-# INLINE xrealPI #-}
+
+-- | Constructs a bounded extended real
+xreal::RealNumber a -> ExtendedReal a
+xreal = BoundedReal 
+{-# INLINE xreal #-}
+
 
 -- * Numeric instances
 -------------------------------------------------------------------------------
@@ -134,6 +240,14 @@ instance Magnitude Float
 instance Magnitude Double
 instance Magnitude CFloat
 instance Magnitude CDouble
+
+-- * RealNumber membership
+-------------------------------------------------------------------------------
+instance Formattable a => Formattable (RealNumber a) where
+    format (RealNumber r) = format r
+
+instance Formattable a => Show (RealNumber a) where
+    show = string . format
     
 -- * Rational membership
 -------------------------------------------------------------------------------
@@ -152,9 +266,9 @@ instance (Formattable a,Integral a) => Formattable (RationalNumber a) where
 instance (Formattable a, Integral a) => Show (RationalNumber a) where
     show = string . format
 
--- *Complex membership
+-- * Complex membership
 -------------------------------------------------------------------------------
-instance Negatable a => Complex (ComplexNumber a) where
+instance Negatable a => ComplexNumeric (ComplexNumber a) where
     conjugate (ComplexNumber (r,i)) = complex (r, negate i)
     re (ComplexNumber (r, _)) = r    
     im (ComplexNumber (_,i)) = i
@@ -188,3 +302,10 @@ instance (Additive a, Multiplicative a, Subtractive a) => LeftDistributive (Comp
 
 instance (Additive a, Multiplicative a, Subtractive a) => RightDistributive (ComplexNumber a) 
         
+instance Formattable a => Formattable (ExtendedReal a)  where
+    format (BoundedReal r) = format r
+    format (InfiniteReal i) = format i
+    format (UndefinedReal i) = format i
+
+instance Formattable a => Show (ExtendedReal a) where
+    show = string . format

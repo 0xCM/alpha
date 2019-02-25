@@ -17,6 +17,8 @@ module Alpha.Canonical.Common.Indexing
     LowerIx(..),
     MultiIx(..),
     NestedTerm(..),
+    Indexable(..),
+    IntMappable(..),
     lowerix,
     upperix,
     multix,
@@ -96,6 +98,18 @@ newtype NestedTerm i t = NestedTerm
     deriving (Generic)
 instance Newtype (NestedTerm i t)      
 
+class Indexable a where
+    type Indexer a
+    type Indexer a = Int
+    
+    idx::a -> Indexer a -> Individual a
+    idx = (!!)
+    {-# INLINE idx #-}
+
+    (!!)::a -> Indexer a -> Individual a
+    (!!) = idx
+    {-# INLINE (!!) #-}
+    infixr 9 !!
         
 -- | Characterizes an index that can safely fail
 class SafeIx s i where
@@ -118,10 +132,14 @@ class KnownNat i => NatIx i a where
     -- | Retrieves the indexed value
     natix::a -> NatIndexed i a
 
+class IntMappable a  b where
+    imap::(Int -> Individual a -> Individual b) -> a -> b
+
 -- | Associates an individual with an index value
 newtype Indexed a = Indexed (Indexer a, Individual a)
     deriving (Generic)
 instance Newtype (Indexed a)
+
 
 -- | Constructs an index range given a pair representing a lower/uppper bound    
 ixrange::(OrdEnum a) => (a,a) -> IxRange a
@@ -166,11 +184,23 @@ multix l u = MultiIx (l,u)
 indexed::Indexable a => Indexer a -> Individual a -> Indexed a
 indexed i ind = Indexed (i, ind)
 
-
+-- * Indexable instances
 -------------------------------------------------------------------------------            
--- * SafeIx class membership
--------------------------------------------------------------------------------            
+instance Indexable [a] where    
+    idx = (List.!!)
 
+instance Indexable (Seq a) where
+    idx = Sequence.index
+    
+instance Indexable (Vector a) where
+    idx vector i = vector Vector.! i
+
+instance Ord k => Indexable (Map k v) where
+    type Indexer (Map k v) = k
+    idx map k = (k, map Map.! k)    
+
+-- * SafeIx instances
+-------------------------------------------------------------------------------            
 instance (Ord k) => SafeIx (Map k v) k where
     lookup map k = case (map Map.!? k) of
                     Just v -> Just (k, v)
@@ -186,10 +216,8 @@ instance (Eq a,Integral k) =>  SafeIx [a] k where
             inbounds = between' k (0, upperBound)
             valid = and' inbounds nonempty
                     
+-- * IxRange membership
 -------------------------------------------------------------------------------            
--- * IxRange class membership
--------------------------------------------------------------------------------            
-
 instance OrdEnum i => Discrete (IxRange i) where
     individuals (IxRange (a,b)) = [a..b]
         
@@ -200,7 +228,7 @@ instance (Formattable i) => Formattable (IxRange i) where
 instance (Formattable i) => Show (IxRange i) where        
     show = string . format
             
--- * IxTerm class membership
+-- * IxTerm membership
 -------------------------------------------------------------------------------            
 instance (Formattable i, Formattable t) => Formattable (IxTerm i t) where
     format (IxTerm (i,f)) = format (i, f i)
@@ -217,7 +245,7 @@ instance (Eq i) => Eq (IxTerm i t) where
 instance (Ord i) => Ord (IxTerm i t) where
     compare (IxTerm (i,t)) (IxTerm (j,s)) = compare i j
 
--- * IxFamily class membership
+-- * IxFamily membership
 -------------------------------------------------------------------------------                
 instance (Ord i) => IsList (IxFamily i a) where
     type Item (IxFamily i a) = IxTerm i a
@@ -251,4 +279,14 @@ instance (OrdEnum i) => Expansive (NestedTerm i t) where
 
     expand (NestedTerm (or, ir, (IxTerm (_, f ) ))) 
         = [termvalue (term (i,j) f)  | i <- individuals or, j <- individuals ir]
+    
+-- * IntMappable instances
+-------------------------------------------------------------------------------            
+instance IntMappable (Vector a) (Vector b) where    
+    imap f src = Vector.imap f src
+
+instance IntMappable [a] [b] where    
+    imap f src = [ f i (src !! i)  | i <- [0..upper]] where
+        upper  = sub' (List.length src) 1
+    
     

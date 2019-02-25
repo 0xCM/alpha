@@ -19,8 +19,6 @@ module Alpha.Canonical.Algebra.Multiplicative
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Unital as X
 
--- | Represents a family of types that support a notion of (potentially) heterogenous multiplication
--- where a type instance is the multiplication result type
 type family Multiplied a b
 
 -- | Represents a formal product of an arbitrary
@@ -87,16 +85,19 @@ instance Invertible CDouble where
 product::[a] -> Product a
 product = Product
 
+-- *Computable instances
+-------------------------------------------------------------------------------
+
 instance (Unital a, Multiplicative a) => Computable (Product a) where
     type Computed (Product a) = a
     compute (Product items) = reduce one (*) items
-            
-instance Multiplicative a => Multiplicative (Vector a) where
-    v1 * v2 = vmix (*) (vecpair v1 v2)  where
-    
--------------------------------------------------------------------------------
+                
 -- * Multiplicative instances
 -------------------------------------------------------------------------------
+instance Multiplicative a => Multiplicative (Vector a) where
+    v1 * v2 = vmix (*) (vecpair v1 v2)  where
+
+        
 instance (Ord a, Multiplicative a) =>  Multiplicative (FiniteSet a) where
     mul x y = intersect x y
 

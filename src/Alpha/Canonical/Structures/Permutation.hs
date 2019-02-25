@@ -22,8 +22,13 @@ import qualified Data.Text as Text
 import qualified Data.Vector as Vector
 import qualified Data.List as List
 import qualified Data.Map as Map
+import qualified Math.Combinat.Permutations as Combinat
 
 default (Int, Double, Text)
+
+type PermArray = UArray Int Int
+
+type CombiPerm = Combinat.Permutation
 
 -- Represents a bijective function over the set {1,2...,n}
 newtype Permutation n = Permutation (Map Int Int)
@@ -37,6 +42,7 @@ instance Newtype (PermuMul n)
 type instance Dom (Permutation n) = Int
 type instance Cod (Permutation n) = Int
 type instance Individual (Permutation n) = Permutation n
+type instance Individual (UArray i a) = a
 
 type SymmetricGroup n = [Permutation n]
 
@@ -47,6 +53,17 @@ class PermLookup p where
 -- | Characterizes types from which permutations can be constructed    
 class (KnownNat n) => ToPermutation n a where
     permutation::a -> Permutation n
+
+
+combiperm :: PermArray -> CombiPerm
+combiperm = Combinat.uarrayToPermutationUnsafe
+
+permarray::forall n. KnownNat n => Permutation n -> PermArray
+permarray (Permutation map) = arr where
+    ix0 = 1
+    ix1 = natg @n
+    pairs = [valOrDefault (map !? i) (i,i) | i <- [ix0..ix1]]
+    arr = uarray (ix0,ix1) pairs
 
 -- Constructs the symmetric group of degree n        
 symgroup::forall n. KnownNat n => SymmetricGroup n
@@ -66,6 +83,10 @@ switch (i,j) p =  unwrap p |> toList |> fmap (\(r,s) -> rule (r,s) ) |> permutat
         rule (r,s) =  if r == i then (r, image p j)
                       else if r == j then (r, image p i)   
                       else (r, s)
+
+instance KnownNat n => Signable (Permutation n) where
+    sign p = ifelse even Positive Negative where
+        even = p |> permarray |> combiperm |> Combinat.isEvenPermutation 
 
 instance KnownNat n => ToPermutation n [Int] where
     permutation range = Permutation  $ Map.fromList (pairzip pt range) 

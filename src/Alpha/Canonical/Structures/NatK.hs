@@ -60,16 +60,16 @@ type KnownNatTriple m n p = (KnownNatPair m n, KnownNat p)
 -- | Alias for a 4-tuple of 'KnownNat' constraints
 type KnownNatQuad m n p q = (KnownNatPair m n, KnownNatPair p q)
 
+
 type instance Individual (NatKPair m n) = Integer
 type instance Individual (NatKSpan m n) = Integer
 type instance Summed (NatK m) (NatK n) = NatK(m + n)
-type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
 type instance Subtracted (NatK m) (NatK n) = NatK(m - n)
 type instance Divided (NatK m) (NatK n) = NatK (m / n)
 type instance BiModulus (NatK m) (NatK n) = NatK (m % n)
 type instance Decrement (NatK m) = NatK (m - 1)
 type instance Increment (NatK m) = NatK (m + 1)
---type instance Powered (NatK m) (NatK n) = NatK (m ^ n)
+type instance Multiplied (NatK m) (NatK n) = NatK(m * n)
 type instance Span (NatK m) (NatK n) = NatKSpan m n
 type instance Tripled (NatK m) (NatK n) (NatKPair m n) = NatKPair m n
 

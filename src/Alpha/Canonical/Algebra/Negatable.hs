@@ -8,23 +8,17 @@ module Alpha.Canonical.Algebra.Negatable
 (    
     Negatable(..),
     Negation(..), 
-    Negated(..),
     Binegatable(..),
 ) where
 import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Subtractive as X
 import qualified Data.List as List
 
-
 -- | Characterizes types whose values are closed under 
 -- additive negation
-class Subtractive a => Negatable a where
+class Negatable a where
     -- | Negates the operand    
     negate::a -> a
-
-    -- | Produces the canonical negation operator
-    negation::Negation a
-    negation = Negation negate
 
     -- | Accepts a list of negatable things, creates
     -- a new list by negating each element in the
@@ -33,36 +27,35 @@ class Subtractive a => Negatable a where
     alternate::[a] -> [a]
     alternate x = intermix x (negate <$> x)
 
-
--- Defines a family of types that represent the result of applying a
--- (potentially) heterogeneous negation operation
-type family Negated a
-
 -- / Characterizes types for which unary negation is defined
 class Binegatable a where
+    type Negated a
     -- | Negates the operand    
     binegate::a -> Negated a
 
--- | Represents a negation operator
-newtype Negation a = Negation (O1 a)    
-    deriving(Generic)
+-- | Represents the negation of the encapsulated content
+newtype Negation a = Negation a
+    deriving(Eq,Ord,Generic,Data,Typeable)
 instance Newtype (Negation a)
 
+-- | Constructs a negation computation
+negation::(Negatable a) => a -> Negation a
+negation = Negation
+
+-- *Computable instances
+-------------------------------------------------------------------------------
+instance (Negatable a) => Computable (Negation a) where
+    type Computed (Negation a) = a
+    compute (Negation a) = negate a    
          
-type instance Negated Natural = Integer
-type instance Negated Word = Int
-type instance Negated Word8 = Int8
-type instance Negated Word16 = Int16
-type instance Negated Word32 = Int32
-type instance Negated Word64 = Int64
-
-
-
 -- *Negatable instances
 -------------------------------------------------------------------------------
 instance Negatable a => Negatable (Vector a) where
     negate v = negate <$> v 
 
+instance Negatable a => Negatable [a] where
+    negate src = negate <$> src
+    
 instance Negatable Integer where 
     negate = negate'
     {-# INLINE negate #-}
@@ -114,7 +107,6 @@ instance Negatable Word32 where
 instance Negatable Word64 where 
     negate x = sub 0 x
     {-# INLINE negate #-}
-    
 
 -- *Negatable tuples
 -------------------------------------------------------------------------------

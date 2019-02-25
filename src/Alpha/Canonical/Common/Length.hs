@@ -11,6 +11,7 @@ module Alpha.Canonical.Common.Length
 ) where
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Conversions
+import qualified Data.Sequence as Seq
 import qualified Data.Text as Text
 import qualified Data.Set as Set
 import qualified Data.List as List
@@ -39,6 +40,10 @@ instance Ord a => Length (Set' a) where
     
 instance Length (NonEmpty a) where
     length  =  integral . NonEmpty.length
+
+instance Length (Seq a) where
+    length = integral . Seq.length
+
 
 
     

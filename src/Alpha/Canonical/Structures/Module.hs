@@ -13,7 +13,6 @@ module Alpha.Canonical.Structures.Module
     LeftModule(..), 
     RightModule(..),
     Module(..),
-    FreeModule(..),
     Bimodule(..),
         
 ) where
@@ -28,7 +27,6 @@ import Alpha.Canonical.Structures.StructuredSets as X
 -- See Y2018MTLA,
 class (Ring r, AbelianGroup m, LeftAction r m) => LeftModule r m where
 
-
 -- | A right module over a ring r
 class (Ring r, AbelianGroup m, RightAction m r) => RightModule m r where
     
@@ -39,29 +37,8 @@ type Module r m = (LeftModule r m, RightModule m r)
 -- | Represents a bimodule where left and right rings potentially differ
 -- See https://en.wikipedia.org/wiki/Bimodule   
 class (LeftModule r m, RightModule m s) => Bimodule r m s where
-    
-                
--- | A free module is a module with a basis
--- See https://en.wikipedia.org/wiki/Free_module    
-class (KnownNat n, LeftModule r m) => FreeModule n r m where
-    basis::m -> BasisSet m
-
-
-data ChainComplex = ChainComplex (forall r m. LeftModule r m => [(Integer, m)])
-
+            
 -- | Captures the invariant that every Abelian group is a module over the
 -- ring of integers
 instance (AbelianGroup m, LeftAction Integer m) => LeftModule Integer m
-
--- | Represents a module homomorphism, otherwise known as a linear map
-newtype ModuleHom a b  = ModuleHom (a -> b)
-    deriving(Generic,Functor)
-instance Newtype(ModuleHom a b)
-
-instance Category ModuleHom where
-    id = ModuleHom(\x -> x)
-    g . f = wrap $ (unwrap g) . (unwrap f)
-
-instance End ModuleHom where
-    end x = unwrap x 
 

@@ -17,7 +17,7 @@ module Alpha.Canonical.Structures.VectorSpace
     VecN(..),
     VecPair(..),
     VecNPair(..),
-    VecNBasis(..),
+    BasisN(..),
     NVectored(..),
     vecN
 
@@ -49,9 +49,9 @@ instance Newtype (VecNPair n a)
 type instance Individual (VecNPair n a) = (a,a)
 
 -- | Represents a basis in an n-dimensional vector space
-newtype VecNBasis n a = VecNBasis [VecN n a]
+newtype BasisN n a = BasisN [VecN n a]
     deriving (Eq,Ord,Generic,Data,Typeable,Functor, Foldable,Traversable)
-instance Newtype (VecNBasis n a)    
+instance Newtype (BasisN n a)    
 
 class (Field k, LeftModule k v, Dimensional v) => VectorSpace k v where
 

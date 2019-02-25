@@ -18,19 +18,16 @@ import Alpha.Data.BitVector
 
 --A model of a logic gate
 class Gate (s::Symbol) (n::Nat) where
-    type Input n    
-    type Input n = BitVector n
-    
-    process::Input n -> Bit
+    bitflow::BitVector n -> Bit
 
 instance Gate "and" 2 where
-    process x = (x !! 0) && (x !! 1) |> bit
+    bitflow x = (x !! 0) && (x !! 1) |> bit
 
 instance Gate "or" 2 where
-    process x = (x !! 0) || (x !! 1) |> bit
+    bitflow x = (x !! 0) || (x !! 1) |> bit
     
 instance Gate "not" 1 where
-    process x = (x !! 0) |> isOn  |> bit
+    bitflow x = (x !! 0) |> isOn  |> bit
     
 
 

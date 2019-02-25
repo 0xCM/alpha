@@ -15,7 +15,6 @@ module Alpha.Canonical.Structures.StructuredGroup
     
 ) where
 import Alpha.Canonical.Structures.Common as X
-import Alpha.Canonical.Structures.Structure as X
 import Alpha.Canonical.Structures.Magma as X
 import Alpha.Canonical.Structures.Semiring as X
 

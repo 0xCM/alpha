@@ -6,7 +6,7 @@
 -----------------------------------------------------------------------------
 module Alpha.Canonical.Common.Sequence
 (
-    Sequence(..), sequence
+    Sequence(..), sequence,
 ) where
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Indexing
@@ -17,6 +17,8 @@ import qualified Data.Sequence as Seq
 import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Text as Text
+import qualified Data.Vector as Vector
+
 
 -- | Represents a sequence of indexed terms
 newtype Sequence i t = Sequence (Map i (IxTerm i t))
@@ -31,10 +33,6 @@ sequence terms = (\t -> (termix t, t)) <$> terms |> Map.fromList |> Sequence
 
 seqsort::(Ord i) => Sequence i a -> [(i,IxTerm i a)]
 seqsort = (List.sortOn fst) . toList . unwrap
-
-instance (Integral i) => Setwise (Sequence i a) where
-    union x y = wrap $ Map.union (unwrap x) (unwrap y)
-    intersect x y = wrap $ Map.intersection (unwrap x) (unwrap y)
 
 instance (Integral i) => IsList (Sequence i a) where
     type Item (Sequence i a) = IxTerm i a

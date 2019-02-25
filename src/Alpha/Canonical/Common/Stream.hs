@@ -13,7 +13,6 @@ module Alpha.Canonical.Common.Stream
 import Alpha.Canonical.Common.Root
 import Alpha.Canonical.Common.Individual
 import Alpha.Canonical.Common.Sequential
-import Alpha.Canonical.Common.Container
 import qualified Data.Stream.Infinite as Stream
 
 class (Listed (Stream a), Weave a (Stream a), Iterable (Stream a) ) => SequentialStream a where    
@@ -34,4 +33,9 @@ instance IsList (Stream a) where
     type Item (Stream a) = a
     toList = Stream.takeWhile (\_ -> True)
     fromList [x] = Stream.cycle [x]
+
+instance Iterable (Stream a) where
+    iterate = Stream.iterate    
+            
+    
 

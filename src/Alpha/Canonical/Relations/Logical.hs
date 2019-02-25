@@ -166,11 +166,11 @@ instance Propositional Bool
 instance (Boolean a, Boolean b) => Boolean (a || b) where
     bool (Or (a,b)) = (bool a) || (bool b)
 
-instance Related (a || b) where
-    type Relation (a || b) = a || b
-    type LeftPart (a || b) = a
-    type RightPart (a || b) = b
-    relate a b = Or(a,b)
+-- instance Related (a || b) where
+--     type Relation (a || b) = a || b
+--     type LeftPart (a || b) = a
+--     type RightPart (a || b) = b
+--     relate a b = Or(a,b)
     
 instance (Boolean a, Boolean b) => Boolean (a && b) where
     bool (And (a,b)) = (bool a) && (bool b)

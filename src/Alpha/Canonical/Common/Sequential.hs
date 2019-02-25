@@ -87,7 +87,6 @@ instance Flippable (a -> b -> c) where
     type Flipped (a -> b -> c) = b -> a -> c
     flip = flip'
 
--------------------------------------------------------------------------------        
 -- *Reversible instances
 -------------------------------------------------------------------------------        
     
@@ -97,7 +96,6 @@ instance Reversible [a] where
 instance Reversible Text where    
     reverse = Text.reverse
 
--------------------------------------------------------------------------------        
 -- *Listed instances
 -------------------------------------------------------------------------------        
 instance Listed (Vector a) where
@@ -130,7 +128,6 @@ instance Listed (Seq a) where
     cons = (Seq.<|)
     snoc = (Seq.|>)
         
--------------------------------------------------------------------------------        
 -- *Bipartite instances
 -------------------------------------------------------------------------------        
 instance Bipartite [a] where
@@ -141,7 +138,6 @@ instance Bipartite (Seq a)  where
     split = Seq.partition    
     while = Seq.takeWhileL 
     
--------------------------------------------------------------------------------        
 -- *Paged instances
 -------------------------------------------------------------------------------        
 instance Paged [a] where
@@ -154,14 +150,12 @@ instance  Paged (Seq a) where
     skip n s = Seq.drop (fromIntegral n) s
     splitAt i s = Seq.splitAt (fromIntegral i) s
 
--------------------------------------------------------------------------------        
 -- *Sequential instances
 -------------------------------------------------------------------------------            
 instance Sequential [a]        
     
 instance Sequential (Seq a)    
 
--------------------------------------------------------------------------------        
 -- *Bireversible instances
 -------------------------------------------------------------------------------            
 instance BiReversible (a1,a2) (a2,a1) where

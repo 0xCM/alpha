@@ -7,6 +7,9 @@
 module Alpha.Canonical.Common.Format
 (
     module X,
+    Formattable(..), 
+    ToString(..),
+    ToLines(..),
     Formattable2, Formattable3, Formattable4, Formattable5,
     trepeat,
     fence,
@@ -20,19 +23,26 @@ module Alpha.Canonical.Common.Format
     pad, 
     lpad, 
     rpad,
-    suffix,
-    prefix,
+    isSuffix, suffix, suffixIfMissing,
+    isPrefix, prefix, prefixIfMissing,
     text,
     hexstring,
     showBasedInt,
     bitText,
-    bitTextW
+    bitTextW,    
+    isTextEmpty,
+    splat, 
+    leftOfFirst, 
+    rightOfLast,
+    ltrim,
+    zpadL, 
+    padL,
+    textlen,     
+
 
 ) where
-import Alpha.Canonical.Common.Root
+import Alpha.Canonical.Common.Root as X
 import Alpha.Canonical.Common.Asci as X
-import Alpha.Canonical.Common.Synonyms as X
-import Alpha.Canonical.Common.TextUtil as X--(zpadL)
 import Numeric(showIntAtBase)
 
 import qualified Data.Text as Text
@@ -40,12 +50,24 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.MultiSet as Bag
 
+-- | Characterizes a value that can be rendered in human-readable form
+class Formattable a where
+    format ::a -> Text            
 
-                
+-- | Characterizes a value that can be converted to a 'String'
+class ToString a where
+    -- | Convers an 'a' value to a 'String'
+    string::a -> String
+
+-- | Characterizes a value that can be converted to a list of 'Text' values
+class ToLines a where
+    -- | Converts an 'a' value to a list of 'Text' values
+    lines::a -> [Text]    
+
 -- | Converts a showable to text    
 text::String -> Text
 text = Text.pack 
-    
+
 -- | Produces a string by formatting an input value that is enclosed within
 -- a formatted boundary
 fence::(Formattable l, Formattable c, Formattable r) => l -> r -> c -> Text
@@ -123,18 +145,113 @@ bitText n = showBasedInt 2 n |> zpadL width
 bitTextW :: (Integral w, Integral n, Show n) => w -> n -> Text
 bitTextW w n = showBasedInt 2 n |> zpadL w
 
+-- | Determines whether text begins with a specified substring
+isPrefix::Text -> Text -> Bool
+isPrefix = Text.isPrefixOf 
+
+-- | Determines whether text ends with a specified substring
+isSuffix::Text -> Text -> Bool
+isSuffix = Text.isSuffixOf
+
+-- | Determines whether text is empty
+isTextEmpty::Text -> Bool
+isTextEmpty x = x == Text.empty
+
+-- | Conditionally prepends the subject with a prefix
+prefixIfMissing::Text -> Text -> Text
+prefixIfMissing match subject 
+    = case isPrefix match subject of
+        True -> subject
+        False -> match <> subject
+
+-- | Conditionally appends a suffix to the subject
+suffixIfMissing::Text -> Text -> Text
+suffixIfMissing match subject 
+    = case isSuffix match subject of
+        True -> subject
+        False -> match <> subject
+
+-- | Converts an integer to the 'Char' value it reprsents
+char::Int -> Char
+char = chr
+
+-- | Creates a left-padded string    
+padL :: Int -> Text -> Text -> Text
+padL n c s
+    | lt' (textlen s) n  = [padding, s] |> Text.concat
+    | otherwise     = s
+    where 
+        padding = Text.replicate len c    
+        len = sub' n (textlen s)
+        
+-- | Creates a left-zero-padded string    
+zpadL :: (Integral n) => n -> Text -> Text
+zpadL n s = padL (fromIntegral n) "0" s    
+
+replicate::(Integral n) => n -> Text -> Text
+replicate n t =  Text.replicate (fromIntegral n) t
+
+-- | Calculates the length of the supplied text
+textlen::(Integral n) => Text -> n
+textlen t = t |> Text.length |> fromIntegral
+
+-- | Concatenates a list of 'Text' values
+splat::[Text] -> Text
+splat = Text.concat
+
+
+-- | Returns the text that follows the last occurrence of a specified pattern, if any
+rightOfLast::Text -> Text -> Maybe Text
+rightOfLast match subject 
+    = case (Text.splitOn match subject) of
+        [] -> Nothing
+        segments -> segments |> List.last |> Just
+
+-- | Returns the text that precedes the first occurrence of a specified pattern, if any
+leftOfFirst::Text -> Text -> Maybe Text
+leftOfFirst match subject 
+    = case (Text.splitOn match subject) of
+        [] -> Nothing
+        segments -> segments |> List.head |> Just
+
+-- Determines whether a block of text contains a specified substring
+textContains::Text -> Text -> Bool
+textContains match subject = Text.isInfixOf match subject    
+
+
+-- | Removes leading occurrence of match and returns the result; otherwise, 
+-- returns the input value
+ltrim::Text -> Text -> Text
+ltrim match subject = 
+    case Text.stripPrefix match subject of
+        Just x -> x
+        _ -> subject
+
 instance Packable String Text where
     pack = Text.pack
     unpack = Text.unpack
                     
-instance  (Formattable v, Faceted f v) => Formattable (FacetValue f  v) where
-    format (FacetValue v) =  format v
-    
-
+-- *Text formatting
+-------------------------------------------------------------------------------    
 instance Formattable Text where
     format s = s         
+
 instance Formattable Char where
     format = Text.singleton 
+
+-- *Container formatting
+-------------------------------------------------------------------------------    
+instance Formattable a => Formattable [a] where
+    format x = x |> (<$>) format |> Text.concat
+    
+instance Formattable a => Formattable (Seq a) where
+    format s =  toList s |> (<$>) format |> embrace        
+
+instance (Formattable k, Formattable v) => Formattable (Map k v) where
+    format m = format $ format  <$> (Map.toList m)    
+    
+-- *Numeric formatting
+-------------------------------------------------------------------------------    
 instance Formattable Natural where
     format = Text.pack . show
 instance Formattable Int where
@@ -170,13 +287,8 @@ instance Formattable CDouble where
 instance Formattable CFloat where
     format = Text.pack . show
 
-instance (Formattable a) => Formattable [a] where
-    format x = x |> (<$>) format |> Text.concat
-    
-instance Formattable Variance where
-    format (Covariant) = "*"
-    format (Contravariant) = "^"    
-
+-- *Tuple formatting
+-------------------------------------------------------------------------------    
 type Formattable2 a1 a2 = (Formattable a1, Formattable a2)
 type Formattable3 a1 a2 a3 = (Formattable2 a1 a2, Formattable a3)
 type Formattable4 a1 a2 a3 a4 = (Formattable3 a1 a2 a3, Formattable a4)
@@ -198,12 +310,36 @@ instance (Formattable5 a1 a2 a3 a4 a5) => Formattable (Tuple5 a1 a2 a3 a4 a5) wh
     format (a1,a2,a3,a4,a5) 
         = tuplestring [format a1, format a2, format a3, format a4, format a5]    
     
-instance (Formattable k, Formattable v) => Formattable (Map k v) where
-    format m = format $ format  <$> (Map.toList m)    
-        
+-- *Other formatting
+-------------------------------------------------------------------------------            
 instance Formattable TyConInfo where
     format (TyConInfo (_,mod,ctor)) = mod <> fence LParen RParen ctor 
 
 instance Show TyConInfo where
-    show = Text.unpack . format
+    show = Text.unpack . format    
+
+instance  (Formattable v, Faceted f v) => Formattable (FacetValue f  v) where
+    format (FacetValue v) =  format v
+        
+instance Formattable Variance where
+    format (Covariant) = "*"
+    format (Contravariant) = "^"    
+
+-------------------------------------------------------------------------------
+-- * ToString instances
+-------------------------------------------------------------------------------    
+instance ToString String where
+    string = id
     
+instance ToString Text where
+    string x = Text.unpack x    
+
+instance ToString Char where
+    string x = [x]
+    
+instance ToLines Text where    
+    lines = Text.lines
+
+instance ToLines String where    
+    lines = Text.lines . Text.pack    
+        

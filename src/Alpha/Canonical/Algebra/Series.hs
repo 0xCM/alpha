@@ -17,7 +17,6 @@ import Alpha.Canonical.Relations
 import Alpha.Canonical.Algebra.Additive
 import Alpha.Canonical.Algebra.Multiplicative
 
-    
 
 -- | Represents a mathematical series
 newtype SeriesSpec i t = SeriesSpec (O2 t, IxRange i, IxTerm i t) 

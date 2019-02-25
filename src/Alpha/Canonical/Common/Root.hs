@@ -23,10 +23,7 @@ module Alpha.Canonical.Common.Root
     Targeted(..),  
     Connective(..),
     Packable(..),
-    Formattable(..),
     Labeled(..),
-    Cardinality(..),   
-    Cardinal(..),
     Discretion(..),
     Generative(..),
     Nullity(..),
@@ -39,13 +36,16 @@ module Alpha.Canonical.Common.Root
     SymbolicName(..),
     Simplifiable(..),
     JoinableMeet(..),
-    Concatenable(..), 
-    BiConcatenable(..),
-    Appended(..), 
-    Appendable(..),
+    Collapsed(..), 
+    Collapsible(..),
     Space(..),
     Point(..),
     Expansive(..),
+    Evaluation(..),
+    Evaluated(..),
+    Mor(..),
+    Structure(..),
+    StructureN(..),
     floatinfo,
     enumValues,
     typeSymbol,
@@ -65,6 +65,7 @@ module Alpha.Canonical.Common.Root
     intermix,
     segment,
     exclude,
+    valOrDefault
 
 ) where
 import Alpha.Base as X
@@ -88,13 +89,43 @@ import qualified Data.Tree as Tree
 -- | Specifies the type of a point relative to a set/space
 type family Point d
 
---data family Space (a::Constraint) (b::Type)  
+type family Sig (i::Nat) = r | r -> i
+type instance Sig 1 = Type -> Constraint
+type instance Sig 2 = Type -> Type -> Constraint
+type instance Sig 3 = Type -> Type -> Type -> Constraint
 
---newtype DualSpace a b = DualSpace (Space a b)
+type family SigN (i::Nat) (n::Nat) = r | r -> i
+type instance SigN 1 n = Nat -> Type -> Constraint
+type instance SigN 2 n = Nat -> Type -> Type -> Constraint
+type instance SigN 3 n = Nat -> Type -> Type -> Type -> Constraint
+   
+class Structure i (c::Sig i) where
 
--- Classifies a type that has a distinguished value    
--- class Pointed a where
---     point::a -> Point a    
+class StructureN i (c::SigN i n) where
+    
+-- Defines a family of structure-preserving functions (for groups, modules, etc)
+-- See https://en.wikipedia.org/wiki/Morphism
+type family Mor (s::Constraint) a b :: Type
+type instance Mor (Structure n s) a b = a -> b
+
+newtype Evaluation a b = Evaluation (a, b)
+    deriving (Eq,Ord,Generic,Data,Typeable)
+instance Newtype (Evaluation a b)    
+
+class Evaluated a where
+    type Input a
+    type Output a
+
+    input::a -> Input a
+
+    output::a -> Output a
+
+instance Evaluated (Evaluation a b)  where
+    type Input (Evaluation a b) = a
+    type Output (Evaluation a b) = b
+
+    input (Evaluation (a,_)) = a
+    output (Evaluation (_,b)) = b
 
 class Space a where
     type PointSource a
@@ -131,7 +162,6 @@ class (KnownSymbol s) => SymbolicName s a where
     symname::Text
     symname = Text.pack (symbol @s)
 
-
 class Partitionable a where
     type PartitionSegment a
     type PartitionCriteria a
@@ -159,10 +189,6 @@ class Cellular a where
 -- Characterizes a type with wich a description may be associated
 class Descriptor a b where
     describe::a -> b
-
--- | Characterizes a value that can be rendered in human-readable form
-class Formattable a where
-    format ::a -> Text            
 
 -- | Characterizes a pair of types for which transformations are defined 
 -- for respectively "packing"  and "unpacking" type values
@@ -234,32 +260,6 @@ class Computable a where
     -- | Effects the computation
     compute::a -> Computed a
 
--- | Classifies a type to which a cardinality may be assigned    
-class Cardinal a where
-
-    -- | Determines the cardinality of 'a'
-    cardinality::a -> Cardinality
-
-    isFinite::a -> Bool
-    isFinite a = (cardinality a) != Infinite
-
-    isUnbounded::a -> Bool
-    isUnbounded a = (cardinality a) == Infinite
-
-    isEmpty::a -> Bool
-    isEmpty a = (cardinality a) == Zero
-
--- | Specifies the cardinality of a set and partitions the universe
--- of sets under consideration
--- See https://en.wikipedia.org/wiki/Cardinality
-data Cardinality =
-    -- | There are no elements
-    Zero
-   -- | A finite, nonzero number of elements
-   | Finite
-   -- | A countably-infinite number of elements
-   | Infinite
-   deriving (Eq, Ord, Generic, Data, Typeable, Enum)
 
 -- | Specifies whether a type/value is discrete
 data Discretion a =
@@ -277,7 +277,6 @@ class Nullity a where
     -- | Determines whether a given value is the canonical
     -- 'empty' value
     null::a -> Bool
-
 
 -- | Specifies whether a construct is covariant or contravariant    
 data Variance = Contravariant | Covariant
@@ -326,43 +325,19 @@ class Generative a where
 class Complementable a where
     complement::a -> a    
 
-class BiConcatenable a b where
-    type BiConcatenated a b
-
-    biconcat::a -> b -> BiConcatenated a b
-    biconcat = (>++<)
-    {-# INLINE biconcat #-}
-
-    (>++<)::a -> b -> BiConcatenated a b
-    (>++<) x y = biconcat x y
-    {-# INLINE (>++<) #-}
-    infixr 5 >++<
-
-
--- | Characterizes a pair whose terms can be related via an append operation
-class Concatenable a where
-    concat::a -> a -> a
-    concat = (++)
-    {-# INLINE concat #-}
-
-    (++)::a -> a -> a
-    (++) x y = concat x y
-    {-# INLINE (++) #-}
-    infixr 5 ++
 
 -- | Defines a family of type-level functions with the intent
 -- of projecting nested a sequence of elements to a (relatively)
 -- non-nested sequence of elements. An instance need not be
 -- Element-invariant
-type family Appended a
-type instance Appended [[a]] = [a]
-type instance Appended [a] = a
-type instance Appended (Tree a) = [a]
+type family Collapsed a
+type instance Collapsed [[a]] = [a]
+type instance Collapsed [a] = a
+type instance Collapsed (Tree a) = [a]
 
 -- Classifies a type that can be transformed into an 'Appended' value
-class Appendable a where
-    append::a -> Appended a
-
+class Collapsible a where
+    collapse::a -> Collapsed a
     
 -- | Describes floating-point characteristics that are speific to the
 -- executing machine that includes 
@@ -473,7 +448,11 @@ segment width = List.takeWhile (not' . List.null) . fmap (List.take width) . Lis
 exclude::(Eq a) => [a] -> [a] -> [a] 
 exclude exclusions source = source |>  List.filter ( `List.notElem` exclusions) 
 
--- Mappable instances
+valOrDefault::Maybe a -> a -> a
+valOrDefault Nothing def = def
+valOrDefault (Just val) _ = val
+
+-- * Mappable instances
 -------------------------------------------------------------------------------
 instance Mappable (Seq a) a b where
     type Mapped (Seq a) a b = Seq b
@@ -487,10 +466,12 @@ instance Mappable (NonEmpty a) a b where
     type Mapped (NonEmpty a) a b = NonEmpty b
     map = NonEmpty.map    
         
--------------------------------------------------------------------------------        
+instance OrdPair a b => Mappable(BalancedSet a) a b where
+    type Mapped (BalancedSet a) a b = BalancedSet b
+    map f s = Set.map f s
+    
 -- *Weavable instances
 -------------------------------------------------------------------------------    
-
 instance Weave Char Text where
     type Woven Char Text = Text
     weave = Text.intersperse
@@ -504,10 +485,9 @@ instance Weave g (Stream g) where
 instance Weave a (NonEmpty a) where
     weave = NonEmpty.intersperse        
 
--------------------------------------------------------------------------------        
--- *Nullity instances
+-- * Nullity instances
 -------------------------------------------------------------------------------    
-instance (Eq a) => Nullity (Interval a) where
+instance Eq a => Nullity (Interval a) where
     empty = Interval.empty
     null = Interval.null
 
@@ -527,42 +507,18 @@ instance Nullity (Vector a) where
     empty = Vector.empty
     null = Vector.null
 
--------------------------------------------------------------------------------        
--- *Appendable instances
+instance Ord a => Nullity (BalancedSet a) where
+    empty = Set.empty
+    null = Set.null
+    
+-- * Appendable instances
 -------------------------------------------------------------------------------    
-instance Appendable (Tree a) where
-    append = Tree.flatten
+instance Collapsible (Tree a) where
+    collapse = Tree.flatten
 
-instance Appendable [[a]] where
-    append = List.concat    
+instance Collapsible [[a]] where
+    collapse = List.concat    
     
-instance Appendable [Text] where    
-    append = Text.concat        
+instance Collapsible [Text] where    
+    collapse = Text.concat        
 
--------------------------------------------------------------------------------        
--- *Concatenable instances
--------------------------------------------------------------------------------        
-instance Concatenable [a] where
-    concat = (List.++)            
-    
-instance Concatenable Text where
-    concat = Text.append    
-
-instance Concatenable (Seq a) where
-    concat a b = a <> b
-    
--------------------------------------------------------------------------------        
--- *BiConcatenable instances
--------------------------------------------------------------------------------            
-instance BiConcatenable Text Char where
-    type BiConcatenated Text Char = Text
-    biconcat t c  = Text.pack  [c] |> Text.append t 
-    
-instance BiConcatenable Char Text where    
-    type BiConcatenated Char Text = Text
-    biconcat c t  = Text.append (Text.pack [c]) t
-    
-instance BiConcatenable Char Char where    
-    type BiConcatenated Char Char = Text
-    biconcat c1 c2  = Text.pack ([c1] List.++ [c2])
-            

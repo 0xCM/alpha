@@ -10,7 +10,6 @@ module Alpha.Canonical.Common.Container
     tree,
     nonempty,
     bag,
-
 ) where
 
 import Alpha.Canonical.Common.Root
@@ -26,10 +25,10 @@ import qualified Data.Text as Text
 import qualified Data.MultiSet as Bag
 import qualified Data.Sequence as Seq
 
+
 -- | Creates a nonempty list
 nonempty::a -> [a] -> NonEmpty a
 nonempty = (:|)
-
 
 -- Constructs a bag from a list    
 bag::(Ord a) => [a] -> Bag a
@@ -37,15 +36,10 @@ bag = Bag.fromList
         
 tree::(b -> (a, [b])) -> b-> Tree a
 tree = Tree.unfoldTree
-                
-    
+                    
 -- *IsList instances
 -------------------------------------------------------------------------------    
 instance (Ord a) =>  IsList (Bag a) where
     type Item (Bag a) = a
     toList = Bag.toList
     fromList = bag
-
-instance Iterable (Stream a) where
-    iterate = Stream.iterate    
-            

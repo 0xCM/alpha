@@ -16,7 +16,6 @@ module Alpha.Linear.Factors
 where
 import Alpha.Canonical
 import Alpha.Linear.Matrix as X
-import Alpha.Linear.Shapes as X
     
 -- | Represents a lower-triangular matrix
 type LTM n a = SquareMatrix n a

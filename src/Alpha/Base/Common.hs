@@ -1,12 +1,11 @@
-{-# LANGUAGE NoStarIsType #-}
 -----------------------------------------------------------------------------
--- | Base Data.* modules
+-- |
 -- Copyright   :  (c) Chris Moore, 2018
 -- License     :  MIT
 -- Maintainer  :  0xCM00@gmail.com
 -----------------------------------------------------------------------------
+{-# LANGUAGE NoStarIsType #-}
 {-# LANGUAGE MagicHash #-}
-
 module Alpha.Base.Common
 (
     Bits,

@@ -14,27 +14,29 @@ import Alpha.Canonical.Common.Individual
 import Alpha.Canonical.Common.Indexing
 import Alpha.Canonical.Common.Sequential
 import Alpha.Canonical.Common.Setwise
+import Alpha.Canonical.Common.Concat
 
 newtype FiniteList a = FiniteList [a]
     deriving (Eq, Generic, Data, Typeable, 
         Functor, Foldable, Traversable, Applicative, Monad, Semigroup, Apply,
-        Nullity, Existential, Universal, FinitelyCountable, FinitelyConstructible, 
+        Nullity, Existential, Universal, FinitelyCountable,
         HasFirst, HasLast, Endpointed, Show, Groupable, Concatenable,
-        Singleton, Reversible, Listed, Setwise, Paged) 
+        Singleton, Reversible, Listed, Set, Setwise, Paged) 
     deriving (Formattable) via ([a])
 instance Newtype(FiniteList a)
 
-type instance Appended [FiniteList a] = FiniteList a
+type instance Collapsed [FiniteList a] = FiniteList a
 type instance Individual (FiniteList a) = a
 
 -------------------------------------------------------------------------------        
--- *FiniteList member instances
+-- * FiniteList member instances
 -------------------------------------------------------------------------------    
+
 instance (Eq a) => Indexable (FiniteList a) where
     (FiniteList elements) !! i = elements !! i
 
-instance Appendable [FiniteList a] where
-    append lists = unwrap <$> lists |> append |> wrap
+instance Collapsible [FiniteList a] where
+    collapse lists = unwrap <$> lists |> collapse |> wrap
 
 instance IsList (FiniteList a) where
     type Item (FiniteList a) = a

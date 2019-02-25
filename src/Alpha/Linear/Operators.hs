@@ -23,7 +23,7 @@ module Alpha.Linear.Operators
 )
 where
 import Alpha.Canonical
-import Alpha.Linear.Shapes as X
+import Alpha.Linear.Matrix as X
 import qualified Data.List as List
 
 -- | Captures a constructed inversion between two squre matrices
@@ -42,8 +42,7 @@ newtype LinearOperator n k = LinearOperator (SquareMatrix n k)
 -- | Represents the data required to compute the determinant of a matrix
 newtype Det n a = Det (SquareMatrix n a)
     deriving (Eq, Functor, Foldable, Formattable, Show, Traversable, Generic, Data, Typeable)
-    --deriving (Formattable, Show) via (SquareMatrix n a)
-
+    
 -- | Represents the cofactor of square matrix of dimension n + 1
 newtype Cofactor n a = Cofactor (Sign, Det n a)
     deriving (Eq, Functor, Foldable, Traversable, Generic, Data, Typeable) 
@@ -66,7 +65,7 @@ cofactor (i,j) m = Cofactor (sign,minor (i,j) m )  where
 rowswap::forall m n a. (KnownNatPair m n, Eq a) => (Int,Int) -> Matrix m n a -> Matrix m n a
 rowswap (i,j) mat 
     = pick <$> natrange @m 
-        |> append 
+        |> collapse
         |> matrix 
     where 
         src = rowdata mat
@@ -79,20 +78,15 @@ colswap (i,j) mat = mat |> transpose |> rowswap (i,j) |> transpose
 
 -- | Substitutes an identified matrix row with another
 rowsub::forall m n a. (KnownNatPair m n, Eq a) => Int -> RowMatrix n a -> Matrix m n a -> Matrix m n a
-rowsub i r src = pick <$> natrange @m |> append |> matrix where
+rowsub i r src = pick <$> natrange @m |> collapse |> matrix where
     rows = rowdata src        
     pick k = ifelse (k == i) (individuals r) (rows !! k) 
 
 -- | Substitutes an identified matrix column with another
 colsub::forall m n a. (KnownNatPair m n, Eq a) => Int -> ColMatrix n a -> Matrix m n a -> Matrix m n a
-colsub i c src = pick <$> natrange @m |> append |> matrix where
+colsub i c src = pick <$> natrange @m |> collapse |> matrix where
     cols = coldata src        
     pick k = ifelse (k == i) (individuals c) (cols !! k) 
 
--- rowscale::forall m n a. (KnownNatPair m n, Semiring a) => Int -> a -> Matrix m n a -> Matrix m n a
--- rowscale i s m = undefined where
---     scaled = (row i m)
 
-instance forall m n p a. (KnownNatTriple m n p, Semiring a) => Bimultiplicative  (Matrix m n a) (Matrix n p a) where
-    a >*< b = (\(r,c) -> r >*< c) <$> [(r,c) | r <- rows a, c <- cols b] |> matrix
 

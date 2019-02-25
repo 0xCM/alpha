@@ -15,7 +15,6 @@ module Alpha.Canonical.Structures.Ring
 
 ) where
 import Alpha.Canonical.Algebra as X
-import Alpha.Canonical.Structures.Structure as X
 import Alpha.Canonical.Structures.Group as X
 
 import qualified Data.List as List

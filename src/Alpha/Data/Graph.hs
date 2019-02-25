@@ -148,7 +148,7 @@ instance Queryable (Edge s a) where
         
 instance (Formattable s, Formattable a) => Formattable (Graph s a) where
     format (Graph edges) 
-        = format <$> edges |> List.intersperse EOL |> append
+        = format <$> edges |> List.intersperse EOL |> collapse
         
 instance (Formattable s, Formattable a) => Show (Graph s a) where
     show = string . format

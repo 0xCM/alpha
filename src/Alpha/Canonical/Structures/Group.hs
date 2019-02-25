@@ -16,7 +16,6 @@ module Alpha.Canonical.Structures.Group
     
 ) where
 import Alpha.Canonical.Structures.Common as X
-import Alpha.Canonical.Structures.Structure as X
 import Alpha.Canonical.Structures.Magma as X
 import Alpha.Canonical.Structures.Semiring as X
 
@@ -34,8 +33,8 @@ class (Semigroup a, Unital a, Multiplicative a, Invertible a) => Group a where
 class (KnownNat n, Group a, FinitelyCountable a) => FiniteGroup n a where
 
 -- | An additive group, always commutative
-class (AdditiveMonoid a, Negatable a) => AbelianGroup a where  
-    
+class (AdditiveMonoid a, Negatable a, Subtractive a) => AbelianGroup a where  
+        
 -- | A group with a basis
 -- See https://en.wikipedia.org/wiki/Free_abelian_group
 class AbelianGroup a => FreeAbelianGroup a where
@@ -43,6 +42,7 @@ class AbelianGroup a => FreeAbelianGroup a where
 
 class (AbelianGroup a, FinitelyCountable a) => FiniteAbelianGroup a where
     
+
 instance Integral a => Semigroup (Ratio a)  where
     (<>) = (*)
     {-# INLINE (<>) #-}
@@ -77,7 +77,7 @@ instance AbelianGroup Float where
 instance AbelianGroup Double where 
 instance AbelianGroup CFloat where 
 instance AbelianGroup CDouble where                                 
-instance (Eq a, Negatable a, Additive a,Nullary a) => AbelianGroup (ComplexNumber a)
+instance (Eq a, Negatable a, Subtractive a, Additive a, Nullary a) => AbelianGroup (ComplexNumber a)
 
 
 type AG2 a1 a2 = (AbelianGroup a1, AbelianGroup a2)

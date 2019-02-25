@@ -19,7 +19,7 @@ module Alpha.System.FilePath
 
 where
 import Alpha.Canonical.Common.Asci
-import Alpha.Canonical.Common.TextUtil(rightOfLast)
+import Alpha.Canonical.Common.Format(rightOfLast)
 import Alpha.Canonical.Relations
 import qualified Data.Text as Text
 
