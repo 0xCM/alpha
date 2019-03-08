@@ -12,7 +12,6 @@ module Alpha.Canonical.Structures.Group
     Group(..),
     AbelianGroup(..),
     FiniteAbelianGroup(..),
-    Punctured(..),
     
 ) where
 import Alpha.Canonical.Structures.Common as X
@@ -42,17 +41,12 @@ class AbelianGroup a => FreeAbelianGroup a where
 
 class (AbelianGroup a, FinitelyCountable a) => FiniteAbelianGroup a where
     
-
 instance Integral a => Semigroup (Ratio a)  where
     (<>) = (*)
     {-# INLINE (<>) #-}
 
 instance Semigroup Float  where
     (<>) = (*)
-    {-# INLINE (<>) #-}
-
-instance Semigroup NonzeroDouble where
-    a <> b =  wrap ( (unwrap a) * (unwrap b))
     {-# INLINE (<>) #-}
         
 -- | Note: for this to really be a group, the 0 element must be deleted

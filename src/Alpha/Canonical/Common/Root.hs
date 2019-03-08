@@ -46,6 +46,9 @@ module Alpha.Canonical.Common.Root
     Mor(..),
     Structure(..),
     StructureN(..),
+    Undefined(..),
+    Successive(..),
+    Antecedent(..),
     floatinfo,
     enumValues,
     typeSymbol,
@@ -111,6 +114,9 @@ type instance Mor (Structure n s) a b = a -> b
 newtype Evaluation a b = Evaluation (a, b)
     deriving (Eq,Ord,Generic,Data,Typeable)
 instance Newtype (Evaluation a b)    
+
+-- | Represents a canonical undefined 'value' for a given type
+data Undefined a = Undefined
 
 class Evaluated a where
     type Input a
@@ -354,6 +360,16 @@ class Expansive a where
     type Expanded a
 
     expand::a -> [Expanded a]
+
+-- / Characterizes a type with which a strictly monotonic finite sequence 
+-- of ascending values is associated
+class Successive a where
+    next::a -> Maybe a
+
+-- / Characterizes a type with which a strictly monotonic finite sequence 
+-- of descending values is associated
+class Antecedent a where    
+    prior::a -> Maybe a
 
 -- | The forward pipe operator
 (|>) :: a -> (a -> b) -> b

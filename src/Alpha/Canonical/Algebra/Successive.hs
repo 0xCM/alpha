@@ -55,18 +55,9 @@ class Decrementable a where
 class (Incrementable a, Decrementable a) => Alternating a where
 instance (Incrementable a, Decrementable a) => Alternating a 
 
--- / Characterizes a type with which a strictly monotonic finite sequence 
--- of ascending values is associated
-class Successive a where
-    next::a -> Maybe a
-
--- / Characterizes a type with which a strictly monotonic finite sequence 
--- of descending values is associated
-class Antecedent a where    
-    prior::a -> Maybe a
 
 
--- Decrement class intsances
+-- * Decrement class intsances
 -------------------------------------------------------------------------------
 instance Decrementable Int
 instance Decrementable Int8
@@ -87,7 +78,7 @@ instance Decrementable CFloat
 instance Decrementable CDouble
         
 
--- Incrementable class intsances
+-- * Incrementable class intsances
 -------------------------------------------------------------------------------
 instance Incrementable Int
 instance Incrementable Int8

@@ -26,7 +26,6 @@ import Alpha.Canonical.Common.Transcendental as X
 import Alpha.Canonical.Common.Tuples as X
 import Alpha.Canonical.Common.Vector as X
 import Alpha.Canonical.Common.Partnership as X
-import Alpha.Canonical.Common.Punctured as X
 import Alpha.Canonical.Common.Sequential as X
 import Alpha.Canonical.Common.Setwise as X
 import Alpha.Canonical.Common.Stream as X
@@ -35,7 +34,6 @@ import Alpha.Canonical.Common.Tuples as X
 import Alpha.Canonical.Common.Row as X
 import Alpha.Canonical.Common.Sequence as X
 import Alpha.Canonical.Common.Table as X
-import Alpha.Canonical.Common.Morphisms as X
 
 
 
